@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { clsx } from 'clsx';
 import { AlertTriangle, Info } from 'lucide-react';
 
-const FeatureMindMap = ({ tables = [], metricGroups = [], predictionModels = [], advancedAnalytics = [], selectedColumns = new Set(), onToggleSelection, onToggleGroup, title = "Prediction Model", scale = 1, pan = { x: 0, y: 0 } }) => {
+const FeatureMindMap = ({ tables = [], metricGroups = [], predictionModels = [], advancedAnalytics = [], selectedColumns = new Set(), onToggleSelection, onToggleGroup, title = "Prediction Model", scale = 1, pan = { x: 0, y: 0 }, showCosts = false }) => {
     // Stats
     // Stats
     const stats = useMemo(() => {
@@ -420,6 +420,13 @@ const FeatureMindMap = ({ tables = [], metricGroups = [], predictionModels = [],
                                 )}>
                                     {node.label}
                                 </span>
+
+                                {/* Cost Preview Badge (If ShowCosts is ON) */}
+                                {showCosts && (
+                                    <div className="ml-3 px-1.5 py-0.5 rounded-md bg-[#131314]/80 border border-[#333537] text-[10px] text-[#A8C7FA] opacity-0 group-hover:opacity-100 transition-opacity">
+                                        $0.05
+                                    </div>
+                                )}
 
                                 {/* Mini Warning/Error Icon (Optional, inline) */}
                                 {isError && <AlertTriangle size={12} className="text-red-500 ml-2" />}

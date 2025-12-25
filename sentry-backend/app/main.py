@@ -35,4 +35,7 @@ app.include_router(websocket.router)
 app.include_router(chat.router, prefix="/api/v1/chat", tags=["chat"])
 app.include_router(agent.router, prefix="/api/v1/agent", tags=["agent"])
 
+from app.api.endpoints import lakehouse
+app.include_router(lakehouse.router, prefix="/api/v1/lakehouse", tags=["lakehouse"])
+
 

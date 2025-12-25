@@ -21,3 +21,4 @@ pandas==2.2.1
 numpy==1.26.4
 openai==1.12.0
 anthropic==0.18.1
+meltano==3.3.0
