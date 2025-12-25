@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Network, AlertTriangle, Play, ZoomIn, ZoomOut } from 'lucide-react';
+import { Play, ZoomIn, ZoomOut } from 'lucide-react';
+import FeatureMindMap from './FeatureMindMap';
 import { clsx } from 'clsx';
 
 const MarketingWorkspace = ({ data, viewState, onAction }) => {
@@ -11,15 +12,69 @@ const MarketingWorkspace = ({ data, viewState, onAction }) => {
 
     // Data from props
     const tables = data?.tables || [];
+    const metricGroups = data?.metricGroups || [];
+    const predictionModels = data?.predictionModels || [];
+    const advancedAnalytics = data?.advancedAnalytics || [];
     const connections = data?.connections || [];
-    const selectedColumns = new Set(data?.selected_columns || []);
+    // Local Selection State
+    const [selectedItems, setSelectedItems] = useState(new Set());
 
-    const toggleSelection = (colId) => {
-        onAction('select_column', { col_id: colId });
+    // Auto-select items without errors on initial load/data change
+    useEffect(() => {
+        const initialSelection = new Set();
+
+        // Helper to process items
+        const processItems = (items) => {
+            items.forEach(item => {
+                if (item.status !== 'error') initialSelection.add(item.id);
+            });
+        };
+
+        // Process all groups
+        tables.forEach(t => processItems(t.columns));
+        metricGroups.forEach(g => processItems(g.metrics));
+        predictionModels.forEach(m => processItems(m.predictions));
+        advancedAnalytics.forEach(g => getAnalyticsItems(g).forEach(item => {
+            if (item.status !== 'error') initialSelection.add(item.id);
+        }));
+
+        setSelectedItems(initialSelection);
+    }, [tables, metricGroups, predictionModels, advancedAnalytics]);
+
+    // Helper for analytics structure consistency
+    const getAnalyticsItems = (g) => g.items || [];
+
+    const toggleSelection = (id) => {
+        const newSet = new Set(selectedItems);
+        if (newSet.has(id)) {
+            newSet.delete(id);
+        } else {
+            newSet.add(id);
+        }
+        setSelectedItems(newSet);
+        onAction('select_item', { id }); // Notify parent just in case
     };
 
-    const handleTrain = () => {
-        onAction('train_model', {});
+    const toggleGroup = (ids) => {
+        const newSet = new Set(selectedItems);
+        // Filter out errors just to be safe (though filtered by caller too)
+        // Check if all provided items are currently selected
+        const allSelected = ids.every(id => newSet.has(id));
+
+        if (allSelected) {
+            // Deselect all
+            ids.forEach(id => newSet.delete(id));
+        } else {
+            // Select all
+            ids.forEach(id => newSet.add(id));
+        }
+        setSelectedItems(newSet);
+    };
+
+    const handleNextStep = () => {
+        // Logic for next step
+        console.log("Proceeding with items:", Array.from(selectedItems));
+        onAction('next_step', { selectedIds: Array.from(selectedItems) });
     };
 
     const handleMouseDown = (e) => {
@@ -39,6 +94,15 @@ const MarketingWorkspace = ({ data, viewState, onAction }) => {
     };
 
     const handleMouseUp = () => setIsDragging(false);
+
+    const handleWheel = (e) => {
+        if (e.ctrlKey || e.metaKey || true) { // Always allow wheel zoom in this view for better UX
+            // e.preventDefault(); // React synthetic events might complain, usually good to avoid if passive. 
+            // Better to just handle the logic. 
+            const delta = -e.deltaY * 0.001;
+            setScale(s => Math.min(4, Math.max(0.2, s + delta)));
+        }
+    };
 
     // Results View
     if (viewState === 'results') {
@@ -87,36 +151,25 @@ const MarketingWorkspace = ({ data, viewState, onAction }) => {
     // Engineering View (Mesh)
     return (
         <div className="h-full w-full flex flex-col relative overflow-hidden bg-[#131314]">
-            {/* Toolbar */}
-            <div className="absolute top-4 left-4 right-4 z-20 flex justify-between items-start pointer-events-none">
-                <div className="pointer-events-auto bg-[#1E1F20]/90 backdrop-blur border border-[#444746] p-4 rounded-xl shadow-xl max-w-sm">
-                    <h2 className="text-lg font-semibold text-[#E3E3E3] flex items-center gap-2 mb-1">
-                        <Network size={18} className="text-[#A8C7FA]" /> Feature Engineering
-                    </h2>
-                    <p className="text-xs text-[#C4C7C5] mb-3">
-                        Select features to include. <span className="text-yellow-400">Yellow</span> items need attention.
-                    </p>
+            {/* Controls (Top Right) - Restored */}
+            <div className="absolute top-4 right-4 z-20 flex flex-col gap-2 pointer-events-none">
+                <div className="pointer-events-auto flex gap-2 bg-[#1E1F20]/90 border border-[#444746] p-1.5 rounded-lg shadow-lg">
+                    <button onClick={() => setScale(s => Math.min(4, s + 0.1))} className="p-2 hover:bg-[#333537] rounded-md text-[#C4C7C5]"><ZoomIn size={18} /></button>
+                    <button onClick={() => setScale(s => Math.max(0.2, s - 0.1))} className="p-2 hover:bg-[#333537] rounded-md text-[#C4C7C5]"><ZoomOut size={18} /></button>
                 </div>
 
-                <div className="pointer-events-auto flex flex-col gap-2">
-                    <div className="flex gap-2 bg-[#1E1F20]/90 border border-[#444746] p-1.5 rounded-lg shadow-lg">
-                        <button onClick={() => setScale(s => Math.min(2, s + 0.1))} className="p-2 hover:bg-[#333537] rounded-md text-[#C4C7C5]"><ZoomIn size={18} /></button>
-                        <button onClick={() => setScale(s => Math.max(0.5, s - 0.1))} className="p-2 hover:bg-[#333537] rounded-md text-[#C4C7C5]"><ZoomOut size={18} /></button>
-                    </div>
-
-                    {selectedColumns.size > 0 && (
-                        <button
-                            onClick={handleTrain}
-                            className="bg-[#A8C7FA] text-[#0B1D3F] px-4 py-3 rounded-xl font-medium shadow-lg hover:bg-[#8AB4F8] transition-all flex items-center gap-2 animate-in slide-in-from-right-10"
-                        >
-                            <Play size={18} fill="currentColor" />
-                            Train Model ({selectedColumns.size})
-                        </button>
-                    )}
-                </div>
+                {selectedItems.size > 0 && (
+                    <button
+                        onClick={handleNextStep}
+                        className="pointer-events-auto bg-green-500 text-white px-5 py-3 rounded-xl font-bold shadow-lg hover:bg-green-400 transition-all flex items-center gap-2 animate-in slide-in-from-right-10"
+                    >
+                        <Play size={18} fill="currentColor" />
+                        Next Step ({selectedItems.size})
+                    </button>
+                )}
             </div>
 
-            {/* Interactive Mesh */}
+            {/* Feature Mind Map Visualization */}
             <div
                 className="flex-1 w-full h-full cursor-grab active:cursor-grabbing"
                 onMouseDown={handleMouseDown}
@@ -124,77 +177,20 @@ const MarketingWorkspace = ({ data, viewState, onAction }) => {
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseUp}
                 onContextMenu={(e) => e.preventDefault()}
+                onWheel={handleWheel}
             >
-                <svg className="w-full h-full">
-                    <g transform={`translate(${pan.x}, ${pan.y}) scale(${scale})`}>
-                        {/* Connections */}
-                        {connections.map((conn, i) => {
-                            const t1 = tables.find(t => t.id === conn.from_table); // Adjusted to backend model keys
-                            const t2 = tables.find(t => t.id === conn.to_table);
-                            if (!t1 || !t2) return null;
-
-                            // Simple center-to-center lines for demo
-                            const x1 = t1.x + 100;
-                            const y1 = t1.y + 100;
-                            const x2 = t2.x + 100;
-                            const y2 = t2.y + 100;
-
-                            return (
-                                <path
-                                    key={i}
-                                    d={`M ${x1} ${y1} C ${x1} ${(y1 + y2) / 2}, ${x2} ${(y1 + y2) / 2}, ${x2} ${y2}`}
-                                    stroke="#444746"
-                                    strokeWidth="2"
-                                    fill="none"
-                                />
-                            );
-                        })}
-
-                        {/* Tables */}
-                        {tables.map(table => (
-                            <foreignObject key={table.id} x={table.x} y={table.y} width="220" height="300">
-                                <div className="bg-[#1E1F20] border border-[#444746] rounded-xl shadow-2xl overflow-hidden text-sm select-none">
-                                    <div className="bg-[#333537] px-3 py-2 border-b border-[#444746] font-medium text-[#E3E3E3] flex justify-between items-center">
-                                        {table.title}
-                                        <div className="text-[10px] text-[#C4C7C5] bg-[#131314] px-1.5 py-0.5 rounded">TABLE</div>
-                                    </div>
-                                    <div className="p-1">
-                                        {table.columns.map(col => {
-                                            const isSelected = selectedColumns.has(col.id); // Backend just sends col IDs for simplicity
-                                            return (
-                                                <div
-                                                    key={col.id}
-                                                    onClick={() => toggleSelection(col.id)}
-                                                    className={clsx(
-                                                        "px-2 py-2 rounded-lg cursor-pointer flex items-center justify-between transition-colors border",
-                                                        isSelected ? "bg-[#A8C7FA]/10 border-[#A8C7FA]/50" : "border-transparent hover:bg-[#333537]"
-                                                    )}
-                                                >
-                                                    <div className="flex items-center gap-2 overflow-hidden">
-                                                        <div className={clsx(
-                                                            "w-1.5 h-1.5 rounded-full shrink-0",
-                                                            col.status === 'ok' ? "bg-green-500" :
-                                                                col.status === 'warning' ? "bg-yellow-400" : "bg-red-500"
-                                                        )} />
-                                                        <span className={clsx("truncate text-[#E3E3E3]", isSelected && "font-medium")}>
-                                                            {col.name}
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-[10px] text-[#80868B] font-mono">{col.type}</span>
-                                                        {col.status !== 'ok' && (
-                                                            <AlertTriangle size={12} className={col.status === 'warning' ? "text-yellow-400" : "text-red-500"} />
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            </foreignObject>
-                        ))}
-                    </g>
-                </svg>
+                <FeatureMindMap
+                    tables={tables}
+                    metricGroups={metricGroups}
+                    predictionModels={predictionModels}
+                    advancedAnalytics={advancedAnalytics}
+                    selectedColumns={selectedItems}
+                    onToggleSelection={toggleSelection}
+                    onToggleGroup={toggleGroup}
+                    title="Campaign ROI Prediction"
+                    scale={scale}
+                    pan={pan}
+                />
             </div>
             {/* Grid Background */}
             <div className="absolute inset-0 z-[-1] opacity-20 pointer-events-none"

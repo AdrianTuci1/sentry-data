@@ -5,6 +5,7 @@ import MarketingWorkspace from '../components/visuals/MarketingWorkspace';
 import LLMTrainingWorkspace from '../components/visuals/LLMTrainingWorkspace';
 import ImageClassificationWorkspace from '../components/visuals/ImageClassificationWorkspace';
 import { AgentService } from '../api/agent';
+import DevTools from '../components/dev/DevTools';
 
 const ChatSession = () => {
     const [messages, setMessages] = useState([
@@ -34,6 +35,26 @@ const ChatSession = () => {
             setMessages(prev => [...prev, { id: Date.now(), role: 'user', content: userInput }]);
         }
 
+        // MOCK INTERCEPTION FOR DEMO
+        if (action === 'next_step') {
+            setTimeout(() => {
+                setMessages(prev => [...prev, { id: Date.now() + 1, role: 'assistant', content: "Great choices! I've trained a model based on your selection. Here are the results." }]);
+                setActiveWorkspace('marketing_results');
+                // Mock Results Data
+                setWorkspaceData({
+                    metrics: { precision: 0.87, recall: 0.92, roi: '3.5' },
+                    features: [
+                        { name: 'User Age', val: 0.85 },
+                        { name: 'Last Purchase', val: 0.65 },
+                        { name: 'Email Open Rate', val: 0.45 },
+                        { name: 'Churn Prob.', val: 0.95 }
+                    ]
+                });
+                setLoading(false);
+            }, 1000);
+            return;
+        }
+
         try {
             const data = await AgentService.interact(
                 sessionId.current,
@@ -55,9 +76,23 @@ const ChatSession = () => {
 
         } catch (error) {
             console.error("Agent Error:", error);
-            setMessages(prev => [...prev, { id: Date.now() + 1, role: 'assistant', content: "Error connecting to Agent server." }]);
+            // Fallback for demo if agent is offline but we want to show UI
+            if (action === 'train_model' || action === 'next_step') {
+                setMessages(prev => [...prev, { id: Date.now() + 1, role: 'assistant', content: "Demo Mode: Processed selection." }]);
+                setActiveWorkspace('marketing_results');
+                setWorkspaceData({
+                    metrics: { precision: 0.87, recall: 0.92, roi: '3.5' },
+                    features: [
+                        { name: 'User Age', val: 0.85 },
+                        { name: 'Last Purchase', val: 0.65 },
+                        { name: 'Email Open Rate', val: 0.45 }
+                    ]
+                });
+            } else {
+                setMessages(prev => [...prev, { id: Date.now() + 1, role: 'assistant', content: "Error connecting to Agent server. (Demo Mode available for main flows)" }]);
+            }
         } finally {
-            setLoading(false);
+            if (action !== 'next_step') setLoading(false); // handled inside timeout for mock
         }
     };
 
@@ -180,6 +215,11 @@ const ChatSession = () => {
                     </div>
                 )}
             </div>
+            {/* Dev Tools Overlay */}
+            <DevTools
+                onSetWorkspace={setActiveWorkspace}
+                onSetData={setWorkspaceData}
+            />
         </div>
     );
 };
