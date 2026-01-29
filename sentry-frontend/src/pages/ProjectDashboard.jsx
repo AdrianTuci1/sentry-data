@@ -109,6 +109,61 @@ const ProjectDashboard = () => {
                     ]
                 }
             ],
+            dashboardGroups: [
+                { id: 'dg1', title: 'Executive Views', sources: ['m1', 'm2', 'p1'] },
+                { id: 'dg2', title: 'Operational Views', sources: ['m2', 'p4', 'c8'] },
+                { id: 'dg3', title: 'Product & UX', sources: ['c7', 'a1', 'c402'] },
+                { id: 'dg4', title: 'Marketing Performance', sources: ['c5', 'c201', 'c202'] },
+                { id: 'dg5', title: 'AI & Predictions', sources: ['p1', 'p2', 'p5', 'a1'] },
+                { id: 'dg6', title: 'Security & Risk', sources: ['p5', 'c403'] },
+                { id: 'dg7', title: 'Sales & Revenue', sources: ['m2', 'c402', 'c401'] }
+            ],
+            dashboards: [
+                {
+                    id: 'd1', title: 'Dashboards',
+                    items: [
+                        { id: 'db1', name: 'Executive Overview', status: 'ok', groupId: 'dg1' },
+                        { id: 'db2', name: 'Sales Performance', status: 'ok', groupId: 'dg2' },
+                        { id: 'db3', name: 'Churn Analysis', status: 'warning', issue: 'Data staleness detected', groupId: 'dg2' },
+
+                        // New Additions
+                        { id: 'db4', name: 'Product Strategy', status: 'ok', groupId: 'dg3' },
+                        { id: 'db5', name: 'User Experience (UX)', status: 'ok', groupId: 'dg3' },
+                        { id: 'db6', name: 'Ad Campaign Tracker', status: 'error', issue: 'Connection lost', groupId: 'dg4' },
+                        { id: 'db7', name: 'Conversion Optimization', status: 'ok', groupId: 'dg4' },
+
+                        { id: 'db8', name: 'Financial Overview', status: 'ok', groupId: 'dg1' },
+                        { id: 'db9', name: 'Regional Sales', status: 'ok', groupId: 'dg2' },
+                        { id: 'db10', name: 'Inventory Health', status: 'warning', groupId: 'dg2' },
+                        { id: 'db11', name: 'Real-time Traffic', status: 'ok', groupId: 'dg3' },
+
+                        // More Charts
+                        { id: 'db12', name: 'Retention Curve', status: 'ok', groupId: 'dg3' },
+                        { id: 'db13', name: 'Customer Satisfaction', status: 'ok', groupId: 'dg3' },
+                        { id: 'db14', name: 'Ad Spend (Daily)', status: 'ok', groupId: 'dg4' },
+                        { id: 'db15', name: 'Server Latency', status: 'error', issue: 'Spike detected', groupId: 'dg2' },
+
+                        // New AI & Prediction Charts
+                        { id: 'db16', name: 'Churn Risk Factors', status: 'warning', groupId: 'dg5' },
+                        { id: 'db17', name: 'Lookalike Audiences', status: 'ok', groupId: 'dg5' },
+                        { id: 'db18', name: 'Campaign Anomalies', status: 'ok', groupId: 'dg5' },
+
+                        { id: 'db19', name: 'Social Sentiment', status: 'ok', groupId: 'dg3' },
+
+                        // Complete BI Expansion
+                        { id: 'db20', name: 'Fraud Detection Log', status: 'ok', groupId: 'dg6' },
+                        { id: 'db21', name: 'Transaction Risk', status: 'ok', groupId: 'dg6' },
+                        { id: 'db22', name: 'Refunds & Disputes', status: 'warning', groupId: 'dg6' },
+
+                        { id: 'db23', name: 'MRR Growth Tracker', status: 'ok', groupId: 'dg7' },
+                        { id: 'db24', name: 'Avg. Order Value (AOV)', status: 'ok', groupId: 'dg7' },
+                        { id: 'db25', name: 'Top Selling Products', status: 'ok', groupId: 'dg7' },
+
+                        { id: 'db26', name: 'Quarterly Goals', status: 'ok', groupId: 'dg1' },
+                        { id: 'db27', name: 'Channel Attribution', status: 'ok', groupId: 'dg4' }
+                    ]
+                }
+            ],
             metrics: { roi: '150%', spend: '$50k' }
         });
 

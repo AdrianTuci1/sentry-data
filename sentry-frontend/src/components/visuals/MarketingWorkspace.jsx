@@ -84,6 +84,8 @@ const MarketingWorkspace = ({ data, viewState = 'engineering', onAction }) => {
     const metricGroups = data?.metricGroups || [];
     const predictionModels = data?.predictionModels || [];
     const advancedAnalytics = data?.advancedAnalytics || [];
+    const dashboards = data?.dashboards || [];
+    const dashboardGroups = data?.dashboardGroups || [];
 
     // Local Selection State (for MindMap)
     const [selectedItems, setSelectedItems] = useState(new Set());
@@ -100,9 +102,12 @@ const MarketingWorkspace = ({ data, viewState = 'engineering', onAction }) => {
         advancedAnalytics.forEach(g => (g.items || []).forEach(item => {
             if (item.status !== 'error') initialSelection.add(item.id);
         }));
+        dashboards.forEach(g => (g.items || []).forEach(item => {
+            if (item.status !== 'error') initialSelection.add(item.id);
+        }));
 
         setSelectedItems(initialSelection);
-    }, [tables, metricGroups, predictionModels, advancedAnalytics]);
+    }, [tables, metricGroups, predictionModels, advancedAnalytics, dashboards]);
 
     // Handlers
     const toggleSelection = (id) => {
@@ -275,6 +280,8 @@ const MarketingWorkspace = ({ data, viewState = 'engineering', onAction }) => {
                         metricGroups={metricGroups}
                         predictionModels={predictionModels}
                         advancedAnalytics={advancedAnalytics}
+                        dashboards={dashboards}
+                        dashboardGroups={dashboardGroups}
                         selectedColumns={selectedItems}
                         onToggleSelection={toggleSelection}
                         onToggleGroup={toggleGroup}

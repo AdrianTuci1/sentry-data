@@ -69,6 +69,8 @@ The project follows a Clean Architecture / Monorepo-style structure:
   - `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`: For S3/DynamoDB access.
   - `MODAL_WEBHOOK_BASE_URL`: Base URL for Modal.com function triggers.
   - `E2B_API_KEY`: For Sandbox instantiation.
+  - `MODAL_TOKEN_ID`: Authentication for Modal.
+  - `MODAL_TOKEN_SECRET`: Secret key for Modal.
   - `API_BASE_URL`: Public URL of this backend (for callback webhooks).
 
 - **Express**: Web server framework.
