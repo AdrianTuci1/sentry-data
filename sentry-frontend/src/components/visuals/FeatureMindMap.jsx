@@ -1,11 +1,37 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
+import { observer } from 'mobx-react-lite';
+import { useStore } from '../../store/StoreProvider';
 import { clsx } from 'clsx';
-import { AlertTriangle, Info, LayoutDashboard, FolderKanban } from 'lucide-react';
+import { AlertTriangle, Info, LayoutDashboard, FolderKanban, Globe, Activity, Box, Database } from 'lucide-react';
 import { useMindMapLayout } from './useMindMapLayout';
 
-const FeatureMindMap = ({ tables = [], metricGroups = [], predictionModels = [], advancedAnalytics = [], dashboards = [], dashboardGroups = [], selectedColumns = new Set(), onToggleSelection, onToggleGroup, title = "Prediction Model", scale = 1, pan = { x: 0, y: 0 }, showCosts = false }) => {
+const FeatureMindMap = observer(({ onNodeClick, showCosts = false }) => {
+    const { workspaceStore } = useStore();
+    const { ui, data } = workspaceStore;
+
+    // Destructure from sub-stores
+    const { scale, pan, selectedItems: selectedColumns } = ui;
+    const {
+        tables,
+        metricGroups,
+        predictionModels,
+        advancedAnalytics,
+        dashboards,
+        dashboardGroups
+    } = data;
+
     // Layout Logic moved to hook
-    const { stats, layout } = useMindMapLayout({ tables, metricGroups, predictionModels, advancedAnalytics, dashboards, dashboardGroups, title });
+    const { layout } = useMindMapLayout({
+        tables,
+        metricGroups,
+        predictionModels,
+        advancedAnalytics,
+        dashboards,
+        dashboardGroups
+    });
+
+    const onToggleSelection = (id) => ui.toggleSelection(id);
+    const onToggleGroup = (ids) => ui.toggleGroup(ids);
 
     // --- Trace Logic ---
     const [hoveredNodeId, setHoveredNodeId] = useState(null);
@@ -25,49 +51,28 @@ const FeatureMindMap = ({ tables = [], metricGroups = [], predictionModels = [],
             layout.edges.forEach(edge => {
                 if (edge.targetId === currentId) {
                     visitedEdges.add(edge.id);
-                    visitedEdges.add(edge.id);
                     if (edge.sourceId && !visitedNodes.has(edge.sourceId)) {
                         visitedNodes.add(edge.sourceId);
 
                         // Check source node type to stop recursion at Metrics/Features (Layer 2)
-                        // We need access to nodes to check type.
                         const sourceNode = layout.nodes.find(n => n.id === edge.sourceId);
                         if (sourceNode && sourceNode.type !== 'idea') {
                             queue.push(edge.sourceId);
-                        } else {
-                            // It is a leaf (idea), trace stops here.
                         }
                     }
                 }
             });
         }
         return { nodes: visitedNodes, edges: visitedEdges };
-    }, [hoveredNodeId, layout.edges]);
+    }, [hoveredNodeId, layout.edges, layout.nodes]);
 
     return (
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            {/* HUD / Toolbar */}
-            <div className="absolute top-4 left-4 z-20 pointer-events-auto bg-[#1E1F20]/90 backdrop-blur border border-[#444746] p-3 rounded-xl shadow-xl flex gap-4 items-center animate-in slide-in-from-top-4">
-                <div className="font-semibold text-[#E3E3E3] text-sm pr-2 border-r border-[#444746]">{title}</div>
-
-                <div className="flex gap-3">
-                    <div className="flex items-center gap-1.5 text-xs font-mono text-[#C4C7C5]">
-                        <AlertTriangle size={14} className="text-red-500" />
-                        <span className="text-red-400 font-bold">{stats.errors}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs font-mono text-[#C4C7C5]">
-                        <AlertTriangle size={14} className="text-yellow-500" />
-                        <span className="text-yellow-400 font-bold">{stats.warnings}</span>
-                    </div>
-                </div>
-            </div>
-
             {/* Transformed Content */}
             <div
                 className="w-full h-full relative flex items-center justify-center transition-transform duration-75 ease-out will-change-transform"
                 style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})` }}
             >
-                {/* We translate the entire container to center the (0,0) coordinate visually */}
                 <div className="relative w-0 h-0">
 
                     {/* 1. Connections Layer (SVG) */}
@@ -96,22 +101,45 @@ const FeatureMindMap = ({ tables = [], metricGroups = [], predictionModels = [],
 
                     {/* 2. Nodes Layer (HTML) */}
                     {layout.nodes.map(node => {
-                        // SHARED STYLES
                         const isTraceNode = activeTrace ? activeTrace.nodes.has(node.id) : false;
                         const isDimmedNode = activeTrace && !isTraceNode;
                         const baseOpacity = isDimmedNode ? "opacity-20 blur-[1px]" : "opacity-100";
                         const baseTransition = "transition-all duration-300";
 
-                        // THEME NODE (Left)
-                        if (node.type === 'theme') {
+                        // SOURCE NODE (Leftmost - Layer 0)
+                        if (node.type === 'source') {
+                            const Icon = node.iconType === 'db' ? Database :
+                                node.iconType === 'api' ? Globe :
+                                    node.iconType === 'stream' ? Activity : Box;
+
                             return (
                                 <div
                                     key={node.id}
-                                    className={clsx("absolute transform -translate-x-full -translate-y-1/2 pointer-events-auto flex items-center justify-end pr-2", baseOpacity, baseTransition)}
+                                    className={clsx("absolute transform -translate-x-full -translate-y-1/2 pointer-events-auto flex items-center justify-end pr-2 gap-3 cursor-pointer hover:scale-105 transition-transform", baseOpacity, baseTransition)}
                                     style={{ left: node.x, top: node.y, maxWidth: 220 }}
+                                    onClick={() => onNodeClick && onNodeClick(node)}
                                 >
-                                    <span className="text-[#E3E3E3] font-bold text-lg text-right leading-tight mr-3">{node.label}</span>
-                                    <div className="w-4 h-4 rounded-full bg-[#A8C7FA] shadow-[0_0_10px_rgba(168,199,250,0.5)] z-10 shrink-0" />
+                                    <div className="flex flex-col items-end">
+                                        <span className="text-[#E3E3E3] font-bold text-sm text-right leading-tight">{node.label}</span>
+                                        <span className="text-[#777] text-[10px] uppercase tracking-wider">{node.iconType}</span>
+                                    </div>
+                                    <div className="w-10 h-10 rounded-xl bg-[#212123] border border-[#444746] flex items-center justify-center shadow-lg z-10 shrink-0">
+                                        <Icon size={20} className="text-[#A8C7FA]" />
+                                    </div>
+                                </div>
+                            );
+                        }
+
+                        // ACTION NODE (Layer 1 - Transformation)
+                        if (node.type === 'action') {
+                            return (
+                                <div
+                                    key={node.id}
+                                    className={clsx("absolute transform -translate-x-1/2 -translate-y-1/2 pointer-events-auto flex flex-col items-center justify-center p-2 rounded-lg bg-[#1E1F20] border border-[#444746]/50 shadow-sm z-10 cursor-pointer hover:border-[#A8C7FA] hover:bg-[#333537] transition-all", baseOpacity, baseTransition)}
+                                    style={{ left: node.x, top: node.y }}
+                                    onClick={() => onNodeClick && onNodeClick(node)}
+                                >
+                                    <span className="text-[#C4C7C5] text-[10px] font-mono uppercase tracking-wide px-1">{node.label}</span>
                                 </div>
                             );
                         }
@@ -119,7 +147,7 @@ const FeatureMindMap = ({ tables = [], metricGroups = [], predictionModels = [],
                         // CATEGORY NODES (Middle)
                         if (node.type === 'category') {
                             const childIds = node.data?.childIds || [];
-                            const isClickable = childIds.length > 0 && onToggleGroup;
+                            const isClickable = childIds.length > 0;
 
                             return (
                                 <div
@@ -182,7 +210,6 @@ const FeatureMindMap = ({ tables = [], metricGroups = [], predictionModels = [],
                         }
 
                         // FEATURE / METRIC / PREDICTION / ANALYTICS NODES (Right)
-                        // Small Dot + Text
                         const status = node.data.status;
                         const isWarning = status === 'warning';
                         const isError = status === 'error';
@@ -193,36 +220,33 @@ const FeatureMindMap = ({ tables = [], metricGroups = [], predictionModels = [],
                                 className={clsx("absolute transform -translate-y-1/2 pointer-events-auto group flex items-center", baseOpacity, baseTransition)}
                                 style={{ left: node.x, top: node.y }}
                             >
-                                {/* Dot Indicator */}
-                                <div className={clsx(
-                                    "w-3 h-3 rounded-full z-10 shrink-0 mr-3 transition-all duration-200",
-                                    isError
-                                        ? "bg-red-500"
-                                        : isWarning
-                                            ? "bg-yellow-500"
-                                            : "bg-[#444746]"
-                                )} />
+                                <div
+                                    className={clsx(
+                                        "w-3 h-3 rounded-full z-10 shrink-0 mr-3 transition-all duration-200 cursor-pointer",
+                                        selectedColumns.has(node.id) ? (
+                                            isError ? "bg-red-500 scale-110" : isWarning ? "bg-yellow-500 scale-110" : "bg-blue-500 scale-110"
+                                        ) : "bg-[#444746]"
+                                    )}
+                                    onClick={() => onToggleSelection(node.id)}
+                                />
 
-                                {/* Text Label */}
                                 <span className={clsx(
                                     "text-sm transition-colors whitespace-nowrap text-[#80868B]",
-                                    (isError || isWarning) ? "text-[#C4C7C5]" : "group-hover:text-[#C4C7C5]"
+                                    (isError || isWarning) ? "text-[#C4C7C5]" : "group-hover:text-[#C4C7C5]",
+                                    selectedColumns.has(node.id) && "text-[#E3E3E3] font-medium"
                                 )}>
                                     {node.label}
                                 </span>
 
-                                {/* Cost Preview Badge (If ShowCosts is ON) */}
                                 {showCosts && (
                                     <div className="ml-3 px-1.5 py-0.5 rounded-md bg-[#131314]/80 border border-[#333537] text-[10px] text-[#A8C7FA] opacity-0 group-hover:opacity-100 transition-opacity">
                                         $0.05
                                     </div>
                                 )}
 
-                                {/* Mini Warning/Error Icon (Optional, inline) */}
                                 {isError && <AlertTriangle size={12} className="text-red-500 ml-2" />}
                                 {isWarning && <AlertTriangle size={12} className="text-yellow-500 ml-2" />}
 
-                                {/* Tooltip */}
                                 {(isError || isWarning) && (
                                     <div className="absolute left-full ml-4 top-1/2 -translate-y-1/2 w-48 bg-[#2A2B2D] text-white text-xs p-3 rounded-xl border border-[#444746] shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
                                         <div className="font-semibold mb-1 flex items-center gap-2">
@@ -241,6 +265,6 @@ const FeatureMindMap = ({ tables = [], metricGroups = [], predictionModels = [],
             </div>
         </div>
     );
-};
+});
 
 export default FeatureMindMap;

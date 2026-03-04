@@ -346,7 +346,7 @@ const PredictiveView = () => {
     );
 };
 
-const MarketingInsights = () => {
+const Insights = () => {
     const [subTab, setSubTab] = useState('overview'); // 'overview', 'audience', 'creative', 'predictive'
 
     const renderSubView = () => {
@@ -363,7 +363,7 @@ const MarketingInsights = () => {
         <div className="h-full w-full bg-[#131314] overflow-y-auto p-8">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
-                    <h1 className="text-2xl font-semibold text-[#E3E3E3] mb-1">Marketing Insights</h1>
+                    <h1 className="text-2xl font-semibold text-[#E3E3E3] mb-1">Insights</h1>
                     <p className="text-[#C4C7C5] text-sm">Deep dive into project performance</p>
                 </div>
 
@@ -379,8 +379,8 @@ const MarketingInsights = () => {
                             key={tab.id}
                             onClick={() => setSubTab(tab.id)}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${subTab === tab.id
-                                    ? 'bg-[#333537] text-white shadow-sm'
-                                    : 'text-[#777] hover:text-[#C4C7C5]'
+                                ? 'bg-[#333537] text-white shadow-sm'
+                                : 'text-[#777] hover:text-[#C4C7C5]'
                                 }`}
                         >
                             {tab.label}
@@ -405,4 +405,4 @@ const MarketingInsights = () => {
     );
 };
 
-export default MarketingInsights;
+export default Insights;

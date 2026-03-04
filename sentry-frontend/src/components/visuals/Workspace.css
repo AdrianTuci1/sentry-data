@@ -1,0 +1,315 @@
+.workspace-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    background-color: #131314;
+}
+
+.workspace-content {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Results View */
+.results-container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    overflow-y: auto;
+    background-color: #131314;
+    color: #e3e3e3;
+}
+
+.results-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+    .metrics-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.metric-card {
+    background-color: #1E1F20;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(68, 71, 70, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.metric-label {
+    color: #C4C7C5;
+    margin-bottom: 0.5rem;
+}
+
+.metric-value {
+    font-size: 2.25rem;
+    font-weight: 700;
+}
+
+.metric-value.precision {
+    color: #4ade80;
+}
+
+.metric-value.recall {
+    color: #A8C7FA;
+}
+
+.metric-value.roi {
+    color: #facc15;
+}
+
+/* Features Breakdown */
+.features-card {
+    background-color: #1E1F20;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    border: 1px solid rgba(68, 71, 70, 0.5);
+    flex: 1;
+}
+
+.features-title {
+    font-size: 1.125rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.features-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.feature-item-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.feature-progress-track {
+    height: 0.5rem;
+    background-color: #131314;
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.feature-progress-bar {
+    height: 100%;
+    background-color: #A8C7FA;
+    border-radius: 9999px;
+}
+
+/* Editor Modal */
+.editor-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.editor-modal {
+    background-color: #1E1F20;
+    border: 1px solid #444746;
+    border-radius: 1rem;
+    width: 100%;
+    max-width: 56rem;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+.editor-header {
+    height: 3.5rem;
+    border-bottom: 1px solid #444746;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    background-color: #252627;
+}
+
+.editor-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.editor-title {
+    font-weight: 600;
+    color: #E3E3E3;
+}
+
+.editor-lang-badge {
+    font-size: 0.75rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    background-color: #333537;
+    color: #C4C7C5;
+    text-transform: uppercase;
+    font-family: monospace;
+}
+
+.editor-close-btn {
+    padding: 0.5rem;
+    background: none;
+    border: none;
+    border-radius: 0.5rem;
+    color: #C4C7C5;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.editor-close-btn:hover {
+    background-color: #333537;
+}
+
+.editor-toolbar {
+    height: 3rem;
+    border-bottom: 1px solid #444746;
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    gap: 1rem;
+    background-color: #1E1F20;
+}
+
+.editor-setting-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.editor-setting-label {
+    font-size: 0.75rem;
+    color: #777;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.editor-select {
+    background-color: #333537;
+    border: 1px solid #444746;
+    color: #E3E3E3;
+    font-size: 0.875rem;
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    outline: none;
+}
+
+.editor-select:focus {
+    border-color: #A8C7FA;
+}
+
+.editor-btn-run {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    background-color: #A8C7FA;
+    color: #0B0D0E;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.editor-btn-run:hover {
+    background-color: #8AB4F8;
+}
+
+.editor-body {
+    flex: 1;
+    position: relative;
+}
+
+/* Mindmap Controls */
+.mindmap-container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    background-color: #131314;
+}
+
+.mindmap-controls {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 20;
+    pointer-events: none;
+}
+
+.mindmap-zoom-group {
+    pointer-events: auto;
+    display: flex;
+    gap: 0.5rem;
+    background-color: rgba(30, 31, 32, 0.9);
+    border: 1px solid #444746;
+    padding: 0.375rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.mindmap-zoom-btn {
+    padding: 0.5rem;
+    background: none;
+    border: none;
+    border-radius: 0.375rem;
+    color: #C4C7C5;
+    cursor: pointer;
+}
+
+.mindmap-zoom-btn:hover {
+    background-color: #333537;
+}
+
+.mindmap-canvas {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+}
+
+.mindmap-canvas:active {
+    cursor: grabbing;
+}
+
+.mindmap-bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: 0.2;
+    pointer-events: none;
+    background-image: radial-gradient(#444746 1px, transparent 1px);
+    background-size: 20px 20px;
+}

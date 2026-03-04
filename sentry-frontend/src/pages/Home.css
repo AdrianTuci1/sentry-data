@@ -1,0 +1,143 @@
+.home-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    background-color: #0b0d0e;
+    overflow-y: auto;
+    color: #e3e3e3;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.home-content {
+    max-width: 1280px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 2rem 3rem;
+}
+
+@media (max-width: 768px) {
+    .home-content {
+        padding: 8px;
+    }
+}
+
+.home-section {
+    margin-bottom: 3rem;
+}
+
+.home-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.home-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+}
+
+.btn-create {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    background-color: #A8C7FA;
+    color: #0B0D0E;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 15px rgba(168, 199, 250, 0.3);
+}
+
+.btn-create:hover {
+    background-color: #8AB4F8;
+}
+
+/* Grid Layout */
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+@media (min-width: 768px) {
+    .projects-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .projects-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Settings section */
+.settings-section {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .settings-section {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.settings-card {
+    background-color: rgba(30, 31, 32, 0.3);
+    border: 1px solid rgba(68, 71, 70, 0.3);
+    border-radius: 20px;
+    padding: 1.5rem;
+    transition: transform 0.2s ease;
+}
+
+.settings-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(168, 199, 250, 0.2);
+}
+
+.settings-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.settings-card-header h3 {
+    font-weight: 600;
+    margin: 0;
+    color: #E3E3E3;
+}
+
+.settings-card-desc {
+    font-size: 0.875rem;
+    color: #80868B;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+
+.settings-card-btn {
+    background: none;
+    border: none;
+    color: #A8C7FA;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s ease;
+}
+
+.settings-card-btn:hover {
+    color: #8AB4F8;
+    text-decoration: underline;
+}

@@ -17,6 +17,24 @@
   color-scheme: dark;
   color: var(--color-text);
   background-color: var(--color-background);
+
+  /* Global Theme Variables for Layout Components */
+  --bg-primary: #1E1F20;
+  /* Surface color, like cards */
+  --bg-secondary: #131314;
+  /* Background color */
+  --bg-tertiary: #333537;
+  /* Hover backgrounds */
+  --border-color: rgba(68, 71, 70, 0.5);
+  /* #444746 with opacity */
+  --text-primary: #E3E3E3;
+  /* Main text */
+  --text-secondary: #C4C7C5;
+  /* Sub text */
+  --text-tertiary: #80868B;
+  /* Muted text */
+  --accent-primary: #A8C7FA;
+  /* Accent color */
 }
 
 body {

@@ -1,0 +1,223 @@
+/* src/components/InviteMember.css */
+
+.invite-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.invite-modal-content {
+    background-color: var(--bg-secondary);
+    width: 100%;
+    max-width: 560px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+    padding: 32px;
+    position: relative;
+    animation: modalSlideUp 0.3s ease-out;
+    color: var(--text-primary);
+    text-align: left;
+}
+
+@keyframes modalSlideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.invite-modal-header {
+    margin-bottom: 24px;
+}
+
+.invite-modal-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+}
+
+.invite-modal-subtitle {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.invite-form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    align-items: flex-end;
+}
+
+.invite-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.invite-field-group.email {
+    flex: 1;
+}
+
+.invite-field-group.role {
+    width: 140px;
+}
+
+.invite-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.invite-input,
+.invite-select {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 15px;
+    color: var(--text-primary);
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.invite-input:focus,
+.invite-select:focus {
+    border-color: var(--text-secondary);
+    outline: none;
+}
+
+.invite-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 32px;
+}
+
+.send-invite-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--bg-tertiary);
+    /* Lighter gray background */
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: not-allowed;
+    margin-bottom: 24px;
+    transition: all 0.2s;
+}
+
+.send-invite-btn.active {
+    background-color: var(--accent-primary);
+    color: var(--bg-primary);
+    cursor: pointer;
+}
+
+.invite-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 24px 0;
+    color: var(--text-tertiary);
+}
+
+.invite-divider::before,
+.invite-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.invite-divider span {
+    padding: 0 16px;
+    font-size: 14px;
+}
+
+.public-invite-section {
+    margin-top: 8px;
+}
+
+.public-invite-header {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.public-invite-card {
+    background-color: #fafafa05;
+    /* Very subtle background */
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 32px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.public-invite-card p {
+    font-size: 15px;
+    color: var(--text-secondary);
+    margin: 0;
+    text-align: left;
+    max-width: 320px;
+    line-height: 1.5;
+}
+
+.create-link-btn {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.create-link-btn:hover {
+    background-color: var(--bg-tertiary);
+}
+
+.invite-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 32px;
+}
+
+.close-btn {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.close-btn:hover {
+    background-color: var(--bg-tertiary);
+}

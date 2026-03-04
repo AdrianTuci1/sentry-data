@@ -364,28 +364,92 @@ export const useMindMapLayout = ({ tables = [], metricGroups = [], predictionMod
         });
 
 
-        // --- 4. Root Node ---
-        const allSecondLayerNodes = [...featureNodes, ...metricGroupNodes, ...predictionNodes, ...analyticsNodes];
-        const rootY = allSecondLayerNodes.length > 0
-            ? allSecondLayerNodes.reduce((sum, node) => sum + node.y, 0) / allSecondLayerNodes.length
-            : 0;
+        // --- 4. Layer 0 & 1: Sources & Transformations (Replaces Root) ---
+        // Iterate tables to generate Sources and Actions to the left
+        const SOURCE_X = -600;
+        const ACTION_X = -400;
 
-        const rootNode = {
-            id: 'root',
-            type: 'theme',
-            label: "BI Insights",
-            x: ROOT_X,
-            y: rootY,
-        };
-        nodes.push(rootNode);
+        // Create a unified list of all second-layer categories to process
+        const allCategories = [
+            ...tables.map(t => ({ ...t, catId: `table-${t.id}` })),
+            ...metricGroups.map(g => ({ ...g, catId: `group-${g.id}` })),
+            ...predictionModels.map(m => ({ ...m, catId: `model-${m.id}` })),
+            ...advancedAnalytics.map(a => ({ ...a, catId: `analytics-${a.id}` }))
+        ];
 
-        allSecondLayerNodes.forEach(node => {
-            edges.push({
-                id: `edge-root-${node.id}`,
-                source: { x: ROOT_X, y: rootY },
-                target: { x: node.x, y: node.y }
-            });
+        allCategories.forEach(item => {
+            if (item.source) {
+                // 1. Source Node
+                let sourceNode = nodes.find(n => n.id === item.source.id);
+
+                // If source node exists, check if we need to adjust its position?
+                // Ideally it sits centrally relative to all its children. 
+                // For simplicity, we create it at the Y of the first child encountered if not exists.
+                const categoryNode = nodes.find(n => n.id === item.catId);
+
+                if (!sourceNode && categoryNode) {
+                    sourceNode = {
+                        id: item.source.id,
+                        type: 'source',
+                        label: item.source.name,
+                        iconType: item.source.type,
+                        x: SOURCE_X,
+                        y: categoryNode.y
+                    };
+                    nodes.push(sourceNode);
+                }
+
+
+                // 2. Action Node
+                // Action is usually 1:1 with the Category (Transform job -> File/MetricSet)
+                if (item.lineage && categoryNode && sourceNode) {
+                    const actionId = `action-${item.id}`;
+
+                    const actionNode = {
+                        id: actionId,
+                        type: 'action',
+                        label: item.lineage.action,
+                        x: ACTION_X,
+                        y: categoryNode.y
+                    };
+                    nodes.push(actionNode);
+
+                    // Edge: Source -> Action
+                    edges.push({
+                        id: `edge-${sourceNode.id}-${actionId}`,
+                        sourceId: sourceNode.id,
+                        targetId: actionId,
+                        source: { x: sourceNode.x, y: sourceNode.y },
+                        target: { x: actionNode.x, y: actionNode.y }
+                    });
+
+                    // Edge: Action -> Category Node
+                    edges.push({
+                        id: `edge-${actionId}-${categoryNode.id}`,
+                        sourceId: actionId,
+                        targetId: categoryNode.id,
+                        source: { x: actionNode.x, y: actionNode.y },
+                        target: { x: categoryNode.x, y: categoryNode.y }
+                    });
+                } else if (sourceNode && categoryNode) {
+                    // Direct Source -> Category
+                    edges.push({
+                        id: `edge-${sourceNode.id}-${categoryNode.id}`,
+                        sourceId: sourceNode.id,
+                        targetId: categoryNode.id,
+                        source: { x: sourceNode.x, y: sourceNode.y },
+                        target: { x: categoryNode.x, y: categoryNode.y }
+                    });
+                }
+            }
         });
+
+        // For other categories (Metrics, Models, etc.), they don't have explicit sources in this mock.
+        // We can leave them unconnected to the left, or connect them to a generic "Data Warehouse" node if we wanted.
+        // For now, let's leave them "floating" on the left or maybe connect them to "Internal DB" if appropriate?
+        // User asked specifically for the "files" flow.
+
+        // Remove old Root Logic
 
         return { nodes, edges };
     }, [tables, metricGroups, predictionModels, advancedAnalytics, dashboards, dashboardGroups, title]);
