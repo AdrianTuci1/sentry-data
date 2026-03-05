@@ -238,11 +238,6 @@ const FeatureMindMap = observer(({ onNodeClick, showCosts = false }) => {
                                     {node.label}
                                 </span>
 
-                                {showCosts && (
-                                    <div className="ml-3 px-1.5 py-0.5 rounded-md bg-[#131314]/80 border border-[#333537] text-[10px] text-[#A8C7FA] opacity-0 group-hover:opacity-100 transition-opacity">
-                                        $0.05
-                                    </div>
-                                )}
 
                                 {isError && <AlertTriangle size={12} className="text-red-500 ml-2" />}
                                 {isWarning && <AlertTriangle size={12} className="text-yellow-500 ml-2" />}

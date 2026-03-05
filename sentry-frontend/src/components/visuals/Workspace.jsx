@@ -195,13 +195,6 @@ const Workspace = observer(({ viewState = 'engineering' }) => {
 
         return (
             <div className="mindmap-container">
-                <div className="mindmap-controls">
-                    <div className="mindmap-zoom-group">
-                        <button onClick={() => ui.setScale(Math.min(4, scale + 0.1))} className="mindmap-zoom-btn"><ZoomIn size={18} /></button>
-                        <button onClick={() => ui.setScale(Math.max(0.2, scale - 0.1))} className="mindmap-zoom-btn"><ZoomOut size={18} /></button>
-                    </div>
-                </div>
-
                 <div
                     className="mindmap-canvas"
                     onMouseDown={handleMouseDown}

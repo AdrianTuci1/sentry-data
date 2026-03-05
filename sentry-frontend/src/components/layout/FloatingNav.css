@@ -1,0 +1,235 @@
+/* FloatingNav.css - Layout wrapper styles */
+
+.layout-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    background-color: #0A0A0A;
+    color: #E3E3E3;
+    overflow: hidden;
+    position: relative;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Main Content Area */
+.layout-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+    z-index: 1;
+    /* User requested dock doesn't affect space, so we remove padding-bottom constraints */
+    padding-bottom: 0px;
+}
+
+/* ------------------------------------- */
+/*  Top Right Navigation (Menu / Back)   */
+/* ------------------------------------- */
+.floating-top-right {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 100;
+}
+
+.nav-circle-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(30, 31, 32, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #E3E3E3;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.nav-circle-btn:hover,
+.nav-circle-btn.menu-active {
+    background: rgba(45, 47, 49, 0.95);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.nav-circle-btn:active {
+    transform: scale(0.95);
+}
+
+/* ------------------------------------- */
+/*  Bottom Dock Integration              */
+/* ------------------------------------- */
+.floating-bottom-dock {
+    position: fixed;
+    bottom: 32px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    z-index: 100;
+    pointer-events: none;
+}
+
+.dock-container {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 320px;
+    /* Base width for centering the children via absolute positions */
+    justify-content: center;
+}
+
+/* User Pill Design */
+.dock-pill-btn {
+    width: 180px;
+    height: 50px;
+    border-radius: 25px;
+    background-color: #fcee0a;
+    /* Bold yellow */
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    position: relative;
+    transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Dotted grid taking the full size, but transparent towards edges */
+.dock-pill-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(0, 0, 0, 0.3) 1.5px, transparent 1.5px);
+    background-size: 10px 10px;
+    border-radius: 25px;
+    /* Safari specific and standard mask for fade out to edge */
+    -webkit-mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 1) 40%, transparent 80%);
+    mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 1) 40%, transparent 80%);
+    pointer-events: none;
+}
+
+.dock-pill-btn:active {
+    transform: scale(0.96);
+}
+
+.pill-dots {
+    display: flex;
+    gap: 6px;
+    position: relative;
+    z-index: 2;
+}
+
+.pill-dots span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #1A1A1A;
+}
+
+.pill-dots span:nth-child(2) {
+    transform: scale(1.3);
+}
+
+/* Right toggle switch dock icon */
+.dock-icon-btn {
+    position: absolute;
+    right: 0;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(30, 31, 32, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #E3E3E3;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    z-index: 5;
+}
+
+/* Left Plus Button */
+.dock-plus-btn {
+    position: absolute;
+    left: 0;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(30, 31, 32, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #E3E3E3;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    z-index: 5;
+}
+
+.dock-plus-btn:hover {
+    background: rgba(45, 47, 49, 0.95);
+    transform: translateY(-2px);
+}
+
+/* Recommendations Toggle Button */
+.dock-recommend-btn {
+    position: absolute;
+    left: 0;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(30, 31, 32, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #E3E3E3;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    z-index: 5;
+}
+
+.dock-recommend-btn:hover {
+    background: rgba(45, 47, 49, 0.95);
+    transform: translateY(-2px);
+    color: #b388ff;
+    border-color: rgba(124, 77, 255, 0.4);
+}
+
+.dock-recommend-btn.active {
+    background: rgba(124, 77, 255, 0.15);
+    border-color: rgba(124, 77, 255, 0.6);
+    color: #b388ff;
+    box-shadow: 0 0 15px rgba(124, 77, 255, 0.3);
+}
+
+.dock-recommend-btn:active {
+    transform: translateY(0) scale(0.95);
+}
+
+.dock-icon-btn:hover {
+    background: rgba(45, 47, 49, 0.95);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.dock-icon-btn:active {
+    transform: translateY(0) scale(0.95);
+}

@@ -1,0 +1,137 @@
+[
+    {
+        "id": "live-traffic",
+        "type": "animated-line",
+        "title": "Live Traffic",
+        "subtitle": "Active Users on Site",
+        "value": "1,204",
+        "unit": "usr",
+        "footerText": "Last 5 Minutes",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2",
+        "dataPoints": [
+            60,
+            50,
+            70,
+            65,
+            80,
+            75,
+            90,
+            85,
+            100,
+            95,
+            110,
+            100,
+            120
+        ]
+    },
+    {
+        "id": "total-revenue",
+        "type": "bar-chart",
+        "title": "Total Revenue",
+        "subtitle": "Week to Date",
+        "value": "$124K",
+        "bars": [
+            40,
+            60,
+            45,
+            80,
+            75,
+            90,
+            110
+        ],
+        "colorTheme": "theme-weather",
+        "gridSpan": "row-span-2",
+        "footerText": "Highest: Tuesday"
+    },
+    {
+        "id": "average-roas",
+        "type": "light-dial",
+        "title": "Avg ROAS",
+        "value": "4.2",
+        "unit": "x",
+        "footerText": "Target 3.5x",
+        "colorTheme": "theme-natural",
+        "dialPercentage": 85,
+        "gridSpan": "default"
+    },
+    {
+        "id": "conversion-rate",
+        "type": "natural",
+        "title": "Conv. Rate",
+        "subtitle": "Checkout complete",
+        "value": "3.8",
+        "unit": "%",
+        "sliderValue": 76,
+        "footerTextLeft": "Current",
+        "footerTextRight": "Target 5.0%",
+        "colorTheme": "theme-light",
+        "gridSpan": "default"
+    },
+    {
+        "id": "top-campaigns",
+        "type": "campaign-list",
+        "title": "Top Campaigns",
+        "subtitle": "By Conv. Volume",
+        "colorTheme": "theme-audience",
+        "gridSpan": "row-span-2",
+        "campaigns": [
+            {
+                "name": "FB Retargeting",
+                "value": "240",
+                "trend": "+"
+            },
+            {
+                "name": "Google Search - Brand",
+                "value": "185",
+                "trend": "+"
+            },
+            {
+                "name": "TikTok Lookalike",
+                "value": "120",
+                "trend": "-"
+            },
+            {
+                "name": "Email Winback",
+                "value": "89",
+                "trend": "+"
+            }
+        ]
+    },
+    {
+        "id": "cpa",
+        "type": "red-gradient",
+        "title": "CPA Trend",
+        "subtitle": "Cost per Acquisition",
+        "value": "$32",
+        "colorTheme": "theme-red",
+        "sliderValue": 60,
+        "gridSpan": "default",
+        "footerText": "Warning threshold $40"
+    },
+    {
+        "id": "platform-spend",
+        "type": "pie-chart",
+        "title": "Platform Spend",
+        "subtitle": "Monthly Allocation",
+        "colorTheme": "theme-color",
+        "gridSpan": "col-span-2",
+        "segments": [
+            {
+                "label": "Meta",
+                "value": 50,
+                "color": "#81E4B5"
+            },
+            {
+                "label": "Google",
+                "value": 30,
+                "color": "#AEEA00"
+            },
+            {
+                "label": "TikTok",
+                "value": 20,
+                "color": "#00f2fe"
+            }
+        ]
+    }
+]

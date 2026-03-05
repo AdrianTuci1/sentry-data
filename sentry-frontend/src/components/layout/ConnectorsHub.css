@@ -1,0 +1,96 @@
+/* ConnectorsHub.css - Minimal Dedicated Styling */
+
+.connectors-hub-container {
+    width: 100%;
+}
+
+.hub-minimal-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.hub-minimal-table td {
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    font-size: 0.9rem;
+}
+
+.hub-minimal-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Brand Column */
+.brand-col {
+    width: 50%;
+}
+
+.brand-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.brand-icon-box {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.brand-name {
+    font-weight: 600;
+    color: #FFF;
+}
+
+/* Status Column */
+.status-col {
+    width: 30%;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.status-dot.connected {
+    background: #4ADE80;
+    box-shadow: 0 0 8px #4ADE80;
+}
+
+.status-dot.active {
+    background: #60A5FA;
+    box-shadow: 0 0 8px #60A5FA;
+}
+
+.status-dot.error {
+    background: #F87171;
+    box-shadow: 0 0 8px #F87171;
+}
+
+.status-text {
+    font-weight: 500;
+    font-size: 0.8rem;
+    color: #8E9196;
+    text-transform: capitalize;
+}
+
+/* Volume Column */
+.volume-col {
+    width: 20%;
+    text-align: right;
+}
+
+.volume-text {
+    color: #5F6368;
+    font-size: 0.85rem;
+}

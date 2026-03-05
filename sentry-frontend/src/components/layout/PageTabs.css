@@ -1,0 +1,31 @@
+/* PageTabs.css */
+.page-tabs-container {
+    padding: 0 1rem;
+}
+
+.page-tabs-nav {
+    display: flex;
+    gap: 1rem;
+    /* Reduced gap */
+    margin: 0;
+    /* Remove auto margin centering since max-width is gone */
+}
+
+.page-tab-link {
+    padding: 0.75rem 0;
+    /* Reduced padding */
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.page-tab-link:hover {
+    color: var(--text-primary);
+}
+
+.page-tab-link.active {
+    color: var(--text-primary);
+    border-bottom-color: var(--text-primary);
+}
