@@ -233,3 +233,32 @@
 .dock-icon-btn:active {
     transform: translateY(0) scale(0.95);
 }
+
+/* Create Project Button styles */
+.dock-create-btn {
+    position: absolute;
+    left: 0;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #A8C7FA;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0B0D0E;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 4px 16px rgba(168, 199, 250, 0.3);
+    z-index: 5;
+}
+
+.dock-create-btn:hover {
+    background: #8AB4F8;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(168, 199, 250, 0.4);
+}
+
+.dock-create-btn:active {
+    transform: translateY(0) scale(0.95);
+}

@@ -10,9 +10,8 @@
     color: #fff;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    aspect-ratio: 1 / 1.1;
-    /* slightly taller than square */
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    height: 280px;
+    padding: 1.5rem;
 }
 
 .micro-card:hover {
@@ -23,13 +22,47 @@
 
 .col-span-2 {
     grid-column: span 2;
-    aspect-ratio: auto;
-    min-height: 200px;
 }
 
 .row-span-2 {
     grid-row: span 2;
-    aspect-ratio: auto;
+    height: 624px;
+    /* (300 * 2) + gap (24px approximated) */
+}
+
+.col-span-2.row-span-2 {
+    grid-column: span 2;
+    grid-row: span 2;
+    height: 624px;
+}
+
+@media (max-width: 1024px) {
+    .micro-card {
+        height: 250px;
+        padding: 1rem;
+    }
+
+    .row-span-2,
+    .col-span-2.row-span-2 {
+        height: 524px;
+        /* (250 * 2) + 24gap */
+    }
+
+    .col-span-2 {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 600px) {
+    .micro-card {
+        height: 220px;
+    }
+
+    .row-span-2,
+    .col-span-2.row-span-2 {
+        height: 460px;
+        /* (220 * 2) + 20gap */
+    }
 }
 
 /* Expanded state takes over the container */
@@ -42,49 +75,49 @@
     z-index: 10;
 }
 
+.micro-card.expanded.row-span-2 {
+    height: auto;
+    min-height: 600px;
+}
+
 @media (max-width: 600px) {
     .micro-card {
         padding: 1rem;
         border-radius: 20px;
     }
-
-    .row-span-2 {
-        grid-row: auto;
-        aspect-ratio: 1 / 1.1;
-    }
 }
 
 /* Themes matching the Image */
 .theme-weather {
-    background: radial-gradient(circle at center, #9F163D 0%, #3C0A1A 80%, #150A0E 100%);
+    background: radial-gradient(circle at center, #8a0c28 0%, #30040e 45%, #050102 100%);
 }
 
 .theme-natural {
-    background: radial-gradient(circle at center, #8BE134 0%, #4B7A1C 80%, #1A2113 100%);
+    background: radial-gradient(circle at center, #3d5a1e 0%, #1a270d 45%, #050802 100%);
 }
 
 .theme-light {
-    background: radial-gradient(circle at center, #A67B54 0%, #5B4029 80%, #241A13 100%);
+    background: radial-gradient(circle at center, #63452c 0%, #2b1d12 45%, #080503 100%);
 }
 
 .theme-color {
-    background: radial-gradient(circle at center, #3BAA84 0%, #1F5441 80%, #0D1C16 100%);
+    background: radial-gradient(circle at center, #1b4d3e 0%, #0d251d 45%, #030806 100%);
 }
 
 .theme-red {
-    background: linear-gradient(180deg, #5C2A34 0%, #E35D5B 100%);
+    background: radial-gradient(circle at center, #7a1b1b 0%, #350c0c 45%, #0a0202 100%);
 }
 
 .theme-productivity {
-    background: radial-gradient(circle at center, #2C4BAC 0%, #142045 80%, #0A0D1B 100%);
+    background: radial-gradient(circle at center, #0f1c42 0%, #070d1f 45%, #010206 100%);
 }
 
 .theme-audience {
-    background: linear-gradient(135deg, #1C1F2E 0%, #0B0D14 100%);
+    background: radial-gradient(circle at center, #1a1c26 0%, #0d0e13 45%, #020204 100%);
 }
 
 .theme-revenue {
-    background: linear-gradient(135deg, #2E1C25 0%, #140B10 100%);
+    background: radial-gradient(circle at center, #351523 0%, #1a0a11 45%, #040102 100%);
 }
 
 /* Headers */
@@ -486,7 +519,7 @@
     display: flex;
     align-items: flex-end;
     gap: 4px;
-    height: 60px;
+    height: 40px;
 }
 
 .bar-item {

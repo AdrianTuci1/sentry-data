@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap');
+
+.premium-pixel-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+
+.pixel-label-top {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.pixel-main-value {
+    font-family: 'Major Mono Display', monospace;
+    font-size: 3.5rem;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 2rem;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.pixel-scale {
+    width: 80%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 20px;
+    margin-bottom: 1rem;
+}
+
+.pixel-tick {
+    width: 1px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.pixel-tick.active {
+    width: 2px;
+    height: 14px;
+    background: #ffecb3;
+    box-shadow: 0 0 8px #ffecb3;
+}
+
+.pixel-footer {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 500;
+}

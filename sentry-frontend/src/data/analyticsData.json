@@ -1,12 +1,168 @@
 [
     {
+        "id": "marketing-roas",
+        "type": "weather",
+        "title": "ROAS Pulse",
+        "subtitle": "Real-time Efficiency Multiplier",
+        "value": "4.8",
+        "unit": "x",
+        "footerText": "Consolidated Channels",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "default"
+    },
+    {
+        "id": "marketing-cpa",
+        "type": "natural",
+        "title": "Acquisition Cost",
+        "subtitle": "CPA Efficiency vs Target",
+        "value": "$24",
+        "unit": "avg",
+        "sliderValue": 65,
+        "footerTextLeft": "Target: $20",
+        "footerTextRight": "Limit: $35",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "default"
+    },
+    {
+        "id": "marketing-conv-rate",
+        "type": "light-dial",
+        "title": "Conversion Flow",
+        "subtitle": "Visitor to Qualified Lead %",
+        "value": "3.8",
+        "unit": "%",
+        "sliderValue": 72,
+        "colorTheme": "theme-productivity",
+        "gridSpan": "default"
+    },
+    {
+        "id": "marketing-pclv",
+        "type": "predictive",
+        "title": "Predictive LTV",
+        "subtitle": "Future Value of Active Customers",
+        "value": "$1,450",
+        "unit": "est",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "col-span-2",
+        "historical": [
+            1100,
+            1150,
+            1200,
+            1180,
+            1250,
+            1300,
+            1350
+        ],
+        "forecast": [
+            1380,
+            1400,
+            1420,
+            1440,
+            1450
+        ],
+        "confidenceRange": [
+            40,
+            60,
+            80
+        ]
+    },
+    {
+        "id": "data-saturation",
+        "type": "liquid-gauge",
+        "title": "ML Signal Feed",
+        "subtitle": "Model Training Saturation",
+        "value": "84",
+        "unit": "%",
+        "sliderValue": 84,
+        "colorTheme": "theme-productivity",
+        "gridSpan": "default"
+    },
+    {
+        "id": "ai-coverage",
+        "type": "neural-nexus",
+        "title": "AI Management",
+        "subtitle": "Autonomous Creative Coverage",
+        "value": "98",
+        "unit": "%",
+        "sliderValue": 98,
+        "footerText": "Operational Limit Reach",
+        "colorTheme": "theme-light",
+        "gridSpan": "default"
+    },
+    {
+        "id": "ad-fatigue",
+        "type": "intensity-heat",
+        "title": "Ad Fatigue",
+        "subtitle": "Audience Saturaion Index",
+        "value": "29",
+        "unit": "deg",
+        "footerText": "High Rotation Suggested",
+        "colorTheme": "theme-red",
+        "gridSpan": "default"
+    },
+    {
+        "id": "refresh-cycle",
+        "type": "chrono-dial",
+        "title": "Creative Health",
+        "subtitle": "Time to Next Asset Refresh",
+        "value": "Active",
+        "unit": "Opt",
+        "sliderValue": 35,
+        "footerText": "Scheduled for Monday",
+        "colorTheme": "theme-color",
+        "gridSpan": "default"
+    },
+    {
+        "id": "budget-burn",
+        "type": "natural",
+        "title": "Budget Pacing",
+        "subtitle": "Monthly Spend Momentum",
+        "value": "72",
+        "unit": "%",
+        "sliderValue": 72,
+        "footerTextLeft": "12 Days Left",
+        "footerTextRight": "Target Pace",
+        "colorTheme": "theme-red",
+        "gridSpan": "default"
+    },
+    {
+        "id": "viral-k-factor",
+        "type": "light-dial",
+        "title": "Viral Multiplier",
+        "subtitle": "Organic Lift per Paid Click",
+        "value": "1.4",
+        "unit": "x",
+        "sliderValue": 45,
+        "colorTheme": "theme-color",
+        "gridSpan": "default"
+    },
+    {
+        "id": "incremental-lift",
+        "type": "incremental-lift",
+        "title": "Incremental Lift",
+        "subtitle": "Paid vs. Baseline Organic",
+        "value": "+22%",
+        "unit": "lift",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "default"
+    },
+    {
+        "id": "optimal-time",
+        "type": "optimal-time",
+        "title": "Peak Engagement",
+        "subtitle": "Best Campaign Window",
+        "value": "18:00",
+        "unit": "GMT",
+        "colorTheme": "theme-natural",
+        "gridSpan": "default"
+    },
+    {
         "id": "live-traffic",
         "type": "animated-line",
-        "title": "Live Traffic",
-        "subtitle": "Active Users on Site",
+        "title": "Live Pulse",
+        "subtitle": "Real-time Concurrent Users",
         "value": "1,204",
         "unit": "usr",
-        "footerText": "Last 5 Minutes",
+        "footerText": "Last 5 Minutes Activity",
         "colorTheme": "theme-productivity",
         "gridSpan": "col-span-2",
         "dataPoints": [
@@ -26,111 +182,400 @@
         ]
     },
     {
-        "id": "total-revenue",
-        "type": "bar-chart",
-        "title": "Total Revenue",
-        "subtitle": "Week to Date",
-        "value": "$124K",
-        "bars": [
-            40,
-            60,
-            45,
-            80,
-            75,
-            90,
-            110
+        "id": "revenue-forecast",
+        "type": "predictive",
+        "title": "Revenue Performance",
+        "subtitle": "Predictive Forecast Model",
+        "value": "$452K",
+        "unit": "est",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "col-span-2",
+        "historical": [
+            320,
+            335,
+            310,
+            350,
+            380,
+            400
         ],
-        "colorTheme": "theme-weather",
-        "gridSpan": "row-span-2",
-        "footerText": "Highest: Tuesday"
+        "forecast": [
+            410,
+            425,
+            440,
+            435,
+            452
+        ],
+        "confidenceRange": [
+            30,
+            45,
+            60
+        ]
     },
     {
-        "id": "average-roas",
-        "type": "light-dial",
-        "title": "Avg ROAS",
-        "value": "4.2",
-        "unit": "x",
-        "footerText": "Target 3.5x",
-        "colorTheme": "theme-natural",
-        "dialPercentage": 85,
-        "gridSpan": "default"
-    },
-    {
-        "id": "conversion-rate",
-        "type": "natural",
-        "title": "Conv. Rate",
-        "subtitle": "Checkout complete",
-        "value": "3.8",
-        "unit": "%",
-        "sliderValue": 76,
-        "footerTextLeft": "Current",
-        "footerTextRight": "Target 5.0%",
-        "colorTheme": "theme-light",
-        "gridSpan": "default"
-    },
-    {
-        "id": "top-campaigns",
-        "type": "campaign-list",
-        "title": "Top Campaigns",
-        "subtitle": "By Conv. Volume",
+        "id": "retention-cohorts",
+        "type": "cohorts",
+        "title": "Retention",
+        "subtitle": "User Stickiness",
         "colorTheme": "theme-audience",
-        "gridSpan": "row-span-2",
-        "campaigns": [
+        "gridSpan": "default",
+        "cohorts": [
             {
-                "name": "FB Retargeting",
-                "value": "240",
-                "trend": "+"
+                "week": "Feb 01",
+                "size": 1200,
+                "data": [
+                    100,
+                    85,
+                    70,
+                    62
+                ]
             },
             {
-                "name": "Google Search - Brand",
-                "value": "185",
-                "trend": "+"
+                "week": "Feb 08",
+                "size": 1150,
+                "data": [
+                    100,
+                    82,
+                    68
+                ]
             },
             {
-                "name": "TikTok Lookalike",
-                "value": "120",
-                "trend": "-"
+                "week": "Feb 15",
+                "size": 1300,
+                "data": [
+                    100,
+                    88
+                ]
             },
             {
-                "name": "Email Winback",
-                "value": "89",
-                "trend": "+"
+                "week": "Feb 22",
+                "size": 1250,
+                "data": [
+                    100
+                ]
             }
         ]
     },
     {
-        "id": "cpa",
-        "type": "red-gradient",
-        "title": "CPA Trend",
-        "subtitle": "Cost per Acquisition",
-        "value": "$32",
-        "colorTheme": "theme-red",
-        "sliderValue": 60,
+        "id": "technical-health",
+        "type": "vitals",
+        "title": "Health",
+        "subtitle": "Core Vitals",
+        "colorTheme": "theme-weather",
         "gridSpan": "default",
-        "footerText": "Warning threshold $40"
+        "metrics": [
+            {
+                "name": "LCP",
+                "value": "1.2s",
+                "status": "good"
+            },
+            {
+                "name": "FID",
+                "value": "14ms",
+                "status": "good"
+            },
+            {
+                "name": "CLS",
+                "value": "0.04",
+                "status": "good"
+            },
+            {
+                "name": "Errors",
+                "value": "0.1%",
+                "status": "good"
+            }
+        ]
     },
     {
-        "id": "platform-spend",
-        "type": "pie-chart",
-        "title": "Platform Spend",
-        "subtitle": "Monthly Allocation",
-        "colorTheme": "theme-color",
+        "id": "stat-leads",
+        "type": "leads-list",
+        "title": "Recent Leads",
+        "subtitle": "Active Conversions",
+        "leads": [
+            {
+                "name": "Andrei Popescu",
+                "value": "Google Ads",
+                "status": "hot",
+                "time": "2m ago"
+            },
+            {
+                "name": "Maria Ionescu",
+                "value": "Facebook",
+                "status": "warm",
+                "time": "15m ago"
+            },
+            {
+                "name": "Digital Solutions",
+                "value": "Direct",
+                "status": "hot",
+                "time": "1h ago"
+            },
+            {
+                "name": "Tech Global",
+                "value": "LinkedIn",
+                "status": "cool",
+                "time": "3h ago"
+            }
+        ],
+        "colorTheme": "theme-productivity",
+        "gridSpan": "default"
+    },
+    {
+        "id": "top-routes",
+        "type": "leads-list",
+        "title": "Top Routes",
+        "subtitle": "Most Visited Pages",
+        "leads": [
+            {
+                "name": "/dashboard/stats",
+                "value": "2.4k views",
+                "status": "hot",
+                "time": "+12%"
+            },
+            {
+                "name": "/campaign/summer",
+                "value": "1.8k views",
+                "status": "warm",
+                "time": "+5%"
+            },
+            {
+                "name": "/products/new",
+                "value": "1.2k views",
+                "status": "hot",
+                "time": "+22%"
+            },
+            {
+                "name": "/cart/checkout",
+                "value": "800 views",
+                "status": "cool",
+                "time": "-2%"
+            }
+        ],
+        "colorTheme": "theme-natural",
+        "gridSpan": "default"
+    },
+    {
+        "id": "financial-waterfall",
+        "type": "waterfall",
+        "title": "Net Profit Bridge",
+        "subtitle": "Gross to Net Visibility",
+        "value": "$42.5K",
+        "unit": "net",
+        "colorTheme": "theme-revenue",
         "gridSpan": "col-span-2",
-        "segments": [
+        "steps": [
             {
-                "label": "Meta",
-                "value": 50,
-                "color": "#81E4B5"
+                "name": "Gross Revenue",
+                "value": 124000
             },
             {
-                "label": "Google",
-                "value": 30,
-                "color": "#AEEA00"
+                "name": "COGS",
+                "value": -45000
             },
             {
-                "label": "TikTok",
-                "value": 20,
-                "color": "#00f2fe"
+                "name": "Ad Spend",
+                "value": -28000
+            },
+            {
+                "name": "OpEx",
+                "value": -8500
+            },
+            {
+                "name": "Net Profit",
+                "isTotal": true
+            }
+        ]
+    },
+    {
+        "id": "market-sentiment",
+        "type": "market-radar",
+        "title": "Market Sentiment",
+        "subtitle": "Aggregated Brand Health",
+        "colorTheme": "theme-audience",
+        "gridSpan": "default"
+    },
+    {
+        "id": "attribution-models",
+        "type": "attribution",
+        "title": "Marketing Attribution",
+        "subtitle": "Value Distribution Model",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2",
+        "models": [
+            {
+                "channel": "Google",
+                "first": 35,
+                "last": 45,
+                "linear": 40
+            },
+            {
+                "channel": "Meta",
+                "first": 40,
+                "last": 28,
+                "linear": 35
+            },
+            {
+                "channel": "Direct",
+                "first": 15,
+                "last": 20,
+                "linear": 18
+            },
+            {
+                "channel": "Other",
+                "first": 10,
+                "last": 7,
+                "linear": 7
+            }
+        ]
+    },
+    {
+        "id": "anomaly-detection",
+        "type": "anomaly-stream",
+        "title": "Anomaly Pulse",
+        "subtitle": "ML-Driven Variance Detection",
+        "value": "2 Spikes",
+        "unit": "warn",
+        "colorTheme": "theme-weather",
+        "gridSpan": "col-span-2"
+    },
+    {
+        "id": "romania-3d",
+        "type": "3d-map",
+        "title": "Local Engagement",
+        "subtitle": "Active RO Campaigns",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2"
+    },
+    {
+        "id": "data-scatter",
+        "type": "scatter",
+        "title": "LTV vs CAC",
+        "subtitle": "Client Distribution",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2"
+    },
+    {
+        "id": "sales-funnel",
+        "type": "funnel",
+        "title": "Sales Funnel",
+        "subtitle": "Conversion Steps",
+        "colorTheme": "theme-weather",
+        "gridSpan": "col-span-2"
+    },
+    {
+        "id": "market-evolution",
+        "type": "market-evolution",
+        "title": "Channel Synergy Dynamics",
+        "subtitle": "Cross-Channel Influence & Temporal Evolution",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2"
+    },
+    {
+        "id": "creative-quadrant",
+        "type": "creative-quadrant",
+        "title": "Creative Performance Quadrant",
+        "subtitle": "CTR vs Conversion Rate Intelligence",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2 row-span-2"
+    },
+    {
+        "id": "lead-clustering",
+        "type": "lead-clustering",
+        "title": "Lead Quality Clusters",
+        "subtitle": "ML-Driven AI Segmentation",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2"
+    },
+    {
+        "id": "budget-sensitivity",
+        "type": "budget-sensitivity",
+        "title": "Budget Sensitivity",
+        "subtitle": "Elasticity & Diminishing Returns",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "col-span-2"
+    },
+    {
+        "id": "intent-sunburst",
+        "type": "intent-sunburst",
+        "title": "Traffic Intent",
+        "subtitle": "Real-time Classification",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2"
+    },
+    {
+        "id": "shapley-attribution",
+        "type": "shapley-attribution",
+        "title": "Shapley Attribution",
+        "subtitle": "Fair contribution model",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2"
+    },
+    {
+        "id": "trend-spotter",
+        "type": "trend-spotter",
+        "title": "Keyword Early Warning",
+        "subtitle": "Emerging Market Signals",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2",
+        "keywords": [
+            {
+                "text": "AI Automation",
+                "weight": 95,
+                "trend": "up"
+            },
+            {
+                "text": "Sustainable",
+                "weight": 80,
+                "trend": "up"
+            },
+            {
+                "text": "Zero-Party Data",
+                "weight": 70,
+                "trend": "up"
+            },
+            {
+                "text": "Omnichannel",
+                "weight": 60,
+                "trend": "stable"
+            },
+            {
+                "text": "Crypto",
+                "weight": 35,
+                "trend": "down"
+            },
+            {
+                "text": "Hyper-Personalization",
+                "weight": 88,
+                "trend": "up"
+            },
+            {
+                "text": "Voice Search",
+                "weight": 65,
+                "trend": "stable"
+            },
+            {
+                "text": "Web3",
+                "weight": 40,
+                "trend": "down"
+            },
+            {
+                "text": "Privacy First",
+                "weight": 85,
+                "trend": "up"
+            },
+            {
+                "text": "Cookieless",
+                "weight": 75,
+                "trend": "up"
+            },
+            {
+                "text": "GenZ Retail",
+                "weight": 68,
+                "trend": "stable"
+            },
+            {
+                "text": "Metadata",
+                "weight": 55,
+                "trend": "up"
             }
         ]
     }

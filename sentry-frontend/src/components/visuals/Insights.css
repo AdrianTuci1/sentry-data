@@ -53,16 +53,10 @@
     padding-block: 0px 100px;
 }
 
-@media (min-width: 768px) {
-    .insights-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 2rem;
-    }
-}
-
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
     .insights-grid {
         grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
     }
 }
 

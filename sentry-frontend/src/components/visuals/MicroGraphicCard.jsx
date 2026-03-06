@@ -1,5 +1,43 @@
 import React from 'react';
 import './MicroGraphicCard.css';
+import RealMapbox from './micrographics/RealMapbox';
+import LiveTrafficChart from './micrographics/LiveTrafficChart';
+import SankeyChart from './micrographics/SankeyChart';
+import StreamGraph from './micrographics/StreamGraph';
+import RangeAreaChart from './micrographics/RangeAreaChart';
+import WaffleChart from './micrographics/WaffleChart';
+import SemiCircleDonut from './micrographics/SemiCircleDonut';
+import ScatterPlot from './micrographics/ScatterPlot';
+import CovarianceMatrix from './micrographics/CovarianceMatrix';
+import FunnelChart from './micrographics/FunnelChart';
+import LeadsList from './micrographics/LeadsList';
+import InterestRadar from './micrographics/InterestRadar';
+import ActivityHeatmap from './micrographics/ActivityHeatmap';
+import CohortAnalysis from './micrographics/CohortAnalysis';
+import PredictiveForecast from './micrographics/PredictiveForecast';
+import FinancialBreakdown from './micrographics/FinancialBreakdown';
+import TechnicalHealth from './micrographics/TechnicalHealth';
+import AttributionModels from './micrographics/AttributionModels';
+import MarketSentimentRadar from './micrographics/MarketSentimentRadar';
+import IncrementalLift from './micrographics/IncrementalLift';
+import AnomalyStream from './micrographics/AnomalyStream';
+import OptimalTimeHeatmap from './micrographics/OptimalTimeHeatmap';
+import LeadClustering from './micrographics/LeadClustering';
+import BudgetSensitivity from './micrographics/BudgetSensitivity';
+import IntentSunburst from './micrographics/IntentSunburst';
+import ShapleyAttribution from './micrographics/ShapleyAttribution';
+import MarketEvolution from './micrographics/MarketEvolution';
+import CreativeQuadrant from './micrographics/CreativeQuadrant';
+import LiquidGauge from './micrographics/LiquidGauge';
+import NeuralNexus from './micrographics/NeuralNexus';
+import IntensityHeat from './micrographics/IntensityHeat';
+import EmotionWave from './micrographics/EmotionWave';
+import ChronoDial from './micrographics/ChronoDial';
+import TrendSpotter from './micrographics/TrendSpotter';
+
+import BarChartMicro from './micrographics/legacy/BarChartMicro';
+import DialMicro from './micrographics/legacy/DialMicro';
+import PieChartMicro from './micrographics/legacy/PieChartMicro';
 
 const MicroGraphicCard = ({ data, isExpanded, onClick }) => {
     // Generate class names for grid span
@@ -8,6 +46,72 @@ const MicroGraphicCard = ({ data, isExpanded, onClick }) => {
     // Render specific graphic based on type
     const renderGraphic = () => {
         switch (data.type) {
+            case '3d-map':
+                return <RealMapbox data={data} />;
+            case 'sankey':
+                return <SankeyChart data={data} />;
+            case 'stream-graph':
+                return <StreamGraph data={data} />;
+            case 'range-area':
+                return <RangeAreaChart data={data} />;
+            case 'waffle':
+                return <WaffleChart data={data} />;
+            case 'semi-circle':
+                return <SemiCircleDonut data={data} />;
+            case 'scatter':
+                return <ScatterPlot data={data} />;
+            case 'covariance':
+                return <CovarianceMatrix data={data} />;
+            case 'funnel':
+                return <FunnelChart data={data} />;
+            case 'leads-list':
+                return <LeadsList data={data} />;
+            case 'radar':
+                return <InterestRadar data={data} />;
+            case 'heatmap-cartesian':
+                return <ActivityHeatmap data={data} />;
+            case 'cohorts':
+                return <CohortAnalysis data={data} />;
+            case 'predictive':
+                return <PredictiveForecast data={data} />;
+            case 'waterfall':
+                return <FinancialBreakdown data={data} />;
+            case 'vitals':
+                return <TechnicalHealth data={data} />;
+            case 'attribution':
+                return <AttributionModels data={data} />;
+            case 'market-radar':
+                return <MarketSentimentRadar data={data} />;
+            case 'incremental-lift':
+                return <IncrementalLift data={data} />;
+            case 'anomaly-stream':
+                return <AnomalyStream data={data} />;
+            case 'optimal-time':
+                return <OptimalTimeHeatmap data={data} />;
+            case 'lead-clustering':
+                return <LeadClustering data={data} />;
+            case 'budget-sensitivity':
+                return <BudgetSensitivity data={data} />;
+            case 'intent-sunburst':
+                return <IntentSunburst data={data} />;
+            case 'shapley-attribution':
+                return <ShapleyAttribution data={data} />;
+            case 'market-evolution':
+                return <MarketEvolution data={data} />;
+            case 'creative-quadrant':
+                return <CreativeQuadrant data={data} />;
+            case 'liquid-gauge':
+                return <LiquidGauge data={data} />;
+            case 'neural-nexus':
+                return <NeuralNexus data={data} />;
+            case 'intensity-heat':
+                return <IntensityHeat data={data} />;
+            case 'chrono-dial':
+                return <ChronoDial data={data} />;
+            case 'emotion-wave':
+                return <EmotionWave data={data} />;
+            case 'trend-spotter':
+                return <TrendSpotter data={data} />;
             case 'weather':
                 return (
                     <div className="micro-weather-card">
@@ -42,36 +146,7 @@ const MicroGraphicCard = ({ data, isExpanded, onClick }) => {
                     </div>
                 );
             case 'light-dial':
-                return (
-                    <div className="micro-light-dial">
-                        <div className="dial-container">
-                            <svg viewBox="0 0 100 100" className="dial-svg">
-                                {/* Background arc */}
-                                <path
-                                    d="M 20 80 A 45 45 0 1 1 80 80"
-                                    fill="none"
-                                    stroke="rgba(255,255,255,0.2)"
-                                    strokeWidth="4"
-                                    strokeLinecap="round"
-                                />
-                                {/* Value arc */}
-                                <path
-                                    d="M 20 80 A 45 45 0 1 1 80 80"
-                                    fill="none"
-                                    stroke="#FFD700"
-                                    strokeWidth="4"
-                                    strokeLinecap="round"
-                                    strokeDasharray="200"
-                                    strokeDashoffset={200 - (200 * data.dialPercentage) / 100}
-                                />
-                            </svg>
-                            <div className="dial-content">
-                                <span className="dial-val">{data.value}</span>
-                                <span className="dial-unit">{data.unit}</span>
-                            </div>
-                        </div>
-                    </div>
-                );
+                return <DialMicro data={data} />;
             case 'color-slider':
                 return (
                     <div className="micro-color-card">
@@ -87,40 +162,7 @@ const MicroGraphicCard = ({ data, isExpanded, onClick }) => {
                     </div>
                 );
             case 'animated-line':
-                {
-                    const maxVal = Math.max(...(data.dataPoints || [100]));
-                    const points = (data.dataPoints || []).map(
-                        (val, i) => `${(i / Math.max(1, data.dataPoints.length - 1)) * 100},${100 - (val / maxVal) * 100}`
-                    ).join(" ");
-                    return (
-                        <div className="micro-animated-line">
-                            <div className="line-value-wrapper">
-                                <span className="line-val">{data.value}</span>
-                                <span className="line-unit">{data.unit}</span>
-                            </div>
-                            <div className="svg-container">
-                                <svg viewBox="0 -10 100 120" preserveAspectRatio="none" className="moving-line-svg">
-                                    <polyline
-                                        points={points}
-                                        fill="none"
-                                        stroke="url(#lineGradient)"
-                                        strokeWidth="4"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        className="path-animate"
-                                    />
-                                    <defs>
-                                        <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                            <stop offset="0%" stopColor="rgba(255,255,255,0.1)" />
-                                            <stop offset="50%" stopColor="#fff" />
-                                            <stop offset="100%" stopColor="#00E5FF" />
-                                        </linearGradient>
-                                    </defs>
-                                </svg>
-                            </div>
-                        </div>
-                    );
-                }
+                return <LiveTrafficChart data={data} />;
             case 'campaign-list':
                 return (
                     <div className="micro-campaign-list">
@@ -164,25 +206,11 @@ const MicroGraphicCard = ({ data, isExpanded, onClick }) => {
                     </div>
                 );
             case 'pie-chart':
-                return (
-                    <div className="micro-pie-chart">
-                        {data.segments?.map((seg, i) => (
-                            <div key={i} className="pie-legend">
-                                <div className="pie-legend-color" style={{ backgroundColor: seg.color }}></div>
-                                <span>{seg.label}: {seg.value}%</span>
-                            </div>
-                        ))}
-                    </div>
-                );
+                return <PieChartMicro data={data} />;
             case 'bar-chart':
                 return (
-                    <div className="micro-bar-chart">
-                        <div className="bar-value">{data.value}</div>
-                        <div className="bars-container">
-                            {data.bars?.map((val, i) => (
-                                <div key={i} className="bar-item" style={{ height: `${val}%` }}></div>
-                            ))}
-                        </div>
+                    <div style={{ width: '30%', alignSelf: 'center', height: '100%' }}>
+                        <BarChartMicro data={data} />
                     </div>
                 );
             default:

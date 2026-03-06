@@ -106,15 +106,24 @@ const Layout = observer(() => {
                         </button>
                     )}
 
+                    {/* Create Project Button - Only in Home view */}
+                    {!isProjectView && (
+                        <button className="dock-create-btn" aria-label="Create Project">
+                            <Plus size={20} />
+                        </button>
+                    )}
+
                     <button className="dock-pill-btn" aria-label="AI Voice/Text Input">
                         <div className="pill-dots">
                             <span></span><span></span><span></span>
                         </div>
                     </button>
 
-                    <button className="dock-icon-btn" onClick={handleDockIconClick} aria-label="Toggle Context">
-                        {isEngineering ? <BarChart2 size={20} /> : <BrainCircuit size={20} />}
-                    </button>
+                    {isProjectView && (
+                        <button className="dock-icon-btn" onClick={handleDockIconClick} aria-label="Toggle Context">
+                            {isEngineering ? <BarChart2 size={20} /> : <BrainCircuit size={20} />}
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
