@@ -14,11 +14,6 @@
     padding: 1.5rem;
 }
 
-.micro-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
 
 .col-span-2 {
     grid-column: span 2;

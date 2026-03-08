@@ -1,37 +1,46 @@
-import express from 'express';
+import express, { Application } from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
-import { sseManager } from './services/sse/SSEManager';
-import { contextMiddleware } from './api/middlewares/context';
+import { requestLogger } from './api/middlewares/logger';
+import { globalErrorHandler } from './api/middlewares/errorHandler';
+import { IController } from './api/controllers/IController';
 
-dotenv.config();
+/**
+ * Object Oriented Application Wrapper
+ */
+export class App {
+    public expressApp: Application;
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+    constructor(controllers: IController[]) {
+        this.expressApp = express();
 
-// Middlewares
-app.use(cors());
-app.use(express.json());
-app.use(contextMiddleware);
+        this.initializeMiddlewares();
+        this.initializeControllers(controllers);
+        this.initializeErrorHandling();
+    }
 
-// Health Check
-app.get('/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
+    private initializeMiddlewares() {
+        this.expressApp.use(cors());
+        this.expressApp.use(express.json());
+        this.expressApp.use(requestLogger);
+    }
 
-// SSE Endpoint
-app.get('/events', (req, res) => {
-    const tenantId = req.user?.tenantId;
-    sseManager.addClient(res, tenantId);
-});
+    private initializeControllers(controllers: IController[]) {
+        // Fast endpoint
+        this.expressApp.get('/health', (req, res) => {
+            res.json({ status: 'ok', timestamp: new Date().toISOString(), service: 'api.sentry.app' });
+        });
 
-// API Routes
-import apiRoutes from './api/routes';
-app.use('/api', apiRoutes);
+        const apiRouter = express.Router();
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-    console.log(`Environment: ${process.env.NODE_ENV}`);
-});
+        controllers.forEach((controller) => {
+            apiRouter.use(controller.path, controller.router);
+        });
 
-export default app;
+        this.expressApp.use('/api', apiRouter);
+    }
+
+    private initializeErrorHandling() {
+        // Must be attached after controllers
+        this.expressApp.use(globalErrorHandler);
+    }
+}

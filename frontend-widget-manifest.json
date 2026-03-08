@@ -1,0 +1,100 @@
+{
+    "version": "1.0",
+    "description": "Acesta este ghidul oficial trimis Agentului Sentry Data la fiecare rulare. Îi spune agentului ce vizualizări există în Frontend și ce format exact de date așteaptă din SQL.",
+    "available_widgets": [
+        {
+            "widget_id": "total_revenue_card",
+            "name": "Total Revenue Metric Card",
+            "description": "Un card simplu care arată venitul total curent și procentul de creștere față de perioada anterioară.",
+            "required_columns_from_sql": [
+                {
+                    "name": "current_value",
+                    "type": "FLOAT",
+                    "description": "Venitul total în perioada selectată"
+                },
+                {
+                    "name": "previous_value",
+                    "type": "FLOAT",
+                    "description": "Venitul total în perioada precedentă"
+                },
+                {
+                    "name": "percentage_change",
+                    "type": "FLOAT",
+                    "description": "Formula: ((current - previous) / previous) * 100"
+                }
+            ],
+            "triggers": [
+                "stripe_connector",
+                "shopify_connector"
+            ]
+        },
+        {
+            "widget_id": "live_traffic_echart",
+            "name": "Live Traffic Area Chart",
+            "description": "Un grafic cu evoluția vizitatorilor sau a acțiunilor pe zile/ore.",
+            "required_columns_from_sql": [
+                {
+                    "name": "date",
+                    "type": "TIMESTAMP",
+                    "description": "Data și ora agregării"
+                },
+                {
+                    "name": "value",
+                    "type": "INTEGER",
+                    "description": "Numărul de evenimente"
+                }
+            ],
+            "triggers": [
+                "google_analytics_connector",
+                "custom_events_webhook"
+            ]
+        },
+        {
+            "widget_id": "platform_spend_pie",
+            "name": "Platform Spend Breakdown",
+            "description": "Un grafic circular care arată distribuția sumelor pe categorii (ex. surse de trafic).",
+            "required_columns_from_sql": [
+                {
+                    "name": "category",
+                    "type": "STRING",
+                    "description": "Numele categoriei (ex: Facebook Ads, Google Ads)"
+                },
+                {
+                    "name": "amount",
+                    "type": "FLOAT",
+                    "description": "Suma totală cheltuită"
+                }
+            ],
+            "triggers": [
+                "facebook_ads_connector",
+                "google_ads_connector"
+            ]
+        },
+        {
+            "widget_id": "ltv_cac_scatter",
+            "name": "LTV vs CAC Grid",
+            "description": "Comparație între valoarea utilizatorului și costul de achiziție, pe segmente.",
+            "required_columns_from_sql": [
+                {
+                    "name": "segment",
+                    "type": "STRING",
+                    "description": "Ex: Organic, Paid Social"
+                },
+                {
+                    "name": "cac",
+                    "type": "FLOAT",
+                    "description": "Customer Acquisition Cost"
+                },
+                {
+                    "name": "ltv",
+                    "type": "FLOAT",
+                    "description": "Life Time Value"
+                }
+            ],
+            "triggers": [
+                "stripe_connector",
+                "facebook_ads_connector"
+            ]
+        }
+    ]
+}

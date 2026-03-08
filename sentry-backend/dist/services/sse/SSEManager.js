@@ -1,54 +1,57 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sseManager = exports.SSEManager = void 0;
-const uuid_1 = require("uuid");
+exports.SSEManager = void 0;
 class SSEManager {
     constructor() {
-        this.clients = [];
+        this.clients = new Map();
     }
-    // Add a new client
-    addClient(res, tenantId) {
-        const id = (0, uuid_1.v4)();
-        const client = { id, res, tenantId };
-        this.clients.push(client);
-        // Initial connection setup
-        res.writeHead(200, {
-            'Content-Type': 'text/event-stream',
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive',
+    /**
+     * Registers a new client connection for a specific tenant.
+     */
+    addClient(tenantId, req, res) {
+        res.setHeader('Content-Type', 'text/event-stream');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Connection', 'keep-alive');
+        // Send initial heartbeat
+        res.write('data: {"message": "Connected to Sentry Analytics Stream"}\n\n');
+        const tenantClients = this.clients.get(tenantId) || [];
+        tenantClients.push(res);
+        this.clients.set(tenantId, tenantClients);
+        console.log(`[SSE] Client connected for Tenant: ${tenantId}. Total: ${tenantClients.length}`);
+        // Cleanup on connection close
+        req.on('close', () => {
+            this.removeClient(tenantId, res);
         });
-        const keepAlive = setInterval(() => {
-            res.write(': keep-alive\n\n');
-        }, 15000);
-        // Remove client on close
-        res.on('close', () => {
-            clearInterval(keepAlive);
-            this.clients = this.clients.filter((c) => c.id !== id);
-        });
-        // Send initial connection success message
-        this.sendToClient(id, { type: 'CONNECTION_ESTABLISHED', id });
     }
-    // Send an event to a specific client
-    sendToClient(clientId, data) {
-        const client = this.clients.find((c) => c.id === clientId);
-        if (client) {
-            client.res.write(`data: ${JSON.stringify(data)}\n\n`);
+    /**
+     * Removes a disconnected client
+     */
+    removeClient(tenantId, res) {
+        const tenantClients = this.clients.get(tenantId) || [];
+        const updatedClients = tenantClients.filter(client => client !== res);
+        if (updatedClients.length === 0) {
+            this.clients.delete(tenantId);
         }
+        else {
+            this.clients.set(tenantId, updatedClients);
+        }
+        console.log(`[SSE] Client disconnected for Tenant: ${tenantId}. Remaining: ${updatedClients.length}`);
     }
-    // Broadcast to all connected clients
-    broadcast(data) {
-        this.clients.forEach((client) => {
-            client.res.write(`data: ${JSON.stringify(data)}\n\n`);
+    /**
+     * Broadcasts an event to all connected clients of a specific tenant.
+     * Often called after the Analytics Worker finishes processing new generic data.
+     */
+    broadcastToTenant(tenantId, eventType, payload) {
+        const tenantClients = this.clients.get(tenantId);
+        if (!tenantClients || tenantClients.length === 0) {
+            return; // No active listeners for this tenant
+        }
+        const dataString = JSON.stringify({ type: eventType, data: payload });
+        tenantClients.forEach(client => {
+            // Standard SSE format: data: {...}\n\n
+            client.write(`data: ${dataString}\n\n`);
         });
-    }
-    // Broadcast to all clients of a specific tenant
-    broadcastToTenant(tenantId, data) {
-        this.clients
-            .filter((client) => client.tenantId === tenantId)
-            .forEach((client) => {
-            client.res.write(`data: ${JSON.stringify(data)}\n\n`);
-        });
+        console.log(`[SSE] Broadcasted '${eventType}' to ${tenantClients.length} clients of Tenant ${tenantId}`);
     }
 }
 exports.SSEManager = SSEManager;
-exports.sseManager = new SSEManager();

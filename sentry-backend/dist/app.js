@@ -3,32 +3,40 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.App = void 0;
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
-const dotenv_1 = __importDefault(require("dotenv"));
-const SSEManager_1 = require("./services/sse/SSEManager");
-const context_1 = require("./api/middlewares/context");
-dotenv_1.default.config();
-const app = (0, express_1.default)();
-const PORT = process.env.PORT || 3000;
-// Middlewares
-app.use((0, cors_1.default)());
-app.use(express_1.default.json());
-app.use(context_1.contextMiddleware);
-// Health Check
-app.get('/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-// SSE Endpoint
-app.get('/events', (req, res) => {
-    const tenantId = req.user?.tenantId;
-    SSEManager_1.sseManager.addClient(res, tenantId);
-});
-// API Routes
-const routes_1 = __importDefault(require("./api/routes"));
-app.use('/api', routes_1.default);
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-    console.log(`Environment: ${process.env.NODE_ENV}`);
-});
-exports.default = app;
+const logger_1 = require("./api/middlewares/logger");
+const errorHandler_1 = require("./api/middlewares/errorHandler");
+/**
+ * Object Oriented Application Wrapper
+ */
+class App {
+    constructor(controllers) {
+        this.expressApp = (0, express_1.default)();
+        this.initializeMiddlewares();
+        this.initializeControllers(controllers);
+        this.initializeErrorHandling();
+    }
+    initializeMiddlewares() {
+        this.expressApp.use((0, cors_1.default)());
+        this.expressApp.use(express_1.default.json());
+        this.expressApp.use(logger_1.requestLogger);
+    }
+    initializeControllers(controllers) {
+        // Fast endpoint
+        this.expressApp.get('/health', (req, res) => {
+            res.json({ status: 'ok', timestamp: new Date().toISOString(), service: 'api.sentry.app' });
+        });
+        const apiRouter = express_1.default.Router();
+        controllers.forEach((controller) => {
+            apiRouter.use(controller.path, controller.router);
+        });
+        this.expressApp.use('/api', apiRouter);
+    }
+    initializeErrorHandling() {
+        // Must be attached after controllers
+        this.expressApp.use(errorHandler_1.globalErrorHandler);
+    }
+}
+exports.App = App;
