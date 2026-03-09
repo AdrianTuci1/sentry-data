@@ -3,7 +3,7 @@ import ReactECharts from 'echarts-for-react';
 import * as echarts from 'echarts';
 
 const MarketEvolution = ({ data: componentData }) => {
-    const channels = [
+    const channels = componentData?.channels || [
         { name: 'Paid Search', color: '#3B82F6', value: 85, synergy: 'High' },
         { name: 'Social Ads', color: '#10B981', value: 72, synergy: 'High' },
         { name: 'Retargeting', color: '#F59E0B', value: 94, synergy: 'Critical' },
@@ -32,7 +32,7 @@ const MarketEvolution = ({ data: componentData }) => {
         }
     }));
 
-    const links = [
+    const links = componentData?.links || [
         { source: 'Paid Search', target: 'Organic SEO', value: 5 },
         { source: 'Social Ads', target: 'Retargeting', value: 8 },
         { source: 'Email Flow', target: 'Retargeting', value: 6 },

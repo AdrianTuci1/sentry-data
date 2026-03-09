@@ -9,18 +9,21 @@ echarts.registerTransform(aggregate);
 const ShapleyAttribution = ({ data: componentData }) => {
     // Generate raw attribution data over multiple intervals (simulating simulations)
     // Format: [Channel, Score, Interval]
-    const channels = ['Email', 'Search', 'Meta', 'Direct', 'Referral'];
-    const rawData = [];
-    channels.forEach(channel => {
-        const base = Math.random() * 30 + 10;
-        for (let year = 2020; year <= 2025; year++) {
-            // Add some variance for the boxplot calculation
-            for (let i = 0; i < 5; i++) {
-                const score = base + (Math.random() - 0.5) * 15;
-                rawData.push([channel, Math.max(0, score), year]);
+    const rawData = componentData?.rawData || (() => {
+        const channels = ['Email', 'Search', 'Meta', 'Direct', 'Referral'];
+        const data = [];
+        channels.forEach(channel => {
+            const base = Math.random() * 30 + 10;
+            for (let year = 2020; year <= 2025; year++) {
+                // Add some variance for the boxplot calculation
+                for (let i = 0; i < 5; i++) {
+                    const score = base + (Math.random() - 0.5) * 15;
+                    data.push([channel, Math.max(0, score), year]);
+                }
             }
-        }
-    });
+        });
+        return data;
+    })();
 
     const option = {
         dataset: [

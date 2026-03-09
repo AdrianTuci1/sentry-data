@@ -15,6 +15,7 @@ export interface ProjectEntity extends Entity {
         widgetId: string;
         sqlString: string;
     }[];
+    discoveryMetadata?: any;
 }
 
 export class ProjectRepository extends BaseRepository<ProjectEntity> {
@@ -54,6 +55,7 @@ export class ProjectRepository extends BaseRepository<ProjectEntity> {
             status: project.status,
             createdAt: project.createdAt,
             queryConfigs: project.queryConfigs,
+            discoveryMetadata: project.discoveryMetadata,
             PK: this.getPartitionKey(project.tenantId),
             SK: this.getSortKey(project.projectId),
         };

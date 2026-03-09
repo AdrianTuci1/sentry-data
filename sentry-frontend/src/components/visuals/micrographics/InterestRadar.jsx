@@ -4,7 +4,7 @@ import ReactECharts from 'echarts-for-react';
 const InterestRadar = ({ data }) => {
     const option = {
         radar: {
-            indicator: [
+            indicator: data?.indicator || [
                 { name: 'Technology', max: 100 },
                 { name: 'Fashion', max: 100 },
                 { name: 'Finance', max: 100 },
@@ -30,7 +30,7 @@ const InterestRadar = ({ data }) => {
             {
                 name: 'Interest Clusters',
                 type: 'radar',
-                data: [
+                data: data?.radarData || [
                     {
                         value: [85, 30, 70, 45, 60, 20],
                         name: 'High Intent',

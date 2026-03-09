@@ -8,7 +8,7 @@ echarts.registerTransform(ecStat.transform.clustering);
 
 const LeadClustering = ({ data: componentData }) => {
     // Domain data: [Engagement Score (0-100), Conversion Probability (0.1-1.0), Name]
-    const data = [
+    const data = componentData?.clusteringData || [
         [85, 0.92, 'TechFlow Corp'], [78, 0.85, 'Maria S.'], [95, 0.98, 'Visionary Ltd'],
         [45, 0.32, 'Nexus Digital'], [22, 0.15, 'Andrei I.'], [65, 0.68, 'Optima Systems'],
         [12, 0.05, 'Skybridge Inc'], [30, 0.22, 'Global Solutions'], [55, 0.45, 'SoftLink'],

@@ -2,7 +2,7 @@ import React from 'react';
 import ReactECharts from 'echarts-for-react';
 
 const IntentSunburst = ({ data }) => {
-    const sunburstData = [
+    const sunburstData = data?.sunburstData || [
         {
             name: 'Ready to Buy',
             itemStyle: { color: '#10B981' },

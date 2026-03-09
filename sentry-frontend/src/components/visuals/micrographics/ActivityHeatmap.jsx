@@ -5,14 +5,16 @@ const ActivityHeatmap = ({ data }) => {
     const hours = ['12a', '1a', '2a', '3a', '4a', '5a', '6a', '7a', '8a', '9a', '10a', '11a', '12p', '1p', '2p', '3p', '4p', '5p', '6p', '7p', '8p', '9p', '10p', '11p'];
     const days = ['Sat', 'Fri', 'Thu', 'Wed', 'Tue', 'Mon', 'Sun'];
 
-    // Mock data: [dayIndex, hourIndex, value]
-    const heatmapData = [];
-    for (let i = 0; i < 7; i++) {
-        for (let j = 0; j < 24; j++) {
-            const val = Math.floor(Math.random() * 10);
-            heatmapData.push([j, i, val === 0 ? '-' : val]);
+    const heatmapData = data?.heatmapData || (() => {
+        const generated = [];
+        for (let i = 0; i < 7; i++) {
+            for (let j = 0; j < 24; j++) {
+                const val = Math.floor(Math.random() * 10);
+                generated.push([j, i, val === 0 ? '-' : val]);
+            }
         }
-    }
+        return generated;
+    })();
 
     const option = {
         tooltip: { position: 'top' },

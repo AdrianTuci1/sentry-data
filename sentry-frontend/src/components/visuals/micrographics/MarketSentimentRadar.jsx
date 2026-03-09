@@ -5,7 +5,7 @@ import * as echarts from 'echarts';
 const MarketSentimentRadar = ({ data }) => {
     const option = {
         radar: {
-            indicator: [
+            indicator: data?.indicator || [
                 { name: 'Trust', max: 100 },
                 { name: 'Innovation', max: 100 },
                 { name: 'Price', max: 100 },
@@ -38,7 +38,7 @@ const MarketSentimentRadar = ({ data }) => {
             {
                 name: 'Brand Health',
                 type: 'radar',
-                data: [
+                data: data?.radarData || [
                     {
                         value: [90, 75, 60, 85, 80],
                         name: 'Current Metric',

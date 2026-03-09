@@ -5,6 +5,7 @@ import { AnalyticsService } from '../application/services/AnalyticsService';
 import { AuthService } from '../application/services/AuthService';
 import { DashboardController } from '../api/controllers/DashboardController';
 import { HealthController } from '../api/controllers/HealthController';
+import { ProjectController } from '../api/controllers/ProjectController';
 import { SSEManager } from '../services/sse/SSEManager';
 import { SSEController } from '../api/controllers/SSEController';
 import { config } from '../config';
@@ -15,8 +16,8 @@ import { E2BSandboxProvider } from '../infrastructure/providers/E2BSandboxProvid
 import { ModalSandboxProvider } from '../infrastructure/providers/ModalSandboxProvider';
 import { ModalInferenceProvider } from '../infrastructure/providers/ModalInferenceProvider';
 import { R2StorageService } from '../infrastructure/storage/R2StorageService';
-import { AgentService } from '../application/services/AgentService';
 import { PipelineOrchestratorService } from '../application/services/PipelineOrchestratorService';
+import { OrchestrationService } from '../application/services/OrchestrationService';
 import { WebhookController } from '../api/controllers/WebhookController';
 
 export function initContainer() {
@@ -44,8 +45,8 @@ export function initContainer() {
     // 3. Initialize Domain Services 
     const authService = new AuthService(tenantRepo);
     const analyticsService = new AnalyticsService(projectRepo);
-    const agentService = new AgentService(sandboxProvider, projectRepo);
-    const pipelineOrchestratorService = new PipelineOrchestratorService(sandboxProvider, r2StorageService, agentService);
+    const orchestrationService = new OrchestrationService(sandboxProvider, projectRepo, r2StorageService, sseManager);
+    const pipelineOrchestratorService = new PipelineOrchestratorService(orchestrationService);
 
     // 4. Initialize Controllers
     // Controllers are standalone objects that will be passed into the App class
@@ -53,12 +54,14 @@ export function initContainer() {
     const dashboardController = new DashboardController(analyticsService, authService);
     const sseController = new SSEController(sseManager, authService);
     const webhookController = new WebhookController(pipelineOrchestratorService);
+    const projectController = new ProjectController(orchestrationService, authService, projectRepo);
 
     const controllers = [
         healthController,
         dashboardController,
         sseController,
-        webhookController
+        webhookController,
+        projectController
     ];
 
     console.log('[DI Container] Dependencies wired successfully.');
@@ -71,9 +74,11 @@ export function initContainer() {
             dashboardController,
             sseController,
             webhookController,
+            projectController,
             analyticsService,
             authService,
             pipelineOrchestratorService,
+            orchestrationService,
             projectRepo,
             tenantRepo,
             sseManager,

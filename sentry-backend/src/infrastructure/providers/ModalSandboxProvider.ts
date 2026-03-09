@@ -2,9 +2,11 @@ import { ISandboxProvider, ISandboxConfig, IExecutionResult } from './ISandboxPr
 import { config } from '../../config';
 
 export class ModalSandboxProvider implements ISandboxProvider {
+    private activeSandboxes: Map<string, Record<string, string>> = new Map();
+
     constructor() {
-        if (!config.providers.modalApiKey) {
-            console.warn('[ModalSandbox] Warning: MODAL_API_KEY is not defined.');
+        if (!config.providers.modalTokenId || !config.providers.modalTokenSecret) {
+            console.warn('[ModalSandbox] Warning: MODAL_TOKEN_ID or MODAL_TOKEN_SECRET is not defined.');
         }
     }
 
@@ -14,23 +16,30 @@ export class ModalSandboxProvider implements ISandboxProvider {
         // so starting a sandbox might just mean authenticating and preparing a call ID.
         // We simulate returning an execution context ID here.
         const sandboxId = `modal-sb-${Date.now()}`;
+
+        if (sandboxConfig?.envVars) {
+            this.activeSandboxes.set(sandboxId, sandboxConfig.envVars);
+        }
+
         return sandboxId;
     }
 
     public async executeTask(sandboxId: string, script: string): Promise<IExecutionResult> {
         console.log(`[ModalSandbox] Triggering ephemeral execution on Modal for ID: ${sandboxId}...`);
 
+        const envVars = this.activeSandboxes.get(sandboxId) || {};
+
         try {
             // Actual implementation would be a REST call to a deployed Modal Webhook 
             // that accepts Python code and runs it securely in its own container.
 
-            const req = await fetch('https://your-modal-workspace.modal.run/sandbox-executor', {
+            const req = await fetch('https://adrian-tucicovenco--sentry-sandbox-executor-sandbox-executor.modal.run', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${config.providers.modalApiKey}`
+                    'Authorization': `Bearer ${config.providers.modalTokenId}:${config.providers.modalTokenSecret}`
                 },
-                body: JSON.stringify({ script, sandboxId })
+                body: JSON.stringify({ script, sandboxId, envVars })
             });
 
             if (!req.ok) {
@@ -55,7 +64,6 @@ export class ModalSandboxProvider implements ISandboxProvider {
 
     public async stopSandbox(sandboxId: string): Promise<void> {
         console.log(`[ModalSandbox] Cleaning up execution artifacts for Modal Sandbox ${sandboxId}.`);
-        // If modal containers are ephemeral, this might just clean up tmp files in R2 
-        // or signify to the modal app that the session is closed.
+        this.activeSandboxes.delete(sandboxId);
     }
 }

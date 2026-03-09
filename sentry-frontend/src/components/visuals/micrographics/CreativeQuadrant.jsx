@@ -4,7 +4,7 @@ import * as echarts from 'echarts';
 
 const CreativeQuadrant = ({ data: componentData }) => {
     // Top-tier marketing creatives: [CTR (%), Conv. Rate (%), Name, Type]
-    const creatives = [
+    const creatives = componentData?.creatives || [
         [4.2, 5.8, 'Video: Summer Lifestyle', 'Video'],
         [3.8, 6.2, 'Static: Product Hero', 'Static'],
         [1.2, 8.5, 'Testimonial: Andrei P.', 'Review'],

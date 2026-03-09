@@ -2,8 +2,8 @@ import { config } from '../../config';
 
 export class ModalInferenceProvider {
     constructor() {
-        if (!config.providers.modalApiKey) {
-            console.warn('[ModalInference] Warning: MODAL_API_KEY is not defined.');
+        if (!config.providers.modalTokenId || !config.providers.modalTokenSecret) {
+            console.warn('[ModalInference] Warning: MODAL_TOKEN_ID or MODAL_TOKEN_SECRET is not defined.');
         }
     }
 
@@ -14,11 +14,12 @@ export class ModalInferenceProvider {
         console.log(`[ModalInference] Triggering inference for model: ${modelName}`);
 
         try {
-            const req = await fetch(`https://your-modal-workspace.modal.run/${modelName}`, {
+            // Using the adrian-tucicovenco workspace as seen in ModalSandboxProvider
+            const req = await fetch(`https://adrian-tucicovenco--${modelName}.modal.run`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${config.providers.modalApiKey}`
+                    'Authorization': `Bearer ${config.providers.modalTokenId}:${config.providers.modalTokenSecret}`
                 },
                 body: JSON.stringify({ inputs })
             });

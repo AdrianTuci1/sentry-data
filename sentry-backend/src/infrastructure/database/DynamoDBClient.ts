@@ -1,11 +1,15 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
+import { config } from '../../config/index';
 
 // Basic configuration for the DynamoDB Client.
-// In production, roles/credentials will be picked up from the AWS Environment.
+// We use explicit credentials from the config object.
 const ddbClient = new DynamoDBClient({
-    region: process.env.AWS_REGION || 'eu-central-1',
-    // ... Any explicit credentials or endpoint configurations (e.g. for local-dynamodb) goes here
+    region: config.aws.region,
+    credentials: {
+        accessKeyId: config.aws.accessKeyId,
+        secretAccessKey: config.aws.secretAccessKey
+    }
 });
 
 // The DocumentClient abstracts away explicit type mappings (e.g., {"S": "String"})

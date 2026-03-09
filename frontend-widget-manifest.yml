@@ -1,0 +1,273 @@
+version: "2.1"
+description: >
+  Official Sentry Data Agent Spec Manifest. This defines all available visual 
+  widgets in the frontend and the exact data structure/schema the agent needs 
+  to prepare (from SQL or other sources) to populate them. Use this YAML to 
+  understand how to map data rows to the UI.
+
+architecture:
+  delivery_method: "HTTP Streaming"
+  notes: >
+    Due to potentially large data volumes (e.g., scatter plots with 3,000+ rows, 
+    detailed event streams), the agent MUST return the frontend widgets via 
+    HTTP streaming JSON or Server-Sent Events (SSE). 
+    Do not buffer massive arrays in memory. Send chunks progressively.
+
+global_properties:
+  - name: id
+    type: string
+    description: Unique identifier for the widget instance.
+  - name: type
+    type: string
+    description: The exact widget type mapped to a visual component (MUST match one of the widget_types below).
+  - name: title
+    type: string
+    description: Primary title of the card.
+  - name: subtitle
+    type: string
+    description: Secondary title/subtitle of the card.
+  - name: colorTheme
+    type: string
+    description: "Theme class, e.g., 'theme-productivity', 'theme-revenue', 'theme-audience', 'theme-weather', 'theme-red'."
+  - name: gridSpan
+    type: string
+    description: "Grid placement sizing, e.g., 'default', 'col-span-2', 'row-span-2', 'col-span-2 row-span-2'."
+  - name: footerText
+    type: string
+    description: Optional single footer text for the card.
+
+widget_types:
+  weather:
+    description: "Simple numeric card with primary value and unit, representing a pulse or current status."
+    data_requirements:
+      value: "string | number (e.g., '4.8')"
+      unit: "string (e.g., 'x', '%')"
+  
+  natural:
+    description: "Card with value, unit, and a horizontal progress slider."
+    data_requirements:
+      value: "string | number"
+      unit: "string"
+      sliderValue: "number (0-100)"
+      footerTextLeft: "string"
+      footerTextRight: "string"
+
+  light-dial:
+    description: "Light dial visualization showing a percentage or multiplier."
+    data_requirements:
+      value: "string | number"
+      unit: "string"
+      sliderValue: "number (0-100)"
+
+  predictive:
+    description: "Predictive line chart highlighting historical and forecasted trend lines, plus confidence intervals."
+    data_requirements:
+      value: "string | number (Current or predicted total)"
+      unit: "string (e.g., 'est')"
+      historical: "array of numbers [number, number, ...]"
+      forecast: "array of numbers [number, number, ...]"
+      confidenceRange: "array of numbers representing bounds (e.g., [30, 45, 60])"
+
+  liquid-gauge:
+    description: "Liquid fill gauge representing saturation or fulfillment."
+    data_requirements:
+      value: "string | number"
+      unit: "string"
+      sliderValue: "number (0-100)"
+
+  neural-nexus:
+    description: "Abstract dial representing AI/neural coverage."
+    data_requirements:
+      value: "string | number"
+      unit: "string"
+      sliderValue: "number (0-100)"
+
+  intensity-heat:
+    description: "A heat indicator representing fatigue or intensity levels."
+    data_requirements:
+      value: "string | number"
+      unit: "string"
+
+  chrono-dial:
+    description: "A clock/time-based dial showing cycle or phase completion."
+    data_requirements:
+      value: "string | number"
+      unit: "string"
+      sliderValue: "number (0-100)"
+
+  incremental-lift:
+    description: "A card highlighting lift percentage or increment."
+    data_requirements:
+      value: "string | number (e.g., '+22%')"
+      unit: "string"
+
+  optimal-time:
+    description: "Visualizes the optimal time for an action (circular clock representation)."
+    data_requirements:
+      value: "string (e.g., '18:00')"
+      unit: "string (e.g., 'GMT')"
+
+  animated-line:
+    description: "Live pulse line chart, typically used for concurrent users or traffic."
+    data_requirements:
+      value: "string | number"
+      unit: "string"
+      dataPoints: "array of numbers [number, number, ...]"
+
+  cohorts:
+    description: "Cohort retention heatmap matrix."
+    data_requirements:
+      cohorts: "array of objects: [{ week: string, size: number, data: number[] }]"
+
+  vitals:
+    description: "List of technical health or core vitals."
+    data_requirements:
+      metrics: "array of objects: [{ name: string, value: string|number, status: 'good' | 'warning' | 'error' }]"
+
+  leads-list:
+    description: "List of active conversions, users, or top routes."
+    data_requirements:
+      leads: "array of objects: [{ name: string, value: string, status: 'hot'|'warm'|'cool', time: string }]"
+
+  waterfall:
+    description: "Financial waterfall or net profit bridge chart."
+    data_requirements:
+      value: "string | number"
+      unit: "string"
+      steps: "array of objects: [{ name: string, value?: number, isTotal?: boolean }]"
+
+  attribution:
+    description: "Marketing attribution value distribution model (comparing First, Last, Linear)."
+    data_requirements:
+      models: "array of objects: [{ channel: string, first: number, last: number, linear: number }]"
+
+  trend-spotter:
+    description: "Keyword trend representation (bubbles/tags)."
+    data_requirements:
+      keywords: "array of objects: [{ text: string, weight: number, trend: 'up'|'down'|'stable' }]"
+
+  scatter:
+    description: "Scatter plot typically used for mappings like LTV vs CAC."
+    data_requirements:
+      scatterData: "array of 2D coordinates: [[x: number, y: number], ...]"
+
+  market-radar:
+    description: "Radar chart representing sentiment or market brand health."
+    data_requirements:
+      indicator: "array of objects: [{ name: string, max: number }]"
+      radarData: "array of objects: [{ value: number[], name: string, ... }]"
+
+  anomaly-stream:
+    description: "Anomaly pulse warning metrics stream."
+    data_requirements:
+      value: "string | number"
+      unit: "string"
+
+  funnel:
+    description: "Sales funnel chart showing sequential drop-off."
+    data_requirements:
+      funnel: "array of objects: [{ value: number, name: string }]"
+
+  market-evolution:
+    description: "Temporal evolution dynamics chart."
+    data_requirements:
+      channels: "array of objects: [{ name: string, color: string, value: number, synergy: string }]"
+      links: "array of objects: [{ source: string, target: string, value: number }]"
+
+  creative-quadrant:
+    description: "Quadrant matrix for clustering/performance maps."
+    data_requirements:
+      creatives: "array of tuples: [[ctr: number, conv: number, name: string, type: string], ...]"
+
+  lead-clustering:
+    description: "ML-Driven AI Segmentation clusters."
+    data_requirements:
+      clusteringData: "array of tuples: [[engagement: number, probability: number, name: string], ...]"
+
+  budget-sensitivity:
+    description: "Simulation curve for budgets vs diminishing returns."
+    data_requirements:
+      curvePoints: "array of 2D coordinates: [[x: number, y: number], ...]"
+
+  intent-sunburst:
+    description: "Sunburst chart for traffic intent categorization."
+    data_requirements:
+      sunburstData: "array of hierarchical objects: [{ name: string, children?: array, value?: number, itemStyle?: object }]"
+
+  shapley-attribution:
+    description: "Shapley algorithm fair contribution model."
+    data_requirements:
+      rawData: "array of tuples: [[channel: string, score: number, year: number], ...]"
+
+  3d-map:
+    description: "Mapbox 3D geographic visual."
+    data_requirements:
+      locations: "array of objects: [{ name: string, longitude: number, latitude: number, intensity: number }]"
+
+  campaign-list:
+    description: "List of active campaigns with trend indicators."
+    data_requirements:
+      campaigns: "array of objects: [{ name: string, trend: '+'|'-', value: string|number }]"
+
+  productivity-chart:
+    description: "Abstract productivity bar chart visual."
+    data_requirements:
+      dataPoints: "array of numbers determining point heights"
+
+  color-slider:
+    description: "Simple range slider showing color scale."
+    data_requirements:
+      sliderValue: "number (0-100)"
+
+  red-gradient:
+    description: "Urgency gauge with red gradient."
+    data_requirements:
+      sliderValue: "number (0-100)"
+
+  pie-chart:
+    description: "Basic pie chart."
+    data_requirements: "Passed to PieChartMicro. Data structure context dependent."
+
+  bar-chart:
+    description: "Basic bar chart."
+    data_requirements: "Passed to BarChartMicro. Data structure context dependent."
+
+  semi-circle:
+    description: "Semi-circle donut chart."
+    data_requirements:
+      platforms: "array of objects: [{ name: string, value: number, color: string }]"
+
+  stream-graph:
+    description: "Stream graph for trends over time."
+    data_requirements:
+      streamData: "array of tuples: [[date: string, value: number, category: string], ...]"
+
+  range-area:
+    description: "Range area chart for displaying min/max bands."
+    data_requirements:
+      dates: "array of strings"
+      maxData: "array of numbers"
+      avgData: "array of numbers"
+      minData: "array of numbers"
+
+  waffle:
+    description: "Waffle chart showing parts of a whole."
+    data_requirements:
+      value: "number (0-100)"
+
+  covariance:
+    description: "Covariance matrix heatmap."
+    data_requirements:
+      fields: "array of strings"
+      matrix: "array of 3-tuples: [[xIndex: number, yIndex: number, value: number], ...]"
+
+  radar:
+    description: "Interest Radar chart."
+    data_requirements:
+      indicator: "array of objects: [{ name: string, max: number }]"
+      radarData: "array of objects: [{ value: number[], name: string, ... }]"
+
+  heatmap-cartesian:
+    description: "Cartesian Activity Heatmap."
+    data_requirements:
+      heatmapData: "array of 3-tuples: [[hourIndex: number, dayIndex: number, value: number|'-'], ...]"

@@ -3,12 +3,14 @@ import ReactECharts from 'echarts-for-react';
 import * as echarts from 'echarts';
 
 const BudgetSensitivity = ({ data }) => {
-    // Generate S-curve data (Sigmoid function)
-    const curvePoints = [];
-    for (let x = 0; x <= 100; x += 2) {
-        const y = 100 / (1 + Math.exp(-0.1 * (x - 50)));
-        curvePoints.push([x, y]);
-    }
+    const curvePoints = data?.curvePoints || (() => {
+        const points = [];
+        for (let x = 0; x <= 100; x += 2) {
+            const y = 100 / (1 + Math.exp(-0.1 * (x - 50)));
+            points.push([x, y]);
+        }
+        return points;
+    })();
 
     const option = {
         grid: {

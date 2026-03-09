@@ -4,3 +4,4 @@ node_modules
 .venv
 layout00
 venv
+dist

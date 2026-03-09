@@ -391,7 +391,67 @@
         "title": "Market Sentiment",
         "subtitle": "Aggregated Brand Health",
         "colorTheme": "theme-audience",
-        "gridSpan": "default"
+        "gridSpan": "default",
+        "indicator": [
+            {
+                "name": "Trust",
+                "max": 100
+            },
+            {
+                "name": "Innovation",
+                "max": 100
+            },
+            {
+                "name": "Price",
+                "max": 100
+            },
+            {
+                "name": "Service",
+                "max": 100
+            },
+            {
+                "name": "Quality",
+                "max": 100
+            }
+        ],
+        "radarData": [
+            {
+                "value": [
+                    92,
+                    80,
+                    65,
+                    88,
+                    85
+                ],
+                "name": "Current Metric",
+                "symbol": "none",
+                "itemStyle": {
+                    "color": "#ec4899"
+                },
+                "areaStyle": {
+                    "color": {
+                        "type": "radial",
+                        "x": 0.5,
+                        "y": 0.5,
+                        "r": 1,
+                        "colorStops": [
+                            {
+                                "offset": 0,
+                                "color": "rgba(236, 72, 153, 0.1)"
+                            },
+                            {
+                                "offset": 1,
+                                "color": "rgba(236, 72, 153, 0.4)"
+                            }
+                        ]
+                    }
+                },
+                "lineStyle": {
+                    "width": 2,
+                    "type": "solid"
+                }
+            }
+        ]
     },
     {
         "id": "attribution-models",
@@ -451,7 +511,49 @@
         "title": "LTV vs CAC",
         "subtitle": "Client Distribution",
         "colorTheme": "theme-audience",
-        "gridSpan": "col-span-2 row-span-2"
+        "gridSpan": "col-span-2 row-span-2",
+        "scatterData": [
+            [
+                45,
+                450
+            ],
+            [
+                60,
+                724
+            ],
+            [
+                70,
+                482
+            ],
+            [
+                85,
+                720
+            ],
+            [
+                100,
+                804
+            ],
+            [
+                120,
+                1084
+            ],
+            [
+                130,
+                758
+            ],
+            [
+                145,
+                1050
+            ],
+            [
+                160,
+                1200
+            ],
+            [
+                180,
+                1280
+            ]
+        ]
     },
     {
         "id": "sales-funnel",
@@ -459,7 +561,29 @@
         "title": "Sales Funnel",
         "subtitle": "Conversion Steps",
         "colorTheme": "theme-weather",
-        "gridSpan": "col-span-2"
+        "gridSpan": "col-span-2",
+        "funnel": [
+            {
+                "value": 100,
+                "name": "Visits"
+            },
+            {
+                "value": 85,
+                "name": "Inquiry"
+            },
+            {
+                "value": 50,
+                "name": "Lead"
+            },
+            {
+                "value": 25,
+                "name": "Cart"
+            },
+            {
+                "value": 12,
+                "name": "Purchase"
+            }
+        ]
     },
     {
         "id": "market-evolution",
@@ -467,7 +591,88 @@
         "title": "Channel Synergy Dynamics",
         "subtitle": "Cross-Channel Influence & Temporal Evolution",
         "colorTheme": "theme-audience",
-        "gridSpan": "col-span-2 row-span-2"
+        "gridSpan": "col-span-2 row-span-2",
+        "channels": [
+            {
+                "name": "Paid Search",
+                "color": "#3B82F6",
+                "value": 85,
+                "synergy": "High"
+            },
+            {
+                "name": "Social Ads",
+                "color": "#10B981",
+                "value": 72,
+                "synergy": "High"
+            },
+            {
+                "name": "Retargeting",
+                "color": "#F59E0B",
+                "value": 94,
+                "synergy": "Critical"
+            },
+            {
+                "name": "Email Flow",
+                "color": "#EF4444",
+                "value": 58,
+                "synergy": "Mid"
+            },
+            {
+                "name": "Organic SEO",
+                "color": "#8B5CF6",
+                "value": 88,
+                "synergy": "High"
+            },
+            {
+                "name": "Referral",
+                "color": "#EC4899",
+                "value": 45,
+                "synergy": "Mid"
+            },
+            {
+                "name": "Influencer",
+                "color": "#06B6D4",
+                "value": 65,
+                "synergy": "High"
+            }
+        ],
+        "links": [
+            {
+                "source": "Paid Search",
+                "target": "Organic SEO",
+                "value": 5
+            },
+            {
+                "source": "Social Ads",
+                "target": "Retargeting",
+                "value": 8
+            },
+            {
+                "source": "Email Flow",
+                "target": "Retargeting",
+                "value": 6
+            },
+            {
+                "source": "Organic SEO",
+                "target": "Direct",
+                "value": 4
+            },
+            {
+                "source": "Influencer",
+                "target": "Social Ads",
+                "value": 9
+            },
+            {
+                "source": "Paid Search",
+                "target": "Retargeting",
+                "value": 7
+            },
+            {
+                "source": "Organic SEO",
+                "target": "Social Ads",
+                "value": 5
+            }
+        ]
     },
     {
         "id": "creative-quadrant",
@@ -475,7 +680,51 @@
         "title": "Creative Performance Quadrant",
         "subtitle": "CTR vs Conversion Rate Intelligence",
         "colorTheme": "theme-productivity",
-        "gridSpan": "col-span-2 row-span-2"
+        "gridSpan": "col-span-2 row-span-2",
+        "creatives": [
+            [
+                4.5,
+                6.2,
+                "Video: Spring Launch",
+                "Video"
+            ],
+            [
+                3.9,
+                6.5,
+                "Static: Product Close-up",
+                "Static"
+            ],
+            [
+                1.5,
+                9.0,
+                "Testimonial: Alex B.",
+                "Review"
+            ],
+            [
+                6.0,
+                1.5,
+                "Flash Sale Banner",
+                "Static"
+            ],
+            [
+                2.5,
+                4.8,
+                "Video: How it works",
+                "Video"
+            ],
+            [
+                0.5,
+                1.0,
+                "Static: Old Generic",
+                "Static"
+            ],
+            [
+                7.2,
+                0.8,
+                "Meme: Friday Vibe",
+                "Social"
+            ]
+        ]
     },
     {
         "id": "lead-clustering",
@@ -483,7 +732,54 @@
         "title": "Lead Quality Clusters",
         "subtitle": "ML-Driven AI Segmentation",
         "colorTheme": "theme-audience",
-        "gridSpan": "col-span-2 row-span-2"
+        "gridSpan": "col-span-2 row-span-2",
+        "clusteringData": [
+            [
+                88,
+                0.95,
+                "Apex Corp"
+            ],
+            [
+                75,
+                0.82,
+                "Ion S."
+            ],
+            [
+                92,
+                0.96,
+                "TechNova"
+            ],
+            [
+                40,
+                0.28,
+                "Digital Frontier"
+            ],
+            [
+                20,
+                0.12,
+                "Paul D."
+            ],
+            [
+                60,
+                0.65,
+                "SysOps"
+            ],
+            [
+                10,
+                0.04,
+                "Unknown LLC"
+            ],
+            [
+                25,
+                0.18,
+                "Global Net"
+            ],
+            [
+                50,
+                0.42,
+                "LinkSoft"
+            ]
+        ]
     },
     {
         "id": "budget-sensitivity",
@@ -491,7 +787,213 @@
         "title": "Budget Sensitivity",
         "subtitle": "Elasticity & Diminishing Returns",
         "colorTheme": "theme-revenue",
-        "gridSpan": "col-span-2"
+        "gridSpan": "col-span-2",
+        "curvePoints": [
+            [
+                0,
+                0.6692850924284856
+            ],
+            [
+                2,
+                0.816257115315989
+            ],
+            [
+                4,
+                0.9951801866904316
+            ],
+            [
+                6,
+                1.2128434984274237
+            ],
+            [
+                8,
+                1.4774031693273055
+            ],
+            [
+                10,
+                1.798620996209156
+            ],
+            [
+                12,
+                2.188127093613047
+            ],
+            [
+                14,
+                2.6596993576865855
+            ],
+            [
+                16,
+                3.2295464698450496
+            ],
+            [
+                18,
+                3.9165722796764353
+            ],
+            [
+                20,
+                4.742587317756678
+            ],
+            [
+                22,
+                5.7324175898868726
+            ],
+            [
+                24,
+                6.913842034334682
+            ],
+            [
+                26,
+                8.317269649392236
+            ],
+            [
+                28,
+                9.975048911968514
+            ],
+            [
+                30,
+                11.920292202211755
+            ],
+            [
+                32,
+                14.185106490048778
+            ],
+            [
+                34,
+                16.79816148660755
+            ],
+            [
+                36,
+                19.781611144141824
+            ],
+            [
+                38,
+                23.14752165009823
+            ],
+            [
+                40,
+                26.894142136999513
+            ],
+            [
+                42,
+                31.002551887238752
+            ],
+            [
+                44,
+                35.43436937742045
+            ],
+            [
+                46,
+                40.1312339887548
+            ],
+            [
+                48,
+                45.016600268752214
+            ],
+            [
+                50,
+                50.0
+            ],
+            [
+                52,
+                54.98339973124779
+            ],
+            [
+                54,
+                59.8687660112452
+            ],
+            [
+                56,
+                64.56563062257955
+            ],
+            [
+                58,
+                68.99744811276125
+            ],
+            [
+                60,
+                73.10585786300048
+            ],
+            [
+                62,
+                76.85247834990177
+            ],
+            [
+                64,
+                80.21838885585818
+            ],
+            [
+                66,
+                83.20183851339245
+            ],
+            [
+                68,
+                85.81489350995123
+            ],
+            [
+                70,
+                88.07970779778823
+            ],
+            [
+                72,
+                90.02495108803149
+            ],
+            [
+                74,
+                91.68273035060777
+            ],
+            [
+                76,
+                93.08615796566532
+            ],
+            [
+                78,
+                94.26758241011314
+            ],
+            [
+                80,
+                95.25741268224333
+            ],
+            [
+                82,
+                96.08342772032357
+            ],
+            [
+                84,
+                96.77045353015495
+            ],
+            [
+                86,
+                97.34030064231341
+            ],
+            [
+                88,
+                97.81187290638695
+            ],
+            [
+                90,
+                98.20137900379083
+            ],
+            [
+                92,
+                98.5225968306727
+            ],
+            [
+                94,
+                98.78715650157258
+            ],
+            [
+                96,
+                99.00481981330957
+            ],
+            [
+                98,
+                99.18374288468401
+            ],
+            [
+                100,
+                99.33071490757152
+            ]
+        ]
     },
     {
         "id": "intent-sunburst",
@@ -499,7 +1001,41 @@
         "title": "Traffic Intent",
         "subtitle": "Real-time Classification",
         "colorTheme": "theme-audience",
-        "gridSpan": "col-span-2 row-span-2"
+        "gridSpan": "col-span-2 row-span-2",
+        "sunburstData": [
+            {
+                "name": "Ready to Buy",
+                "itemStyle": {
+                    "color": "#10B981"
+                },
+                "children": [
+                    {
+                        "name": "Product X",
+                        "value": 20
+                    },
+                    {
+                        "name": "Checkout",
+                        "value": 25
+                    }
+                ]
+            },
+            {
+                "name": "Researching",
+                "itemStyle": {
+                    "color": "#3B82F6"
+                },
+                "children": [
+                    {
+                        "name": "Pricing",
+                        "value": 15
+                    },
+                    {
+                        "name": "Features",
+                        "value": 15
+                    }
+                ]
+            }
+        ]
     },
     {
         "id": "shapley-attribution",
@@ -507,7 +1043,234 @@
         "title": "Shapley Attribution",
         "subtitle": "Fair contribution model",
         "colorTheme": "theme-productivity",
-        "gridSpan": "col-span-2"
+        "gridSpan": "col-span-2",
+        "rawData": [
+            [
+                "Email",
+                19.683019058189853,
+                2021
+            ],
+            [
+                "Email",
+                24.6833903211189,
+                2021
+            ],
+            [
+                "Email",
+                23.64701871671297,
+                2021
+            ],
+            [
+                "Email",
+                33.91222823701676,
+                2022
+            ],
+            [
+                "Email",
+                32.716793702194735,
+                2022
+            ],
+            [
+                "Email",
+                37.026395307833425,
+                2022
+            ],
+            [
+                "Email",
+                20.921580606324838,
+                2023
+            ],
+            [
+                "Email",
+                27.621240347441923,
+                2023
+            ],
+            [
+                "Email",
+                19.77874834249792,
+                2023
+            ],
+            [
+                "Search",
+                16.66624500617535,
+                2021
+            ],
+            [
+                "Search",
+                7.089858637785376,
+                2021
+            ],
+            [
+                "Search",
+                10.535892257841073,
+                2021
+            ],
+            [
+                "Search",
+                19.556827999698566,
+                2022
+            ],
+            [
+                "Search",
+                17.457968856172435,
+                2022
+            ],
+            [
+                "Search",
+                10.967951684922037,
+                2022
+            ],
+            [
+                "Search",
+                18.344452921626278,
+                2023
+            ],
+            [
+                "Search",
+                22.747748377664635,
+                2023
+            ],
+            [
+                "Search",
+                6.689114437669323,
+                2023
+            ],
+            [
+                "Meta",
+                38.137365454748775,
+                2021
+            ],
+            [
+                "Meta",
+                30.979587885344078,
+                2021
+            ],
+            [
+                "Meta",
+                27.28416755121987,
+                2021
+            ],
+            [
+                "Meta",
+                43.31883899911986,
+                2022
+            ],
+            [
+                "Meta",
+                30.906468457236777,
+                2022
+            ],
+            [
+                "Meta",
+                26.0294944225872,
+                2022
+            ],
+            [
+                "Meta",
+                26.10890509165352,
+                2023
+            ],
+            [
+                "Meta",
+                41.124464881933434,
+                2023
+            ],
+            [
+                "Meta",
+                36.24909818232206,
+                2023
+            ],
+            [
+                "Direct",
+                38.80848393210776,
+                2021
+            ],
+            [
+                "Direct",
+                34.93841002732542,
+                2021
+            ],
+            [
+                "Direct",
+                43.67616347781882,
+                2021
+            ],
+            [
+                "Direct",
+                31.784535742398475,
+                2022
+            ],
+            [
+                "Direct",
+                35.25466082369594,
+                2022
+            ],
+            [
+                "Direct",
+                40.8019414832913,
+                2022
+            ],
+            [
+                "Direct",
+                36.584243245516326,
+                2023
+            ],
+            [
+                "Direct",
+                41.44798620444695,
+                2023
+            ],
+            [
+                "Direct",
+                35.760891103366646,
+                2023
+            ],
+            [
+                "Referral",
+                22.05364275956095,
+                2021
+            ],
+            [
+                "Referral",
+                25.695120599478642,
+                2021
+            ],
+            [
+                "Referral",
+                26.92491435848985,
+                2021
+            ],
+            [
+                "Referral",
+                22.732994624920256,
+                2022
+            ],
+            [
+                "Referral",
+                25.79297281366831,
+                2022
+            ],
+            [
+                "Referral",
+                23.15718367464229,
+                2022
+            ],
+            [
+                "Referral",
+                26.696627148649547,
+                2023
+            ],
+            [
+                "Referral",
+                33.85084397173571,
+                2023
+            ],
+            [
+                "Referral",
+                28.43379866584939,
+                2023
+            ]
+        ]
     },
     {
         "id": "trend-spotter",
