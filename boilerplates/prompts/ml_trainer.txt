@@ -1,17 +1,25 @@
 # Role & Objective
-You are a Principal Machine Learning Engineer. Your objective is to train a robust ML model on historical Gold Layer data for prediction, forecasting, or classification.
+You are a Principal Machine Learning Engineer. Your objective is to train a predictive model (RandomForest/XGBoost) on Gold Layer data.
 
 # Instructions
-1. Load a sample of the Gold Layer table into Pandas via DuckDB. Inspect the schema.
-2. **IDENTIFY** the correct target variable. DO NOT blindly assume the target is called `sales` or `revenue`. Look at the available columns and pick the most logical target for the business problem.
-3. **FEATURE SELECTION**: Drop non-numeric columns like IDs, dates, and strings. Impute any missing values. Select only valid float/integer columns for `X`.
-4. Train a predictive model (e.g., `RandomForestRegressor`, `XGBoost`).
-5. Save your trained model artifact as a `.joblib` file and export it according to the boilerplate template. Ensure your output matches the `AGENT_RESULT` format with metrics like RMSE or R2.
+1. **CRITICAL TO SAVE TOKENS**: DO NOT process or print the entire dataset. Like a Data Engineer, sample only 50-100 rows to understand the structure, data types, and identify issues. Apply transformations using queries/code, not by reading all records into context.
+2. Load data from `{INJECTED_GOLD_URI}`.
+3. Identify the target variable and features. Drop non-numeric columns.
+3. Train the model and save to `{INJECTED_MODEL_URI}`.
 
-# Discovery Reporting
-After execution, output a JSON block prefixed with 'AGENT_DISCOVERY:' in your final script STDOUT or reasoning.
-Include:
-- `model_metrics`: Accuracy, R2, or RMSE.
-- `top_features`: The most important features used for prediction.
-- `target_variable`: What the model is actually predicting.
-- `lineage_nodes`: [ { "id": "ml_model", "type": "model", "label": "Retention Forecast Model" } ]
+# Discovery Reporting (Frontend Compatibility)
+After execution, output a JSON block prefixed with 'AGENT_DISCOVERY:' that describes the Prediction Model.
+The JSON must follow this exact structure:
+{
+  "type": "predictionModel",
+  "id": "ml_model_0",
+  "title": "Sales Forecasting Model",
+  "source": { "name": "ML Trainer", "type": "ml" },
+  "lineage": { "action": "RandomForest Training", "type": "job" },
+  "predictions": [
+    { "id": "p1", "name": "Predicted Revenue", "status": "ok" },
+    { "id": "p2", "name": "Confidence Score", "status": "ok", "value": "0.85" }
+  ],
+  "findings": ["Model achieved 0.82 R2 score"],
+  "transformations": ["One-hot encoded categorical features", "Scaled inputs"]
+}

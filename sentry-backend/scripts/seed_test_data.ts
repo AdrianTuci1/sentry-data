@@ -103,15 +103,22 @@ async function seed() {
             }
         }
 
-        // 5. Upload Mock Manifest
-        const manifestPath = path.join(__dirname, '../../boilerplates/config/frontend-widget-manifest.yml');
-        if (fs.existsSync(manifestPath)) {
-            console.log('[R2] Uploading Manifest...');
-            await s3Client.send(new PutObjectCommand({
-                Bucket: config.r2.bucketData,
-                Key: 'system/config/frontend-widget-manifest.yml',
-                Body: fs.readFileSync(manifestPath)
-            }));
+        // 5. Upload Manifests
+        const configDir = path.join(__dirname, '../../boilerplates/config');
+        if (fs.existsSync(configDir)) {
+            console.log('[R2] Uploading Manifests...');
+            const configFiles = fs.readdirSync(configDir);
+            for (const file of configFiles) {
+                if (file.endsWith('.yml') || file.endsWith('.json')) {
+                    const filePath = path.join(configDir, file);
+                    await s3Client.send(new PutObjectCommand({
+                        Bucket: config.r2.bucketData,
+                        Key: `system/config/${file}`,
+                        Body: fs.readFileSync(filePath)
+                    }));
+                    console.log(`    Uploaded Manifest: system/config/${file}`);
+                }
+            }
         }
 
         // Upload Mock Data

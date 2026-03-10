@@ -10,7 +10,7 @@ image = modal.Image.debian_slim() \
 
 app = modal.App("sentry-sandbox-executor")
 
-@app.function(image=image, secrets=[modal.Secret.from_name("sentry-r2-secrets")])
+@app.function(image=image, secrets=[modal.Secret.from_name("sentry-r2-secrets")], cpu=2.0, memory=2048)
 @modal.fastapi_endpoint(method="POST")
 def sandbox_executor(data: dict):
     """
@@ -30,7 +30,7 @@ def sandbox_executor(data: dict):
             ["python", "/root/agent_manager.py"],
             capture_output=True,
             text=True,
-            timeout=600 # Agenții pot lucra mai mult timp (10 min)
+            timeout=300 # Agenții pot lucra mai mult timp (10 min)
         )
         return {
             "success": result.returncode == 0,
@@ -39,3 +39,13 @@ def sandbox_executor(data: dict):
         }
     except Exception as e:
         return {"success": False, "logs": "", "error": str(e)}
+
+@app.local_entrypoint()
+def main():
+    """
+    Permite rularea: modal run modal_executor.py
+    Utilitate: Verifică dacă aplicația Modal este configurată corect.
+    """
+    print("✅ Modal App 'sentry-sandbox-executor' is ready.")
+    print("👉 To deploy as a permanent API: modal deploy modal_executor.py")
+    print("👉 To run in dev mode (hot-reload): modal serve modal_executor.py")

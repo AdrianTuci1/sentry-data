@@ -18,7 +18,7 @@ export class AnalyticsService {
      */
     public async getDashboardData(tenantId: string, projectId: string): Promise<any> {
         // 1. Fetch Project Metadata
-        const project = await this.projectRepository.findOne(tenantId, projectId);
+        const project = await this.projectRepository.findById(tenantId, projectId);
 
         if (!project) {
             throw new Error(`Project ${projectId} not found or access denied.`);

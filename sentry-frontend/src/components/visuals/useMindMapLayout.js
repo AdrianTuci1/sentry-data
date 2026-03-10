@@ -7,27 +7,27 @@ export const useMindMapLayout = ({ tables = [], metricGroups = [], predictionMod
         let errors = 0;
         let warnings = 0;
         // Check tables
-        tables.forEach(t => t.columns.forEach(c => {
+        tables.forEach(t => (t.columns || []).forEach(c => {
             if (c.status === 'error') errors++;
             if (c.status === 'warning') warnings++;
         }));
         // Check metric groups
-        metricGroups.forEach(g => g.metrics.forEach(m => {
+        metricGroups.forEach(g => (g.metrics || []).forEach(m => {
             if (m.status === 'error') errors++;
             if (m.status === 'warning') warnings++;
         }));
         // Check prediction models
-        predictionModels.forEach(m => m.predictions.forEach(p => {
+        predictionModels.forEach(m => (m.predictions || []).forEach(p => {
             if (p.status === 'error') errors++;
             if (p.status === 'warning') warnings++;
         }));
         // Check advanced analytics
-        advancedAnalytics.forEach(g => g.items.forEach(i => {
+        advancedAnalytics.forEach(g => (g.items || []).forEach(i => {
             if (i.status === 'error') errors++;
             if (i.status === 'warning') warnings++;
         }));
         // Check dashboards
-        dashboards.forEach(g => g.items.forEach(i => {
+        dashboards.forEach(g => (g.items || []).forEach(i => {
             if (i.status === 'error') errors++;
             if (i.status === 'warning') warnings++;
         }));
@@ -40,14 +40,14 @@ export const useMindMapLayout = ({ tables = [], metricGroups = [], predictionMod
         const edges = [];
 
         // Config
-        const ROOT_X = -400; // Central Hub
+        const ROOT_X = -450; // Central Hub
         const CATEGORY_X = -200; // Features Column
-        const FEATURE_X = 180; // Leaf Nodes (Layer 2)
-        const GROUP_X = 500; // New Dashboard Groups (Layer 3)
-        const DASHBOARD_X = 800; // Dashboards (Layer 4)
+        const FEATURE_X = 220; // Leaf Nodes (Layer 2)
+        const GROUP_X = 600; // New Dashboard Groups (Layer 3)
+        const DASHBOARD_X = 950; // Dashboards (Layer 4)
 
-        const ITEM_HEIGHT = 45;
-        const GROUP_GAP = 60;
+        const ITEM_HEIGHT = 55;
+        const GROUP_GAP = 90;
 
         // Helper: Calculate total height of a set of tables/groups
         const getSetHeight = (items) => items.reduce((acc, t) => acc + (t.columns?.length || t.metrics?.length || 0), 0) * ITEM_HEIGHT;
@@ -59,12 +59,12 @@ export const useMindMapLayout = ({ tables = [], metricGroups = [], predictionMod
         const analyticsTotalHeight = getSetHeight(advancedAnalytics);
 
         // Calculate height for 3rd layer (Groups)
-        // Calculate height for 3rd layer (Groups)
-        const groupItemHeight = 60;
+        const groupItemHeight = 70;
         const totalGroupHeight = dashboardGroups.reduce((acc, group) => {
-            const groupDashboards = dashboards.flatMap(d => d.items).filter(db => db.groupId === group.id);
-            const dbHeight = groupDashboards.length * 60;
-            return acc + Math.max(groupItemHeight, dbHeight + 20);
+            // Fix: Handle both nested collection .items and flat dashboard items
+            const groupDashboards = dashboards.flatMap(d => d.items || [d]).filter(db => db && db.groupId === group.id);
+            const dbHeight = groupDashboards.length * 70;
+            return acc + Math.max(groupItemHeight, dbHeight + 30);
         }, 0);
 
         // Calculate height for 4th layer (Dashboards) - approximate for centering
@@ -309,14 +309,13 @@ export const useMindMapLayout = ({ tables = [], metricGroups = [], predictionMod
                 });
             }
 
-            // --- 3. Layer 4: Dashboards ---
             // Find dashboards that belong to this group
-            // We need to iterate through all dashboard collections to find items belonging to this group
-            // Or simple flat list? The structure passed is dashboards[0].items...
+            // Fix: Handle both nested collections and flat dashboards
             const groupDashboards = [];
             dashboards.forEach(dCollection => {
-                dCollection.items.forEach(db => {
-                    if (db.groupId === group.id) {
+                const items = dCollection.items || [dCollection];
+                items.forEach(db => {
+                    if (db && db.groupId === group.id) {
                         groupDashboards.push(db);
                     }
                 });

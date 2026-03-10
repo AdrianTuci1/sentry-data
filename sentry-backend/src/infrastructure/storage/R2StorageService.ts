@@ -60,6 +60,19 @@ export class R2StorageService {
     }
 
     /**
+     * Save agent reasoning logs (thoughts) to R2.
+     */
+    public async saveLog(tenantId: string, projectId: string, taskName: string, content: string): Promise<void> {
+        const key = `tenants/${tenantId}/projects/${projectId}/system/logs/${taskName}.log`;
+        await this.client.send(new PutObjectCommand({
+            Bucket: this.dataBucket,
+            Key: key,
+            Body: content,
+            ContentType: 'text/plain'
+        }));
+    }
+
+    /**
      * Fetch a system prompt from the generic boilerplates area.
      */
     public async getPrompt(promptFileName: string): Promise<string> {

@@ -79,6 +79,9 @@ export class OrchestrationService {
                 throw new Error(`Execution failed: ${execution.error}`);
             }
 
+            // 1. Save FULL Agent Logs (reasoning + execution results) to R2
+            await this.r2StorageService.saveLog(tenantId, projectId, taskName, execution.logs);
+
             // 2. If it was a CACHE MISS (LLM run), save the generated script for next time
             if (!hasCache) {
                 const scriptMatch = execution.logs.match(/--- AGENT_FINAL_SCRIPT_START ---\n([\s\S]*?)\n--- AGENT_FINAL_SCRIPT_END ---/);
@@ -89,7 +92,7 @@ export class OrchestrationService {
                 }
             }
 
-            // 1. Parse LLM-generated discovery (from agent_manager reasoning)
+            // 3. Parse LLM-generated discovery (from agent_manager reasoning)
             const llmMatch = [...execution.logs.matchAll(/--- AGENT_DISCOVERY_METADATA ---\n([\s\S]*?)(\n---|$)/g)];
             let llmDiscovery = {};
             llmMatch.forEach(m => {
@@ -98,14 +101,31 @@ export class OrchestrationService {
                 } catch (e) { }
             });
 
-            // 2. Parse Code-generated discovery (prefixed with AGENT_DISCOVERY:)
-            const codeMatch = [...execution.logs.matchAll(/AGENT_DISCOVERY:(\{.*?\})/g)];
+            // Extract only the execution phase stdout to avoid parsing the LLM-generated script containing print() statements
+            let stdoutLogs = execution.logs;
+            if (stdoutLogs.includes('--- AGENT_EXECUTION_STDOUT ---')) {
+                // Take everything after the execution start marker
+                stdoutLogs = stdoutLogs.split('--- AGENT_EXECUTION_STDOUT ---').pop() || '';
+            }
+            if (stdoutLogs.includes('--- STDOUT ---')) {
+                // Further narrow down to the actual script output
+                stdoutLogs = stdoutLogs.split('--- STDOUT ---')[1];
+            }
+
+            // 4. Parse Code-generated discovery (prefixed with AGENT_DISCOVERY:)
+            // We split by lines to avoid greedy matching capturing subsequent prints
+            const lines = stdoutLogs.split('\n');
             let codeDiscovery = {};
-            codeMatch.forEach(m => {
-                try {
-                    Object.assign(codeDiscovery, JSON.parse(m[1].trim()));
-                } catch (e) { }
-            });
+            for (const line of lines) {
+                if (line.startsWith('AGENT_DISCOVERY:')) {
+                    const jsonStr = line.replace('AGENT_DISCOVERY:', '').trim();
+                    try {
+                        Object.assign(codeDiscovery, JSON.parse(jsonStr));
+                    } catch (e: any) {
+                        console.warn(`[Orchestrator] Failed to parse AGENT_DISCOVERY line: ${e.message}`);
+                    }
+                }
+            }
 
             // Merge discoveries
             const discoveryMetadata = {
@@ -113,14 +133,22 @@ export class OrchestrationService {
                 ...codeDiscovery
             };
 
-            const resultLine = execution.logs.split('\n').find(line => line.startsWith('AGENT_RESULT:'));
+            const resultMatch = [...stdoutLogs.matchAll(/AGENT_RESULT:(.*?)(?=\nAGENT_|$)/gs)];
             let agentResult = null;
-            if (resultLine) {
+            if (resultMatch.length > 0) {
+                const rawContent = resultMatch[resultMatch.length - 1][1].trim();
                 try {
-                    const jsonString = resultLine.replace('AGENT_RESULT:', '').trim();
-                    agentResult = JSON.parse(jsonString);
-                } catch (e) {
-                    console.warn(`[Orchestrator] Failed to parse AGENT_RESULT for ${taskName}:`, e);
+                    agentResult = JSON.parse(rawContent);
+                } catch (e: any) {
+                    // Fallback: search for first valid JSON object/array if there's trailing noise
+                    const jsonCandidate = rawContent.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
+                    if (jsonCandidate) {
+                        try {
+                            agentResult = JSON.parse(jsonCandidate[0]);
+                        } catch (e2: any) {
+                            console.warn(`[Orchestrator] Failed to parse AGENT_RESULT for ${taskName}: ${e2.message}`);
+                        }
+                    }
                 }
             }
 
@@ -138,8 +166,7 @@ export class OrchestrationService {
             await this.sandboxProvider.stopSandbox(sandboxId);
         }
     }
-
-    /**
+    /** 
      * Initiates the End-to-End full pipeline for a project based on newly connected data sources.
      */
     public async runFullPipeline(tenantId: string, projectId: string, rawSourceUris: string[]): Promise<void> {
@@ -150,6 +177,7 @@ export class OrchestrationService {
         const boilerplatePrefix = `s3://${systemBucket}/system/boilerplates/tasks`;
         const promptPrefix = `s3://${systemBucket}/system/boilerplates/prompts`;
         const manifestUri = `s3://${systemBucket}/system/config/frontend-widget-manifest.yml`;
+        const mindmapManifestUri = `s3://${systemBucket}/system/config/frontend-mindmap-manifest.yml`;
 
         // --- STEP 1: NORMALIZATION (PARALLEL) ---
         console.log(`[Orchestrator] STEP 1: Normalizing ${rawSourceUris.length} sources...`);
@@ -171,15 +199,25 @@ export class OrchestrationService {
 
         const normalizationResults = await Promise.all(normalizationPromises);
 
-        // Collect discoveries
-        let cumulativeDiscovery: any = {};
-        normalizationResults.forEach((res, index) => {
+        // Initialize cumulative discovery as a Frontend-friendly workspace
+        let cumulativeDiscovery: any = {
+            tables: [], // Array of normalized tables
+            metricGroups: [], // Array of metric groups
+            predictionModels: [], // Array of models
+            advancedAnalytics: [], // Array of complex analytics
+            dashboardGroups: [], // Logical groupings
+            dashboards: [] // Dashboards
+        };
+
+        // Collect discovery from Normalization steps (Skipped to reduce MindMap noise as requested)
+        /*
+        normalizationResults.forEach(res => {
             if (res.discovery) {
-                cumulativeDiscovery[`normalization_source_${index}`] = res.discovery;
+                cumulativeDiscovery.tables.push(res.discovery);
             }
         });
+        */
 
-        // Fallback to dummy URIs if execution failed to return them properly in our mock scenario
         const normalizedUris = normalizationResults.map((res, index) => res.result?.output_uri || this.r2StorageService.getS3Uri(tenantId, projectId, 'silver', `normalized_source_${index}.parquet`)).filter(Boolean);
         console.log(`[Orchestrator] STEP 1 Complete. Normalized URIs:`, normalizedUris);
         this.sseManager.broadcastToTenant(tenantId, 'pipeline_progress', {
@@ -188,7 +226,6 @@ export class OrchestrationService {
             status: 'completed',
             discovery: cumulativeDiscovery
         });
-
 
         // --- STEP 2: FEATURE ENGINEERING (SEQUENTIAL after step 1) ---
         console.log(`[Orchestrator] STEP 2: Feature Engineering (Gold Table Generation)...`);
@@ -202,12 +239,18 @@ export class OrchestrationService {
             `${boilerplatePrefix}/feature_engineer.py`,
             {
                 'INJECTED_DATA_URIS': JSON.stringify(normalizedUris),
+                'INJECTED_MINDMAP_MANIFEST_URI': mindmapManifestUri,
                 'TARGET_GOLD_URI': goldTableUri
             }
         );
 
         if (feResult.discovery) {
-            cumulativeDiscovery['feature_engineering'] = feResult.discovery;
+            if (feResult.discovery.type === 'metricGroups') {
+                cumulativeDiscovery.metricGroups.push(feResult.discovery);
+            } else {
+                // Handle complex discovery objects if needed
+                Object.assign(cumulativeDiscovery, feResult.discovery);
+            }
         }
 
         console.log(`[Orchestrator] STEP 2 Complete.`);
@@ -218,11 +261,15 @@ export class OrchestrationService {
             discovery: feResult.discovery
         });
 
+        // Save early discovery after Step 2
+        const p2 = await this.projectRepo.findById(tenantId, projectId);
+        if (p2) {
+            p2.discoveryMetadata = cumulativeDiscovery;
+            await this.projectRepo.createOrUpdate(p2);
+        }
 
-        // --- STEP 3 & 4: QUERY GENERATION & ML TRAINING (PARALLEL after step 2) ---
-        console.log(`[Orchestrator] STEP 3 & 4: Starting SQL Generator and ML Trainer simultaneously...`);
-
-        const mlModelUri = `s3://${dataBucket}/tenants/${tenantId}/projects/${projectId}/ml/sales_forecast_model.joblib`;
+        // --- STEP 3: QUERY GENERATION ---
+        console.log(`[Orchestrator] STEP 3: Starting SQL Generator...`);
 
         const queryPromise = this.executeAgentTask(
             tenantId,
@@ -232,37 +279,35 @@ export class OrchestrationService {
             `${boilerplatePrefix}/query_generator.py`,
             {
                 'INJECTED_GOLD_URI': goldTableUri,
-                'INJECTED_MANIFEST_URI': manifestUri
+                'INJECTED_MANIFEST_URI': manifestUri,
+                'INJECTED_METRICS_DISCOVERY': JSON.stringify(cumulativeDiscovery.metricGroups)
             }
         );
 
-        const trainingPromise = this.executeAgentTask(
-            tenantId,
-            projectId,
-            `ML_Trainer`,
-            `${promptPrefix}/ml_trainer.txt`,
-            `${boilerplatePrefix}/ml_trainer.py`,
-            {
-                'INJECTED_GOLD_URI': goldTableUri,
-                'INJECTED_MODEL_URI': mlModelUri
+        const [queriesResult] = await Promise.all([queryPromise]);
+
+        if (queriesResult.discovery) {
+            // The agent now returns a composite object: { dashboardGroups: [], dashboards: [] }
+            // We merge these into the cumulative discovery.
+            if (queriesResult.discovery.dashboardGroups) {
+                cumulativeDiscovery.dashboardGroups = queriesResult.discovery.dashboardGroups;
             }
-        );
+            if (queriesResult.discovery.dashboards) {
+                cumulativeDiscovery.dashboards = queriesResult.discovery.dashboards;
+            }
+        }
+        // if (trainingResult.discovery) cumulativeDiscovery.predictionModels.push(trainingResult.discovery);
 
-        const [queriesResult, trainingResult] = await Promise.all([queryPromise, trainingPromise]);
-
-        if (queriesResult.discovery) cumulativeDiscovery['query_generation'] = queriesResult.discovery;
-        if (trainingResult.discovery) cumulativeDiscovery['ml_training'] = trainingResult.discovery;
-
-        console.log(`[Orchestrator] STEP 3 & 4 Complete.`);
+        console.log(`[Orchestrator] STEP 3 Complete.`);
         this.sseManager.broadcastToTenant(tenantId, 'pipeline_progress', {
-            step: 'Query & Model Generation',
+            step: 'Query Generation',
             progress: 80,
             status: 'completed',
-            discovery: { queries: queriesResult.discovery, training: trainingResult.discovery }
+            discovery: { queries: queriesResult.discovery }
         });
 
         // Save queries and metadata to the project record
-        const project = await this.projectRepo.findOne(tenantId, projectId);
+        const project = await this.projectRepo.findById(tenantId, projectId);
         if (project) {
             project.queryConfigs = Array.isArray(queriesResult.result) ? queriesResult.result : [];
             project.discoveryMetadata = cumulativeDiscovery;
@@ -271,6 +316,7 @@ export class OrchestrationService {
         }
 
         // --- STEP 5: INITIAL INFERENCE (SEQUENTIAL after step 4) ---
+        /* Temporarily disabled ML Inference
         console.log(`[Orchestrator] STEP 5: Running initial ML Inference...`);
         const predictionsUri = this.r2StorageService.getS3Uri(tenantId, projectId, 'gold', 'predictions_initial.parquet');
         const inferenceResult = await this.executeAgentTask(
@@ -283,7 +329,6 @@ export class OrchestrationService {
                 'INJECTED_NEW_DATA_URI': goldTableUri,
                 'INJECTED_MODEL_URI': mlModelUri,
                 'INJECTED_PREDICTIONS_OUTPUT_URI': predictionsUri,
-                // Pass R2 credentials explicitly for boto3 inside the script if needed
                 'R2_ACCESS_KEY_ID': config.r2.accessKeyId || '',
                 'R2_SECRET_ACCESS_KEY': config.r2.secretAccessKey || '',
                 'R2_ENDPOINT_URL': (config.r2.endpoint || '').startsWith('http') ? config.r2.endpoint : `https://${config.r2.endpoint}`
@@ -292,7 +337,7 @@ export class OrchestrationService {
 
         if (inferenceResult.discovery) {
             cumulativeDiscovery['ml_inference'] = inferenceResult.discovery;
-            const updatedProject = await this.projectRepo.findOne(tenantId, projectId);
+            const updatedProject = await this.projectRepo.findById(tenantId, projectId);
             if (updatedProject) {
                 updatedProject.discoveryMetadata = cumulativeDiscovery;
                 await this.projectRepo.createOrUpdate(updatedProject);
@@ -306,6 +351,7 @@ export class OrchestrationService {
             status: 'completed',
             discovery: inferenceResult.discovery
         });
+        */
         console.log(`[Orchestrator] Pipeline ${projectId} Fully Operational.`);
     }
 }

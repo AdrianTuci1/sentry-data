@@ -1,10 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Insights.css';
 import MicroGraphicCard from './MicroGraphicCard';
-import analyticsData from '../../data/analyticsData.json';
+import fallbackAnalyticsData from '../../data/analyticsData.json';
+import { useStore } from '../../store/StoreProvider';
+import { ProjectService } from '../../api/core';
+import { observer } from 'mobx-react-lite';
 
-const Insights = () => {
+const Insights = observer(() => {
+    const { projectStore, workspaceStore } = useStore();
     const [expandedCardId, setExpandedCardId] = useState(null);
+    const [analyticsData, setAnalyticsData] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchAnalytics = async () => {
+            const projectId = projectStore.currentProjectId;
+            if (!projectId) {
+                setAnalyticsData(fallbackAnalyticsData);
+                setIsLoading(false);
+                return;
+            }
+
+            try {
+                const res = await ProjectService.getAnalytics(projectId);
+
+                // Get Dashboards
+                if (res.data && res.data.dashboards && res.data.dashboards.length > 0) {
+                    setAnalyticsData(res.data.dashboards);
+                } else {
+                    setAnalyticsData(fallbackAnalyticsData);
+                }
+
+
+            } catch (error) {
+                console.warn("[Insights] Failed to fetch analytics, using fallback.", error);
+                setAnalyticsData(fallbackAnalyticsData);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchAnalytics();
+    }, [projectStore.currentProjectId]);
 
     const handleCardClick = (id) => {
         // Prevent expansion on desktop (user requirement)
@@ -17,11 +54,14 @@ const Insights = () => {
         }
     };
 
+    if (isLoading) {
+        return <div className="insights-container"><div className="insights-header"><h1 className="insights-title">Loading...</h1></div></div>;
+    }
+
     return (
         <div className="insights-container">
             <div className="insights-header">
                 <h1 className="insights-title">Analytics</h1>
-
             </div>
 
             <div className={`insights-grid ${expandedCardId ? 'has-expanded' : ''}`}>
@@ -52,6 +92,6 @@ const Insights = () => {
             )}
         </div>
     );
-};
+});
 
 export default Insights;

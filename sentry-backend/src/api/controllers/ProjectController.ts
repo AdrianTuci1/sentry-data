@@ -26,11 +26,12 @@ export class ProjectController implements IController {
         this.router.get('/', auth, this.getProjects);
         this.router.post('/', auth, this.createProject);
         this.router.post('/:projectId/sources', auth, this.addSource);
+        this.router.get('/:projectId', auth, this.getProjectById);
         this.router.post('/:projectId/pipeline/run', auth, this.runPipeline);
 
-        // Mock endpoints for Frontend data format
-        this.router.get('/:projectId/lineage', auth, this.getLineageMock);
-        this.router.get('/:projectId/analytics', auth, this.getAnalyticsMock);
+        // Endpoints for Frontend data extraction
+        this.router.get('/:projectId/lineage', auth, this.getLineage);
+        this.router.get('/:projectId/analytics', auth, this.getAnalytics);
     }
 
     private getProjects = async (req: Request, res: Response, next: NextFunction) => {
@@ -42,6 +43,27 @@ export class ProjectController implements IController {
             res.status(200).json({
                 status: 'success',
                 data: projects
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    private getProjectById = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const tenantId = req.tenantId!;
+            const { projectId } = req.params;
+
+            const project = await this.projectRepo.findById(tenantId, projectId);
+
+            if (!project) {
+                res.status(404).json({ error: 'Project not found' });
+                return;
+            }
+
+            res.status(200).json({
+                status: 'success',
+                data: project
             });
         } catch (error) {
             next(error);
@@ -109,11 +131,46 @@ export class ProjectController implements IController {
         }
     };
 
-    private getLineageMock = async (req: Request, res: Response, next: NextFunction) => {
-        res.status(200).json({ message: "Lineage structure corresponding to projectData.json will be here" });
-    }
+    private getLineage = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const tenantId = req.tenantId!;
+            const { projectId } = req.params;
+            const project = await this.projectRepo.findById(tenantId, projectId);
 
-    private getAnalyticsMock = async (req: Request, res: Response, next: NextFunction) => {
-        res.status(200).json({ message: "Analytics structure corresponding to analyticsData.json will be here" });
-    }
+            if (!project || !project.discoveryMetadata) {
+                res.status(404).json({ error: 'Lineage data not found' });
+                return;
+            }
+
+            res.status(200).json({
+                status: 'success',
+                data: project.discoveryMetadata
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    private getAnalytics = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const tenantId = req.tenantId!;
+            const { projectId } = req.params;
+            const project = await this.projectRepo.findById(tenantId, projectId);
+
+            if (!project) {
+                res.status(404).json({ error: 'Project not found' });
+                return;
+            }
+
+            res.status(200).json({
+                status: 'success',
+                data: {
+                    queryConfigs: project.queryConfigs || [],
+                    dashboards: project.discoveryMetadata?.dashboards || []
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
 }

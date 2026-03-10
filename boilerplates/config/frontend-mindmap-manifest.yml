@@ -1,0 +1,89 @@
+# Frontend MindMap Node Manifest
+# This file describes the permitted node categories and their internal data structures
+# that the AI agents must use when generating discovery metadata for the FeatureMindMap.
+
+# 1. Sources (Layer 0)
+# Represents the origin of data
+sources:
+  types:
+    - db       # Database (e.g., PostgreSQL, Snowflake)
+    - api      # API Endpoint (e.g., Stripe, Shopify)
+    - stream   # Clickstream / Event Bus (e.g., Kafka, Segment)
+    - compute  # Compute Cluster (e.g., Spark, Dataflow)
+    - ml       # ML Platform (e.g., Sagemaker, Vertex)
+    - transform # Transform Engine (e.g., dbt)
+
+# 2. Categories (Middle Layers)
+# These are the main groupings that appear in the MindMap.
+# Each category contains a specific type of child nodes.
+categories:
+  tables:
+    description: "Raw or lightly normalized datasets (Silver Layer)."
+    children_key: "columns"
+    child_schema:
+      id: "string (unique)"
+      name: "string"
+      type: "string (Integer, Float, String, Date, Boolean)"
+      status: "enum (ok, warning, error)"
+      issue: "string (optional, required if status is warning/error)"
+
+  metricGroups:
+    description: "Business metrics and KPIs derived from tables (Gold Layer)."
+    children_key: "metrics"
+    child_schema:
+      id: "string (unique)"
+      name: "string"
+      value: "string (e.g., '$50k', '140%', 'Calculated')"
+      status: "enum (ok, warning, error)"
+      issue: "string (optional)"
+
+  predictionModels:
+    description: "ML predictions or forecasts."
+    children_key: "predictions"
+    child_schema:
+      id: "string (unique)"
+      name: "string"
+      status: "enum (ok, warning, error)"
+      issue: "string (optional)"
+
+  advancedAnalytics:
+    description: "Complex analytical outputs (Sentiment, Graphs, NLP)."
+    children_key: "items"
+    child_schema:
+      id: "string (unique)"
+      name: "string"
+      status: "enum (ok, warning, error)"
+      issue: "string (optional)"
+
+# 3. Aggregation (Layer 3)
+# Groups that aggregate metrics/columns/predictions to be displayed together on dashboards
+dashboardGroups:
+  description: "Logical groupings for dashboards (e.g., 'Executive Views', 'System Health')."
+  schema:
+    id: "string (unique)"
+    title: "string"
+    sources: "array of strings (Must be IDs of columns, metrics, predictions, or items from the categories above)"
+
+# Example Output from AI Agent (Data Normalizer / Silver Layer):
+# {
+#   "type": "tables",
+#   "id": "t1",
+#   "title": "Shopify Orders",
+#   "source": { "id": "s1", "name": "Shopify API", "type": "api" },
+#   "lineage": { "action": "API Ingestion", "type": "transform" },
+#   "columns": [
+#     { "id": "c1", "name": "revenue", "type": "Float", "status": "ok" }
+#   ]
+# }
+
+# Example Output from AI Agent (Feature Engineer / Gold Layer):
+# {
+#   "type": "metricGroups",
+#   "id": "g1",
+#   "title": "Financial KPIs",
+#   "source": { "id": "t1", "name": "Shopify Orders", "type": "transform" },
+#   "lineage": { "action": "SQL Aggregation", "type": "job" },
+#   "metrics": [
+#     { "id": "m1", "name": "LTV", "value": "$450", "status": "ok" }
+#   ]
+# }

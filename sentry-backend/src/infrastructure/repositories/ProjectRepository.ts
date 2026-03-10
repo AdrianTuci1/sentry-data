@@ -37,7 +37,7 @@ export class ProjectRepository extends BaseRepository<ProjectEntity> {
     }
 
     // Fetch a single project by its ID for a specific Tenant
-    public async findOne(tenantId: string, projectId: string): Promise<ProjectEntity | null> {
+    public async findById(tenantId: string, projectId: string): Promise<ProjectEntity | null> {
         return this.get(tenantId, projectId);
     }
 

@@ -1,10 +1,13 @@
-const API_BASE_URL = 'http://localhost:8000/api/v1';
+const API_BASE_URL = 'http://localhost:3000/api';
 
-// Temporary mock token for Auth Middleware bypass until fully integrated
-const getHeaders = () => ({
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer mock-tenant-token-123'
-});
+// Use token from localStorage (set by seed/login) or fallback to mock for dev
+const getHeaders = () => {
+    const token = localStorage.getItem('sentry_token') || 'mock-tenant-token-123';
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token.replace('Bearer ', '')}`
+    };
+};
 
 export const ProjectService = {
     /**
@@ -12,6 +15,18 @@ export const ProjectService = {
      */
     async getProjects() {
         const res = await fetch(`${API_BASE_URL}/projects`, {
+            method: 'GET',
+            headers: getHeaders()
+        });
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        return res.json();
+    },
+
+    /**
+     * Retrieves details for a specific project.
+     */
+    async getProject(projectId) {
+        const res = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
             method: 'GET',
             headers: getHeaders()
         });

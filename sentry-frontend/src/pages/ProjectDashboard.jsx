@@ -3,6 +3,7 @@ import { Database, Layers, Folder } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../store/StoreProvider';
+import { ProjectService } from '../api/core';
 import Workspace from '../components/visuals/Workspace';
 import projectData from '../data/projectData.json';
 
@@ -10,7 +11,7 @@ const ProjectDashboard = observer(() => {
     const { projectId } = useParams();
     const { projectStore, workspaceStore } = useStore();
 
-    // Ensure the project store has the correct active project selected
+    // Synchronize Project Store
     useEffect(() => {
         if (projectId && projectStore.currentProjectId !== projectId) {
             projectStore.selectProject(projectId);
@@ -19,12 +20,34 @@ const ProjectDashboard = observer(() => {
 
     const activeProject = projectStore.currentProject;
 
-    // Use mock data from JSON and initialize store
+    // Fetch Backend Discovery Metadata with Fallback
     useEffect(() => {
-        if (projectData.workspaceData) {
-            workspaceStore.data.setData(projectData.workspaceData);
-        }
-    }, [workspaceStore]);
+        const loadWorkspaceData = async () => {
+            try {
+                if (projectId) {
+                    const response = await ProjectService.getProject(projectId);
+
+                    // If project exists but has no custom ML metadata, check if there's a specific mock payload, if not fallback to the main JSON
+                    if (response.data && response.data.discoveryMetadata) {
+                        console.log(`[Dashboard] Using backend discovery for ${projectId}`);
+                        // Populate Workspace/MindMap
+                        workspaceStore.data.setData(response.data.discoveryMetadata);
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.warn("[Dashboard] Backend fetch failed, falling back to local mock data.", err);
+            }
+
+            // FALLBACK to local mock data
+            if (projectData.workspaceData) {
+                console.log("[Dashboard] Using local projectData.json fallback");
+                workspaceStore.data.setData(projectData.workspaceData);
+            }
+        };
+
+        loadWorkspaceData();
+    }, [projectId, workspaceStore]);
 
     return (
         <div className="flex flex-col h-full w-full bg-[#0B0D0E]">

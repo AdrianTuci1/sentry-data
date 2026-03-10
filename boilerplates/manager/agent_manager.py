@@ -84,16 +84,27 @@ def run_agent_loop():
     if not system_prompt:
         system_prompt = "You are an AI Agent."
     
-    # Collect all INJECTED_ environment variables to pass to the LLM
+    # Collect all INJECTED_ environment variables and R2 Config to pass to the LLM
+    r2_context = {
+        "R2_REGION": R2_REGION,
+        "R2_ENDPOINT_CLEAN": os.environ.get("R2_ENDPOINT_CLEAN"),
+        "R2_ACCESS_KEY_ID": R2_ACCESS_KEY_ID,
+        "R2_SECRET_ACCESS_KEY": R2_SECRET_ACCESS_KEY
+    }
     injected_vars_str = "\n".join([f"{k} = {v}" for k, v in os.environ.items() if k.startswith("INJECTED_")])
-    
+    r2_vars_str = "\n".join([f"{k} = {v}" for k, v in r2_context.items()])
+
     messages = [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": (
-            f"Here are your target URIs and parameters to replace in the boilerplate:\n{injected_vars_str}\n\n"
+            f"TECHNICAL CONTEXT:\n{r2_vars_str}\n\n"
+            f"TARGET PARAMETERS:\n{injected_vars_str}\n\n"
             f"Start from this boilerplate:\n```python\n{boilerplate_code}\n```\n\n"
-            "CRITICAL: After you have a verified working script, provide a summary of what you discovered about the data (schema, key features, lineage) in your final message "
-            "between '--- AGENT_DISCOVERY_METADATA_START ---' and '--- AGENT_DISCOVERY_METADATA_END ---' tags in JSON format."
+            "CRITICAL RULES:\n"
+            "1. You MUST write the ENTIRE script. No truncation or '... Read more'.\n"
+            "2. You MUST report your discovery (schema, groups, widgets) via a print() statement inside your script:\n"
+            "   `print(f'AGENT_DISCOVERY:{json.dumps(discovery_payload)}')` where discovery_payload follows the manifest schema.\n"
+            "3. BE DESCRIPTIVE: Print your progress clearly (e.g., '1. Sampled data...', '2. Formulated SQL...', '3. Validated schema...') so the user can follow your reasoning in the logs.\n"
         )}
     ]
 

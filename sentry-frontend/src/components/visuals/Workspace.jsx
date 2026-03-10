@@ -107,6 +107,15 @@ const Workspace = observer(({ viewState = 'engineering' }) => {
                 type: isPython ? 'python' : 'sql',
                 recurrence: 'daily'
             });
+        } else if (node.type === 'card' && node.data?.sqlString) {
+            editor.setState({
+                isOpen: true,
+                nodeId: node.id,
+                title: `SQL: ${node.label}`,
+                code: node.data.sqlString,
+                type: 'sql',
+                recurrence: 'realtime'
+            });
         }
     };
 
