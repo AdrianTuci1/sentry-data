@@ -9,14 +9,9 @@ import { TenantRepository } from '../src/infrastructure/repositories/TenantRepos
 import { ProjectRepository } from '../src/infrastructure/repositories/ProjectRepository';
 
 async function seed() {
-    console.log('--- SEEDING TEST DATA & R2 ASSETS ---');
+    console.log('--- SEEDING SYSTEM & TEST DATA ---');
 
-    // Check credentials
-    if (!config.aws.accessKeyId || !config.aws.secretAccessKey) {
-        console.error('Error: AWS credentials missing in .env');
-        process.exit(1);
-    }
-
+    // 1. Initialize Clients
     const ddbClient = new DynamoDBClient({
         region: config.aws.region,
         credentials: {
@@ -27,7 +22,7 @@ async function seed() {
 
     const s3Client = new S3Client({
         region: 'auto',
-        endpoint: config.r2.endpoint.replace(/\/$/, ""), // Ensure no trailing slash
+        endpoint: config.r2.endpoint.replace(/\/$/, ""),
         credentials: {
             accessKeyId: config.r2.accessKeyId,
             secretAccessKey: config.r2.secretAccessKey,
@@ -42,7 +37,7 @@ async function seed() {
     const projectId = 'proj_ga4_demo';
 
     try {
-        // 1. Create Tenant
+        // --- 1. SEED DYNAMODB ---
         console.log(`[DB] Creating Tenant: ${tenantId}...`);
         await tenantRepo.createTenant({
             id: tenantId,
@@ -52,16 +47,7 @@ async function seed() {
             status: 'active'
         });
 
-        // 2. Generate JWT Token
-        console.log('[Auth] Generating JWT Token...');
-        const token = jwt.sign(
-            { tenantId, role: 'admin' },
-            config.jwt.secret,
-            { expiresIn: '24h' }
-        );
-
-        // 3. Create Project
-        console.log(`[DB] Creating Project: ${projectId} for Tenant: ${tenantId}...`);
+        console.log(`[DB] Creating Project: ${projectId}...`);
         await projectRepo.createOrUpdate({
             tenantId,
             projectId,
@@ -71,83 +57,57 @@ async function seed() {
             createdAt: new Date().toISOString()
         });
 
-        // 4. Upload Boilerplates and Prompts to R2
-        console.log('[R2] Uploading Boilerplates and Prompts...');
-        const boilerplateDirs = [
-            path.join(__dirname, '../../boilerplates'),
-            path.join(__dirname, '../../boilerplates/tasks'),
-            path.join(__dirname, '../../boilerplates/prompts')
-        ];
+        // --- 2. UPLOAD SYSTEM ASSETS (Specific prefixing for Orchestrator) ---
+        const boilerplatesPath = path.join(__dirname, '../../boilerplates');
 
-        for (const dir of boilerplateDirs) {
-            if (fs.existsSync(dir)) {
-                const files = fs.readdirSync(dir);
-                for (const file of files) {
-                    if (file.endsWith('.py') || file.endsWith('.txt')) {
-                        const filePath = path.join(dir, file);
-                        const content = fs.readFileSync(filePath);
+        const uploadSubDir = async (subDir: string, bucketPrefix: string, extensions: string[]) => {
+            const dirPath = path.join(boilerplatesPath, subDir);
+            if (!fs.existsSync(dirPath)) return;
 
-                        // Determine if the file is in a subdirectory (e.g., 'tasks', 'prompts')
-                        const baseDir = path.join(__dirname, '../../boilerplates');
-                        const relativePath = path.relative(baseDir, filePath);
-                        const key = `system/boilerplates/${relativePath}`;
-
-                        await s3Client.send(new PutObjectCommand({
-                            Bucket: config.r2.bucketData,
-                            Key: key,
-                            Body: content
-                        }));
-                        console.log(`    Uploaded: ${key}`);
-                    }
-                }
-            }
-        }
-
-        // 5. Upload Manifests
-        const configDir = path.join(__dirname, '../../boilerplates/config');
-        if (fs.existsSync(configDir)) {
-            console.log('[R2] Uploading Manifests...');
-            const configFiles = fs.readdirSync(configDir);
-            for (const file of configFiles) {
-                if (file.endsWith('.yml') || file.endsWith('.json')) {
-                    const filePath = path.join(configDir, file);
+            const files = fs.readdirSync(dirPath);
+            for (const file of files) {
+                if (extensions.some(ext => file.endsWith(ext))) {
+                    const filePath = path.join(dirPath, file);
+                    const key = `${bucketPrefix}/${file}`;
                     await s3Client.send(new PutObjectCommand({
                         Bucket: config.r2.bucketData,
-                        Key: `system/config/${file}`,
+                        Key: key,
                         Body: fs.readFileSync(filePath)
                     }));
-                    console.log(`    Uploaded Manifest: system/config/${file}`);
+                    console.log(`[R2] Uploaded: ${key}`);
                 }
             }
-        }
+        };
 
-        // Upload Mock Data
+        console.log('[R2] Uploading System Boilerplates & Configs...');
+        await uploadSubDir('tasks', 'system/boilerplates/tasks', ['.py']);
+        await uploadSubDir('prompts', 'system/boilerplates/prompts', ['.txt']);
+        await uploadSubDir('config', 'system/config', ['.yml', '.json']);
+
+        // --- 3. UPLOAD MOCK DATA ---
         const mockParquetKey = `tenants/${tenantId}/projects/${projectId}/bronze/ga4_export.parquet`;
         const mockDataPath = path.join(__dirname, '../scripts/ga4_test_data.parquet');
+
         if (fs.existsSync(mockDataPath)) {
-            console.log(`[R2] Uploading Mock GA4 Data from ${mockDataPath}...`);
+            console.log(`[R2] Uploading Mock GA4 Data: ${mockParquetKey}...`);
             await s3Client.send(new PutObjectCommand({
                 Bucket: config.r2.bucketData,
                 Key: mockParquetKey,
                 Body: fs.readFileSync(mockDataPath),
             }));
         } else {
-            console.warn('Mock data file not found:', mockDataPath);
-            console.log('[R2] Uploading DUMMY Mock GA4 Data...');
-            await s3Client.send(new PutObjectCommand({
-                Bucket: config.r2.bucketData,
-                Key: mockParquetKey,
-                Body: Buffer.from("DUMMY PARQUET CONTENT - In a real test, upload a valid parquet file here")
-            }));
+            console.warn(`[R2] Warning: Mock data file not found at ${mockDataPath}`);
         }
 
+        // --- 4. GENERATE AUTH TOKEN ---
+        const token = jwt.sign(
+            { tenantId, role: 'admin' },
+            config.jwt.secret,
+            { expiresIn: '24h' }
+        );
+
         console.log('\n--- SEEDING COMPLETE ---');
-        console.log(`\nTENANT_ID: ${tenantId}`);
-        console.log(`PROJECT_ID: ${projectId}`);
-        console.log(`MOCK_DATA_PATH: s3://${config.r2.bucketData}/${mockParquetKey}`);
-        console.log(`\n>>> AUTH TOKEN:`);
-        console.log(`\nBearer ${token}\n`);
-        console.log('------------------------');
+        console.log(`\nAUTH TOKEN: Bearer ${token}\n`);
 
     } catch (error) {
         console.error('Seed failed:', error);

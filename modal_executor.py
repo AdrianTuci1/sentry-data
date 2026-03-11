@@ -5,12 +5,17 @@ import subprocess
 # Imaginea de bază care conține toate dependințele necesare agenților
 # Adăugăm agent_manager.py direct în imagine la Build-time pentru viteză maximă!
 image = modal.Image.debian_slim() \
-    .pip_install("pandas", "duckdb", "openai", "boto3", "scikit-learn", "fastapi") \
+    .pip_install("pandas", "duckdb", "google-genai", "boto3", "scikit-learn", "fastapi", "pyyaml") \
+    .run_commands(
+        # Pre-install DuckDB httpfs extension at image build time.
+        # This avoids a 30-90s INSTALL download at every sandbox cold start.
+        "python -c \"import duckdb; con = duckdb.connect(); con.execute('INSTALL httpfs;'); print('httpfs pre-installed OK')\""
+    ) \
     .add_local_file("boilerplates/manager/agent_manager.py", "/root/agent_manager.py")
 
 app = modal.App("sentry-sandbox-executor")
 
-@app.function(image=image, secrets=[modal.Secret.from_name("sentry-r2-secrets")], cpu=2.0, memory=2048)
+@app.function(image=image, secrets=[modal.Secret.from_name("sentry-r2-secrets")], cpu=2.0, memory=2048, timeout=600)
 @modal.fastapi_endpoint(method="POST")
 def sandbox_executor(data: dict):
     """
@@ -30,12 +35,18 @@ def sandbox_executor(data: dict):
             ["python", "/root/agent_manager.py"],
             capture_output=True,
             text=True,
-            timeout=300 # Agenții pot lucra mai mult timp (10 min)
+            timeout=540  # 9 min — sub limita de 600s a funcției Modal
         )
         return {
             "success": result.returncode == 0,
             "logs": result.stdout + "\n" + result.stderr,
             "error": None if result.returncode == 0 else result.stderr
+        }
+    except subprocess.TimeoutExpired as te:
+        return {
+            "success": False,
+            "logs": (te.stdout or "") + "\n" + (te.stderr or ""),
+            "error": f"Agent timed out after {te.timeout}s. Partial logs above."
         }
     except Exception as e:
         return {"success": False, "logs": "", "error": str(e)}

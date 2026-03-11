@@ -50,7 +50,7 @@ export const useMindMapLayout = ({ tables = [], metricGroups = [], predictionMod
         const GROUP_GAP = 90;
 
         // Helper: Calculate total height of a set of tables/groups
-        const getSetHeight = (items) => items.reduce((acc, t) => acc + (t.columns?.length || t.metrics?.length || 0), 0) * ITEM_HEIGHT;
+        const getSetHeight = (items) => items.reduce((acc, t) => acc + (t.columns?.length || t.metrics?.length || t.items?.length || 0), 0) * ITEM_HEIGHT;
 
         // Calculate vertical offsets
         const tablesTotalHeight = getSetHeight(tables);
@@ -61,8 +61,8 @@ export const useMindMapLayout = ({ tables = [], metricGroups = [], predictionMod
         // Calculate height for 3rd layer (Groups)
         const groupItemHeight = 70;
         const totalGroupHeight = dashboardGroups.reduce((acc, group) => {
-            // Fix: Handle both nested collection .items and flat dashboard items
-            const groupDashboards = dashboards.flatMap(d => d.items || [d]).filter(db => db && db.groupId === group.id);
+            // Support both snake_case (group_id from agent) and camelCase (groupId)
+            const groupDashboards = dashboards.filter(db => db && (db.group_id === group.id || db.groupId === group.id));
             const dbHeight = groupDashboards.length * 70;
             return acc + Math.max(groupItemHeight, dbHeight + 30);
         }, 0);
@@ -131,9 +131,14 @@ export const useMindMapLayout = ({ tables = [], metricGroups = [], predictionMod
         if (tables.length > 0) startY += GROUP_GAP;
 
         // Metric Groups
+        // NOTE: Skip groups that only have 'columns' (not 'metrics') — those are Gold table
+        // schema repeated by the feature_engineer and would duplicate the tables layer.
         const metricGroupNodes = [];
         metricGroups.forEach((group) => {
             const groupMetrics = group.metrics || [];
+            // If there are no real business metrics (only columns), skip rendering
+            if (groupMetrics.length === 0) return;
+
             const validChildIds = groupMetrics.filter(m => m.status !== 'error').map(m => m.id);
             const groupStartY = startY;
 
@@ -292,34 +297,37 @@ export const useMindMapLayout = ({ tables = [], metricGroups = [], predictionMod
             };
             nodes.push(groupNode);
 
-            // Edges: Feature -> Group
-            if (group.sources) {
-                group.sources.forEach(sourceId => {
-                    const sourceNode = nodes.find(n => n.id === sourceId);
-                    if (sourceNode) {
-                        edges.push({
-                            id: `edge-${sourceId}-${group.id}`,
-                            sourceId: sourceId,
-                            targetId: group.id,
-                            source: { x: sourceNode.x, y: sourceNode.y },
-                            target: { x: GROUP_X, y: groupY },
-                            isGroupConnection: true
-                        });
-                    }
-                });
-            }
-
-            // Find dashboards that belong to this group
-            // Fix: Handle both nested collections and flat dashboards
-            const groupDashboards = [];
-            dashboards.forEach(dCollection => {
-                const items = dCollection.items || [dCollection];
-                items.forEach(db => {
-                    if (db && db.groupId === group.id) {
-                        groupDashboards.push(db);
-                    }
+            // Edges: adjusted_data_columns → Group
+            // group.sources contains insight IDs (not column IDs), so we use
+            // each dashboard's adjusted_data_columns to find the actual column nodes.
+            const adjustedColIds = new Set();
+            const previewDashboards = dashboards.filter(
+                db => db && (db.group_id === group.id || db.groupId === group.id)
+            );
+            previewDashboards.forEach(db => {
+                (db.adjusted_data_columns || []).forEach(colName => {
+                    // Column nodes are keyed by id (c_0, c_1...) but their label/name is the column name
+                    const colNode = nodes.find(n => n.label === colName || n.data?.name === colName);
+                    if (colNode) adjustedColIds.add(colNode.id);
                 });
             });
+            adjustedColIds.forEach(colId => {
+                const sourceNode = nodes.find(n => n.id === colId);
+                if (sourceNode) {
+                    edges.push({
+                        id: `edge-${colId}-${group.id}`,
+                        sourceId: colId,
+                        targetId: group.id,
+                        source: { x: sourceNode.x, y: sourceNode.y },
+                        target: { x: GROUP_X, y: groupY },
+                        isGroupConnection: true
+                    });
+                }
+            });
+
+            // Find dashboards that belong to this group.
+            // Agent uses snake_case group_id; support both snake_case and camelCase for safety.
+            const groupDashboards = dashboards.filter(db => db && (db.group_id === group.id || db.groupId === group.id));
 
             // Position dashboards to the right of this group
             // Spread them vertically centered around the groupY?
@@ -335,7 +343,7 @@ export const useMindMapLayout = ({ tables = [], metricGroups = [], predictionMod
                 const dbNode = {
                     id: db.id,
                     type: 'card',
-                    label: db.name,
+                    label: db.title || db.name, // Fix: Use title from agent discovery
                     data: { ...db, isDashboard: true },
                     x: DASHBOARD_X,
                     y: dbY,

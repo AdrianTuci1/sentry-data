@@ -8,6 +8,8 @@
     "start": "node dist/app.js",
     "dev": "nodemon src/server.ts",
     "seed": "ts-node scripts/seed_test_data.ts",
+    "clean": "ts-node scripts/full_cleanup.ts",
+    "pipeline": "ts-node scripts/test_pipeline.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {

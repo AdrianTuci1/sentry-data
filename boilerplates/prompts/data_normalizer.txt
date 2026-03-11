@@ -16,10 +16,6 @@ The JSON must follow this exact structure to be compatible with the frontend wor
   "id": "normalization_0",
   "title": "GA4 Normalized Source",
   "source": { "id": "s_ga4", "name": "GA4", "type": "stream" },
-  "columns": [
-    { "id": "c1", "name": "event_date", "type": "Date", "status": "ok" },
-    { "id": "c2", "name": "event_name", "type": "String", "status": "ok" }
-  ],
   "lineage": { "action": "Normalization", "type": "transform" },
   "findings": ["Summarize 1-2 key technical findings here"],
   "transformations": ["List 1-2 key actions here like 'Dropped nested items'"]

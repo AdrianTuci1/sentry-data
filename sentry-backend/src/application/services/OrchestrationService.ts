@@ -62,8 +62,6 @@ export class OrchestrationService {
                 'R2_ENDPOINT_URL': (config.r2.endpoint || '').startsWith('http') ? config.r2.endpoint : `https://${config.r2.endpoint}`,
                 'R2_ACCESS_KEY_ID': config.r2.accessKeyId || '',
                 'R2_SECRET_ACCESS_KEY': config.r2.secretAccessKey || '',
-                'OPENAI_API_KEY': process.env.OPENAI_API_KEY || '',
-                'AGENT_MODEL': config.llm.agentModel,
 
                 ...additionalEnvVars
             }
