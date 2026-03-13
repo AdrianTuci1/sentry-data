@@ -19,23 +19,13 @@ def run_normalization():
     
     try:
         # Discovery Step
-        schema = con.execute(f"DESCRIBE SELECT * FROM '{INJECTED_RAW_URI}'").fetchall()
+        schema = con.execute(f"DESCRIBE SELECT * FROM read_parquet('{INJECTED_RAW_URI}')").fetchall()
         
         # Exclude complex nested types
-        safe_columns = []
-        frontend_columns = []
-        dropped_columns = []
-        
         for i, col in enumerate(schema):
             col_name, col_type = col[0], col[1]
             if not col_type.startswith('STRUCT') and not col_type.startswith('LIST'):
                 safe_columns.append(f'"{col_name}"')
-                frontend_columns.append({
-                    "id": f"c{i}",
-                    "name": col_name,
-                    "type": col_type,
-                    "status": "ok"
-                })
             else:
                 dropped_columns.append(col_name)
                 
@@ -45,9 +35,8 @@ def run_normalization():
         discovery_info = {
             "type": "tables",
             "id": "normalization_0",
-            "title": "GA4 Normalized Source",
-            "source": { "id": "s_raw", "name": "Google Analytics 4", "type": "parquet" },
-            "columns": frontend_columns,
+            "title": "Normalized Source",
+            "source": { "id": "s_raw", "name": "Raw Source", "type": "parquet" },
             "lineage": { "action": "Normalization", "type": "transform" },
             "findings": [f"Discovered {len(schema)} columns in raw source"],
             "transformations": [
@@ -60,7 +49,7 @@ def run_normalization():
         # EXECUTION: Create Silver Table
         normalization_query = f"""
             COPY (
-                SELECT {cols_str} FROM '{INJECTED_RAW_URI}'
+                SELECT {cols_str} FROM read_parquet('{INJECTED_RAW_URI}')
             ) TO '{INJECTED_NORMALIZED_URI}' (FORMAT PARQUET);
         """
         con.execute(normalization_query)

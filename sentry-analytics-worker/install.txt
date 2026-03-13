@@ -1,0 +1,3 @@
+cd sentry-analytics-worker
+pip install -r requirements.txt
+python main.py

@@ -1,0 +1,193 @@
+import { R2StorageService } from '../../infrastructure/storage/R2StorageService';
+import { SSEManager } from '../../services/sse/SSEManager';
+import { AgentExecutor } from './AgentExecutor';
+import { PipelineContext, PipelineResult } from './types';
+import { config } from '../../config';
+
+export class MLPathRunner {
+    private agentExecutor: AgentExecutor;
+    private r2StorageService: R2StorageService;
+    private sseManager: SSEManager;
+
+    constructor(agentExecutor: AgentExecutor, r2StorageService: R2StorageService, sseManager: SSEManager) {
+        this.agentExecutor = agentExecutor;
+        this.r2StorageService = r2StorageService;
+        this.sseManager = sseManager;
+    }
+
+    /**
+     * Executes the ML Path (usually weekly/periodic)
+     * Performs model training, inference, and predictions query generation
+     */
+    public async execute(ctx: PipelineContext): Promise<PipelineResult> {
+        console.log(`[MLPathRunner] Executing ML Path for Project ${ctx.projectId}`);
+        const { tenantId, projectId } = ctx;
+
+        const systemBucket = config.r2.bucketData;
+        const boilerplatePrefix = `s3://${systemBucket}/system/boilerplates/tasks`;
+        const promptPrefix = `s3://${systemBucket}/system/boilerplates/prompts`;
+        const manifestUri = `s3://${systemBucket}/system/config/frontend-widget-manifest.yml`;
+        const startTime = Date.now();
+
+        let cumulativeDiscovery: any = {
+            tables: [],
+            metricGroups: [],
+            predictionModels: [],
+            dashboardGroups: [],
+            dashboards: []
+        };
+        let estimatedTokensUsed = 0;
+        let tasksExecuted: string[] = [];
+        let hitCount = 0;
+
+        const goldTableUri = this.r2StorageService.getS3Uri(tenantId, projectId, 'gold', 'gold_layer.parquet');
+        const mlModelUri = this.r2StorageService.getS3Uri(tenantId, projectId, 'system', 'models/ltv_model.pkl');
+
+        // --- STEP 1: ML STRATEGY (Architect) ---
+        console.log(`[MLPathRunner] STEP 1: Designing ML Strategy (Architect)...`);
+        const mlArchitectTaskName = 'ML_Architect';
+        tasksExecuted.push(mlArchitectTaskName);
+
+        const architectResult = await this.agentExecutor.execute({
+            tenantId,
+            projectId,
+            taskName: mlArchitectTaskName,
+            systemPromptUri: `${promptPrefix}/ml_architect.txt`,
+            boilerplateUri: `${boilerplatePrefix}/ml_architect.py`,
+            additionalEnvVars: {
+                'INJECTED_GOLD_URI': goldTableUri
+            }
+        });
+
+        estimatedTokensUsed += architectResult.estimatedTokens;
+        if (architectResult.estimatedTokens === 0) hitCount++;
+        
+        let snippetName = 'regression'; // Fallback
+        if (architectResult.success && architectResult.result?.recommended_snippet) {
+            snippetName = architectResult.result.recommended_snippet;
+            console.log(`[MLPathRunner] Architect strategically selected snippet: ${snippetName} (Target: ${architectResult.result.target_variable})`);
+        } else {
+            console.warn(`[MLPathRunner] ML Architect didn't return a clear snippet. Defaulting to: ${snippetName}`);
+        }
+
+        this.sseManager.broadcastToTenant(tenantId, 'pipeline_progress', {
+            step: `ML Architecture Strategy: Using ${snippetName}`,
+            progress: 30,
+            status: 'completed'
+        });
+
+        // --- STEP 2: ML EVALUATION & TRAINING ---
+        console.log(`[MLPathRunner] STEP 2: Evaluating & Training Models utilizing snippet: ${snippetName}...`);
+        const mlTrainerTaskName = 'ML_Trainer';
+        tasksExecuted.push(mlTrainerTaskName);
+
+        const trainingResult = await this.agentExecutor.execute({
+            tenantId,
+            projectId,
+            taskName: mlTrainerTaskName,
+            systemPromptUri: `${promptPrefix}/ml_trainer.txt`,
+            boilerplateUri: `s3://${systemBucket}/system/boilerplates/snippets/ml/${snippetName}.py`,
+            additionalEnvVars: {
+                'INJECTED_GOLD_URI': goldTableUri,
+                'INJECTED_MODEL_OUTPUT_URI': mlModelUri
+            }
+        });
+        
+        estimatedTokensUsed += trainingResult.estimatedTokens;
+        if (trainingResult.estimatedTokens === 0) hitCount++;
+        
+        if (trainingResult.discovery) {
+            cumulativeDiscovery.predictionModels.push(trainingResult.discovery);
+        }
+
+        this.sseManager.broadcastToTenant(tenantId, 'pipeline_progress', {
+            step: 'ML Training (ML Path)',
+            progress: 40,
+            status: 'completed',
+            discovery: trainingResult.discovery
+        });
+
+        // --- STEP 2: ML INFERENCE ---
+        console.log(`[MLPathRunner] STEP 2: Running ML Inference...`);
+        const predictionsUri = this.r2StorageService.getS3Uri(tenantId, projectId, 'gold', 'predictions_latest.parquet');
+        const mlInferenceTaskName = 'ML_Inference';
+        tasksExecuted.push(mlInferenceTaskName);
+
+        const inferenceResult = await this.agentExecutor.execute({
+            tenantId,
+            projectId,
+            taskName: mlInferenceTaskName,
+            systemPromptUri: `${promptPrefix}/ml_inference.txt`,
+            // Inference currently uses a unified boilerplate, could also be snippet-based if needed
+            boilerplateUri: `${boilerplatePrefix}/ml_inference.py`,
+            additionalEnvVars: {
+                'INJECTED_NEW_DATA_URI': goldTableUri,
+                'INJECTED_MODEL_URI': mlModelUri,
+                'INJECTED_PREDICTIONS_OUTPUT_URI': predictionsUri
+            }
+        });
+
+        estimatedTokensUsed += inferenceResult.estimatedTokens;
+        if (inferenceResult.estimatedTokens === 0) hitCount++;
+
+        this.sseManager.broadcastToTenant(tenantId, 'pipeline_progress', {
+            step: 'ML Inference (ML Path)',
+            progress: 70,
+            status: 'completed'
+        });
+
+        // --- STEP 3: QUERY GENERATOR V2 (Enhanced) ---
+        console.log(`[MLPathRunner] STEP 3: Query Generation v2 (with ML predictions)...`);
+        const qgTaskName = 'Query_Generator_V2';
+        tasksExecuted.push(qgTaskName);
+
+        const queriesResult = await this.agentExecutor.execute({
+            tenantId,
+            projectId,
+            taskName: qgTaskName,
+            systemPromptUri: `${promptPrefix}/query_generator_v2.txt`,
+            boilerplateUri: `${boilerplatePrefix}/query_generator.py`, // Reuse same boilerplate, different prompt
+            additionalEnvVars: {
+                'INJECTED_GOLD_URI': goldTableUri,
+                'INJECTED_PREDICTIONS_URI': predictionsUri,
+                'INJECTED_MANIFEST_URI': manifestUri
+            }
+        });
+
+        estimatedTokensUsed += queriesResult.estimatedTokens;
+        if (queriesResult.estimatedTokens === 0) hitCount++;
+
+        if (queriesResult.discovery) {
+            if (queriesResult.discovery.dashboardGroups) {
+                cumulativeDiscovery.dashboardGroups = queriesResult.discovery.dashboardGroups;
+            }
+            if (queriesResult.discovery.dashboards) {
+                cumulativeDiscovery.dashboards = queriesResult.discovery.dashboards;
+            }
+        }
+
+        this.sseManager.broadcastToTenant(tenantId, 'pipeline_progress', {
+            step: 'Query Generation v2 (ML Path)',
+            progress: 100,
+            status: 'completed',
+            discovery: { queries: queriesResult.discovery }
+        });
+
+        const endTime = Date.now();
+        console.log(`[MLPathRunner] ML Pipeline ${projectId} Fully Operational. Tokens: ~${estimatedTokensUsed}`);
+
+        return {
+            path: 'ml',
+            discovery: cumulativeDiscovery,
+            vitals: {
+                pipelineLatencyMs: endTime - startTime,
+                pathUsed: 'ml',
+                cacheHitRate: tasksExecuted.length > 0 ? hitCount / tasksExecuted.length : 0,
+                estimatedTokensUsed,
+                tasksExecuted,
+                startedAt: new Date(startTime).toISOString(),
+                completedAt: new Date(endTime).toISOString()
+            }
+        };
+    }
+}

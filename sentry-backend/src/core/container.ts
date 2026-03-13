@@ -1,6 +1,7 @@
 import { dynamoDbDocumentClient } from '../infrastructure/database/DynamoDBClient';
 import { ProjectRepository } from '../infrastructure/repositories/ProjectRepository';
 import { TenantRepository } from '../infrastructure/repositories/TenantRepository';
+import { SourceRepository } from '../infrastructure/repositories/SourceRepository';
 import { AnalyticsService } from '../application/services/AnalyticsService';
 import { AuthService } from '../application/services/AuthService';
 import { DashboardController } from '../api/controllers/DashboardController';
@@ -28,6 +29,7 @@ export function initContainer() {
     // 1. Initialize Singletons & Database
     const projectRepo = new ProjectRepository(dynamoDbDocumentClient, dynamoTable);
     const tenantRepo = new TenantRepository(dynamoDbDocumentClient, dynamoTable);
+    const sourceRepo = new SourceRepository(dynamoDbDocumentClient, dynamoTable);
     const sseManager = new SSEManager();
 
     // 2. Initialize Infrastructure Providers
@@ -45,8 +47,30 @@ export function initContainer() {
     // 3. Initialize Domain Services 
     const authService = new AuthService(tenantRepo);
     const analyticsService = new AnalyticsService(projectRepo);
-    const orchestrationService = new OrchestrationService(sandboxProvider, projectRepo, r2StorageService, sseManager);
-    const pipelineOrchestratorService = new PipelineOrchestratorService(orchestrationService);
+    
+    // Pipeline Architectural Components
+    const { AgentExecutor } = require('../application/pipeline/AgentExecutor');
+    const { PathResolver } = require('../application/pipeline/PathResolver');
+    const { HotPathRunner } = require('../application/pipeline/HotPathRunner');
+    const { ColdPathRunner } = require('../application/pipeline/ColdPathRunner');
+    const { MLPathRunner } = require('../application/pipeline/MLPathRunner');
+    
+    const agentExecutor = new AgentExecutor(sandboxProvider, r2StorageService);
+    const pathResolver = new PathResolver(r2StorageService);
+    const hotPathRunner = new HotPathRunner(agentExecutor, r2StorageService, sseManager);
+    const coldPathRunner = new ColdPathRunner(agentExecutor, r2StorageService, sseManager);
+    const mlPathRunner = new MLPathRunner(agentExecutor, r2StorageService, sseManager);
+    
+    const orchestrationService = new OrchestrationService(
+        pathResolver,
+        hotPathRunner,
+        coldPathRunner,
+        mlPathRunner,
+        projectRepo,
+        sseManager
+    );
+    
+    const pipelineOrchestratorService = new PipelineOrchestratorService(orchestrationService, sourceRepo);
 
     // 4. Initialize Controllers
     // Controllers are standalone objects that will be passed into the App class
@@ -54,7 +78,7 @@ export function initContainer() {
     const dashboardController = new DashboardController(analyticsService, authService);
     const sseController = new SSEController(sseManager, authService);
     const webhookController = new WebhookController(pipelineOrchestratorService);
-    const projectController = new ProjectController(orchestrationService, authService, projectRepo);
+    const projectController = new ProjectController(orchestrationService, authService, projectRepo, sourceRepo);
 
     const controllers = [
         healthController,
@@ -81,6 +105,7 @@ export function initContainer() {
             orchestrationService,
             projectRepo,
             tenantRepo,
+            sourceRepo,
             sseManager,
             r2StorageService,
             modalInferenceProvider,

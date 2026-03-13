@@ -1,0 +1,75 @@
+version: "1.0"
+description: >
+  Combinatorial Metrics Strategy Matrix. This config defines the exact business 
+  insights (widgets) the Query Generator should produce based on the combination 
+  of data sources available in the Gold Layer. LLMs should strictly follow these 
+  priorities to ensure consistent value delivery and token efficiency.
+
+strategies:
+  # --- Single Source Fallbacks ---
+  single_source_orders:
+    condition: "Has 'Orders' OR 'Sales' data, but strictly NO 'Customers' data."
+    priorities:
+      - name: "Total Revenue"
+        widget: "weather"
+        description: "Aggregate sum of total revenue for the period."
+      - name: "Average Order Value (AOV)"
+        widget: "weather"
+        description: "Total revenue divided by number of orders."
+      - name: "Revenue Trend"
+        widget: "predictive"
+        description: "Time-series of revenue on a daily/monthly basis."
+
+  single_source_customers:
+    condition: "Has 'Customers' or 'Users' data, but strictly NO 'Orders' data."
+    priorities:
+      - name: "Total Users"
+        widget: "weather"
+        description: "Count of unique users."
+      - name: "User Growth"
+        widget: "incremental-lift"
+        description: "Percentage growth in new users over the last 30 days."
+      - name: "Geographic Distribution"
+        widget: "3d-map"
+        description: "Count of users grouped by geolocation/city/country."
+
+  # --- Combinatorial Strategies (High Value) ---
+  combo_ecommerce_core:
+    condition: "Has BOTH 'Orders' AND 'Customers' data."
+    priorities:
+      - name: "Customer Lifetime Value (LTV)"
+        widget: "weather"
+        description: "Total revenue generated per unique customer ID."
+      - name: "Churn Risk Indicator"
+        widget: "intensity-heat"
+        description: "Percentage of customers who haven't ordered in 90+ days."
+      - name: "Repeat Purchase Rate"
+        widget: "natural"
+        description: "Percentage of customers with > 1 order."
+      - name: "LTV vs CAC Scatter (If Ad data available)"
+        widget: "scatter"
+        description: "Scatter plot of LTV vs estimated acquisition cost."
+
+  combo_inventory_sales:
+    condition: "Has BOTH 'Orders' AND 'Products/Inventory' data."
+    priorities:
+      - name: "Inventory Turnover Rate"
+        widget: "liquid-gauge"
+        description: "Ratio of items sold vs items in stock."
+      - name: "Top Perfoming Products"
+        widget: "bar-chart"
+        description: "Top 10 products by revenue."
+      - name: "Product Affinity"
+        widget: "market-evolution"
+        description: "Which products are frequently bought together."
+
+  # --- Universal Fallbacks ---
+  generic_fallback:
+    condition: "If the data does not match the specific combinations above."
+    priorities:
+      - name: "Volume Trends"
+        widget: "animated-line"
+        description: "Time-series showing the volume of primary records over time."
+      - name: "Record Distribution"
+        widget: "pie-chart"
+        description: "Breakdown of the primary categorical column."

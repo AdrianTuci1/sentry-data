@@ -22,8 +22,11 @@ print("[DuckDB] Initializing new native In-Memory Database...")
 con = duckdb.connect(':memory:')
 
 def setup_duckdb():
-    print("[DuckDB] Installing and loading HTTPFS extension...")
-    con.execute("INSTALL httpfs;")
+    print("[DuckDB] Loading HTTPFS extension...")
+    try:
+        con.execute("INSTALL httpfs;")
+    except Exception:
+        pass  # Already installed
     con.execute("LOAD httpfs;")
     
     # Clean the endpoint domain if necessary (e.g. remove https://)
@@ -34,8 +37,7 @@ def setup_duckdb():
     con.execute(f"SET s3_endpoint='{clean_endpoint}';")
     con.execute(f"SET s3_access_key_id='{R2_ACCESS_KEY}';")
     con.execute(f"SET s3_secret_access_key='{R2_SECRET_KEY}';")
-    # For R2 specifically we need path style requests sometimes, or url-style.
-    # DuckDB handles R2 perfectly with url-style if the endpoint is accountid.r2.cloudflarestorage.com
+    con.execute("SET s3_url_style='path';")
     print("[DuckDB] Setup Complete.")
 
 setup_duckdb()

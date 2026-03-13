@@ -5,7 +5,7 @@ import subprocess
 # Imaginea de bază care conține toate dependințele necesare agenților
 # Adăugăm agent_manager.py direct în imagine la Build-time pentru viteză maximă!
 image = modal.Image.debian_slim() \
-    .pip_install("pandas", "duckdb", "google-genai", "boto3", "scikit-learn", "fastapi", "pyyaml") \
+    .pip_install("pandas", "duckdb", "google-genai", "boto3", "scikit-learn", "fastapi", "pyyaml", "xgboost", "lifelines", "shap", "textblob", "vaderSentiment", "lightgbm") \
     .run_commands(
         # Pre-install DuckDB httpfs extension at image build time.
         # This avoids a 30-90s INSTALL download at every sandbox cold start.

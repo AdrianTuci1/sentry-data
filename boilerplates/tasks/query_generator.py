@@ -21,13 +21,19 @@ def fetch_from_r2(uri: str) -> str:
 
 def run_query_generation():
     # Injected by Orchestrator
-    gold_uri             = os.environ.get("INJECTED_GOLD_URI", "")
+    gold_uris_raw        = os.environ.get("INJECTED_GOLD_URIS", "[]")
     manifest_uri         = os.environ.get("INJECTED_MANIFEST_URI", "")
+    strategy_uri         = os.environ.get("INJECTED_STRATEGY_URI", "")
     metrics_discovery_raw = os.environ.get("INJECTED_METRICS_DISCOVERY", "[]")
+
+    try:
+        gold_uris = json.loads(gold_uris_raw)
+    except:
+        gold_uris = [os.environ.get("INJECTED_GOLD_URI", "")]
 
     print("1. Connecting to memory DB and loading HTTPFS extension...")
     con = duckdb.connect(database=':memory:')
-    con.execute("LOAD httpfs;")  # Pre-installed at image build time — LOAD only
+    con.execute("LOAD httpfs;")  # Pre-installed at image build time
 
     con.execute(f"SET s3_region='{os.environ.get('R2_REGION', 'auto')}';")
     con.execute(f"SET s3_endpoint='{os.environ.get('R2_ENDPOINT_CLEAN', '').replace('https://', '')}';")
@@ -36,152 +42,163 @@ def run_query_generation():
     con.execute("SET s3_url_style='path';")
 
     # -------------------------------------------------------------------------
-    # PHASE 1: DISCOVER GOLD LAYER SCHEMA (Parquet footer only — no data scan)
+    # PHASE 1 & 2: DISCOVER GOLD LAYER SCHEMAS & SAMPLE DATA
     # -------------------------------------------------------------------------
-    print(f"2. [Schema Discovery] Describing Gold Layer (metadata only): {gold_uri}")
-    try:
-        schema_rows = con.execute(
-            f"DESCRIBE SELECT * FROM read_parquet('{gold_uri}')"
-        ).fetchall()
-    except Exception as e:
-        if "404" in str(e) or "NoSuchKey" in str(e):
-            print(f"AGENT_ERROR: Gold Layer not found at {gold_uri}. Did Feature Engineering complete?")
-        else:
-            print(f"AGENT_ERROR: {str(e)}")
-        return
-
-    print("  Gold Layer columns:")
-    gold_columns = []
-    for col in schema_rows:
-        col_name, col_type = col[0], col[1]
-        gold_columns.append({"name": col_name, "type": col_type})
-        print(f"    - {col_name} ({col_type})")
-
-    # -------------------------------------------------------------------------
-    # PHASE 2: SAMPLE GOLD DATA (50 rows for value intuition)
-    # Used by LLM to understand actual value ranges before writing queries
-    # -------------------------------------------------------------------------
-    print("3. [Data Profiling] Sampling 50 rows from Gold Layer...")
-    try:
-        sample = con.execute(
-            f"SELECT * FROM read_parquet('{gold_uri}') USING SAMPLE 50 ROWS"
-        ).fetchdf()
-        print(f"  Sample shape: {sample.shape[0]} rows × {sample.shape[1]} cols")
-        for col in sample.columns:
-            null_pct = round(sample[col].isna().mean() * 100, 1)
-            if sample[col].dtype in ('float64', 'int64'):
-                print(f"    {col}: null={null_pct}% | min={sample[col].min()} | max={sample[col].max()} | mean={round(sample[col].mean(), 2)}")
+    print(f"2. [Schema Discovery] Describing {len(gold_uris)} Gold Layer table(s)...")
+    
+    for i, gold_uri in enumerate(gold_uris):
+        if not gold_uri: continue
+        alias = f"gold_{i}"
+        print(f"\n  ➤ Table {i} [{alias}]: {gold_uri}")
+        
+        try:
+            schema_rows = con.execute(f"DESCRIBE SELECT * FROM read_parquet('{gold_uri}')").fetchall()
+            print("    Columns:")
+            for col in schema_rows:
+                print(f"      - {col[0]} ({col[1]})")
+        except Exception as e:
+            if "404" in str(e) or "NoSuchKey" in str(e):
+                print(f"    AGENT_ERROR: Gold Layer not found. Did Feature Engineering fail or skip this?")
             else:
-                top = sample[col].dropna().value_counts().head(3).to_dict()
-                print(f"    {col}: null={null_pct}% | top_values={top}")
-    except Exception as e:
-        print(f"  Sample failed (non-fatal): {str(e)}")
+                print(f"    AGENT_ERROR: {str(e)}")
+            continue
+
+        try:
+            print("    Sample stats:")
+            sample = con.execute(f"SELECT * FROM read_parquet('{gold_uri}') USING SAMPLE 50 ROWS").fetchdf()
+            for col in sample.columns:
+                null_pct = round(sample[col].isna().mean() * 100, 1)
+                if sample[col].dtype in ('float64', 'int64'):
+                    print(f"      {col}: null={null_pct}% | min={sample[col].min()} | max={sample[col].max()} | mean={round(sample[col].mean(), 2)}")
+                else:
+                    top = sample[col].dropna().value_counts().head(2).to_dict()
+                    print(f"      {col}: null={null_pct}% | top={top}")
+        except Exception as e:
+            print(f"    Sample failed (non-fatal): {str(e)}")
 
     # -------------------------------------------------------------------------
     # PHASE 3: LOAD METRIC GROUPS (from Feature Engineering discovery)
-    # These are the "groups" that connect adjusted_data → insights
     # -------------------------------------------------------------------------
     print("4. [Context] Loading Feature Engineering metric groups...")
     try:
         metrics_discovery = json.loads(metrics_discovery_raw)
-        print(f"  Received {len(metrics_discovery)} metric group(s) from Feature Engineering:")
+        print(f"  Received {len(metrics_discovery)} metric group(s):")
         for mg in metrics_discovery:
-            mg_id = mg.get('id', '?')
             mg_title = mg.get('title', '?')
             metrics = mg.get('metrics', mg.get('columns', []))
-            print(f"    Group [{mg_id}] '{mg_title}': {len(metrics)} metric(s)")
+            print(f"    '{mg_title}': {len(metrics)} metric(s)")
             for m in metrics[:10]:
                 print(f"      - {m.get('name','?')} ({m.get('type','?')})")
     except Exception as e:
-        print(f"  Could not parse INJECTED_METRICS_DISCOVERY (non-fatal): {str(e)}")
+        print(f"  Parse failed (non-fatal): {str(e)}")
         metrics_discovery = []
 
     # -------------------------------------------------------------------------
-    # PHASE 4: READ FRONTEND MANIFEST (understand dashboard/insight schema)
+    # PHASE 4: READ FRONTEND WIDGET MANIFEST
+    # This tells the LLM which widget types exist and what data each needs.
     # -------------------------------------------------------------------------
     print("5. [Manifest] Reading Frontend Widget Manifest...")
-    manifest_content = ""
+    manifest_yaml = ""
     if manifest_uri:
         try:
-            manifest_content = fetch_from_r2(manifest_uri)
-            print(f"  Manifest loaded ({len(manifest_content)} chars). Schema understood.")
+            manifest_yaml = fetch_from_r2(manifest_uri)
+            manifest = yaml.safe_load(manifest_yaml)
+
+            # Print available widget types and their data requirements
+            print("  Available widget types:")
+            widget_types = manifest.get('widget_types', {})
+            for wtype, wspec in widget_types.items():
+                desc = wspec.get('description', '')[:60]
+                print(f"    - {wtype}: {desc}")
+
+            # Print layout guidelines for gridSpan selection
+            print("  Layout guidelines (gridSpan):")
+            preferred = manifest.get('layout_guidelines', {}).get('preferred_spans', {})
+            for wtype, span in preferred.items():
+                if span != 'default':
+                    print(f"    - {wtype}: {span}")
+                    
         except Exception as e:
             print(f"  Manifest fetch failed (non-fatal): {str(e)}")
 
     # -------------------------------------------------------------------------
-    # PHASE 5: ONE-SHOT QUERY + INSIGHT GENERATION (LLM fills this in)
-    #
-    # The LLM must now generate, for each metric group (group):
-    #   1. A DuckDB SQL query that computes the insight value from gold_uri
-    #   2. An AGENT_DISCOVERY payload with dashboardGroups and dashboards
-    #
-    # LINEAGE MODEL:
-    #   connection → action_type → origin → adjusted_data (Gold) → group → insight
-    #
-    # RULES FOR LLM:
-    # - Use read_parquet('{gold_uri}') — always single-quoted URI
-    # - Quote dot-columns: "traffic_source.name"
-    # - Each "insight" is ONE scalar or time-series query result
-    # - Each "group" is a dashboardGroup that bundles related insights
-    # - Output AGENT_DISCOVERY with the exact schema from the manifest
-    # - DO NOT invent column names — only use those printed in Phase 1
-    # - Test your queries with test_run_script before finalizing
-    #
-    # EXAMPLE structure (LLM will overwrite with real SQL):
-    # insights = []
-    # groups = []
-    #
-    # --- For each metric in the gold schema, generate a query: ---
-    # result = con.execute(f"""
-    #     SELECT
-    #         DATE_TRUNC('day', event_date) AS period,
-    #         SUM(revenue) AS total_revenue,
-    #         COUNT(DISTINCT user_id) AS unique_users,
-    #         ROUND(SUM(revenue) / COUNT(DISTINCT user_id), 2) AS arpu
-    #     FROM read_parquet('{gold_uri}')
-    #     GROUP BY 1
-    #     ORDER BY 1
-    # """).fetchall()
-    #
-    # --- Build insight node ---
-    # insights.append({
-    #     "id": "ins_revenue",
-    #     "title": "Total Revenue by Day",
-    #     "query": "SELECT ...",
-    #     "result_preview": result[:3],
-    #     "group_id": "grp_financial",
-    #     "adjusted_data_columns": ["revenue", "user_id"],  # lineage: which Gold cols feed this
-    #     "status": "ok"
-    # })
-    # groups.append({"id": "grp_financial", "title": "Financial KPIs", "insight_ids": ["ins_revenue"]})
-    #
-    # --- LLM END ---
-    print("6. Generating insight queries and assembling discovery payload...")
+    # PHASE 4: FETCH BUSINESS STRATEGY
+    # -------------------------------------------------------------------------
+    if strategy_uri:
+        print("\n4. [Strategy] Loading Business Metrics Strategy Matrix...")
+        try:
+            strategy_yaml = fetch_from_r2(strategy_uri)
+            print("  --- STRATEGY MATRIX RULES ---")
+            for line in strategy_yaml.split('\n'):
+                print(f"    {line}")
+            print("  -----------------------------")
+        except Exception as e:
+            print(f"  Strategy fetch failed (non-fatal): {str(e)}")
 
-    # =========================================================================
-    # DISCOVERY OUTPUT — LLM must produce this format:
-    # =========================================================================
+    # -------------------------------------------------------------------------
+    # PHASE 5: ONE-SHOT QUERY + WIDGET CONFIG GENERATION (LLM fills this in)
+    #
+    # The LLM must generate for EACH insight:
+    #   1. A DuckDB SQL query against read_parquet('{gold_uri}')
+    #   2. Execute it, extract the value
+    #   3. Choose a widget type from the manifest
+    #   4. Set all widget properties: type, value, unit, colorTheme, gridSpan
+    #
+    # RULES:
+    # - You have N gold tables available in the `gold_uris` array.
+    # - Use read_parquet(gold_uris[i]) to read from a specific table.
+    # - You can JOIN multiple tables if needed (e.g. read_parquet(gold_uris[0]) AS a JOIN read_parquet(gold_uris[1]) AS b ON a.id = b.id).
+    # - Quote dot-columns: "traffic_source.name"
+    # - DO NOT invent columns — only use those printed in Phase 1
+    # - Test everything with test_run_script before finalizing
+    #
+    # WIDGET TYPE SELECTION GUIDE:
+    #   Scalar (one number)          → "weather"  (value + unit)
+    #   Scalar with progress         → "natural"  (value + unit + sliderValue 0-100)
+    #   Time series                  → "predictive" (historical[] + forecast[])
+    #   Category breakdown           → "bar-chart" or "pie-chart"
+    #   Distribution                 → "funnel" (funnel[] array)
+    #
+    # EXAMPLE (LLM will overwrite with real code):
+    # -----------------------------------------------------------
+    # dashboards = []
+    # dashboard_groups = []
+    #
+    # # --- Insight 1: Total LTV (scalar → weather widget) ---
+    # result = con.execute(f"""
+    #     SELECT ROUND(SUM(total_ltv), 2) as total
+    #     FROM read_parquet('{gold_uris[0]}') -- Use the appropriate index
+    # """).fetchone()
+    # total_ltv = result[0] if result else 0
+    #
+    # dashboards.append({
+    #     "id": "ins_total_ltv",
+    #     "title": "Total Lifetime Value",
+    #     "type": "weather",
+    #     "value": f"${total_ltv/1000:.1f}k" if total_ltv > 1000 else f"${total_ltv:.0f}",
+    #     "unit": "total",
+    #     "colorTheme": "theme-revenue",
+    #     "gridSpan": "default",
+    #     "query": f"SELECT ROUND(SUM(total_ltv), 2) as total FROM read_parquet('{gold_uri}')",
+    #     "group_id": "grp_revenue",
+    #     "adjusted_data_columns": ["total_ltv"]
+    # })
+    #
+    # dashboard_groups.append({
+    #     "id": "grp_revenue",
+    #     "title": "Revenue & Monetization",
+    #     "sources": ["ins_total_ltv"]
+    # })
+    #
     # discovery_payload = {
-    #     "dashboardGroups": [
-    #         {
-    #             "id": "grp_X",
-    #             "title": "Group Title",
-    #             "sources": ["ins_A", "ins_B"]   # insight IDs that belong to this group
-    #         }
-    #     ],
-    #     "dashboards": [
-    #         {
-    #             "id": "ins_A",
-    #             "title": "Insight Title",
-    #             "group_id": "grp_X",
-    #             "query": "SELECT ... FROM read_parquet('s3://...')",
-    #             "adjusted_data_columns": ["col1", "col2"],  # Gold cols used
-    #             "result_preview": [[...], [...]]            # max 3 sample rows
-    #         }
-    #     ]
+    #     "dashboardGroups": dashboard_groups,
+    #     "dashboards": dashboards
     # }
     # print(f"AGENT_DISCOVERY:{json.dumps(discovery_payload)}")
-    # print("Query generation completed successfully.")
+    # -----------------------------------------------------------
+    # --- LLM END ---
+
+    print("6. Generating insight queries and widget configs...")
 
     print("Query generation completed.")
 

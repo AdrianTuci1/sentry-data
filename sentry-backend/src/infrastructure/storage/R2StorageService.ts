@@ -112,4 +112,69 @@ export class R2StorageService {
     public getS3Uri(tenantId: string, projectId: string, layer: 'bronze' | 'silver' | 'gold' | 'system', filename: string): string {
         return `s3://${this.dataBucket}/tenants/${tenantId}/projects/${projectId}/${layer}/${filename}`;
     }
+
+    /**
+     * Date-partitioned bronze path: bronze/{sourceName}/{YYYY-MM-DD}/{filename}
+     */
+    public getBronzeUri(tenantId: string, projectId: string, sourceName: string, filename: string, date?: string): string {
+        const partition = date || this.getDatePartition();
+        return `s3://${this.dataBucket}/tenants/${tenantId}/projects/${projectId}/bronze/${sourceName}/${partition}/${filename}`;
+    }
+
+    /**
+     * Glob URI to read ALL dates for a bronze source.
+     * DuckDB resolves glob natively.
+     */
+    public getBronzeGlobUri(tenantId: string, projectId: string, sourceName: string): string {
+        return `s3://${this.dataBucket}/tenants/${tenantId}/projects/${projectId}/bronze/${sourceName}/*/*.parquet`;
+    }
+
+    /**
+     * Source-specific, date-partitioned silver path: silver/{sourceName}/{YYYY-MM-DD}/{filename}
+     */
+    public getSilverUri(tenantId: string, projectId: string, sourceName: string, filename: string, date?: string): string {
+        const partition = date || this.getDatePartition();
+        return `s3://${this.dataBucket}/tenants/${tenantId}/projects/${projectId}/silver/${sourceName}/${partition}/${filename}`;
+    }
+
+    /**
+     * Glob URI to read ALL dates for a silver source.
+     */
+    public getSilverGlobUri(tenantId: string, projectId: string, sourceName: string): string {
+        return `s3://${this.dataBucket}/tenants/${tenantId}/projects/${projectId}/silver/${sourceName}/*/*.parquet`;
+    }
+
+    /**
+     * Source-specific, date-partitioned gold path: gold/{sourceName}/{YYYY-MM-DD}/{filename}
+     */
+    public getGoldUri(tenantId: string, projectId: string, sourceName: string, filename: string, date?: string): string {
+        const partition = date || this.getDatePartition();
+        return `s3://${this.dataBucket}/tenants/${tenantId}/projects/${projectId}/gold/${sourceName}/${partition}/${filename}`;
+    }
+
+    /**
+     * Glob URI to read ALL dates for a gold source.
+     */
+    public getGoldGlobUri(tenantId: string, projectId: string, sourceName: string): string {
+        return `s3://${this.dataBucket}/tenants/${tenantId}/projects/${projectId}/gold/${sourceName}/*/*.parquet`;
+    }
+
+    /**
+     * Presigned upload URL for date-partitioned bronze.
+     */
+    public async generatePartitionedUploadUrl(tenantId: string, projectId: string, sourceName: string, filename: string): Promise<{ url: string; uri: string }> {
+        const partition = this.getDatePartition();
+        const key = `tenants/${tenantId}/projects/${projectId}/bronze/${sourceName}/${partition}/${filename}`;
+        const command = new PutObjectCommand({
+            Bucket: this.dataBucket,
+            Key: key,
+            ContentType: 'application/octet-stream',
+        });
+        const url = await getSignedUrl(this.client, command, { expiresIn: 3600 });
+        return { url, uri: `s3://${this.dataBucket}/${key}` };
+    }
+
+    private getDatePartition(): string {
+        return new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    }
 }
