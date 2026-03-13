@@ -159,3 +159,46 @@ graph TD
 
 ---
 
+## ⚙️ 8. Orchestration & Autonomous DAG
+
+The **Orchestration Service** governs data flow by routing through three distinct execution paths based on system state.
+
+### 🔄 Multi-Path Execution Logic
+1.  **🔥 Hot Path (Cached):** Triggered when the incoming schema matches the `schemaFingerprint` in DynamoDB. Skips LLM reasoning to execute **Verified Scripts** directly in Modal sandboxes (Zero Token overhead).
+2.  **❄️ Cold Path (Self-Healing):** Triggered by schema drift. LLM agents dynamically reinvent the transformation logic, updating the R2 script cache and DynamoDB fingerprints.
+3.  **🤖 ML Path (Concept Drift):** Monitors statistical health (Accuracy, RMSE). If drift is detected, it executes a "Challenger" training cycle to replace stale models.
+
+### 📊 DynamoDB: The System Brain
+DynamoDB acts as the Source of Truth for the entire DAG lifecycle:
+*   **Stateful Orchestration:** Stores `cronSchedule`, `schemaFingerprint`, and **Model Health Metrics** to determine the optimal path before execution.
+*   **Discovery Persistence:** Post-execution, it captures new discovery metadata (Lineage, SQL templates) and telemetry, allowing the **Analytics Hot Path** to serve live data without manual SQL updates.
+*   **Scheduling:** Acts as a passive state store; external triggers (Meltano/EventBridge) hit the `/ingestion-complete` hook to initiate the DAG.
+
+
+```mermaid
+graph TD
+    Trigger[Ingestion Trigger<br/>Cron / Webhook] --> FetchState[Fetch Project State<br/>from DynamoDB]
+    FetchState --> CompareFingerprint{Schema<br/>Fingerprint Match?}
+    
+    %% Hot Path
+    CompareFingerprint -- Yes --> HotPath[<b>🔥 Hot Path</b><br/>Zero-Token Execution]
+    HotPath --> ExecuteCached[Execute Verified Script<br/>in Modal Sandbox]
+    ExecuteCached --> UpdateLastRun[Update lastRunAt<br/>in DynamoDB]
+    
+    %% Cold Path
+    CompareFingerprint -- No --> ColdPath[<b>❄️ Cold Path</b><br/>LLM Discovery & Healing]
+    ColdPath --> LLMReasoning[LLM Infers New Schema<br/>& Writes Python Logic]
+    LLMReasoning --> SaveVerified[Save New Verified<br/>Script to R2 Cache]
+    SaveVerified --> UpdateFingerprint[Update schemaFingerprint<br/>in DynamoDB]
+    
+    %% ML Monitoring
+    UpdateLastRun --> MonitorDrift{Detect Concept<br/>Drift?}
+    UpdateFingerprint --> MonitorDrift
+    
+    MonitorDrift -- Yes --> MLPath[<b>🤖 ML Path</b><br/>Model Retraining]
+    MLPath --> TrainChallenger[Train Challenger Model<br/>in Micro-VM]
+    TrainChallenger --> DeployModel[Promote to Champion<br/>in DynamoDB]
+    
+    MonitorDrift -- No --> Finish[Pipeline Operational]
+    DeployModel --> Finish
+```
