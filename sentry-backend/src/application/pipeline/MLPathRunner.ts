@@ -30,8 +30,16 @@ export class MLPathRunner {
         const startTime = Date.now();
 
         let cumulativeDiscovery: any = {
-            tables: [],
-            metricGroups: [],
+            sourceClassifications: [
+                {
+                    id: 'ml_insights_engine',
+                    name: 'ML Insights Engine',
+                    type: 'ml_agent',
+                    description: 'Predictive intelligence agent trained on Gold Layer data.',
+                    status: 'active',
+                    origins: []
+                }
+            ],
             predictionModels: [],
             dashboardGroups: [],
             dashboards: []
@@ -43,7 +51,7 @@ export class MLPathRunner {
         const effectiveSourceNames = ctx.rawSourceUris.map((_, i) => (ctx.sourceNames?.[i] || `source_${i}`).replace(/\s+/g, '_'));
 
         const goldGlobUris = effectiveSourceNames.map(name => 
-            this.r2StorageService.getGoldGlobUri(tenantId, projectId, name.replace(/\s+/g, '_'))
+            this.r2StorageService.getGoldGlobUri(tenantId, projectId, name)
         );
         const mlModelUri = this.r2StorageService.getS3Uri(tenantId, projectId, 'system', 'models/active_model.pkl');
 
@@ -52,6 +60,15 @@ export class MLPathRunner {
         const mlArchitectTaskName = 'ML_Architect';
         tasksExecuted.push(mlArchitectTaskName);
 
+        // Inject discovery schemas to skip discovery phase in Architect
+        // OPTIMIZED: only pass name and type to save tokens
+        const goldSchemas: Record<string, any> = {};
+        if (ctx.discovery?.tables) {
+            ctx.discovery.tables.forEach((table: any, i: number) => {
+                goldSchemas[`gold_${i}`] = table.columns?.map((col: any) => ({ name: col.name, type: col.type }));
+            });
+        }
+
         const architectResult = await this.agentExecutor.execute({
             tenantId,
             projectId,
@@ -59,17 +76,25 @@ export class MLPathRunner {
             systemPromptUri: `${promptPrefix}/ml_architect.txt`,
             boilerplateUri: `${boilerplatePrefix}/ml_architect.py`,
             additionalEnvVars: {
-                'INJECTED_GOLD_URIS': JSON.stringify(goldGlobUris)
-            }
+                'INJECTED_GOLD_URIS': JSON.stringify(goldGlobUris),
+                'INJECTED_SCHEMA_JSON': JSON.stringify(goldSchemas)
+            },
+            forceRegenerate: ctx.forceRediscover
         });
 
         estimatedTokensUsed += architectResult.estimatedTokens;
         if (architectResult.estimatedTokens === 0) hitCount++;
         
         let snippetName = 'regression'; // Fallback
+        let targetVariable = '';
+        let strategicReason = '';
+        let modelId = 'ml_generic_insight_engine';
+
         if (architectResult.success && architectResult.result?.recommended_snippet) {
             snippetName = architectResult.result.recommended_snippet;
-            console.log(`[MLPathRunner] Architect strategically selected snippet: ${snippetName} (Target: ${architectResult.result.target_variable})`);
+            targetVariable = architectResult.result.target_variable || '';
+            strategicReason = architectResult.result.strategic_reason || '';
+            console.log(`[MLPathRunner] Architect strategically selected snippet: ${snippetName} (Target: ${targetVariable})`);
         } else {
             console.warn(`[MLPathRunner] ML Architect didn't return a clear snippet. Defaulting to: ${snippetName}`);
         }
@@ -93,8 +118,12 @@ export class MLPathRunner {
             boilerplateUri: `s3://${systemBucket}/system/boilerplates/snippets/ml/${snippetName}.py`,
             additionalEnvVars: {
                 'INJECTED_GOLD_URIS': JSON.stringify(goldGlobUris),
-                'INJECTED_MODEL_OUTPUT_URI': mlModelUri
-            }
+                'INJECTED_MODEL_OUTPUT_URI': mlModelUri,
+                'INJECTED_TARGET_VARIABLE': targetVariable.replace(/'/g, "\\'"),
+                'INJECTED_STRATEGIC_REASON': strategicReason.replace(/'/g, "\\'"),
+                'INJECTED_SCHEMA_JSON': JSON.stringify(goldSchemas)
+            },
+            forceRegenerate: ctx.forceRediscover
         });
         
         estimatedTokensUsed += trainingResult.estimatedTokens;
@@ -102,6 +131,13 @@ export class MLPathRunner {
         
         if (trainingResult.discovery) {
             cumulativeDiscovery.predictionModels.push(trainingResult.discovery);
+            
+            // --- ML ORIGIN REGISTRATION ---
+            // We add the specific model target as an "origin" of the single AI engine node
+            modelId = `ml_${snippetName}_${targetVariable.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+            if (cumulativeDiscovery.sourceClassifications[0]) {
+                cumulativeDiscovery.sourceClassifications[0].origins.push(targetVariable || snippetName);
+            }
         }
 
         this.sseManager.broadcastToTenant(tenantId, 'pipeline_progress', {
@@ -113,7 +149,8 @@ export class MLPathRunner {
 
         // --- STEP 2: ML INFERENCE ---
         console.log(`[MLPathRunner] STEP 2: Running ML Inference...`);
-        const predictionsUri = this.r2StorageService.getS3Uri(tenantId, projectId, 'gold', 'predictions_latest.parquet');
+        const today = new Date().toISOString().split('T')[0];
+        const predictionsUri = this.r2StorageService.getS3Uri(tenantId, projectId, 'gold', `${modelId}/${today}/predictions.parquet`);
         const mlInferenceTaskName = 'ML_Inference';
         tasksExecuted.push(mlInferenceTaskName);
 
@@ -124,10 +161,13 @@ export class MLPathRunner {
             systemPromptUri: `${promptPrefix}/ml_inference.txt`,
             boilerplateUri: `${boilerplatePrefix}/ml_inference.py`,
             additionalEnvVars: {
-                'INJECTED_GOLD_URIS': JSON.stringify(goldGlobUris),
+                'INJECTED_NORMALIZED_URIS': JSON.stringify(effectiveSourceNames.map(name => this.r2StorageService.getSilverGlobUri(tenantId, projectId, name))),
                 'INJECTED_MODEL_URI': mlModelUri,
-                'INJECTED_PREDICTIONS_OUTPUT_URI': predictionsUri
-            }
+                'INJECTED_PREDICTIONS_OUTPUT_URI': predictionsUri,
+                'INJECTED_TARGET_VARIABLE': targetVariable.replace(/'/g, "\\'"),
+                'INJECTED_SCHEMA_JSON': JSON.stringify(goldSchemas)
+            },
+            forceRegenerate: ctx.forceRediscover
         });
 
         estimatedTokensUsed += inferenceResult.estimatedTokens;
@@ -153,8 +193,13 @@ export class MLPathRunner {
             additionalEnvVars: {
                 'INJECTED_GOLD_URIS': JSON.stringify(goldGlobUris),
                 'INJECTED_PREDICTIONS_URI': predictionsUri,
-                'INJECTED_MANIFEST_URI': manifestUri
-            }
+                'INJECTED_MANIFEST_URI': manifestUri,
+                'INJECTED_MODEL_TYPE': snippetName,
+                'INJECTED_MODEL_ID': modelId,
+                'INJECTED_TARGET_VARIABLE': targetVariable.replace(/'/g, "\\'"),
+                'INJECTED_STRATEGIC_REASON': strategicReason.replace(/'/g, "\\'")
+            },
+            forceRegenerate: ctx.forceRediscover
         });
 
         estimatedTokensUsed += queriesResult.estimatedTokens;
@@ -180,11 +225,11 @@ export class MLPathRunner {
         console.log(`[MLPathRunner] ML Pipeline ${projectId} Fully Operational. Tokens: ~${estimatedTokensUsed}`);
 
         return {
-            path: 'ml',
+            path: 'unified',
             discovery: cumulativeDiscovery,
             vitals: {
                 pipelineLatencyMs: endTime - startTime,
-                pathUsed: 'ml',
+                pathUsed: 'unified',
                 cacheHitRate: tasksExecuted.length > 0 ? hitCount / tasksExecuted.length : 0,
                 estimatedTokensUsed,
                 tasksExecuted,

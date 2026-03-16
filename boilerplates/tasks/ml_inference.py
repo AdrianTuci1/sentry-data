@@ -60,8 +60,21 @@ def run_ml_inference():
         # Example (joined scoring): 
         # df = con.execute(f"SELECT a.*, b.status FROM read_parquet('{GOLD_URIS[0]}') a JOIN read_parquet('{GOLD_URIS[1]}') b ON a.id = b.id").fetchdf()
         
-        # Predict logic (placeholder)
-        X = df.select_dtypes(include=['number', 'float', 'int']).fillna(0)
+        # Predict logic
+        # Robustly align features with what the model expects
+        feature_cols = getattr(model, 'feature_names_in_', None)
+        if feature_cols is not None:
+            print(f"  [Alignment] Model expects: {list(feature_cols)}")
+            # 1. Fill missing columns with 0
+            for col in feature_cols:
+                if col not in df.columns:
+                    df[col] = 0
+            # 2. Reorder columns to match exactly
+            X = df[list(feature_cols)]
+        else:
+            print("  [Alignment] Model has no explicit feature names. Using all numeric columns.")
+            X = df.select_dtypes(include=['number', 'float', 'int']).fillna(0)
+            
         df['predicted_value'] = model.predict(X)
         
         # Discovery Reporting

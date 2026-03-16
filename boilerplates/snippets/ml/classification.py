@@ -41,25 +41,27 @@ def run_ml_training():
     # PHASE 1: PREPARE DATASET (LLM fills this in)
     # Use: con.execute("SELECT ... FROM read_parquet('...')")
     # You MUST create a pandas DataFrame 'df' for training.
-    # --- LLM START ---
+    # --- LLM START: Data Preparation ---
+    target_var = os.environ.get("INJECTED_TARGET_VARIABLE", "is_churned")
+    strategic_reason = os.environ.get("INJECTED_STRATEGIC_REASON", "")
+    print(f"2. [Strategy] Targeting '{target_var}' based on: {strategic_reason}")
     
-    # Example (single source):
-    # df = con.execute(f"SELECT * FROM read_parquet('{gold_uris[0]}')").fetchdf()
-    
-    # Example (multi-source join):
-    # df = con.execute(f"SELECT a.*, b.status FROM read_parquet('{gold_uris[0]}') a JOIN read_parquet('{gold_uris[1]}') b ON a.id = b.id").fetchdf()
+    # Example: df = con.execute(f"SELECT * FROM read_parquet('{gold_uris[0]}')").fetchdf()
+    # --- LLM END ---
 
     # -------------------------------------------------------------------------
     # PHASE 2: ML CLASSIFICATION TRAINING (LLM fills this in)
     #
     # INSTRUCTIONS FOR LLM:
     # 1. This is a CLASSIFICATION scenario. 
-    # 2. Identify a binary or multi-class target variable (e.g., is_churned).
-    # 3. Clean and prepare 'df': handle missing values, encode categoricals, check for imbalance.
-    # 4. Train a Classification model using xgboost (XGBClassifier) or lightgbm (LGBMClassifier) for superior performance.
+    # 2. You ARE TARGETING: {target_var}
+    # 3. Clean and prepare 'df': handle missing values, encode categoricals.
+    # 4. Train a Classification model using xgboost (XGBClassifier) or lightgbm (LGBMClassifier).
     # 5. Evaluate (AUC-ROC, F1-score).
-    # 6. Save the model locally (e.g., /tmp/model.pkl) and use `upload_to_r2` to upload it to `model_output_uri`.
-    # 7. Print the `AGENT_DISCOVERY` JSON with performance metrics and top features (e.g. from model.feature_importances_).
+    # 6. Save the model locally (/tmp/model.pkl) and upload to R2.
+    # 7. Print AGENT_DISCOVERY with 'primaryMetric' and 'topFeatures'.
+    # 
+    # --- LLM START: Training & Evaluation ---
     # 
     # EXAMPLE:
     # -----------------------------------------------------------

@@ -1,12 +1,10 @@
 import { ProjectRepository } from '../../infrastructure/repositories/ProjectRepository';
 import { SSEManager } from '../../services/sse/SSEManager';
 
-import { PathResolver } from '../pipeline/PathResolver';
-import { HotPathRunner } from '../pipeline/HotPathRunner';
-import { ColdPathRunner } from '../pipeline/ColdPathRunner';
+import { PipelineRunner } from '../pipeline/PipelineRunner';
 import { MLPathRunner } from '../pipeline/MLPathRunner';
 import { PipelineContext, PipelineResult } from '../pipeline/types';
-import { SourceSchema } from '../pipeline/SchemaFingerprint';
+import { SchemaFingerprint, SourceSchema } from '../pipeline/SchemaFingerprint';
 import { PipelineConfig } from '../pipeline/PipelineConfig';
 
 /**
@@ -14,24 +12,18 @@ import { PipelineConfig } from '../pipeline/PipelineConfig';
  * It delegates to specific PipelinePath runners (Hot/Cold/ML) based on project state.
  */
 export class OrchestrationService {
-    private pathResolver: PathResolver;
-    private hotPathRunner: HotPathRunner;
-    private coldPathRunner: ColdPathRunner;
+    private pipelineRunner: PipelineRunner;
     private mlPathRunner: MLPathRunner;
     private projectRepo: ProjectRepository;
     private sseManager: SSEManager;
 
     constructor(
-        pathResolver: PathResolver,
-        hotPathRunner: HotPathRunner,
-        coldPathRunner: ColdPathRunner,
+        pipelineRunner: PipelineRunner,
         mlPathRunner: MLPathRunner,
         projectRepo: ProjectRepository,
         sseManager: SSEManager
     ) {
-        this.pathResolver = pathResolver;
-        this.hotPathRunner = hotPathRunner;
-        this.coldPathRunner = coldPathRunner;
+        this.pipelineRunner = pipelineRunner;
         this.mlPathRunner = mlPathRunner;
         this.projectRepo = projectRepo;
         this.sseManager = sseManager;
@@ -65,25 +57,8 @@ export class OrchestrationService {
         const dummyCurrentSchemas: SourceSchema[] = [];
 
         try {
-            // Determine the execution path and granular invalidations
-            const resolution = await this.pathResolver.resolve(ctx, dummyCurrentSchemas, project.schemaFingerprint);
-            
-            // Inject invalidated sources into the context so ColdPathRunner knows what to regenerate
-            ctx.invalidatedSources = resolution.invalidatedSources;
-
-            console.log(`[Orchestrator] Execution Path: ${resolution.path}, Invalidated Sources: ${resolution.invalidatedSources.join(', ') || 'None'}`);
-
-            // --- PHASE 1: ETL EXECUTION (Hot/Cold) ---
-            let etlResult: PipelineResult;
-            if (resolution.path === 'ml') {
-                // If PathResolver explicitly asked for ML (e.g. periodic), we still need current ETL state
-                // For now, we assume periodic ML is triggered after a brief 'hot' check.
-                etlResult = await this.hotPathRunner.execute(ctx);
-            } else if (resolution.path === 'hot') {
-                etlResult = await this.hotPathRunner.execute(ctx);
-            } else {
-                etlResult = await this.coldPathRunner.execute(ctx);
-            }
+            // --- PHASE 1: ETL EXECUTION (Unified Smart Runner) ---
+            const etlResult = await this.pipelineRunner.execute(ctx);
 
             // Save basic ETL results immediately (Dashboards v1)
             await this.savePipelineResult(project, etlResult);
@@ -93,16 +68,31 @@ export class OrchestrationService {
             if (PipelineConfig.ENABLE_ML_PATH) {
                 console.log(`[Orchestrator] Triggering ML Path Enrichment for ${projectId}...`);
                 try {
+                    // Enrich context with ETL discovery for ML optimization (scaffolds)
+                    ctx.discovery = etlResult.discovery;
+                    
                     const mlResult = await this.mlPathRunner.execute(ctx);
                     
-                    // Update project again with ML-enhanced metadata and dashboards v2
-                    // We merge predictionModels from mlResult into project
+                    // --- SAFE DISCOVERY MERGE ---
+                    // We preserve everything from ETL and only ADD ML insights.
                     const mergedDiscovery = {
                         ...etlResult.discovery,
-                        ...mlResult.discovery,
                         predictionModels: [
                             ...(etlResult.discovery.predictionModels || []),
                             ...(mlResult.discovery.predictionModels || [])
+                        ],
+                        // ML V2 Dashboards/Groups are additive to ETL ones
+                        dashboardGroups: [
+                            ...(etlResult.discovery.dashboardGroups || []),
+                            ...(mlResult.discovery.dashboardGroups || [])
+                        ],
+                        dashboards: [
+                            ...(etlResult.discovery.dashboards || []),
+                            ...(mlResult.discovery.dashboards || [])
+                        ],
+                        sourceClassifications: [
+                            ...(etlResult.discovery.sourceClassifications || []),
+                            ...(mlResult.discovery.sourceClassifications || [])
                         ]
                     };
                     mlResult.discovery = mergedDiscovery as any;
@@ -120,6 +110,12 @@ export class OrchestrationService {
                     });
                 }
             }
+
+            // --- PHASE 3: FINALIZATION ---
+            // Update the project's schema fingerprint so next run knows what's already processed
+            const currentFingerprint = SchemaFingerprint.compute(dummyCurrentSchemas);
+            project.schemaFingerprint = currentFingerprint;
+            await this.projectRepo.createOrUpdate(project);
 
             console.log(`[Orchestrator] Pipeline ${projectId} Fully Operational.`);
         } catch (error: any) {

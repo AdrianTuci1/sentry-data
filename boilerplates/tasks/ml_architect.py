@@ -26,20 +26,29 @@ def run_ml_architecture():
     # -------------------------------------------------------------------------
     # PHASE 1: DISCOVER ALL GOLD TABLES
     # -------------------------------------------------------------------------
-    print(f"2. [Schema Discovery] Describing {len(GOLD_URIS)} Gold Tables for ML...")
+    injected_schemas_raw = os.environ.get("INJECTED_SCHEMA_JSON", "")
     
-    all_schemas = {}
-    for i, uri in enumerate(GOLD_URIS):
-        if not uri: continue
-        alias = f"gold_{i}"
-        try:
-            schema_rows = con.execute(f"DESCRIBE SELECT * FROM read_parquet('{uri}')").fetchall()
-            all_schemas[alias] = [{"name": col[0], "type": col[1]} for col in schema_rows]
-            print(f"  [{alias}] {uri} columns:")
-            for col in all_schemas[alias]:
+    if injected_schemas_raw:
+        print("2. [Schema Discovery] Using PRE-INJECTED Gold Schemas...")
+        all_schemas = json.loads(injected_schemas_raw)
+        for alias, cols in all_schemas.items():
+            print(f"  [{alias}] columns:")
+            for col in cols:
                 print(f"    - {col['name']} ({col['type']})")
-        except Exception as e:
-            print(f"Warning: Could not describe {uri}: {str(e)}")
+    else:
+        print(f"2. [Schema Discovery] Describing {len(GOLD_URIS)} Gold Tables for ML...")
+        all_schemas = {}
+        for i, uri in enumerate(GOLD_URIS):
+            if not uri: continue
+            alias = f"gold_{i}"
+            try:
+                schema_rows = con.execute(f"DESCRIBE SELECT * FROM read_parquet('{uri}')").fetchall()
+                all_schemas[alias] = [{"name": col[0], "type": col[1]} for col in schema_rows]
+                print(f"  [{alias}] {uri} columns:")
+                for col in all_schemas[alias]:
+                    print(f"    - {col['name']} ({col['type']})")
+            except Exception as e:
+                print(f"Warning: Could not describe {uri}: {str(e)}")
 
     # -------------------------------------------------------------------------
     # PHASE 2: ML STRATEGY GENERATION (LLM fills this in)

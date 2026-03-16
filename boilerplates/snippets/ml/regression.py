@@ -41,13 +41,27 @@ def run_ml_training():
     # PHASE 1: PREPARE DATASET (LLM fills this in)
     # Use: con.execute("SELECT ... FROM read_parquet('...')")
     # You MUST create a pandas DataFrame 'df' for training.
-    # --- LLM START ---
+    # --- LLM START: Data Preparation ---
+    target_var = os.environ.get("INJECTED_TARGET_VARIABLE", "revenue")
+    strategic_reason = os.environ.get("INJECTED_STRATEGIC_REASON", "")
+    print(f"2. [Strategy] Targeting '{target_var}' based on: {strategic_reason}")
     
-    # Example (single source):
-    # df = con.execute(f"SELECT * FROM read_parquet('{gold_uris[0]}')").fetchdf()
-    
-    # Example (multi-source join):
-    # df = con.execute(f"SELECT a.*, b.feat FROM read_parquet('{gold_uris[0]}') a JOIN read_parquet('{gold_uris[1]}') b ON a.id = b.id").fetchdf()
+    # Example: df = con.execute(f"SELECT * FROM read_parquet('{gold_uris[0]}')").fetchdf()
+    # --- LLM END ---
+
+    # -------------------------------------------------------------------------
+    # PHASE 2: ML REGRESSION TRAINING (LLM fills this in)
+    #
+    # INSTRUCTIONS FOR LLM:
+    # 1. This is a REGRESSION scenario. 
+    # 2. You ARE TARGETING: {target_var}
+    # 3. Clean and prepare 'df': handle missing values, encode categoricals.
+    # 4. Train a Regression model using xgboost (XGBRegressor) or lightgbm (LGBMRegressor).
+    # 5. Evaluate (RMSE, R2).
+    # 6. Save the model locally (/tmp/model.pkl) and upload to R2.
+    # 7. Print AGENT_DISCOVERY with 'primaryMetric' and 'topFeatures'.
+    #
+    # --- LLM START: Training & Evaluation ---
 
     # -------------------------------------------------------------------------
     # PHASE 2: ML REGRESSION TRAINING (LLM fills this in)

@@ -1,0 +1,29 @@
+# Specialized ML Widget Mapping (MANDATORY)
+You have received `INJECTED_MODEL_TYPE`. You MUST use the corresponding specialized widget from the manifest:
+- **clustering** → Use `lead-clustering` or `creative-quadrant`.
+- **regression** or **forecasting** → Use `predictive` or `animated-line`.
+- **shapley_attribution** → Use `shapley-attribution`.
+- **market_sentiment** → Use `market-radar` or `intensity-heat`.
+- **classification** → Use `funnel` or `bar-chart` (with score intervals).
+- **survival_analytics** → Use `predictive` (time-to-event curves).
+
+# Instructions
+
+1. **INTEGRATE ML**: You have received `INJECTED_PREDICTIONS_URI`. This is the **current run's partitioned predictions file**. 
+2. **SCHEMA DISCOVERY**: The boilerplate output (Phase 6) has already printed the **Columns** and a **Sample** from this predictions file. Use these names for your JOINs.
+3. **JOINING**: You MUST join the Gold tables with the Predictions table on common keys (e.g., `order_id`, `user_id`).
+3. **PREDICTIVE WIDGETS**: Create widgets that show predicted values. 
+   - You MUST use the Specialized ML Widget identified above based on `INJECTED_MODEL_TYPE`.
+
+4. **DIVERSIFIED DASHBOARD (CRITICAL)**:
+   - **STRETCH YOUR VISUALS**: Use at least 2-3 DIFFERENT widget types for ML insights.
+   - **EXOTIC WIDGETS**: Favor specialized ML components over standard weather cards.
+
+5. **WIDGET CONFIGURATION (PROPERTIES)**:
+   - **gridSpan**: Use the exact `gridSpan` from the manifest.
+   - **description**: Provide a 1-sentence context-specific description.
+   - **subtitle**: Mention the model type (e.g., "AI-Generated Clustering").
+
+6. **OUTPUT FORMAT**:
+   Inside your script, print the discovery payload:
+   `print(f"AGENT_DISCOVERY:{json.dumps(discovery_payload)}")`

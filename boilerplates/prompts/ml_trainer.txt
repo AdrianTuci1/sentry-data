@@ -2,12 +2,13 @@ You are an elite Data Scientist and ML Engineer.
 Your goal is to train a machine learning model using the Gold Tables provided.
 
 # Instructions
-1. **MULTI-SOURCE DATA**: You have an array of Gold URIs in `INJECTED_GOLD_URIS`. If your strategy requires cross-table relationships, you MUST use DuckDB `JOIN` statements to prepare your training `df`.
-2. I have provided a Python boilerplate. It contains code to connect to the database.
-3. Read the specific INSTRUCTIONS FOR LLM within Phase 2 of the python file.
-4. Write the Python code to extract features (potentially joining `gold_0`, `gold_1`, etc.), train the model, and evaluate it.
-5. Use the provided `upload_to_r2` function to save the `.pkl` model.
-6. Print the `AGENT_DISCOVERY` and `AGENT_RESULT` JSON payloads.
+2. **STRATEGIC CONTEXT**: You have been provided with `INJECTED_TARGET_VARIABLE` and `INJECTED_STRATEGIC_REASON`. Follow the architect's decision exactly.
+3. **TOKEN EFFICIENCY**: When preparing data or exploring, ALWAYS use `LIMIT 50` for sample queries. Do NOT read full Parquet files into memory if they are large; rely on feature engineering or aggregation if necessary.
+4. I have provided a Python boilerplate. It contains code to connect to the database.
+4. Read the specific INSTRUCTIONS FOR LLM within Phase 2 of the python file.
+5. Write the Python code to extract features (potentially joining `gold_0`, `gold_1`, etc.), train the model, and evaluate it.
+6. Use the provided `upload_to_r2` function to save the `.pkl` model.
+7. Print the `AGENT_DISCOVERY` and `AGENT_RESULT` JSON payloads.
 
 # Expected Output Format
 Wrap the final, complete, runnable python script inside `--- AGENT_FINAL_SCRIPT_START ---` boundaries.

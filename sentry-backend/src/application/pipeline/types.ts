@@ -1,4 +1,4 @@
-export type PipelinePath = 'hot' | 'cold' | 'ml';
+export type PipelinePath = 'unified';
 
 export interface PipelineContext {
     tenantId: string;
@@ -7,6 +7,7 @@ export interface PipelineContext {
     sourceNames: string[];
     forceRediscover?: boolean;
     invalidatedSources?: string[];
+    discovery?: CumulativeDiscovery;
 }
 
 export interface PipelineVitals {

@@ -71,8 +71,12 @@ def run_feature_engineering():
     # con.execute(sql)
     # --- LLM END ---
 
-    # PHASE 4: VERIFICATION
-    print("5. [Verification] Describing Gold Layer schemas...")
+    # Discovery Metadata (Standardized)
+    connector = os.environ.get("INJECTED_CONNECTOR", "Unknown")
+    action_type = os.environ.get("INJECTED_ACTION_TYPE", "batch")
+    origin = os.environ.get("INJECTED_ORIGIN", "Data")
+    source_id = os.environ.get("INJECTED_SOURCE_ID", "default")
+    
     all_tables_discovery = []
     
     for i, gold_uri in enumerate(target_gold_uris):
@@ -82,11 +86,10 @@ def run_feature_engineering():
             columns_discovery = []
             for j, col in enumerate(gold_schema):
                 col_name = col[0]
-                # Format technical names to human-readable titles (e.g. bounce_rate -> Bounce rate)
                 col_title = col_name.replace("_", " ").capitalize()
                 
                 columns_discovery.append({
-                    "id": f"c_{i}_{j}",
+                    "id": f"c_{source_id}_{j}",
                     "name": col_name,
                     "title": col_title,
                     "type": "Decimal" if ("DOUBLE" in col[1] or "INT" in col[1] or "FLOAT" in col[1]) else "String",
@@ -94,20 +97,21 @@ def run_feature_engineering():
                 })
 
             all_tables_discovery.append({
-                "id": f"gold_table_{i}",
-                "title": f"Engineered Features {i}",
-                "source": {"id": f"src_silver_{i}", "name": "Silver Layer", "type": "stream"},
+                "id": f"gold_table_{source_id}",
+                "title": f"{connector} > {action_type} > {origin}",
+                "source": {"id": f"src_silver_{source_id}", "name": f"Silver {origin}", "type": "stream"},
                 "lineage": {"action": "Feature Engineering", "type": "transform"},
                 "columns": columns_discovery[:15]
             })
         except Exception as e:
             print(f"Warning: Failed to describe target gold layer {gold_uri}: {str(e)}")
-            # We don't return here so other successful descriptions can still be sent.
 
     if not all_tables_discovery:
          print("AGENT_ERROR: No gold tables were successfully created/described.")
          return
 
+    # Standardized Discovery: ONLY 'tables' are reported by Feature Engineer.
+    # No metricGroups, no dashboards - they belong to Query Generator.
     discovery_payload = {
         "tables": all_tables_discovery
     }

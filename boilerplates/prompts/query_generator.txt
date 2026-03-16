@@ -9,7 +9,7 @@ You have already been given:
 
 # Your Output Model: adjusted_data → group → insight (widget)
 - **adjusted_data** = columns in the Gold Layer (already printed for you)
-- **group** = a dashboardGroup that bundles related insights (e.g., "Revenue KPIs")
+- **group** = a dashboardGroup that bundles related insights (e.g., "Operational KPIs")
 - **insight** = a SQL query + full widget config that the frontend renders directly
 
 # Instructions
@@ -18,66 +18,32 @@ You have already been given:
 
 2. **CRAFTING THE BUSINESS STRATEGY**: 
    - A business strategy named "STRATEGY MATRIX RULES" (version 3.0) has been printed in the boilerplate execution output (Phase 4). 
-   - This version is a flat **Metrics Wishlist** of ~30 desirable business insights.
    - You MUST read this wishlist and treat it as your primary target list.
    - For EACH metric in the wishlist, evaluate if it can be computed using the columns in your Gold Layer schema.
    - **PROACTIVE DISCOVERY**: If the data supports it, you MUST implement the corresponding widget.
-   - This approach is "Target-Driven": we know what we WANT (e.g., LTV, Churn, ROAS), your job is to see if the available data allows it.
    - If a metric cannot be derived, skip it. Do not invent metrics outside this wishlist unless the data is exceptionally unique and valuable.
 
 3. **INTERPOLATIONS & CROSS-TABLE JOINs**: 
    - You have been provided with an array of Gold URIs in `INJECTED_GOLD_URIS`.
    - You MUST perform JOINs between these tables to create "Interpolated Insights".
-   - **ML PREDICTIONS (OPTIONAL)**: You may also receive `INJECTED_PREDICTIONS_URI`.
-   - If provided, treat the predictions table as an independent data source.
-   - You MUST join Gold tables with the predictions table (Joining on common keys like `user_id` or `product_id`) to derive high-value predictive widgets like "Churn Risk Breakdown" or "Predicted Revenue by Segment".
-   - Crucially, if ML predictions are missing, simply proceed with base Gold Layer analytics.
 
-4. **ONE-SHOT QUERY GENERATION**: Write all queries in a single pass.
+4. **DIVERSIFIED DASHBOARD (CRITICAL)**:
+   - **STRETCH YOUR VISUALS**: You MUST use at least 4 DIFFERENT widget types across your dashboard groups.
+   - **NO REPETITION**: NEVER use the same widget type (e.g., `weather`) for two consecutive insights in the same group.
+   - **EXOTIC WIDGETS**: Favor `animated-line`, `light-dial`, `predictive`, and `waterfall` over simple `weather` cards when the data allows it.
+
+5. **WIDGET CONFIGURATION (PROPERTIES)**:
+   - **gridSpan**: You MUST use the exact `gridSpan` value printed for that widget type in the manifest. Do not hallucinate "col-span-1".
+   - **description**: You MUST provide a 1-sentence context-specific description for each widget (e.g., "Measures the net revenue after freight costs").
+   - **subtitle**: Add a short subtitle representing the grain or filter (e.g., "Daily trend", "By Category").
+
+6. **ONE-SHOT QUERY GENERATION**: Write all queries in a single pass.
    - Always: `FROM read_parquet('s3://...')` (single-quoted URI)
    - Quote dot-columns: `"traffic_source.name"`
 
-3. **WIDGET CONFIGURATION (CRITICAL)**: Each dashboard item MUST include all fields the frontend needs to render. Read the widget manifest carefully.
+7. **GROUP STRUCTURE**: Create 2-4 dashboardGroups, each with 2-4 insights.
 
-   **How to choose widget type:**
-   - Scalar value (one number like total revenue, avg sessions) → `weather`
-   - Scalar with percentage or progress → `natural` or `light-dial`
-   - Time series (date + values) → `predictive` or `animated-line`
-   - Distribution / breakdown → `bar-chart` or `pie-chart`
-   - Retention grid → `cohorts`
-   - Funnel steps → `funnel`
-
-   **Required fields per dashboard item:**
-   ```json
-   {
-     "id": "ins_xxx",
-     "title": "Human Readable Title",
-     "type": "weather",               // Widget type from manifest
-     "value": "45.2k",                // Computed from query result
-     "unit": "$",                     // Unit label
-     "colorTheme": "theme-revenue",   // Visual theme
-     "gridSpan": "default",           // From manifest widget_type definition
-     "query": "SELECT ...",           // DuckDB SQL
-     "group_id": "grp_xxx",           // Links to dashboardGroup
-     "adjusted_data_columns": ["col1", "col2"]  // Gold cols used (for lineage)
-   }
-   ```
-
-   **colorTheme options**: theme-productivity, theme-revenue, theme-audience, theme-weather, theme-red
-   **gridSpan**: Use the `grid_span` value defined within each widget type in the manifest.
-
-4. **ONE-SHOT LOGIC GENERATION**: Your goal is to define the structure and logic of the dashboard items.
-   - You MUST NOT compute the actual result values (e.g., "45.2k", arrays of numbers) during this phase.
-   - Instead, focus on crafting the perfect DuckDB SQL query for each insight.
-   - Quote dot-columns: `"traffic_source.name"`
-   - For time-series: `GROUP BY DATE_TRUNC('day', <date_col>) ORDER BY 1`
-   - For scalars: aggregate over the full Gold Layer
-
-5. **WIDGET CONFIGURATION (CRITICAL)**: Each dashboard item MUST include all fields the frontend needs to render. Read the widget manifest carefully.
-
-6. **GROUP STRUCTURE**: Create 2-4 dashboardGroups, each with 2-4 insights.
-
-7. **DO NOT TRUNCATE CODE**: Write the full script. Every query must be tested.
+8. **DO NOT TRUNCATE CODE**: Write the full script. Every query must be tested.
 
 # Output Format (MANDATORY)
 

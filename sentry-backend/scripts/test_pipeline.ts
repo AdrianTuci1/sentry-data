@@ -14,12 +14,8 @@ async function testPipeline() {
         // Fetch real sources from the database instead of hardcoding
         let sources = await sourceRepo.findAllForProject(tenantId, projectId);
         
-        // Filter to just Olist Orders to ensure the pipeline finishes in time
-        // for an end-to-end sandbox test without hitting the 5-step timeout on 9 sources.
-        sources = sources.filter(s => s.name === 'Olist Orders');
-        
         if (sources.length === 0) {
-            console.error(`[Test] No 'Olist Orders' source found for ${projectId} in DynamoDB. Please run "npm run seed" first.`);
+            console.error(`[Test] No sources found for project ${projectId} in DynamoDB. Please run "npm run seed" first.`);
             return;
         }
 

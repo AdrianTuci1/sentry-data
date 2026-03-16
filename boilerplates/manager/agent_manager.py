@@ -67,7 +67,8 @@ def test_run_script(script_content: str) -> str:
             ["python", file_path], 
             capture_output=True, 
             text=True, 
-            timeout=60
+            timeout=60,
+            env=os.environ.copy() # Ensure environment variables are passed to the sub-process
         )
         output = f"--- STDOUT ---\n{result.stdout}\n--- STDERR ---\n{result.stderr}\nExit Code: {result.returncode}"
         return output
@@ -112,11 +113,11 @@ def run_agent_loop():
         f"TARGET PARAMETERS:\n{injected_vars_str}\n\n"
         f"Start from this boilerplate:\n```python\n{boilerplate_code}\n```\n\n"
         "CRITICAL RULES:\n"
-        "1. You MUST write the ENTIRE script in every response. DO NOT use placeholders like '# ...' or '...'. Truncation causes a syntax error.\n"
-        "2. You MUST report your discovery (schema, groups, widgets) via a print() statement inside your script:\n"
-        "   `print(f'AGENT_DISCOVERY:{json.dumps(discovery_payload)}')` where discovery_payload follows the manifest schema.\n"
-        "3. BE DESCRIPTIVE: Print your progress clearly (e.g., '1. Sampled data...', '2. Formulated SQL...', '3. Validated schema...') so the user can follow your reasoning in the logs.\n"
-        "4. NO LAZINESS: Do not omit helper functions like `get_grid_spans`. Rewriting the whole file is mandatory.\n"
+        "1. ONE-SHOT PREFERRED: Optimize your script to run successfully in one or two steps via `test_run_script`.\n"
+        "2. REPORT DISCOVERY: You MUST report findings (schema, logic) via:\n"
+        "   `print(f'AGENT_DISCOVERY:{json.dumps(discovery_payload)}')` inside your script.\n"
+        "3. EXIT STRATEGY: Once your logic works in `test_run_script`, JUST SAY 'COMPLETED' (no markdown blocks). Gemini truncation often breaks large code blocks in text.\n"
+        "4. BE DESCRIPTIVE: Print progress steps (e.g., '1. Data prepared...', '2. Model loaded...') during execution.\n"
     )
 
     # Gemini tools definition
@@ -147,9 +148,11 @@ def run_agent_loop():
         types.Content(role="user", parts=[types.Part.from_text(text=user_message)])
     ]
 
-    max_steps = 10  # Increased to allow complex discovery + generation loops
+    max_steps = 15  # Increased to allow complex discovery + generation + debugging loops
     step = 0
     final_script = boilerplate_code
+    last_tested_script = ""
+    last_tested_output = ""
 
     while step < max_steps:
         step += 1
@@ -180,9 +183,12 @@ def run_agent_loop():
                 fc = part.function_call
                 if fc.name == "test_run_script":
                     script_code = fc.args.get("script_content", "")
-                    if script_code: final_script = script_code
+                    if script_code: 
+                        final_script = script_code
+                        last_tested_script = script_code
                     print(f"[Agent Manager] Step {step}: Executing test_run_script...")
                     result = test_run_script(script_code)
+                    last_tested_output = result
                     print(f"[Agent Manager] Step {step}: Script execution complete. Output preview: {result[:300]}")
                     function_response_parts.append(
                         types.Part.from_function_response(
@@ -197,10 +203,18 @@ def run_agent_loop():
             # LLM sent a final text response
             text_content = "\n".join(text_parts)
             extracted = extract_code(text_content)
+            
             if extracted:
-                print("[Agent Manager] LLM provided code in final message. Verifying one last time...")
-                final_script = extracted
-                final_output = test_run_script(final_script)
+                # If the code in text is IDENTICAL to what we just tested, don't re-run it.
+                # This prevents loops where the script works in the tool but fails in the text-verification phase
+                # (e.g. due to slight environment differences or just wasting steps).
+                if extracted.strip() == last_tested_script.strip() and "AGENT_ERROR" not in last_tested_output and "Exit Code: 1" not in last_tested_output:
+                    print("[Agent Manager] LLM provided code in final message matching successful last test. Skipping re-verification.")
+                    final_output = last_tested_output
+                else:
+                    print("[Agent Manager] LLM provided new or untested code in final message. Verifying...")
+                    final_script = extracted
+                    final_output = test_run_script(final_script)
                 
                 if "AGENT_ERROR" in final_output or "Exit Code: 1" in final_output:
                     print(f"[Agent Manager] Final code failed verification. Retrying loop... (Step {step})")
@@ -211,14 +225,29 @@ def run_agent_loop():
                 
                 output_to_report = final_output
             else:
-                output_to_report = test_run_script(final_script)
+                # No code in text, use the last successfully tested script
+                print("[Agent Manager] No code block in final message. Using last tested script logic.")
+                if not last_tested_script:
+                    output_to_report = test_run_script(final_script)
+                else:
+                    output_to_report = last_tested_output
 
             print("[Agent Manager] LLM generation complete and verified.")
             
             # Emit the script so Node.js can save it to R2 for future reuse
+            # We keep this for logic, but it's often hidden in rich UIs
             print("--- AGENT_FINAL_SCRIPT_START ---")
             print(final_script)
             print("--- AGENT_FINAL_SCRIPT_END ---")
+            
+            # Extract concise result for the user
+            concise_report = ""
+            for line in output_to_report.splitlines():
+                if any(x in line for x in ["AGENT_RESULT:", "AGENT_DISCOVERY:", "AGENT_ERROR:"]):
+                    concise_report += line + "\n"
+            
+            if not concise_report:
+                concise_report = output_to_report[-500:] # Fallback to last 500 chars
 
             # Allow LLM to output discovery metadata
             if "--- AGENT_DISCOVERY_METADATA_START ---" in text_content:
@@ -226,7 +255,7 @@ def run_agent_loop():
                 print("--- AGENT_DISCOVERY_METADATA ---")
                 print(metadata_block.strip())
             
-            print(f"--- AGENT_EXECUTION_STDOUT ---\n{output_to_report}")
+            print(f"--- AGENT_EXECUTION_STDOUT ---\n{concise_report}")
             return
 
     print("[Agent Manager] Hit max steps limit.")

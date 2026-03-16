@@ -105,21 +105,47 @@ def run_query_generation():
             manifest = yaml.safe_load(manifest_yaml)
 
             # Print available widget types and their data requirements
-            print("  Available widget types:")
+            print("  Available widget types (STRICT SCHEMA):")
             widget_types = manifest.get('widget_types', {})
             for wtype, wspec in widget_types.items():
-                desc = wspec.get('description', '')[:60]
-                print(f"    - {wtype}: {desc}")
+                desc = wspec.get('description', '')
+                span = wspec.get('grid_span', 'default')
+                print(f"    - {wtype}:")
+                print(f"        description: {desc}")
+                print(f"        gridSpan: {span}")
+                print(f"        data: {wspec.get('data_requirements', {})}")
 
-            # Print layout guidelines for gridSpan selection
-            print("  Layout guidelines (gridSpan):")
-            preferred = manifest.get('layout_guidelines', {}).get('preferred_spans', {})
-            for wtype, span in preferred.items():
-                if span != 'default':
-                    print(f"    - {wtype}: {span}")
-                    
         except Exception as e:
             print(f"  Manifest fetch failed (non-fatal): {str(e)}")
+
+    # -------------------------------------------------------------------------
+    # PHASE 4.5: ML PREDICTIONS CONTEXT
+    # -------------------------------------------------------------------------
+    predictions_uri = os.environ.get("INJECTED_PREDICTIONS_URI", "")
+    model_type = os.environ.get("INJECTED_MODEL_TYPE", "")
+    target_var = os.environ.get("INJECTED_TARGET_VARIABLE", "")
+    strat_reason = os.environ.get("INJECTED_STRATEGIC_REASON", "")
+
+    if predictions_uri:
+        print(f"\n6. [ML Context] Found Predictive Data Source:")
+        print(f"  URI: {predictions_uri}")
+        print(f"  Model Type: {model_type}")
+        print(f"  Target: {target_var}")
+        print(f"  Reason: {strat_reason}")
+        
+        try:
+            print(f"  [Predictions Schema] Describing model output...")
+            pred_schema = con.execute(f"DESCRIBE SELECT * FROM read_parquet('{predictions_uri}')").fetchall()
+            for col in pred_schema:
+                print(f"      - {col[0]} ({col[1]})")
+            
+            print("  [Predictions Sample]:")
+            pred_sample = con.execute(f"SELECT * FROM read_parquet('{predictions_uri}') LIMIT 5").fetchdf()
+            print(pred_sample.to_string())
+        except Exception as e:
+            print(f"  Predictions discovery failed: {str(e)}")
+            
+        print("\n  Use this to create high-value join widgets (e.g., 'Predicted Revenue' or 'Churn Risk').")
 
     # -------------------------------------------------------------------------
     # PHASE 4: FETCH BUSINESS STRATEGY

@@ -16,10 +16,11 @@ You have 7 valid snippets to choose from:
 7. "forecasting" (time-series prediction using lags)
 
 # Instructions
-1. Analyze all `gold_X` schemas printed in Phase 1.
-2. Determine a target business metric or outcome and a strategy that connects these tables.
-3. Choose exactly one snippet name.
-4. Replace the code in Phase 2 with a script that sets:
+1. Analyze all `gold_X` schemas discovered for you in Phase 1.
+2. **TOKEN EFFICIENCY**: If you need to explore data distributions, ALWAYS use `LIMIT 50`. NEVER read more than 50 rows in your exploratory queries.
+3. Determine a target business metric or outcome and a strategy that connects these tables.
+4. Choose exactly one snippet name.
+5. Replace the code in Phase 2 with a script that sets:
    `result_payload = {"status": "success", "target_variable": "...", "recommended_snippet": "...", "strategic_reason": "..."}`
    and calls `print(f"AGENT_RESULT:{json.dumps(result_payload)}")`.
 

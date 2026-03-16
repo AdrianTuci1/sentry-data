@@ -50,21 +50,15 @@ export function initContainer() {
     
     // Pipeline Architectural Components
     const { AgentExecutor } = require('../application/pipeline/AgentExecutor');
-    const { PathResolver } = require('../application/pipeline/PathResolver');
-    const { HotPathRunner } = require('../application/pipeline/HotPathRunner');
-    const { ColdPathRunner } = require('../application/pipeline/ColdPathRunner');
+    const { PipelineRunner } = require('../application/pipeline/PipelineRunner');
     const { MLPathRunner } = require('../application/pipeline/MLPathRunner');
     
     const agentExecutor = new AgentExecutor(sandboxProvider, r2StorageService);
-    const pathResolver = new PathResolver(r2StorageService);
-    const hotPathRunner = new HotPathRunner(agentExecutor, r2StorageService, sseManager);
-    const coldPathRunner = new ColdPathRunner(agentExecutor, r2StorageService, sseManager);
+    const pipelineRunner = new PipelineRunner(agentExecutor, r2StorageService, sseManager, projectRepo);
     const mlPathRunner = new MLPathRunner(agentExecutor, r2StorageService, sseManager);
     
     const orchestrationService = new OrchestrationService(
-        pathResolver,
-        hotPathRunner,
-        coldPathRunner,
+        pipelineRunner,
         mlPathRunner,
         projectRepo,
         sseManager
