@@ -21,10 +21,16 @@ def upload_to_r2(local_path: str, s3_uri: str):
     print(f"Successfully uploaded model to {s3_uri}")
 
 def run_ml_training():
-    gold_uri = os.environ.get("INJECTED_GOLD_URI", "")
+    injected_uris_raw = os.environ.get("INJECTED_GOLD_URIS", "")
+    injected_uri = os.environ.get("INJECTED_GOLD_URI", "")
     model_output_uri = os.environ.get("INJECTED_MODEL_OUTPUT_URI", "")
 
-    print("1. [Data Loading] Connecting to DuckDB and loading Gold Layer...")
+    if injected_uris_raw:
+        gold_uris = json.loads(injected_uris_raw)
+    else:
+        gold_uris = [injected_uri] if injected_uri else []
+
+    print(f"1. [Data Loading] Connecting to DuckDB and preparing {len(gold_uris)} Gold Tables...")
     con = duckdb.connect(database=':memory:')
     con.execute("INSTALL httpfs; LOAD httpfs;")
     con.execute(f"SET s3_region='{os.environ.get('R2_REGION', 'auto')}';")
@@ -32,12 +38,16 @@ def run_ml_training():
     con.execute(f"SET s3_access_key_id='{os.environ.get('R2_ACCESS_KEY_ID', '')}';")
     con.execute(f"SET s3_secret_access_key='{os.environ.get('R2_SECRET_ACCESS_KEY', '')}';")
 
-    try:
-        df = con.execute(f"SELECT * FROM read_parquet('{gold_uri}')").fetchdf()
-        print(f"Loaded {len(df)} rows and {len(df.columns)} columns.")
-    except Exception as e:
-        print(f"AGENT_ERROR: Failed to load data: {str(e)}")
-        return
+    # PHASE 1: PREPARE DATASET (LLM fills this in)
+    # Use: con.execute("SELECT ... FROM read_parquet('...')")
+    # You MUST create a pandas DataFrame 'df' for training.
+    # --- LLM START ---
+    
+    # Example (single source):
+    # df = con.execute(f"SELECT * FROM read_parquet('{gold_uris[0]}')").fetchdf()
+    
+    # Example (multi-source join):
+    # df = con.execute(f"SELECT a.*, b.feat FROM read_parquet('{gold_uris[0]}') a JOIN read_parquet('{gold_uris[1]}') b ON a.id = b.id").fetchdf()
 
     # -------------------------------------------------------------------------
     # PHASE 2: ML REGRESSION TRAINING (LLM fills this in)

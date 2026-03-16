@@ -6,7 +6,13 @@ import duckdb
 # AGENT 4.5: ML ARCHITECT
 # ==========================================
 
+INJECTED_GOLD_URIS_RAW = os.environ.get("INJECTED_GOLD_URIS", "")
 INJECTED_GOLD_URI = os.environ.get("INJECTED_GOLD_URI", "")
+
+if INJECTED_GOLD_URIS_RAW:
+    GOLD_URIS = json.loads(INJECTED_GOLD_URIS_RAW)
+else:
+    GOLD_URIS = [INJECTED_GOLD_URI] if INJECTED_GOLD_URI else []
 
 def run_ml_architecture():
     print("1. Connecting to memory DB and loading HTTPFS extension...")
@@ -18,20 +24,22 @@ def run_ml_architecture():
     con.execute(f"SET s3_secret_access_key='{os.environ.get('R2_SECRET_ACCESS_KEY', '')}';")
 
     # -------------------------------------------------------------------------
-    # PHASE 1: DISCOVER GOLD LAYER SCHEMA (Parquet metadata only)
+    # PHASE 1: DISCOVER ALL GOLD TABLES
     # -------------------------------------------------------------------------
-    print(f"2. [Schema Discovery] Describing Gold Layer metadata for ML: {INJECTED_GOLD_URI}")
-    try:
-        schema_rows = con.execute(f"DESCRIBE SELECT * FROM read_parquet('{INJECTED_GOLD_URI}')").fetchall()
-    except Exception as e:
-        print(f"AGENT_ERROR: Gold Layer not found. ({str(e)})")
-        return
-
-    columns = []
-    print("  Gold Layer columns:")
-    for col in schema_rows:
-        columns.append({"name": col[0], "type": col[1]})
-        print(f"    - {col[0]} ({col[1]})")
+    print(f"2. [Schema Discovery] Describing {len(GOLD_URIS)} Gold Tables for ML...")
+    
+    all_schemas = {}
+    for i, uri in enumerate(GOLD_URIS):
+        if not uri: continue
+        alias = f"gold_{i}"
+        try:
+            schema_rows = con.execute(f"DESCRIBE SELECT * FROM read_parquet('{uri}')").fetchall()
+            all_schemas[alias] = [{"name": col[0], "type": col[1]} for col in schema_rows]
+            print(f"  [{alias}] {uri} columns:")
+            for col in all_schemas[alias]:
+                print(f"    - {col['name']} ({col['type']})")
+        except Exception as e:
+            print(f"Warning: Could not describe {uri}: {str(e)}")
 
     # -------------------------------------------------------------------------
     # PHASE 2: ML STRATEGY GENERATION (LLM fills this in)

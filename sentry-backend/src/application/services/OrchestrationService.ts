@@ -7,6 +7,7 @@ import { ColdPathRunner } from '../pipeline/ColdPathRunner';
 import { MLPathRunner } from '../pipeline/MLPathRunner';
 import { PipelineContext, PipelineResult } from '../pipeline/types';
 import { SourceSchema } from '../pipeline/SchemaFingerprint';
+import { PipelineConfig } from '../pipeline/PipelineConfig';
 
 /**
  * OrchestrationService is the entrypoint for the Multi-Agent execution DAG.
@@ -72,24 +73,53 @@ export class OrchestrationService {
 
             console.log(`[Orchestrator] Execution Path: ${resolution.path}, Invalidated Sources: ${resolution.invalidatedSources.join(', ') || 'None'}`);
 
-            // Execute the appropriate runner
-            let result: PipelineResult;
-            switch (resolution.path) {
-                case 'hot':
-                    result = await this.hotPathRunner.execute(ctx);
-                    break;
-                case 'cold':
-                    result = await this.coldPathRunner.execute(ctx);
-                    break;
-                case 'ml':
-                    result = await this.mlPathRunner.execute(ctx);
-                    break;
-                default:
-                    throw new Error(`Unknown pipeline path: ${resolution.path}`);
+            // --- PHASE 1: ETL EXECUTION (Hot/Cold) ---
+            let etlResult: PipelineResult;
+            if (resolution.path === 'ml') {
+                // If PathResolver explicitly asked for ML (e.g. periodic), we still need current ETL state
+                // For now, we assume periodic ML is triggered after a brief 'hot' check.
+                etlResult = await this.hotPathRunner.execute(ctx);
+            } else if (resolution.path === 'hot') {
+                etlResult = await this.hotPathRunner.execute(ctx);
+            } else {
+                etlResult = await this.coldPathRunner.execute(ctx);
             }
 
-            // Save results and telemetry
-            await this.savePipelineResult(project, result);
+            // Save basic ETL results immediately (Dashboards v1)
+            await this.savePipelineResult(project, etlResult);
+            console.log(`[Orchestrator] ETL Phase Completed for ${projectId}. Dashboards operational.`);
+
+            // --- PHASE 2: ML ENRICHMENT (Follow-up) ---
+            if (PipelineConfig.ENABLE_ML_PATH) {
+                console.log(`[Orchestrator] Triggering ML Path Enrichment for ${projectId}...`);
+                try {
+                    const mlResult = await this.mlPathRunner.execute(ctx);
+                    
+                    // Update project again with ML-enhanced metadata and dashboards v2
+                    // We merge predictionModels from mlResult into project
+                    const mergedDiscovery = {
+                        ...etlResult.discovery,
+                        ...mlResult.discovery,
+                        predictionModels: [
+                            ...(etlResult.discovery.predictionModels || []),
+                            ...(mlResult.discovery.predictionModels || [])
+                        ]
+                    };
+                    mlResult.discovery = mergedDiscovery as any;
+
+                    await this.savePipelineResult(project, mlResult);
+                    console.log(`[Orchestrator] ML Phase Completed for ${projectId}. Dashboards enhanced.`);
+                } catch (mlErr: any) {
+                    console.error(`[Orchestrator] ML enrichment failed, but ETL remains valid: ${mlErr.message}`);
+                    // We don't fail the whole pipeline if ML fails
+                    this.sseManager.broadcastToTenant(tenantId, 'pipeline_progress', {
+                        step: 'ML Enrichment Warning',
+                        progress: 100,
+                        status: 'warning',
+                        message: `ML Enrichment failed: ${mlErr.message}`
+                    });
+                }
+            }
 
             console.log(`[Orchestrator] Pipeline ${projectId} Fully Operational.`);
         } catch (error: any) {

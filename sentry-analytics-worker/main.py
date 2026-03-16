@@ -32,12 +32,19 @@ def setup_duckdb():
     # Clean the endpoint domain if necessary (e.g. remove https://)
     clean_endpoint = R2_ENDPOINT.replace("https://", "")
     
-    print("[DuckDB] Configuring R2 Credentials...")
-    con.execute(f"SET s3_region='{R2_REGION}';")
+    print(f"[DuckDB] Configuring R2 Credentials...")
+    print(f"         Endpoint: {clean_endpoint}")
+    mask = lambda s: f"{s[:4]}...{s[-4:]}" if len(s) > 8 else "****"
+    print(f"         Access Key: {mask(R2_ACCESS_KEY)}")
+    
+    con.execute("SET s3_use_ssl=true;")
+    con.execute("SET s3_region='auto';")
     con.execute(f"SET s3_endpoint='{clean_endpoint}';")
     con.execute(f"SET s3_access_key_id='{R2_ACCESS_KEY}';")
     con.execute(f"SET s3_secret_access_key='{R2_SECRET_KEY}';")
     con.execute("SET s3_url_style='path';")
+    # con.execute("SET s3_use_v2_auth=true;") # R2 supports both, path style often needs true
+    
     print("[DuckDB] Setup Complete.")
 
 setup_duckdb()
@@ -70,7 +77,22 @@ def health_check():
     try:
         # Simple test query
         res = con.execute("SELECT 1 as is_alive").fetchall()
-        return {"status": "ok", "service": "analytics-worker-python", "db": res}
+        
+        # Check R2 config (masking keys)
+        mask = lambda s: f"{s[:4]}...{s[-4:]}" if len(s) > 8 else "****"
+        config_status = {
+            "endpoint": R2_ENDPOINT,
+            "access_key": mask(R2_ACCESS_KEY),
+            "region": R2_REGION,
+            "duckdb_version": duckdb.__version__
+        }
+        
+        return {
+            "status": "ok", 
+            "service": "analytics-worker-python", 
+            "db": res,
+            "config": config_status
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -80,19 +102,26 @@ def execute_queries(payload: ExecutePayload):
     
     results = []
     
+    import time
     for q in payload.queries:
         try:
+            start_time = time.time()
+            print(f"[DuckDB] Executing widget {q.widgetId}...")
+            print(f"         SQL: {q.sqlString}")
+            
             # We fetch as a list of dictionaries (records) which maps nicely to JSON
-            # DuckDB fetchdf() requires pandas, but we can just use fetchall() and descriptions
             cursor = con.execute(q.sqlString)
             columns = [col[0] for col in cursor.description]
             rows = cursor.fetchall()
+            latency = (time.time() - start_time) * 1000
             
             data_dicts = [dict(zip(columns, row)) for row in rows]
+            print(f"[DuckDB] Success: {len(data_dicts)} rows in {latency:.2f}ms")
             
             results.append({
                 "widgetId": q.widgetId,
                 "data": data_dicts,
+                "latency_ms": latency,
                 "error": None
             })
         except Exception as e:

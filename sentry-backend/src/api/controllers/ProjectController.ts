@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { IController } from './IController';
 import { Router } from 'express';
 import { OrchestrationService } from '../../application/services/OrchestrationService';
+import { AnalyticsService } from '../../application/services/AnalyticsService';
 import { requireAuth } from '../middlewares/auth';
 import { AuthService } from '../../application/services/AuthService';
 import { ProjectRepository } from '../../infrastructure/repositories/ProjectRepository';
@@ -12,17 +13,20 @@ export class ProjectController implements IController {
     public path = '/projects';
     public router = Router();
     private orchestrationService: OrchestrationService;
+    private analyticsService: AnalyticsService;
     private authService: AuthService;
     private projectRepo: ProjectRepository;
     private sourceRepo: SourceRepository;
 
     constructor(
         orchestrationService: OrchestrationService,
+        analyticsService: AnalyticsService,
         authService: AuthService,
         projectRepo: ProjectRepository,
         sourceRepo: SourceRepository
     ) {
         this.orchestrationService = orchestrationService;
+        this.analyticsService = analyticsService;
         this.authService = authService;
         this.projectRepo = projectRepo;
         this.sourceRepo = sourceRepo;
@@ -230,19 +234,13 @@ export class ProjectController implements IController {
         try {
             const tenantId = req.tenantId!;
             const { projectId } = req.params;
-            const project = await this.projectRepo.findById(tenantId, projectId);
 
-            if (!project) {
-                res.status(404).json({ error: 'Project not found' });
-                return;
-            }
+            // Fetch live data from the analytics worker via the analytics service
+            const data = await this.analyticsService.getDashboardData(tenantId, projectId);
 
             res.status(200).json({
                 status: 'success',
-                data: {
-                    queryConfigs: project.queryConfigs || [],
-                    dashboards: project.discoveryMetadata?.dashboards || []
-                }
+                data
             });
         } catch (error) {
             next(error);

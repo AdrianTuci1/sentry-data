@@ -40,11 +40,14 @@ export class PathResolver {
             return { path: 'cold', invalidatedSources };
         }
 
-        // Check cache existence for normalizer, feature engineer and query generator
-        // Using source_0 as generic task check for normalization
-        const normalizerCached = await this.r2StorageService.scriptExists(
-            ctx.tenantId, ctx.projectId, `Normalization_${ctx.sourceNames?.[0] || 'source_0'}`
+        // Check cache existence for normalizer (ALL sources), feature engineer and query generator
+        const normalizationCacheChecks = await Promise.all(
+            (ctx.sourceNames || ['source_0']).map(sourceName => 
+                this.r2StorageService.scriptExists(ctx.tenantId, ctx.projectId, `Normalization_${sourceName}`)
+            )
         );
+        const normalizerCached = normalizationCacheChecks.every(cached => cached === true);
+
         const feCached = await this.r2StorageService.scriptExists(
             ctx.tenantId, ctx.projectId, `Feature_Engineering`
         );
@@ -52,14 +55,23 @@ export class PathResolver {
             ctx.tenantId, ctx.projectId, `Query_Generator`
         );
 
-        if (normalizerCached && feCached && qgCached) {
-            console.log(`[PathResolver] All core scripts cached and schema identical → HOT PATH`);
-            return { path: 'hot', invalidatedSources: [] };
+        const missingSources: string[] = [];
+        normalizationCacheChecks.forEach((cached, i) => {
+            if (!cached) missingSources.push((ctx.sourceNames || ['source_0'])[i]);
+        });
+
+        if (!feCached || !qgCached || missingSources.length > 0) {
+            console.log(`[PathResolver] Partial cache miss → COLD PATH for: ${missingSources.join(', ') || 'Global tasks'}`);
+            // If global tasks (FE/QG) are missing, we might need all sources for a full rebuild, 
+            // but for now let's just invalidate the missing normalizers to be efficient.
+            // If FE or QG is missing, we definitely need to run them, but we only NEED to normalize what's missing.
+            return { 
+                path: 'cold', 
+                invalidatedSources: [...new Set([...(ctx.invalidatedSources || []), ...missingSources])] 
+            };
         }
 
-        console.log(`[PathResolver] Scripts missing from R2 cache → COLD PATH`);
-        // If it's a cache miss, we need to regenerate the missing sources. 
-        // For simplicity, if ANY script is missing, we invalidate all current sources to ensure a safe rebuild
-        return { path: 'cold', invalidatedSources: ctx.sourceNames || [] };
+        console.log(`[PathResolver] All core scripts cached and schema identical → HOT PATH`);
+        return { path: 'hot', invalidatedSources: [] };
     }
 }

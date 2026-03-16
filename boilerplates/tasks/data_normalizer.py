@@ -16,6 +16,8 @@ def run_normalization():
     con.execute(f"SET s3_endpoint='{os.environ.get('R2_ENDPOINT_CLEAN', '')}';")
     con.execute(f"SET s3_access_key_id='{os.environ.get('R2_ACCESS_KEY_ID', '')}';")
     con.execute(f"SET s3_secret_access_key='{os.environ.get('R2_SECRET_ACCESS_KEY', '')}';")
+    safe_columns = []
+    dropped_columns = []
     
     try:
         # Discovery Step

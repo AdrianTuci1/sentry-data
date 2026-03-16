@@ -1,4 +1,5 @@
 import { ProjectRepository } from '../../infrastructure/repositories/ProjectRepository';
+import { WidgetDataMapper } from '../utils/WidgetDataMapper';
 
 export class AnalyticsService {
     private projectRepository: ProjectRepository;
@@ -54,9 +55,37 @@ export class AnalyticsService {
                 throw new Error(`Analytics Worker Failed: ${response.status} - ${errorText}`);
             }
 
-            // 3. Return formatted data
-            const dashboardData = await response.json();
-            return dashboardData;
+            // 3. Process and Return formatted data
+            const workerResponse = await response.json();
+            const metadataDashboards = project.discoveryMetadata?.dashboards || [];
+            
+            console.log(`[AnalyticsService] Project has ${metadataDashboards.length} dashboards, Worker returned ${workerResponse.results?.length || 0} results`);
+            
+            // Merge live results into the metadata-defined dashboard structures
+            const enrichedDashboards = metadataDashboards.map((widget: any) => {
+                // Find matching result from worker
+                const result = workerResponse.results?.find((r: any) => r.widgetId === widget.id);
+                
+                if (!result || result.error || !result.data || !Array.isArray(result.data)) {
+                    console.warn(`[AnalyticsService] No live data for widget ${widget.id}${result?.error ? ': ' + result.error : ''}`);
+                    return widget; // Return basic metadata if no live data is available
+                }
+
+                // Map raw data using the widget type
+                const mappedData = WidgetDataMapper.map(widget.type, result.data);
+                
+                return {
+                    ...widget,
+                    ...mappedData, // Overwrite/add live data fields (value, historical, etc.)
+                    latency: result.latency_ms
+                };
+            });
+
+            return {
+                tenantId,
+                projectId,
+                dashboards: enrichedDashboards
+            };
 
         } catch (error: any) {
             console.error(`[AnalyticsService] Error calling DuckDB Worker:`, error.message);

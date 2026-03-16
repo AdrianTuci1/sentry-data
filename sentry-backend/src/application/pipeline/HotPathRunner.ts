@@ -1,7 +1,7 @@
 import { R2StorageService } from '../../infrastructure/storage/R2StorageService';
 import { SSEManager } from '../../services/sse/SSEManager';
 import { AgentExecutor } from './AgentExecutor';
-import { PipelineContext, PipelineResult } from './types';
+import { AgentTaskResult, PipelineContext, PipelineResult } from './types';
 import { config } from '../../config';
 
 export class HotPathRunner {
@@ -30,6 +30,8 @@ export class HotPathRunner {
         const mindmapManifestUri = `s3://${systemBucket}/system/config/frontend-mindmap-manifest.yml`;
         const startTime = Date.now();
         
+        const effectiveSourceNames = rawSourceUris.map((_, i) => (sourceNames?.[i] || `source_${i}`).replace(/\s+/g, '_'));
+
         let cumulativeDiscovery: any = {
             tables: [],
             metricGroups: [],
@@ -42,7 +44,7 @@ export class HotPathRunner {
         // --- STEP 1: NORMALIZATION (PARALLEL) ---
         console.log(`[HotPathRunner] STEP 1: Normalizing ${rawSourceUris.length} sources...`);
         const normalizationPromises = rawSourceUris.map((uri, index) => {
-            const sourceName = sourceNames?.[index] || `source_${index}`;
+            const sourceName = effectiveSourceNames[index];
             const targetUri = this.r2StorageService.getSilverUri(tenantId, projectId, sourceName, 'normalized.parquet');
             const taskName = `Normalization_${sourceName}`;
             tasksExecuted.push(taskName);
@@ -60,12 +62,19 @@ export class HotPathRunner {
             });
         });
 
-        const normalizationResults = await Promise.all(normalizationPromises);
+        const normalizationResults = await Promise.all(normalizationPromises.map(p => p.catch(err => ({ success: false, error: err.message }))));
 
-        const normalizedUris = normalizationResults.map((res, index) => {
+        const successfulNormalizationResults = normalizationResults.filter(res => !('success' in res && res.success === false)) as AgentTaskResult[];
+
+        if (successfulNormalizationResults.length === 0) {
+            throw new Error("No sources were successfully normalized.");
+        }
+
+        const normalizedUris = successfulNormalizationResults.map((res, index) => {
             estimatedTokensUsed += res.estimatedTokens;
-            const sourceName = sourceNames?.[index] || `source_${index}`;
-            return res.result?.output_uri || this.r2StorageService.getSilverUri(tenantId, projectId, sourceName, 'normalized.parquet');
+            const sourceName = effectiveSourceNames[index];
+            // Always return the glob URI for downstream steps, regardless of whether it was a cache hit or not
+            return this.r2StorageService.getSilverGlobUri(tenantId, projectId, sourceName);
         }).filter(Boolean);
 
         this.sseManager.broadcastToTenant(tenantId, 'pipeline_progress', {
@@ -75,8 +84,13 @@ export class HotPathRunner {
         });
 
         // --- STEP 2: FEATURE ENGINEERING ---
-        console.log(`[HotPathRunner] STEP 2: Feature Engineering (Gold Table)...`);
-        const goldTableUri = this.r2StorageService.getS3Uri(tenantId, projectId, 'gold', 'gold_layer.parquet');
+        console.log(`[HotPathRunner] STEP 2: Feature Engineering (N-to-N Gold Tables)...`);
+        
+        // Generate an N-to-N list of target Gold URIs (exact partition for writing)
+        const goldTargetUris = effectiveSourceNames.map(name => 
+            this.r2StorageService.getGoldUri(tenantId, projectId, name.replace(/\s+/g, '_'), 'engineered.parquet')
+        );
+
         const feTaskName = 'Feature_Engineering';
         tasksExecuted.push(feTaskName);
 
@@ -87,9 +101,9 @@ export class HotPathRunner {
             systemPromptUri: `${promptPrefix}/feature_engineer.txt`,
             boilerplateUri: `${boilerplatePrefix}/feature_engineer.py`,
             additionalEnvVars: {
-                'INJECTED_DATA_URIS': JSON.stringify(normalizedUris),
+                'INJECTED_NORMALIZED_URIS': JSON.stringify(normalizedUris),
                 'INJECTED_MINDMAP_MANIFEST_URI': mindmapManifestUri,
-                'TARGET_GOLD_URI': goldTableUri
+                'INJECTED_GOLD_URIS': JSON.stringify(goldTargetUris)
             }
         });
 
@@ -114,6 +128,13 @@ export class HotPathRunner {
         const qgTaskName = 'Query_Generator';
         tasksExecuted.push(qgTaskName);
 
+        const strategyUri = `s3://${systemBucket}/system/config/business-metrics-strategy.yml`;
+
+        // Generate the glob URIs to pass to Query Generator for reading all history
+        const goldGlobUris = effectiveSourceNames.map(name => 
+            this.r2StorageService.getGoldGlobUri(tenantId, projectId, name.replace(/\s+/g, '_'))
+        );
+
         const queriesResult = await this.agentExecutor.execute({
             tenantId,
             projectId,
@@ -121,8 +142,9 @@ export class HotPathRunner {
             systemPromptUri: `${promptPrefix}/query_generator.txt`,
             boilerplateUri: `${boilerplatePrefix}/query_generator.py`,
             additionalEnvVars: {
-                'INJECTED_GOLD_URI': goldTableUri,
+                'INJECTED_GOLD_URIS': JSON.stringify(goldGlobUris),
                 'INJECTED_MANIFEST_URI': manifestUri,
+                'INJECTED_STRATEGY_URI': strategyUri,
                 'INJECTED_METRICS_DISCOVERY': JSON.stringify(cumulativeDiscovery.metricGroups)
             }
         });

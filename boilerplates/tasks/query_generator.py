@@ -165,21 +165,13 @@ def run_query_generation():
     # dashboard_groups = []
     #
     # # --- Insight 1: Total LTV (scalar → weather widget) ---
-    # result = con.execute(f"""
-    #     SELECT ROUND(SUM(total_ltv), 2) as total
-    #     FROM read_parquet('{gold_uris[0]}') -- Use the appropriate index
-    # """).fetchone()
-    # total_ltv = result[0] if result else 0
-    #
     # dashboards.append({
     #     "id": "ins_total_ltv",
     #     "title": "Total Lifetime Value",
     #     "type": "weather",
-    #     "value": f"${total_ltv/1000:.1f}k" if total_ltv > 1000 else f"${total_ltv:.0f}",
-    #     "unit": "total",
     #     "colorTheme": "theme-revenue",
     #     "gridSpan": "default",
-    #     "query": f"SELECT ROUND(SUM(total_ltv), 2) as total FROM read_parquet('{gold_uri}')",
+    #     "query": f"SELECT ROUND(SUM(total_ltv), 2) as total FROM read_parquet('{gold_uris[0]}')",
     #     "group_id": "grp_revenue",
     #     "adjusted_data_columns": ["total_ltv"]
     # })

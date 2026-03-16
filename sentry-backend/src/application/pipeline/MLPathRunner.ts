@@ -40,8 +40,12 @@ export class MLPathRunner {
         let tasksExecuted: string[] = [];
         let hitCount = 0;
 
-        const goldTableUri = this.r2StorageService.getS3Uri(tenantId, projectId, 'gold', 'gold_layer.parquet');
-        const mlModelUri = this.r2StorageService.getS3Uri(tenantId, projectId, 'system', 'models/ltv_model.pkl');
+        const effectiveSourceNames = ctx.rawSourceUris.map((_, i) => (ctx.sourceNames?.[i] || `source_${i}`).replace(/\s+/g, '_'));
+
+        const goldGlobUris = effectiveSourceNames.map(name => 
+            this.r2StorageService.getGoldGlobUri(tenantId, projectId, name.replace(/\s+/g, '_'))
+        );
+        const mlModelUri = this.r2StorageService.getS3Uri(tenantId, projectId, 'system', 'models/active_model.pkl');
 
         // --- STEP 1: ML STRATEGY (Architect) ---
         console.log(`[MLPathRunner] STEP 1: Designing ML Strategy (Architect)...`);
@@ -55,7 +59,7 @@ export class MLPathRunner {
             systemPromptUri: `${promptPrefix}/ml_architect.txt`,
             boilerplateUri: `${boilerplatePrefix}/ml_architect.py`,
             additionalEnvVars: {
-                'INJECTED_GOLD_URI': goldTableUri
+                'INJECTED_GOLD_URIS': JSON.stringify(goldGlobUris)
             }
         });
 
@@ -88,7 +92,7 @@ export class MLPathRunner {
             systemPromptUri: `${promptPrefix}/ml_trainer.txt`,
             boilerplateUri: `s3://${systemBucket}/system/boilerplates/snippets/ml/${snippetName}.py`,
             additionalEnvVars: {
-                'INJECTED_GOLD_URI': goldTableUri,
+                'INJECTED_GOLD_URIS': JSON.stringify(goldGlobUris),
                 'INJECTED_MODEL_OUTPUT_URI': mlModelUri
             }
         });
@@ -118,10 +122,9 @@ export class MLPathRunner {
             projectId,
             taskName: mlInferenceTaskName,
             systemPromptUri: `${promptPrefix}/ml_inference.txt`,
-            // Inference currently uses a unified boilerplate, could also be snippet-based if needed
             boilerplateUri: `${boilerplatePrefix}/ml_inference.py`,
             additionalEnvVars: {
-                'INJECTED_NEW_DATA_URI': goldTableUri,
+                'INJECTED_GOLD_URIS': JSON.stringify(goldGlobUris),
                 'INJECTED_MODEL_URI': mlModelUri,
                 'INJECTED_PREDICTIONS_OUTPUT_URI': predictionsUri
             }
@@ -146,9 +149,9 @@ export class MLPathRunner {
             projectId,
             taskName: qgTaskName,
             systemPromptUri: `${promptPrefix}/query_generator_v2.txt`,
-            boilerplateUri: `${boilerplatePrefix}/query_generator.py`, // Reuse same boilerplate, different prompt
+            boilerplateUri: `${boilerplatePrefix}/query_generator.py`,
             additionalEnvVars: {
-                'INJECTED_GOLD_URI': goldTableUri,
+                'INJECTED_GOLD_URIS': JSON.stringify(goldGlobUris),
                 'INJECTED_PREDICTIONS_URI': predictionsUri,
                 'INJECTED_MANIFEST_URI': manifestUri
             }

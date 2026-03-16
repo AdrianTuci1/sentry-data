@@ -30,10 +30,26 @@ const DATASETS: DatasetConfig[] = [
         name: 'Olist Orders',
         localFile: 'orders.parquet',
         type: 'parquet',
-        cronSchedule: '0 2 * * *',  // daily at 2 AM
+        cronSchedule: '0 2 * * *',
+    },
+    {
+        name: 'Olist Order Items',
+        localFile: 'order_items.parquet',
+        type: 'parquet',
+        cronSchedule: '0 2 * * *',
+    },
+    {
+        name: 'Olist Products',
+        localFile: 'products.parquet',
+        type: 'parquet',
+        cronSchedule: '0 2 * * *',
+    },
+    {
+        name: 'Olist Reviews',
+        localFile: 'reviews.parquet',
+        type: 'parquet',
+        cronSchedule: '0 2 * * *',
     }
-    // Other datasets commented out for single-source end-to-end testing
-    // { name: 'Olist Customers', ... }, etc.
 ];
 
 // ═══════════════════════════════════════════════════════════
@@ -146,7 +162,7 @@ async function seed() {
             const currentDate = new Date().toISOString().split('T')[0];
             const r2Key = `tenants/${tenantId}/projects/${projectId}/bronze/${sanitizedName}/${currentDate}/${dataset.localFile}`;
             const r2UriExact = `s3://${config.r2.bucketData}/${r2Key}`;
-            
+
             // The pipeline should read ALL partitions for a connector.
             const r2UriGlob = `s3://${config.r2.bucketData}/tenants/${tenantId}/projects/${projectId}/bronze/${sanitizedName}/**/*.parquet`;
 

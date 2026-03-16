@@ -8,9 +8,15 @@ import pandas as pd
 # AGENT 5: ML INFERENCE SERVING
 # ==========================================
 
-INJECTED_NEW_DATA_URI = os.environ.get("INJECTED_NEW_DATA_URI")
+INJECTED_GOLD_URIS_RAW = os.environ.get("INJECTED_GOLD_URIS", "")
+INJECTED_NEW_DATA_URI = os.environ.get("INJECTED_NEW_DATA_URI") # Legacy
 INJECTED_MODEL_URI = os.environ.get("INJECTED_MODEL_URI") 
 INJECTED_PREDICTIONS_OUTPUT_URI = os.environ.get("INJECTED_PREDICTIONS_OUTPUT_URI")
+
+if INJECTED_GOLD_URIS_RAW:
+    GOLD_URIS = json.loads(INJECTED_GOLD_URIS_RAW)
+else:
+    GOLD_URIS = [INJECTED_NEW_DATA_URI] if INJECTED_NEW_DATA_URI else []
 
 def run_ml_inference():
     try:
@@ -36,14 +42,23 @@ def run_ml_inference():
 
         model = joblib.load(local_model_path)
         
-        # Load new data
+        # Prepare DuckDB
         con = duckdb.connect(database=':memory:')
         con.execute("INSTALL httpfs; LOAD httpfs;")
         con.execute(f"SET s3_region='{os.environ.get('R2_REGION', 'auto')}';")
-        con.execute(f"SET s3_endpoint='{os.environ.get('R2_ENDPOINT_CLEAN', '')}';")
+        con.execute(f"SET s3_endpoint='{os.environ.get('R2_ENDPOINT_CLEAN', '').replace('https://', '')}';")
         con.execute(f"SET s3_access_key_id='{os.environ.get('R2_ACCESS_KEY_ID', '')}';")
         con.execute(f"SET s3_secret_access_key='{os.environ.get('R2_SECRET_ACCESS_KEY', '')}';")
-        df = con.execute(f"SELECT * FROM '{INJECTED_NEW_DATA_URI}'").df()
+
+        print(f"2. [Inference] Preparing {len(GOLD_URIS)} Gold Tables for scoring...")
+        
+        # PHASE 1: PREPARE INFERENCE DATASET (LLM fills this in)
+        # Use: con.execute("SELECT ... FROM read_parquet('...')")
+        # You MUST create a pandas DataFrame 'df' for scoring.
+        # --- LLM START ---
+        
+        # Example (joined scoring): 
+        # df = con.execute(f"SELECT a.*, b.status FROM read_parquet('{GOLD_URIS[0]}') a JOIN read_parquet('{GOLD_URIS[1]}') b ON a.id = b.id").fetchdf()
         
         # Predict logic (placeholder)
         X = df.select_dtypes(include=['number', 'float', 'int']).fillna(0)

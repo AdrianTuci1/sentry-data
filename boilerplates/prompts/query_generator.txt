@@ -17,17 +17,25 @@ You have already been given:
 1. **SCHEMA-FIRST, NO HALLUCINATIONS**: Only use column names printed in the schema discovery block. If a metric cannot be derived from existing columns, skip it.
 
 2. **CRAFTING THE BUSINESS STRATEGY**: 
-   - A business strategy named "STRATEGY MATRIX RULES" has been printed in the boilerplate execution output (Phase 4). 
-   - You MUST read these rules. 
-   - Identify which `condition` matches the data sources you discovered in the Gold Layer.
-   - Execute the `priorities` listed under that specific condition. Do not invent random metrics if a strategy applies to your data.
-   - If the data forms a combination (e.g., both Orders and Customers), adhere strictly to the combinatorial strategy provided.
+   - A business strategy named "STRATEGY MATRIX RULES" (version 3.0) has been printed in the boilerplate execution output (Phase 4). 
+   - This version is a flat **Metrics Wishlist** of ~30 desirable business insights.
+   - You MUST read this wishlist and treat it as your primary target list.
+   - For EACH metric in the wishlist, evaluate if it can be computed using the columns in your Gold Layer schema.
+   - **PROACTIVE DISCOVERY**: If the data supports it, you MUST implement the corresponding widget.
+   - This approach is "Target-Driven": we know what we WANT (e.g., LTV, Churn, ROAS), your job is to see if the available data allows it.
+   - If a metric cannot be derived, skip it. Do not invent metrics outside this wishlist unless the data is exceptionally unique and valuable.
 
-3. **ONE-SHOT QUERY GENERATION**: Write all queries in a single pass.
+3. **INTERPOLATIONS & CROSS-TABLE JOINs**: 
+   - You have been provided with an array of Gold URIs in `INJECTED_GOLD_URIS`.
+   - You MUST perform JOINs between these tables to create "Interpolated Insights".
+   - **ML PREDICTIONS (OPTIONAL)**: You may also receive `INJECTED_PREDICTIONS_URI`.
+   - If provided, treat the predictions table as an independent data source.
+   - You MUST join Gold tables with the predictions table (Joining on common keys like `user_id` or `product_id`) to derive high-value predictive widgets like "Churn Risk Breakdown" or "Predicted Revenue by Segment".
+   - Crucially, if ML predictions are missing, simply proceed with base Gold Layer analytics.
+
+4. **ONE-SHOT QUERY GENERATION**: Write all queries in a single pass.
    - Always: `FROM read_parquet('s3://...')` (single-quoted URI)
    - Quote dot-columns: `"traffic_source.name"`
-   - For time-series: `GROUP BY DATE_TRUNC('day', <date_col>) ORDER BY 1`
-   - For scalars: aggregate over the full Gold Layer
 
 3. **WIDGET CONFIGURATION (CRITICAL)**: Each dashboard item MUST include all fields the frontend needs to render. Read the widget manifest carefully.
 
@@ -48,7 +56,7 @@ You have already been given:
      "value": "45.2k",                // Computed from query result
      "unit": "$",                     // Unit label
      "colorTheme": "theme-revenue",   // Visual theme
-     "gridSpan": "default",           // From manifest layout_guidelines
+     "gridSpan": "default",           // From manifest widget_type definition
      "query": "SELECT ...",           // DuckDB SQL
      "group_id": "grp_xxx",           // Links to dashboardGroup
      "adjusted_data_columns": ["col1", "col2"]  // Gold cols used (for lineage)
@@ -56,16 +64,16 @@ You have already been given:
    ```
 
    **colorTheme options**: theme-productivity, theme-revenue, theme-audience, theme-weather, theme-red
-   
-   **gridSpan**: Check `layout_guidelines.preferred_spans` in the manifest for each widget type.
+   **gridSpan**: Use the `grid_span` value defined within each widget type in the manifest.
 
-4. **COMPUTE VALUES**: After running each query, extract the result and set it as `value`.
-   - For `weather` widgets: format the number nicely (e.g., `"45.2k"`, `"3.8"`, `"142"`)
-   - For `natural`/`light-dial`: also set `sliderValue` (0-100)
-   - For `predictive`: set `historical` and `forecast` arrays
-   - For `bar-chart`/`pie-chart`: set the data array per manifest spec
+4. **ONE-SHOT LOGIC GENERATION**: Your goal is to define the structure and logic of the dashboard items.
+   - You MUST NOT compute the actual result values (e.g., "45.2k", arrays of numbers) during this phase.
+   - Instead, focus on crafting the perfect DuckDB SQL query for each insight.
+   - Quote dot-columns: `"traffic_source.name"`
+   - For time-series: `GROUP BY DATE_TRUNC('day', <date_col>) ORDER BY 1`
+   - For scalars: aggregate over the full Gold Layer
 
-5. **VERIFY WITH test_run_script**: Run your script to ensure queries return data and the discovery payload is valid JSON.
+5. **WIDGET CONFIGURATION (CRITICAL)**: Each dashboard item MUST include all fields the frontend needs to render. Read the widget manifest carefully.
 
 6. **GROUP STRUCTURE**: Create 2-4 dashboardGroups, each with 2-4 insights.
 
@@ -93,8 +101,6 @@ Where `discovery_payload` follows this schema:
       "id": "ins_total_revenue",
       "title": "Total Revenue",
       "type": "weather",
-      "value": "45.2k",
-      "unit": "$",
       "colorTheme": "theme-revenue",
       "gridSpan": "default",
       "query": "SELECT ROUND(SUM(total_ltv), 2) as total FROM read_parquet('s3://...')",

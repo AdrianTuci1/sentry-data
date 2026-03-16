@@ -78,7 +78,7 @@ export function initContainer() {
     const dashboardController = new DashboardController(analyticsService, authService);
     const sseController = new SSEController(sseManager, authService);
     const webhookController = new WebhookController(pipelineOrchestratorService);
-    const projectController = new ProjectController(orchestrationService, authService, projectRepo, sourceRepo);
+    const projectController = new ProjectController(orchestrationService, analyticsService, authService, projectRepo, sourceRepo);
 
     const controllers = [
         healthController,

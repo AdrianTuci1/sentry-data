@@ -32,6 +32,8 @@ export class ColdPathRunner {
         const mindmapManifestUri = `s3://${systemBucket}/system/config/frontend-mindmap-manifest.yml`;
         const startTime = Date.now();
         
+        const effectiveSourceNames = rawSourceUris.map((_, i) => (sourceNames?.[i] || `source_${i}`).replace(/\s+/g, '_'));
+
         let cumulativeDiscovery: any = {
             tables: [],
             metricGroups: [],
@@ -49,47 +51,66 @@ export class ColdPathRunner {
         
         for (let index = 0; index < rawSourceUris.length; index++) {
             const uri = rawSourceUris[index];
-            const sourceName = sourceNames?.[index] || `source_${index}`;
+            const sourceName = effectiveSourceNames[index];
             const targetUri = this.r2StorageService.getSilverUri(tenantId, projectId, sourceName, 'normalized.parquet');
             const taskName = `Normalization_${sourceName}`;
             
             // GRANULAR CACHING: Force generation ONLY if the user manually triggers a full refresh OR 
             // if this specific source was detected as changed in SchemaFingerprint
-            const isSourceInvalidated = ctx.invalidatedSources?.includes(sourceName) || false;
+            const isSourceInvalidated = ctx.invalidatedSources?.includes(sourceNames?.[index] || `source_${index}`) || false;
             const forceRegenerate = ctx.forceRediscover || isSourceInvalidated;
             
             tasksExecuted.push(taskName);
             
             console.log(`[ColdPathRunner] Triggering ${taskName} (forceRegenerate: ${forceRegenerate})`);
-            const res = await this.agentExecutor.execute({
-                tenantId,
-                projectId,
-                taskName,
-                systemPromptUri: `${promptPrefix}/data_normalizer.txt`,
-                boilerplateUri: `${boilerplatePrefix}/data_normalizer.py`,
-                additionalEnvVars: {
-                    'INJECTED_RAW_URI': uri,
-                    'INJECTED_NORMALIZED_URI': targetUri
-                },
-                forceRegenerate
-            });
-            
-            normalizationResults.push(res);
+            try {
+                const res = await this.agentExecutor.execute({
+                    tenantId,
+                    projectId,
+                    taskName,
+                    systemPromptUri: `${promptPrefix}/data_normalizer.txt`,
+                    boilerplateUri: `${boilerplatePrefix}/data_normalizer.py`,
+                    additionalEnvVars: {
+                        'INJECTED_RAW_URI': uri,
+                        'INJECTED_NORMALIZED_URI': targetUri
+                    },
+                    forceRegenerate
+                });
+                
+                normalizationResults.push({ success: true, res, index });
+            } catch (err: any) {
+                console.error(`[ColdPathRunner] Normalization failed for ${sourceName}: ${err.message}`);
+                normalizationResults.push({ success: false, error: err.message, index });
+                // We broadcast a warning but continue with other sources
+                this.sseManager.broadcastToTenant(tenantId, 'pipeline_progress', {
+                    step: `Normalization Error: ${sourceName}`,
+                    progress: 20,
+                    status: 'warning',
+                    message: err.message
+                });
+            }
         }
 
         // We pass the GLOB URI to subsequent steps so Feature Engineering sees all historical partitions
-        const normalizedUris = normalizationResults.map((res, index) => {
+        const normalizedResultsSuccess = normalizationResults.filter(r => r.success);
+        
+        const normalizedUris = normalizedResultsSuccess.map((r) => {
+            const res = r.res!;
             estimatedTokensUsed += res.estimatedTokens;
             if (res.estimatedTokens === 0) hitCount++;
             
-            const sourceName = sourceNames?.[index] || `source_${index}`;
+            const sourceName = effectiveSourceNames[r.index];
             // res.result.output_uri is the exact partition written to.
             // We substitute it with the glob URI for downstream analysis.
             return this.r2StorageService.getSilverGlobUri(tenantId, projectId, sourceName);
         }).filter(Boolean);
 
         // Collect normalizer discoveries for the Source Classifier
-        const normalizedSchemas = normalizationResults.map(res => res.discovery).filter(Boolean);
+        const normalizedSchemas = normalizedResultsSuccess.map(r => r.res!.discovery).filter(Boolean);
+
+        if (normalizedUris.length === 0) {
+            throw new Error("No sources were successfully normalized.");
+        }
 
         this.sseManager.broadcastToTenant(tenantId, 'pipeline_progress', {
             step: 'Normalization (Cold)',
@@ -124,14 +145,14 @@ export class ColdPathRunner {
         console.log(`[ColdPathRunner] STEP 2: Feature Engineering (N-to-N Gold Tables)...`);
         
         // Generate an N-to-N list of target Gold URIs (exact partition for writing)
-        const goldTargetUris = sourceNames?.map(name => 
-            this.r2StorageService.getGoldUri(tenantId, projectId, name.replace(/\s+/g, '_'), 'engineered.parquet')
-        ) || [];
+        const goldTargetUris = normalizedResultsSuccess.map(r => 
+            this.r2StorageService.getGoldUri(tenantId, projectId, effectiveSourceNames[r.index], 'engineered.parquet')
+        );
 
         // Generate the glob URIs to pass to Query Generator for reading all history
-        const goldGlobUris = sourceNames?.map(name => 
-            this.r2StorageService.getGoldGlobUri(tenantId, projectId, name.replace(/\s+/g, '_'))
-        ) || [];
+        const goldGlobUris = normalizedResultsSuccess.map(r => 
+            this.r2StorageService.getGoldGlobUri(tenantId, projectId, effectiveSourceNames[r.index])
+        );
 
         const feTaskName = 'Feature_Engineering';
         tasksExecuted.push(feTaskName);

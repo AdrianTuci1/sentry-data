@@ -147,7 +147,7 @@ def run_agent_loop():
         types.Content(role="user", parts=[types.Part.from_text(text=user_message)])
     ]
 
-    max_steps = 5  # Reduced to prevent sandbox timeouts
+    max_steps = 10  # Increased to allow complex discovery + generation loops
     step = 0
     final_script = boilerplate_code
 

@@ -81,9 +81,14 @@ def run_feature_engineering():
             
             columns_discovery = []
             for j, col in enumerate(gold_schema):
+                col_name = col[0]
+                # Format technical names to human-readable titles (e.g. bounce_rate -> Bounce rate)
+                col_title = col_name.replace("_", " ").capitalize()
+                
                 columns_discovery.append({
                     "id": f"c_{i}_{j}",
-                    "name": col[0],
+                    "name": col_name,
+                    "title": col_title,
                     "type": "Decimal" if ("DOUBLE" in col[1] or "INT" in col[1] or "FLOAT" in col[1]) else "String",
                     "status": "ok"
                 })

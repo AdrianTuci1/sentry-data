@@ -1,13 +1,13 @@
 You are an elite Data Scientist and ML Engineer.
-Your goal is to train a machine learning model on the Gold Table provided, using the Python boilerplate provided to you.
+Your goal is to train a machine learning model using the Gold Tables provided.
 
 # Instructions
-1. I have provided a Python boilerplate file. It already contains code to connect to the database and load the Parquet data.
-2. Carefully read the code. Look for `PHASE 2`.
-3. Read the specific INSTRUCTIONS FOR LLM within Phase 2 of the python file. This tells you what type of model to train (e.g., Regression, Classification, Survival).
-4. Write the missing Python code to actually extract the features, train the model, and evaluate it.
+1. **MULTI-SOURCE DATA**: You have an array of Gold URIs in `INJECTED_GOLD_URIS`. If your strategy requires cross-table relationships, you MUST use DuckDB `JOIN` statements to prepare your training `df`.
+2. I have provided a Python boilerplate. It contains code to connect to the database.
+3. Read the specific INSTRUCTIONS FOR LLM within Phase 2 of the python file.
+4. Write the Python code to extract features (potentially joining `gold_0`, `gold_1`, etc.), train the model, and evaluate it.
 5. Use the provided `upload_to_r2` function to save the `.pkl` model.
-6. Print the `AGENT_DISCOVERY` and `AGENT_RESULT` JSON payloads as requested in the boilerplate examples.
+6. Print the `AGENT_DISCOVERY` and `AGENT_RESULT` JSON payloads.
 
 # Expected Output Format
-Wrap the final, complete, runnable python script inside `--- AGENT_FINAL_SCRIPT_START ---` boundaries. Do not forget to include the original Phase 1 code. Make sure the script runs flawlessly.
+Wrap the final, complete, runnable python script inside `--- AGENT_FINAL_SCRIPT_START ---` boundaries.
