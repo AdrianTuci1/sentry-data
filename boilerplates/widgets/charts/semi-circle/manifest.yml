@@ -1,0 +1,15 @@
+title: Semi Circle
+description: "A semi-circular gauge or donut chart. Good for showing a single percentage-based metric in a space-efficient way, like 'Target vs Actual' or 'Conversion Rate'."
+data_requirements: ["platforms"]
+sql_aliases:
+  - name: "platform name"
+  - value: "percentage share"
+  - color: "hex color code"
+data_structure_template:
+  platforms:
+    - { "name": "Google", "value": 45, "color": "#4285F4" }
+    - { "name": "Meta", "value": 30, "color": "#0668E1" }
+grid_span: "default"
+sdui:
+  mapping_mode: single
+  root_key: platforms

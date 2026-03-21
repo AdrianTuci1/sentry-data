@@ -1,0 +1,13 @@
+title: Range Area
+description: "An area chart that highlights the gap between two series (upper and lower bounds). Perfect for showing volatility, confidence intervals, or temperature ranges."
+data_requirements: ["timestamp", "lower_bound", "upper_bound"]
+sql_aliases:
+  - time: "temporal axis"
+  - low: "minimum value"
+  - high: "maximum value"
+data_structure_template:
+  data: [{ "time": "2024-03-24", "low": 10, "high": 25 }]
+grid_span: "col-span-2"
+sdui:
+  mapping_mode: single
+  root_key: data

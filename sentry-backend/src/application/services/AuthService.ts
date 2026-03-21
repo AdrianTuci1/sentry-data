@@ -23,6 +23,12 @@ export class AuthService {
      * @returns The tenantId if valid
      */
     public async validateTokenAndGetTenant(token: string): Promise<string> {
+        // MOCK BYPASS FOR TESTING PHASE
+        if (token === 'mock-tenant-token-123') {
+            console.log('[AuthService] Using MOCK bypass for testing.');
+            return 'test_tenant_1';
+        }
+
         try {
             const decoded = jwt.verify(token, this.jwtSecret) as DecodedToken;
 

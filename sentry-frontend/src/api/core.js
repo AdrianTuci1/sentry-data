@@ -88,7 +88,29 @@ export const ProjectService = {
      * Fetches the generated insights/ML predictions mapped to Dashboard Widgets.
      */
     async getAnalytics(projectId) {
-        const res = await fetch(`${API_BASE_URL}/projects/${projectId}/analytics`, {
+        const res = await fetch(`${API_BASE_URL}/dashboard/${projectId}`, {
+            headers: getHeaders()
+        });
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        return res.json();
+    },
+
+    /**
+     * Fetches the structural manifest of a dashboard.
+     */
+    async getDashboardManifest(projectId) {
+        const res = await fetch(`${API_BASE_URL}/dashboard/${projectId}/manifest`, {
+            headers: getHeaders()
+        });
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        return res.json();
+    },
+
+    /**
+     * Fetches hydrated data for a specific widget.
+     */
+    async getWidgetData(projectId, widgetId) {
+        const res = await fetch(`${API_BASE_URL}/dashboard/${projectId}/widget/${widgetId}`, {
             headers: getHeaders()
         });
         if (!res.ok) throw new Error(`API Error: ${res.status}`);
@@ -99,30 +121,62 @@ export const ProjectService = {
      * Subscribes to Server-Sent Events (SSE) to receive real-time updates of agent progress.
      */
     connectToPipelineStream(onMessage, onError) {
-        // SSE natively uses GET. We pass token via query string or rely on cookies since browsers restrict custom headers in EventSource.
-        const token = 'mock-tenant-token-123';
-        const eventSource = new EventSource(`${API_BASE_URL}/events?token=${token}`);
+        let eventSource = null;
+        let reconnectTimeout = null;
+        let retryCount = 0;
+        const maxRetries = 10;
+        const baseDelay = 1000;
 
-        eventSource.onmessage = (event) => {
-            try {
-                const data = JSON.parse(event.data);
-                if (data.type === 'pipeline_progress') {
-                    onMessage(data.data);
-                }
-            } catch (err) {
-                console.warn("Failed to parse SSE event:", err);
+        const connect = () => {
+            const headers = getHeaders();
+            const token = headers['Authorization'].replace('Bearer ', '');
+            
+            if (eventSource) {
+                eventSource.close();
             }
+
+            console.log(`[SSE] Connecting to stream (Attempt ${retryCount + 1})...`);
+            eventSource = new EventSource(`${API_BASE_URL}/events?token=${token}`);
+
+            eventSource.onopen = () => {
+                console.log("[SSE] Connection established.");
+                retryCount = 0; // Reset on success
+            };
+
+            eventSource.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    onMessage(data);
+                } catch (err) {
+                    console.warn("Failed to parse SSE event:", err);
+                }
+            };
+
+            eventSource.onerror = (error) => {
+                console.error("SSE Streaming Error observed:", error);
+                if (onError) onError(error);
+                
+                eventSource.close();
+                
+                if (retryCount < maxRetries) {
+                    const delay = Math.min(baseDelay * Math.pow(2, retryCount), 30000);
+                    console.log(`[SSE] Reconnecting in ${delay}ms...`);
+                    reconnectTimeout = setTimeout(() => {
+                        retryCount++;
+                        connect();
+                    }, delay);
+                } else {
+                    console.error("[SSE] Max retries reached. Stopping reconnection.");
+                }
+            };
         };
 
-        eventSource.onerror = (error) => {
-            console.error("SSE Streaming Error:", error);
-            if (onError) onError(error);
-            eventSource.close();
-        };
+        connect();
 
         return () => {
-            // Return closer function
-            eventSource.close();
+            console.log("[SSE] Closing connection manually.");
+            if (reconnectTimeout) clearTimeout(reconnectTimeout);
+            if (eventSource) eventSource.close();
         };
     }
 };

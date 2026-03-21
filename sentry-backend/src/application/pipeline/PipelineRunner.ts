@@ -5,6 +5,7 @@ import { PipelineContext, PipelineResult } from './types';
 import { SchemaFingerprint, SourceSchema } from './SchemaFingerprint';
 import { config } from '../../config';
 import { ProjectRepository } from '../../infrastructure/repositories/ProjectRepository';
+import { WidgetService } from '../services/WidgetService';
 
 /**
  * Unified Pipeline Runner
@@ -16,77 +17,93 @@ export class PipelineRunner {
     private r2StorageService: R2StorageService;
     private sseManager: SSEManager;
     private projectRepo: ProjectRepository;
+    private widgetService: WidgetService;
 
-    constructor(agentExecutor: AgentExecutor, r2StorageService: R2StorageService, sseManager: SSEManager, projectRepo: ProjectRepository) {
+    constructor(agentExecutor: AgentExecutor, r2StorageService: R2StorageService, sseManager: SSEManager, projectRepo: ProjectRepository, widgetService: WidgetService) {
         this.agentExecutor = agentExecutor;
         this.r2StorageService = r2StorageService;
         this.sseManager = sseManager;
         this.projectRepo = projectRepo;
+        this.widgetService = widgetService;
     }
 
     public async execute(ctx: PipelineContext): Promise<PipelineResult> {
         console.log(`[PipelineRunner] Executing Unified Path for Project ${ctx.projectId}`);
         const { tenantId, projectId, rawSourceUris, sourceNames } = ctx;
-        
-        const systemBucket = config.r2.bucketData;
-        const boilerplatePrefix = `s3://${systemBucket}/system/boilerplates/tasks`;
-        const promptPrefix = `s3://${systemBucket}/system/boilerplates/prompts`;
-        const manifestUri = `s3://${systemBucket}/system/config/frontend-widget-manifest.yml`;
-        const strategyUri = `s3://${systemBucket}/system/config/business-metrics-strategy.yml`;
-        const mindmapManifestUri = `s3://${systemBucket}/system/config/frontend-mindmap-manifest.yml`;
+
         const startTime = Date.now();
-        
+
         // --- STEP 0: CHANGE DETECTION (RESOLUTION) ---
         console.log(`[PipelineRunner] STEP 0: Detecting schema changes...`);
         const effectiveSourceNames = rawSourceUris.map((_, i) => (sourceNames?.[i] || `source_${i}`).replace(/\s+/g, '_'));
-        
+
         // In a real scenario, we would sample the files for schemas. 
         // For now, we use a placeholder or assume forceRediscover implies change.
-        const currentSchemas: SourceSchema[] = []; 
+        const currentSchemas: SourceSchema[] = [];
         const project = await this.projectRepo.findById(tenantId, projectId);
-        
+
         const currentFingerprint = SchemaFingerprint.compute(currentSchemas);
         let consolidatedInvalidations: string[] = ctx.invalidatedSources || [];
-        
+
         if (project?.schemaFingerprint) {
             const invalidatedSources = SchemaFingerprint.getInvalidatedSources(project.schemaFingerprint, currentFingerprint);
             consolidatedInvalidations.push(...invalidatedSources);
         }
-        
+
         consolidatedInvalidations = [...new Set(consolidatedInvalidations)];
 
-        let cumulativeDiscovery: any = {
+        let cumulativeDiscovery: any = project?.discoveryMetadata || {
+            connector: [],
+            actionType: [],
+            adjustedData: [],
+            group: [],
+            insight: [],
             tables: [],
             metricGroups: [],
-            dashboardGroups: [],
-            dashboards: [],
-            sourceClassifications: []
+            sourceClassifications: [],
+            predictionModels: []
         };
+
+        // Ensure arrays exist if object was partial
+        const ensureKeys = ['connector', 'actionType', 'adjustedData', 'group', 'insight', 'tables', 'metricGroups', 'sourceClassifications', 'predictionModels'];
+        for (const key of ensureKeys) {
+            cumulativeDiscovery[key] = cumulativeDiscovery[key] || [];
+        }
+        // Migrate legacy keys if present from a previous run
+        if (cumulativeDiscovery.dashboardGroups && !cumulativeDiscovery.group?.length) {
+            cumulativeDiscovery.group = cumulativeDiscovery.dashboardGroups;
+        }
+        if (cumulativeDiscovery.dashboards && !cumulativeDiscovery.insight?.length) {
+            cumulativeDiscovery.insight = cumulativeDiscovery.dashboards;
+        }
+        delete cumulativeDiscovery.dashboardGroups;
+        delete cumulativeDiscovery.dashboards;
         let estimatedTokensUsed = 0;
         let tasksExecuted: string[] = [];
         let hitCount = 0;
 
         // --- PHASE 1: PARALLEL ETL BLOCKS (Normalization -> Feature Engineering) ---
         console.log(`[PipelineRunner] STEP 1: Processing ${rawSourceUris.length} ETL blocks in parallel...`);
-        
+
+        // OPTIMIZATION: Fetch existing scripts once to avoid redundant R2 calls
+        const existingScripts = await this.r2StorageService.listScripts(tenantId, projectId);
+        console.log(`[PipelineRunner] Found ${existingScripts.size} existing scripts in project.`);
+
         const etlBlockPromises = rawSourceUris.map(async (uri, index) => {
             const sourceName = effectiveSourceNames[index];
             const originalSourceName = sourceNames?.[index] || `source_${index}`;
-            
-            const normalizedTargetUri = this.r2StorageService.getSilverUri(tenantId, projectId, sourceName, 'normalized.parquet');
-            const normalizedGlobUri = this.r2StorageService.getSilverGlobUri(tenantId, projectId, sourceName);
-            const goldTargetUri = this.r2StorageService.getGoldUri(tenantId, projectId, sourceName, 'engineered.parquet');
+
             const goldGlobUri = this.r2StorageService.getGoldGlobUri(tenantId, projectId, sourceName);
-            
+
             const normTaskName = `Normalization_${sourceName}`;
             const feTaskName = `Feature_Engineering_${sourceName}`;
-            
+
             const isSourceInvalidated = consolidatedInvalidations.includes(originalSourceName) || false;
             const forceRegenerate = ctx.forceRediscover || isSourceInvalidated;
-            
+
             // Extra cache check: if script doesn't exist, we MUST regenerate regardless of fingerprint
-            const normExists = await this.r2StorageService.scriptExists(tenantId, projectId, normTaskName);
-            const feExists = await this.r2StorageService.scriptExists(tenantId, projectId, feTaskName);
+            const normExists = existingScripts.has(normTaskName);
+            const feExists = existingScripts.has(feTaskName);
             const needsRefresh = forceRegenerate || !normExists || !feExists;
 
             try {
@@ -101,36 +118,55 @@ export class PipelineRunner {
                 console.log(`[PipelineRunner] [${sourceName}] Executing Normalization (force: ${forceRegenerate})...`);
                 const normRes = await this.agentExecutor.execute({
                     tenantId, projectId, taskName: normTaskName,
-                    systemPromptUri: `${promptPrefix}/data_normalizer.txt`,
-                    boilerplateUri: `${boilerplatePrefix}/data_normalizer.py`,
-                    additionalEnvVars: { 
-                        'INJECTED_RAW_URI': uri, 
-                        'INJECTED_NORMALIZED_URI': normalizedTargetUri,
-                        'INJECTED_CONNECTOR': connector.replace(/'/g, "\\'"),
-                        'INJECTED_ACTION_TYPE': actionType,
-                        'INJECTED_ORIGIN': origin.replace(/'/g, "\\'"),
-                        'INJECTED_SOURCE_ID': sourceName
-                    },
+                    existingScripts,
                     forceRegenerate
                 });
-                
+
                 // 1.2 Feature Engineering
                 console.log(`[PipelineRunner] [${sourceName}] Executing Feature Engineering (force: ${forceRegenerate})...`);
                 const feRes = await this.agentExecutor.execute({
                     tenantId, projectId, taskName: feTaskName,
-                    systemPromptUri: `${promptPrefix}/feature_engineer.txt`,
-                    boilerplateUri: `${boilerplatePrefix}/feature_engineer.py`,
-                    additionalEnvVars: {
-                        'INJECTED_NORMALIZED_URIS': JSON.stringify([normalizedGlobUri]),
-                        'INJECTED_MINDMAP_MANIFEST_URI': mindmapManifestUri,
-                        'INJECTED_GOLD_URIS': JSON.stringify([goldTargetUri]),
-                        'INJECTED_CONNECTOR': connector.replace(/'/g, "\\'"),
-                        'INJECTED_ACTION_TYPE': actionType,
-                        'INJECTED_ORIGIN': origin.replace(/'/g, "\\'"),
-                        'INJECTED_SOURCE_ID': sourceName
-                    },
+                    existingScripts,
                     forceRegenerate
                 });
+
+                // Capture Discovery from both stages
+                const mergeDiscovery = (disco: any) => {
+                    if (!disco) return;
+                    
+                    // Additive merging for all graph/lineage components (modern keys only)
+                    const keysToAppend = ['connector', 'actionType', 'adjustedData', 'group', 'insight', 'tables', 'metricGroups', 'sourceClassifications'];
+                    for (const key of keysToAppend) {
+                        // Support legacy key names from agents: dashboardGroups -> group, dashboards -> insight
+                        const sourceKey = key === 'group' ? (disco.group ? 'group' : 'dashboardGroups') :
+                                          key === 'insight' ? (disco.insight ? 'insight' : 'dashboards') : key;
+                        if (disco[sourceKey]) {
+                            const items = Array.isArray(disco[sourceKey]) ? disco[sourceKey] : [disco[sourceKey]];
+                            if (items.length > 0) {
+                                cumulativeDiscovery[key] = cumulativeDiscovery[key] || [];
+                                if (key === 'connector') {
+                                    items.forEach((newItem: any) => {
+                                        const existingIndex = cumulativeDiscovery[key].findIndex((c: any) => c.id === newItem.id);
+                                        if (existingIndex >= 0) {
+                                            cumulativeDiscovery[key][existingIndex] = { ...cumulativeDiscovery[key][existingIndex], ...newItem };
+                                        } else {
+                                            cumulativeDiscovery[key].push(newItem);
+                                        }
+                                    });
+                                } else {
+                                    cumulativeDiscovery[key].push(...items);
+                                }
+                            }
+                        }
+                    }
+                };
+
+                mergeDiscovery(normRes.discovery);
+                mergeDiscovery(feRes.discovery);
+
+                if (normRes.discovery || feRes.discovery) {
+                    this.broadcastDiscovery(tenantId, projectId, cumulativeDiscovery);
+                }
 
                 return { success: true, normRes, feRes, sourceName, goldGlobUri, tasks: [normTaskName, feTaskName] };
             } catch (err: any) {
@@ -153,45 +189,18 @@ export class PipelineRunner {
             if (res.normRes.estimatedTokens === 0) hitCount++;
             if (res.feRes.estimatedTokens === 0) hitCount++;
             tasksExecuted.push(...(res.tasks || []));
-            
-            // Discovery aggregation
-            if (res.feRes.discovery) {
-                if (res.feRes.discovery.metricGroups) {
-                    cumulativeDiscovery.metricGroups.push(...res.feRes.discovery.metricGroups);
-                } else if (res.feRes.discovery.tables) {
-                    cumulativeDiscovery.tables.push(...res.feRes.discovery.tables);
-                }
-            }
+
+            // Note: cumulativeDiscovery was already partially populated by granular broadcasts above
             // IMPORTANT: We skip normRes.discovery to prevent Normalization (Silver) from appearing in the graph.
-            // Only the Feature Engineering (Gold) layer should represent the data source.
         });
 
         const goldGlobUris = successResults.map(r => (r as any).goldGlobUri);
 
         this.sseManager.broadcastToTenant(tenantId, 'pipeline_progress', {
             step: 'ETL Phase (Unified)',
-            progress: 50,
+            progress: 70,
             status: 'completed'
         });
-
-        // --- STEP 2: SOURCE CLASSIFIER (Optional Global) ---
-        console.log(`[PipelineRunner] STEP 2: Classifying Sources...`);
-        const scTaskName = 'Source_Classifier';
-        tasksExecuted.push(scTaskName);
-        const normalizedSchemas = successResults.map(r => (r as any).normRes.discovery).filter(Boolean);
-
-        const scResult = await this.agentExecutor.execute({
-            tenantId, projectId, taskName: scTaskName,
-            systemPromptUri: `${promptPrefix}/source_classifier.txt`,
-            boilerplateUri: `${boilerplatePrefix}/source_classifier.py`,
-            additionalEnvVars: { 'INJECTED_SCHEMA_JSON': JSON.stringify(normalizedSchemas) }
-        });
-        
-        estimatedTokensUsed += scResult.estimatedTokens;
-        if (scResult.estimatedTokens === 0) hitCount++;
-        if (scResult.discovery?.sourceClassifications) {
-            cumulativeDiscovery.sourceClassifications = scResult.discovery.sourceClassifications;
-        }
 
         // --- STEP 3: QUERY GENERATION (Global) ---
         console.log(`[PipelineRunner] STEP 3: Starting SQL Generator...`);
@@ -200,25 +209,39 @@ export class PipelineRunner {
 
         const queriesResult = await this.agentExecutor.execute({
             tenantId, projectId, taskName: qgTaskName,
-            systemPromptUri: `${promptPrefix}/query_generator.txt`,
-            boilerplateUri: `${boilerplatePrefix}/query_generator.py`,
-            additionalEnvVars: {
-                'INJECTED_GOLD_URIS': JSON.stringify(goldGlobUris),
-                'INJECTED_MANIFEST_URI': manifestUri,
-                'INJECTED_STRATEGY_URI': strategyUri,
-                'INJECTED_METRICS_DISCOVERY': JSON.stringify(cumulativeDiscovery.metricGroups),
-                'INJECTED_SOURCE_CLASSIFICATIONS': JSON.stringify(cumulativeDiscovery.sourceClassifications)
-            },
+            existingScripts,
             // If any source changed, we force re-generate the global query logic
             forceRegenerate: ctx.forceRediscover || consolidatedInvalidations.length > 0
         });
 
         estimatedTokensUsed += queriesResult.estimatedTokens;
         if (queriesResult.estimatedTokens === 0) hitCount++;
-        
+
         if (queriesResult.discovery) {
-            if (queriesResult.discovery.dashboardGroups) cumulativeDiscovery.dashboardGroups = queriesResult.discovery.dashboardGroups;
-            if (queriesResult.discovery.dashboards) cumulativeDiscovery.dashboards = queriesResult.discovery.dashboards;
+            // Normalize legacy keys from agent output
+            const dg = queriesResult.discovery.group || queriesResult.discovery.dashboardGroups;
+            const db = queriesResult.discovery.insight || queriesResult.discovery.dashboards;
+            
+            // Query Generator is AUTHORITATIVE for group/insight (replaces, not appends)
+            if (dg && Array.isArray(dg) && dg.length > 0) cumulativeDiscovery.group = dg;
+            if (db && Array.isArray(db) && db.length > 0) cumulativeDiscovery.insight = db;
+
+            // Additive merging for everything else (sourceClassifications, tables, etc.)
+            const skipKeys = new Set(['dashboardGroups', 'dashboards', 'group', 'insight']);
+            Object.keys(queriesResult.discovery).forEach(key => {
+                if (skipKeys.has(key)) return;
+                
+                const val = queriesResult.discovery[key];
+                if (Array.isArray(val) && val.length > 0) {
+                    cumulativeDiscovery[key] = cumulativeDiscovery[key] || [];
+                    cumulativeDiscovery[key].push(...val);
+                } else if (val && !Array.isArray(val)) {
+                    cumulativeDiscovery[key] = val;
+                }
+            });
+
+            // GRANULAR BROADCAST: After Query Generation
+            this.broadcastDiscovery(tenantId, projectId, cumulativeDiscovery);
         }
 
         this.sseManager.broadcastToTenant(tenantId, 'pipeline_progress', {
@@ -234,12 +257,36 @@ export class PipelineRunner {
             vitals: {
                 pipelineLatencyMs: endTime - startTime,
                 pathUsed: 'unified',
-                cacheHitRate: tasksExecuted.length > 0 ? hitCount / tasksExecuted.length : 0, 
+                cacheHitRate: tasksExecuted.length > 0 ? hitCount / tasksExecuted.length : 0,
                 estimatedTokensUsed,
                 tasksExecuted,
                 startedAt: new Date(startTime).toISOString(),
                 completedAt: new Date(endTime).toISOString()
             }
         };
+    }
+
+    private async broadcastDiscovery(tenantId: string, projectId: string, discovery: any) {
+        // 1. PERSISTENCE (R2 & DB) - Must happen BEFORE broadcast
+        // Save to R2 so Sovereign Agents can pull it (Zero-Injection Context)
+        await this.r2StorageService.saveDiscovery(tenantId, projectId, discovery);
+
+        // Save to DB for backend state
+        try {
+            const project = await this.projectRepo.findById(tenantId, projectId);
+            if (project) {
+                project.discoveryMetadata = discovery;
+                await this.projectRepo.createOrUpdate(project);
+                console.log(`[PipelineRunner] Granular discovery persisted for ${projectId}`);
+            }
+        } catch (err: any) {
+            console.warn(`[PipelineRunner] Failed to persist granular discovery: ${err.message}`);
+        }
+
+        // 2. Broadcast via SSE for real-time UI notification
+        // We strip discoveryMetadata to force the frontend to fetch from authoritative DynamoDB
+        this.sseManager.broadcastToTenant(tenantId, 'discovery_updated', {
+            projectId
+        });
     }
 }

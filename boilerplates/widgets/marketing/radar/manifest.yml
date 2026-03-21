@@ -1,0 +1,14 @@
+title: Marketing Radar
+description: "A radar chart comparing marketing channel performance across multiple KPIs like 'CPA', 'LTV', 'CTR', and 'Volume'."
+data_requirements: ["kpi_name", "value", "channel"]
+sql_aliases:
+  - axis: "KPI name"
+  - weight: "normalized score"
+  - group: "channel name"
+data_structure_template:
+  data: [{ "axis": "CTR", "weight": 90, "group": "Email" }]
+grid_span: "col-span-2"
+color_theme: "theme-color"
+sdui:
+  mapping_mode: single
+  root_key: data

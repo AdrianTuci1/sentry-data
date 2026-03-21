@@ -1,0 +1,13 @@
+title: Sankey
+description: "Visualizes flow between categories. Ideal for showing funnel drop-offs, user journey transitions, or budget allocations across departments."
+data_requirements: ["source", "target", "value"]
+sql_aliases:
+  - from: "source node"
+  - to: "target node"
+  - weight: "flow volume"
+data_structure_template:
+  links: [{ "from": "A", "to": "B", "weight": 10 }]
+grid_span: "col-span-2"
+sdui:
+  mapping_mode: list
+  root_key: links

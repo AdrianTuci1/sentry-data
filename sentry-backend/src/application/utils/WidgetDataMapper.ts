@@ -16,50 +16,134 @@ export class WidgetDataMapper {
         const cleanRows = rows.map(r => this.unmarshall(r));
 
         switch (widgetType) {
-            case 'weather':
-            case 'natural':
-            case 'light-dial':
-            case 'liquid-gauge':
-            case 'neural-nexus':
-            case 'intensity-heat':
-            case 'chrono-dial':
-            case 'incremental-lift':
-            case 'waffle':
-                // For scalar-based widgets, we take the first numeric-looking value from the first row.
-                const firstRow = cleanRows[0];
-                const scalarVal = this.extractNumericValue(firstRow);
-                return {
-                    value: this.formatNumber(scalarVal),
-                    sliderValue: typeof scalarVal === 'number' ? Math.min(100, Math.max(0, scalarVal)) : 0
+            case 'leads-list':
+                return { leads: cleanRows, results: cleanRows, data: cleanRows };
+
+            case 'vitals':
+                return { metrics: cleanRows, results: cleanRows, data: cleanRows };
+
+            case 'cohorts':
+                return { cohorts: cleanRows, results: cleanRows, data: cleanRows };
+
+            case 'waterfall':
+                return { 
+                    steps: cleanRows,
+                    results: cleanRows,
+                    data: cleanRows,
+                    value: cleanRows.length > 0 ? this.formatNumber(this.extractNumericValue(cleanRows[cleanRows.length-1])) : "0"
                 };
 
-            case 'predictive':
+            case 'attribution':
+            case 'shapley-attribution':
+                return { models: cleanRows, rawData: cleanRows, results: cleanRows, data: cleanRows };
+
+            case 'trend-spotter':
+                return { keywords: cleanRows, results: cleanRows, data: cleanRows };
+
+            case 'market-radar':
+            case 'radar':
+                return { radarData: cleanRows, indicator: this.extractIndicators(cleanRows), results: cleanRows, data: cleanRows };
+
+            case 'funnel':
+                return { funnel: cleanRows, results: cleanRows, data: cleanRows };
+
+            case 'creative-quadrant':
+                const quadrantData = cleanRows.map(r => this.extractValuesAsArray(r));
+                return { creatives: quadrantData, results: cleanRows, data: quadrantData };
+
+            case 'lead-clustering':
+                const clusterData = cleanRows.map(r => this.extractValuesAsArray(r));
+                return { clusteringData: clusterData, results: cleanRows, data: clusterData };
+
+            case 'budget-sensitivity':
+                const sensitivityData = cleanRows.map(r => this.extractValuesAsArray(r));
+                return { curvePoints: sensitivityData, results: cleanRows, data: sensitivityData };
+
+            case 'intent-sunburst':
+                return { sunburstData: cleanRows, results: cleanRows, data: cleanRows };
+
+            case '3d-map':
+                return { locations: cleanRows, results: cleanRows, data: cleanRows };
+
             case 'animated-line':
-            case 'productivity-chart':
-                // For time-series/list-based widgets, we extract a flat array of numbers.
-                // We pick the first numeric value found in each row (usually the count/sum).
-                const numericArray = cleanRows.map(row => this.extractNumericValue(row) ?? 0);
+                const points = cleanRows.map(r => this.extractNumericValue(r)).filter(v => v !== null);
+                return { 
+                    dataPoints: points,
+                    results: cleanRows,
+                    data: points,
+                    value: cleanRows.length > 0 ? this.formatNumber(this.extractNumericValue(cleanRows[cleanRows.length-1])) : "0",
+                    unit: "usr"
+                };
 
-                if (widgetType === 'predictive') {
-                    return {
-                        historical: numericArray,
-                        forecast: [] // Forecast is usually a placeholder or computed separately
-                    };
-                }
+            case 'scatter':
+                const scatterData = cleanRows.map(r => this.extractValuesAsArray(r));
+                return { scatterData: scatterData, results: cleanRows, data: scatterData };
 
-                if (widgetType === 'animated-line') {
-                    return {
-                        value: numericArray.length > 0 ? this.formatNumber(numericArray[numericArray.length - 1]) : "0",
-                        dataPoints: numericArray
-                    };
-                }
+            case 'intensity-heat':
+                const heatData = cleanRows.map(r => this.extractValuesAsArray(r));
+                const latestHeatVal = cleanRows.length > 0 ? this.extractNumericValue(cleanRows[cleanRows.length-1]) : 0;
+                return { 
+                    heatmapData: heatData, 
+                    results: cleanRows, 
+                    data: heatData,
+                    value: this.formatNumber(latestHeatVal) 
+                };
 
-                return { dataPoints: numericArray };
+            case 'chrono-dial':
+                // Find peak hour and event distribution
+                const peakRow = cleanRows.reduce((prev, curr) => 
+                    ((this.extractNumericValue(prev) || 0) > (this.extractNumericValue(curr) || 0) ? prev : curr), 
+                    cleanRows[0]
+                );
+                const peakHourText = peakRow ? (peakRow.time?.split(':')[0] || "00") : "00";
+                const peakSliderVal = (parseInt(peakHourText) / 24) * 100;
+                return { 
+                    data: cleanRows,
+                    results: cleanRows,
+                    peakHour: peakHourText,
+                    sliderValue: peakSliderVal,
+                    value: peakSliderVal.toFixed(0) + '%'
+                };
 
             default:
-                // Fallback: return the clean rows as "data"
-                return { data: cleanRows };
+                // Universal Fallback
+                const numericValues = cleanRows.map(r => this.extractNumericValue(r)).filter(v => v !== null);
+                const firstRow = cleanRows[0];
+                const labelKey = Object.keys(firstRow).find(k => typeof firstRow[k] === 'string') || 'label';
+                const labels = cleanRows.map(r => r[labelKey]);
+
+                return { 
+                    data: cleanRows, 
+                    results: cleanRows,
+                    dataPoints: numericValues,
+                    labels: labels,
+                    values: numericValues,
+                    metrics: cleanRows.map(r => ({
+                        name: r[labelKey] || 'Metric',
+                        value: this.extractNumericValue(r),
+                        status: (this.extractNumericValue(r) || 0) > 0 ? 'healthy' : 'degraded'
+                    })),
+                    value: numericValues.length > 0 ? this.formatNumber(numericValues[numericValues.length-1]) : "0"
+                };
         }
+    }
+
+    /**
+     * Extracts radar indicators from rows.
+     */
+    private static extractIndicators(rows: any[]): any[] {
+        if (!rows || rows.length === 0) return [];
+        const firstRow = rows[0];
+        return Object.keys(firstRow)
+            .filter(k => typeof firstRow[k] === 'number')
+            .map(k => ({ name: k, max: 100 }));
+    }
+
+    /**
+     * Extracts all values from a row as a flat array (for tuple-based widgets).
+     */
+    private static extractValuesAsArray(row: any): any[] {
+        return Object.values(row);
     }
 
     /**
@@ -70,7 +154,7 @@ export class WidgetDataMapper {
         if (typeof row !== 'object' || row === null) return null;
 
         // Priority keys
-        const priorityKeys = ['value', 'total', 'count', 'val', 'amount', 'result'];
+        const priorityKeys = ['value', 'weight', 'total', 'count', 'val', 'amount', 'result'];
         for (const key of priorityKeys) {
             if (typeof row[key] === 'number') return row[key];
             if (typeof row[key] === 'string' && !isNaN(parseFloat(row[key]))) return parseFloat(row[key]);

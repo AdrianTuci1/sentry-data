@@ -1,0 +1,13 @@
+title: Heatmap Cartesian
+description: "Shows density or activity distribution across two dimensions (e.g. time vs day, region vs category)."
+data_requirements: ["x_axis", "y_axis", "value"]
+sql_aliases:
+  - x: "horizontal dimension"
+  - y: "vertical dimension"
+  - weight: "intensity value"
+data_structure_template:
+  cells: [{ "x": "Mon", "y": "10am", "weight": 45 }]
+grid_span: "col-span-2"
+sdui:
+  mapping_mode: list
+  root_key: cells

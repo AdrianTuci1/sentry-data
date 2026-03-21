@@ -1,0 +1,14 @@
+title: Scatter
+description: "Shows relationship between two numeric variables (X and Y). Useful for identifying correlations, clusters, or outliers in datasets like 'Profit vs Ad Spend'."
+data_requirements: ["x_value", "y_value", "label", "size"]
+sql_aliases:
+  - x: "horizontal axis"
+  - y: "vertical axis"
+  - group: "bubble category"
+data_structure_template:
+  points: [{ "x": 10, "y": 20, "group": "A" }]
+grid_span: "col-span-2 row-span-2"
+color_theme: "theme-audience"
+sdui:
+  mapping_mode: list
+  root_key: points

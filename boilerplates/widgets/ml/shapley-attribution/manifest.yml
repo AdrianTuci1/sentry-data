@@ -1,0 +1,13 @@
+title: Shapley Attribution
+description: "Uses Shapley values from cooperative game theory to fairly attribute credit to various marketing channels or features. Highly precise for multi-touch attribution."
+data_requirements: ["feature_name", "importance_score"]
+sql_aliases:
+  - name: "channel or feature identifier"
+  - weight: "attribution score"
+data_structure_template:
+  data: [{ "name": "Email", "weight": 0.25 }, { "label": "Social", "weight": 0.45 }]
+grid_span: "col-span-2"
+color_theme: "theme-productivity"
+sdui:
+  mapping_mode: single
+  root_key: data

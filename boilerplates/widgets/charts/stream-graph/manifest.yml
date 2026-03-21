@@ -1,0 +1,13 @@
+title: Stream Graph
+description: "A type of stacked area graph which is displaced around a central axis, resulting in a flowing, organic shape. Ideal for visualizing high-volume time-series data like 'Traffic Sources over Time' or 'Revenue Streams'."
+data_requirements: ["timestamp", "category", "value"]
+sql_aliases:
+  - time: "temporal axis"
+  - group: "category/segment"
+  - weight: "volume"
+data_structure_template:
+  streams: [{ "time": "2024-03-24", "group": "Direct", "weight": 500 }]
+grid_span: "col-span-2"
+sdui:
+  mapping_mode: list
+  root_key: streams

@@ -1,0 +1,14 @@
+title: Incremental Lift
+description: "Measures the 'true' lift provided by a campaign by comparing test vs control groups. Essential for determining actual ROI beyond simple attribution."
+data_requirements: ["value", "unit"]
+sql_aliases:
+  - value: "lift percentage"
+  - unit: "metric label"
+data_structure_template:
+  value: "+22%"
+  unit: "lift"
+grid_span: "default"
+color_theme: "theme-revenue"
+sdui:
+  mapping_mode: single
+  root_key: data

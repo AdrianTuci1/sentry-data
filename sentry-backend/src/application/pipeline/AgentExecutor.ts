@@ -17,20 +17,23 @@ export class AgentExecutor {
      * SMART LOGIC: Checks if a verified script exists in R2 to avoid LLM costs.
      */
     public async execute(params: AgentTaskParams): Promise<AgentTaskResult> {
-        const { tenantId, projectId, taskName, systemPromptUri, boilerplateUri, additionalEnvVars } = params;
+        const { tenantId, projectId, taskName } = params;
         console.log(`[AgentExecutor] Preparing task: ${taskName} for ${projectId}`);
 
         const startMs = Date.now();
 
         // 1. Check for cached script
-        let hasCache = await this.r2StorageService.scriptExists(tenantId, projectId, taskName);
-        let verifiedScriptUri = hasCache ? this.r2StorageService.getScriptUri(tenantId, projectId, taskName) : undefined;
+        let hasCache = false;
+        if (params.existingScripts) {
+            hasCache = params.existingScripts.has(taskName);
+        } else {
+            hasCache = await this.r2StorageService.scriptExists(tenantId, projectId, taskName);
+        }
 
         // GRANULAR CACHING: Override cache if regeneration is explicitly requested
         if (params.forceRegenerate) {
             console.log(`[AgentExecutor] forceRegenerate is TRUE. Bypassing cache for ${taskName}.`);
             hasCache = false;
-            verifiedScriptUri = undefined;
         }
 
         if (hasCache) {
@@ -42,18 +45,9 @@ export class AgentExecutor {
         const sandboxConfig = {
             template: 'sentry-agent-v1',
             envVars: {
-                'INJECTED_SYSTEM_PROMPT': systemPromptUri.startsWith('s3://') ? '' : systemPromptUri,
-                'R2_PROMPT_URI': systemPromptUri.startsWith('s3://') ? systemPromptUri : '',
-                'R2_BOILERPLATE_URI': boilerplateUri,
-                'R2_VERIFIED_SCRIPT_URI': verifiedScriptUri || '', // If present, manager runs this directly
-
-                'R2_REGION': config.r2.region || 'auto',
-                'R2_ENDPOINT_CLEAN': (config.r2.endpoint || '').replace(/^https?:\/\//, ''),
-                'R2_ENDPOINT_URL': (config.r2.endpoint || '').startsWith('http') ? config.r2.endpoint : `https://${config.r2.endpoint}`,
-                'R2_ACCESS_KEY_ID': config.r2.accessKeyId || '',
-                'R2_SECRET_ACCESS_KEY': config.r2.secretAccessKey || '',
-
-                ...additionalEnvVars
+                'tenantId': tenantId,
+                'projectId': projectId,
+                'taskName': taskName,
             }
         };
 
@@ -88,13 +82,13 @@ export class AgentExecutor {
             let estimatedTokens = 0;
             const tokenMatch = execution.logs.match(/AGENT_TOKENS:(.*?)(?=\n|$)/);
             if (tokenMatch && tokenMatch[1]) {
-                 try {
-                     const usageData = JSON.parse(tokenMatch[1].trim());
-                     // gemini returns total_token_count or similar
-                     if (usageData.total_token_count) {
-                         estimatedTokens = usageData.total_token_count;
-                     }
-                 } catch (e) {}
+                try {
+                    const usageData = JSON.parse(tokenMatch[1].trim());
+                    // gemini returns total_token_count or similar
+                    if (usageData.total_token_count) {
+                        estimatedTokens = usageData.total_token_count;
+                    }
+                } catch (e) { }
             }
             if (estimatedTokens === 0 && !hasCache) {
                 // Fallback estimate (~4 chars per token)
@@ -122,16 +116,22 @@ export class AgentExecutor {
             }
 
             // 5. Parse Code-generated discovery (prefixed with AGENT_DISCOVERY:)
-            // We split by lines to avoid greedy matching capturing subsequent prints
-            const lines = stdoutLogs.split('\n');
+            const discoveryMatch = [...stdoutLogs.matchAll(/AGENT_DISCOVERY:(.*?)(?=\nAGENT_|$)/gs)];
             let codeDiscovery = {};
-            for (const line of lines) {
-                if (line.startsWith('AGENT_DISCOVERY:')) {
-                    const jsonStr = line.replace('AGENT_DISCOVERY:', '').trim();
+            if (discoveryMatch.length > 0) {
+                for (const match of discoveryMatch) {
+                    const rawContent = match[1].trim();
                     try {
-                        Object.assign(codeDiscovery, JSON.parse(jsonStr));
+                        Object.assign(codeDiscovery, JSON.parse(rawContent));
                     } catch (e: any) {
-                        console.warn(`[AgentExecutor] Failed to parse AGENT_DISCOVERY line: ${e.message}`);
+                        const jsonCandidate = rawContent.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
+                        if (jsonCandidate) {
+                            try {
+                                Object.assign(codeDiscovery, JSON.parse(jsonCandidate[0]));
+                            } catch (e2: any) {
+                                console.warn(`[AgentExecutor] Failed to parse AGENT_DISCOVERY: ${e2.message}`);
+                            }
+                        }
                     }
                 }
             }

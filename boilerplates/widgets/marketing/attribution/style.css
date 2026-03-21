@@ -1,0 +1,90 @@
+/* Attribution Models Styles */
+.attribution-container {
+    height: 100%;
+    width: 100%;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.model-switcher {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+    justify-content: center;
+}
+
+.model-btn {
+    padding: 3px 8px;
+    font-size: 10px;
+    font-weight: 500;
+    border-radius: 12px;
+    cursor: pointer;
+    text-transform: capitalize;
+    transition: all 0.2s ease;
+    background: transparent;
+    color: #9CA3AF;
+    border: 1px solid transparent;
+}
+
+.model-btn.active {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.chart-wrapper {
+    flex: 1;
+    position: relative;
+    min-height: 120px;
+}
+
+.chart-overlay {
+    position: absolute;
+    top: 65%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.overlay-label {
+    font-size: 10px;
+    color: #6B7280;
+    display: block;
+}
+
+.overlay-val {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    display: block;
+}
+
+.legend-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    padding-bottom: 4px;
+    margin-top: -10px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: #9CA3AF;
+}
+
+.legend-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.legend-val {
+    color: #fff;
+    font-weight: 500;
+}

@@ -40,8 +40,8 @@ IMPORTANT: Inside your generated Python script, you MUST create a dictionary for
 1. **NAMING CONVENTION (CRITICAL)**: Use the standardized title format: `{INJECTED_CONNECTOR} > {INJECTED_ACTION_TYPE} > {INJECTED_ORIGIN}` for your table discovery.
 2. **UNIQUE IDs**: Use `{INJECTED_SOURCE_ID}` in your discovery IDs (e.g., `gold_table_{INJECTED_SOURCE_ID}`) to ensure uniqueness.
 3. **ROLE**: You engineer Gold-layer features and attach them to the standardized origin.
-4. **STRICT OUTPUT**: Your `discovery_payload` MUST contain ONLY the `tables` category. NO `metricGroups`, NO `dashboards`, NO `dashboardGroups`. These are handled by other agents.
-5. **DISCOVERY PAYLOAD**: Generate the JSON payload representing the 'tables' (Gold layer) that you created.
+4. **STRICT OUTPUT**: Your `discovery_payload` MUST contain ONLY the `adjustedData` category. NO `metricGroups`, NO `dashboards`, NO `dashboardGroups`. These are handled by other agents.
+5. **DISCOVERY PAYLOAD**: Generate the JSON payload representing the 'adjustedData' (Gold layer) that you created. Make sure to link it using `"origin_id": "org_{INJECTED_SOURCE_ID}"`.
 
 CRITICAL RULES:
 1. ENGINEERED FEATURES: Output business-level "Actually Engineered" features (e.g. "Conversion Rate", "Churn Risk", "Predicted LTV").

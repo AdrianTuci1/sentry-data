@@ -21,12 +21,15 @@ export interface PipelineVitals {
 }
 
 export interface CumulativeDiscovery {
+    connector: any[];
+    actionType: any[];
+    adjustedData: any[];
+    group: any[];
+    insight: any[];
     tables: any[];
     metricGroups: any[];
     predictionModels: any[];
     advancedAnalytics: any[];
-    dashboardGroups: any[];
-    dashboards: any[];
     sourceClassifications?: any[];
 }
 
@@ -40,10 +43,8 @@ export interface AgentTaskParams {
     tenantId: string;
     projectId: string;
     taskName: string;
-    systemPromptUri: string;
-    boilerplateUri: string;
-    additionalEnvVars: Record<string, string>;
     forceRegenerate?: boolean;
+    existingScripts?: Set<string>;
 }
 
 export interface AgentTaskResult {

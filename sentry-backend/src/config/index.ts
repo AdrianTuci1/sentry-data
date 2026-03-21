@@ -40,5 +40,6 @@ export const config = {
     worker: {
         url: process.env.ANALYTICS_WORKER_URL || 'http://localhost:4000/execute',
         secret: process.env.INTERNAL_API_SECRET || 'secret'
-    }
+    },
+    mapboxToken: process.env.VITE_MAPBOX_TOKEN || process.env.MAPBOX_TOKEN || ''
 };

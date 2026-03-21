@@ -1,0 +1,52 @@
+/* Cohort Analysis Styles */
+.cohort-container {
+    padding: 10px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    font-size: 10px;
+    color: #9CA3AF;
+    font-family: 'Inter', sans-serif;
+}
+
+.cohort-header {
+    display: grid;
+    grid-template-columns: 80px repeat(6, 1fr);
+    gap: 2px;
+    margin-bottom: 4px;
+    font-weight: bold;
+}
+
+.cohort-row {
+    display: grid;
+    grid-template-columns: 80px repeat(6, 1fr);
+    gap: 2px;
+    margin-bottom: 2px;
+}
+
+.cohort-label {
+    white-space: nowrap;
+}
+
+.cohort-size {
+    font-size: 8px;
+    opacity: 0.6;
+}
+
+.cohort-cell {
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+}
+
+.cohort-cell.high-intensity {
+    color: #fff;
+    font-weight: 600;
+}
+
+.cohort-cell.low-intensity {
+    color: #9CA3AF;
+    font-weight: 400;
+}

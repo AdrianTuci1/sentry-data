@@ -12,7 +12,6 @@ export class DashboardController implements IController {
     private analyticsService: AnalyticsService;
     private authService: AuthService;
 
-    // Dependency Injection via Constructor
     constructor(analyticsService: AnalyticsService, authService: AuthService) {
         this.analyticsService = analyticsService;
         this.authService = authService;
@@ -20,28 +19,56 @@ export class DashboardController implements IController {
     }
 
     public initRoutes() {
-        // Protect the Dashboard fetching route
         const authMiddleware = requireAuth(this.authService);
         this.router.get('/:projectId', authMiddleware, this.getDashboard);
+        this.router.get('/:projectId/manifest', authMiddleware, this.getManifest);
+        this.router.get('/:projectId/widget/:widgetId', authMiddleware, this.getWidgetData);
+        this.router.get('/system/reload', authMiddleware, this.reloadWidgets);
     }
 
     private getDashboard = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { projectId } = req.params;
-
-            // Extracted securely from the JWT validation middleware
             const tenantId = req.tenantId;
-
-            if (!tenantId) {
-                throw new AppError('Server error: Tenant ID not present after auth.', 500);
-            }
+            if (!tenantId) throw new AppError('Tenant ID not present', 500);
 
             const data = await this.analyticsService.getDashboardData(tenantId, projectId);
+            res.status(200).json({ status: 'success', data });
+        } catch (error) {
+            next(error);
+        }
+    };
 
-            res.status(200).json({
-                status: 'success',
-                data
-            });
+    private getManifest = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { projectId } = req.params;
+            const tenantId = req.tenantId;
+            if (!tenantId) throw new AppError('Tenant ID not present', 500);
+
+            const data = await this.analyticsService.getDashboardManifest(tenantId, projectId);
+            res.status(200).json({ status: 'success', data });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    private getWidgetData = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { projectId, widgetId } = req.params;
+            const tenantId = req.tenantId;
+            if (!tenantId) throw new AppError('Tenant ID not present', 500);
+
+            const data = await this.analyticsService.getWidgetDataInstance(tenantId, projectId, widgetId);
+            res.status(200).json({ status: 'success', data });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    private reloadWidgets = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            this.analyticsService.reloadWidgets();
+            res.status(200).json({ status: 'success', message: 'Widget cache reloaded' });
         } catch (error) {
             next(error);
         }

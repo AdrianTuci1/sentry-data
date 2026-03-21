@@ -1,0 +1,14 @@
+title: Optimal Time
+description: "Identifies the best time to take an action (e.g. sending an email or launching an ad) based on historical response rates across days and hours."
+data_requirements: ["day_of_week", "hour_of_day", "probability"]
+sql_aliases:
+  - row: "day index"
+  - col: "hour index"
+  - weight: "success probability"
+data_structure_template:
+  data: [{ "row": "Monday", "col": 9, "weight": 0.45 }]
+grid_span: "default"
+color_theme: "theme-natural"
+sdui:
+  mapping_mode: single
+  root_key: data

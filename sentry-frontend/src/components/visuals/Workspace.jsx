@@ -3,7 +3,7 @@ import Editor from '@monaco-editor/react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../store/StoreProvider';
-import { BrainCircuit, Play, X, ZoomIn, ZoomOut, Database, PieChart } from 'lucide-react';
+import { BrainCircuit, Play, X } from 'lucide-react';
 import FeatureMindMap from './FeatureMindMap';
 import Insights from './Insights';
 import './Workspace.css';
@@ -18,17 +18,10 @@ const Workspace = observer(({ viewState = 'engineering' }) => {
         activeTab,
         scale,
         pan,
-        isDragging,
-        selectedItems
+        isDragging
     } = ui;
 
     const {
-        tables,
-        metricGroups,
-        predictionModels,
-        advancedAnalytics,
-        dashboards,
-        dashboardGroups,
         metrics,
         features
     } = data;
@@ -50,9 +43,6 @@ const Workspace = observer(({ viewState = 'engineering' }) => {
     }, [viewState, ui]);
 
 
-    // Handlers
-    const toggleSelection = (id) => ui.toggleSelection(id);
-    const toggleGroup = (ids) => ui.toggleGroup(ids);
 
     const renderResults = () => {
         return (

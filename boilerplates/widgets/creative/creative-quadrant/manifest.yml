@@ -1,0 +1,14 @@
+title: Creative Quadrant
+description: "A 2x2 matrix plotting ad creatives based on 'Engagement' vs 'Cost Efficiency'. Helps in identifying 'Winners', 'Budget Wasters', and 'Potentials'."
+data_requirements: ["creative_id", "engagement_score", "cpa_value"]
+sql_aliases:
+  - id: "creative identifier/image"
+  - x: "engagement index"
+  - y: "cost efficiency index"
+data_structure_template:
+  data: [{ "id": "creative_1", "x": 85, "y": 90 }]
+grid_span: "col-span-2 row-span-2"
+color_theme: "theme-productivity"
+sdui:
+  mapping_mode: single
+  root_key: data

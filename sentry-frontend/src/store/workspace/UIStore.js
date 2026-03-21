@@ -59,17 +59,20 @@ export class UIStore {
     initializeSelection(data) {
         if (!data) return;
         const initialSelection = new Set();
-        const processItems = (items) => items?.forEach(item => {
+        const { connector, actionType, adjustedData, insight } = data;
+
+        const processList = (list) => list?.forEach(item => {
             if (item.status !== 'error') initialSelection.add(item.id);
         });
 
-        const { tables, metricGroups, predictionModels, advancedAnalytics, dashboards } = data;
+        const processColumns = (items) => items?.forEach(item => {
+            if (item.status !== 'error') initialSelection.add(item.id);
+        });
 
-        (tables || []).forEach(t => processItems(t.columns));
-        (metricGroups || []).forEach(g => processItems(g.metrics));
-        (predictionModels || []).forEach(m => processItems(m.predictions));
-        (advancedAnalytics || []).forEach(g => processItems(g.items));
-        (dashboards || []).forEach(g => processItems(g.items));
+        processList(connector);
+        processList(actionType);
+        (adjustedData || []).forEach(adj => processColumns(adj.columns));
+        processList(insight);
 
         this.selectedItems = initialSelection;
     }

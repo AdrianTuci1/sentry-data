@@ -6,6 +6,7 @@ import { MLPathRunner } from '../pipeline/MLPathRunner';
 import { PipelineContext, PipelineResult } from '../pipeline/types';
 import { SchemaFingerprint, SourceSchema } from '../pipeline/SchemaFingerprint';
 import { PipelineConfig } from '../pipeline/PipelineConfig';
+import { WidgetService } from './WidgetService';
 
 /**
  * OrchestrationService is the entrypoint for the Multi-Agent execution DAG.
@@ -16,17 +17,20 @@ export class OrchestrationService {
     private mlPathRunner: MLPathRunner;
     private projectRepo: ProjectRepository;
     private sseManager: SSEManager;
+    private widgetService: WidgetService;
 
     constructor(
         pipelineRunner: PipelineRunner,
         mlPathRunner: MLPathRunner,
         projectRepo: ProjectRepository,
-        sseManager: SSEManager
+        sseManager: SSEManager,
+        widgetService: WidgetService
     ) {
         this.pipelineRunner = pipelineRunner;
         this.mlPathRunner = mlPathRunner;
         this.projectRepo = projectRepo;
         this.sseManager = sseManager;
+        this.widgetService = widgetService;
     }
 
     /** 
@@ -61,7 +65,7 @@ export class OrchestrationService {
             const etlResult = await this.pipelineRunner.execute(ctx);
 
             // Save basic ETL results immediately (Dashboards v1)
-            await this.savePipelineResult(project, etlResult);
+            await this.saveProjectDiscovery(tenantId, projectId, etlResult.discovery, etlResult.vitals);
             console.log(`[Orchestrator] ETL Phase Completed for ${projectId}. Dashboards operational.`);
 
             // --- PHASE 2: ML ENRICHMENT (Follow-up) ---
@@ -81,14 +85,21 @@ export class OrchestrationService {
                             ...(etlResult.discovery.predictionModels || []),
                             ...(mlResult.discovery.predictionModels || [])
                         ],
-                        // ML V2 Dashboards/Groups are additive to ETL ones
-                        dashboardGroups: [
-                            ...(etlResult.discovery.dashboardGroups || []),
-                            ...(mlResult.discovery.dashboardGroups || [])
+                        tables: [
+                            ...(etlResult.discovery.tables || []),
+                            ...(mlResult.discovery.tables || [])
                         ],
-                        dashboards: [
-                            ...(etlResult.discovery.dashboards || []),
-                            ...(mlResult.discovery.dashboards || [])
+                        metricGroups: [
+                            ...(etlResult.discovery.metricGroups || []),
+                            ...(mlResult.discovery.metricGroups || [])
+                        ],
+                        group: [
+                            ...(etlResult.discovery.group || []),
+                            ...(mlResult.discovery.group || [])
+                        ],
+                        insight: [
+                            ...(etlResult.discovery.insight || []),
+                            ...(mlResult.discovery.insight || [])
                         ],
                         sourceClassifications: [
                             ...(etlResult.discovery.sourceClassifications || []),
@@ -97,7 +108,7 @@ export class OrchestrationService {
                     };
                     mlResult.discovery = mergedDiscovery as any;
 
-                    await this.savePipelineResult(project, mlResult);
+                    await this.saveProjectDiscovery(tenantId, projectId, mlResult.discovery, mlResult.vitals);
                     console.log(`[Orchestrator] ML Phase Completed for ${projectId}. Dashboards enhanced.`);
                 } catch (mlErr: any) {
                     console.error(`[Orchestrator] ML enrichment failed, but ETL remains valid: ${mlErr.message}`);
@@ -113,9 +124,12 @@ export class OrchestrationService {
 
             // --- PHASE 3: FINALIZATION ---
             // Update the project's schema fingerprint so next run knows what's already processed
-            const currentFingerprint = SchemaFingerprint.compute(dummyCurrentSchemas);
-            project.schemaFingerprint = currentFingerprint;
-            await this.projectRepo.createOrUpdate(project);
+            const finalProject = await this.projectRepo.findById(tenantId, projectId);
+            if (finalProject) {
+                const currentFingerprint = SchemaFingerprint.compute(dummyCurrentSchemas);
+                finalProject.schemaFingerprint = currentFingerprint;
+                await this.projectRepo.createOrUpdate(finalProject);
+            }
 
             console.log(`[Orchestrator] Pipeline ${projectId} Fully Operational.`);
         } catch (error: any) {
@@ -130,35 +144,49 @@ export class OrchestrationService {
         }
     }
 
-    private async savePipelineResult(project: any, result: PipelineResult) {
-        // Build queryConfigs from dashboards discovery
-        const dashboardInsights = result.discovery.dashboards || [];
-        project.queryConfigs = dashboardInsights
+    public async saveProjectDiscovery(tenantId: string, projectId: string, discovery: any, vitals?: any) {
+        // Force reading from DynamoDB to get the absolute latest state (avoid overwriting concurrent changes)
+        const project = await this.projectRepo.findById(tenantId, projectId);
+        if (!project) {
+            console.error(`[Orchestrator] Cannot save results: Project ${projectId} not found.`);
+            return;
+        }
+
+        // Build queryConfigs from insights discovery
+        const insights = discovery.insight || [];
+        project.queryConfigs = insights
             .map((db: any) => ({
                 widgetId: db.id,
-                sqlString: db.query
+                sqlString: db.query || db.sql
             }))
             .filter((q: any) => q.widgetId && q.sqlString);
 
         // Update Project Entity with discovery metadata
-        project.discoveryMetadata = result.discovery;
+        project.discoveryMetadata = discovery;
         project.status = 'active';
 
-        // Save execution telemetry / vitals
-        project.pipelineVitals = project.pipelineVitals || { runsThisMonth: 0, estimatedTokensUsed: 0 };
-        project.pipelineVitals.lastRunAt = result.vitals.completedAt;
-        project.pipelineVitals.lastRunDurationMs = result.vitals.pipelineLatencyMs;
-        project.pipelineVitals.lastPathUsed = result.vitals.pathUsed;
-        project.pipelineVitals.cacheHitRate = result.vitals.cacheHitRate;
-        project.pipelineVitals.runsThisMonth += 1;
-        project.pipelineVitals.estimatedTokensUsed += result.vitals.estimatedTokensUsed;
+        // Save execution telemetry / vitals if provided
+        if (vitals) {
+            project.pipelineVitals = project.pipelineVitals || { runsThisMonth: 0, estimatedTokensUsed: 0 };
+            project.pipelineVitals.lastRunAt = vitals.completedAt;
+            project.pipelineVitals.lastRunDurationMs = vitals.pipelineLatencyMs;
+            project.pipelineVitals.lastPathUsed = vitals.pathUsed;
+            project.pipelineVitals.cacheHitRate = vitals.cacheHitRate;
+            project.pipelineVitals.runsThisMonth += 1;
+            project.pipelineVitals.estimatedTokensUsed += vitals.estimatedTokensUsed;
+        }
 
         // Save discovery source classifications if any
-        if (result.discovery.sourceClassifications) {
-            project.sourceClassifications = result.discovery.sourceClassifications;
+        if (discovery.sourceClassifications) {
+            project.sourceClassifications = discovery.sourceClassifications;
         }
 
         await this.projectRepo.createOrUpdate(project);
+
+        // Broadcast SSE notification (without payload — frontend fetches from DB)
+        this.sseManager.broadcastToTenant(project.tenantId, 'discovery_updated', {
+            projectId: project.id
+        });
     }
 }
 

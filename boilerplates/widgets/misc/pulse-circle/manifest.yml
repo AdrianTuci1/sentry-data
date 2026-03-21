@@ -1,0 +1,12 @@
+title: Pulse Circle
+description: "A dynamic pulsing circle visualization used to represent a single real-time metric or status. The intensity of the pulse can indicate activity level or health."
+data_requirements: ["value"]
+sql_aliases:
+  - value: "display value"
+data_structure_template:
+  value: "98"
+grid_span: "default"
+color_theme: "theme-color"
+sdui:
+  mapping_mode: single
+  root_key: data

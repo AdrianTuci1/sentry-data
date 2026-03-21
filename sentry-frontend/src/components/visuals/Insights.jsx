@@ -22,19 +22,17 @@ const Insights = observer(() => {
             }
 
             try {
+                // Fetch FULLY HYDRATED data (server-side orchestration)
                 const res = await ProjectService.getAnalytics(projectId);
 
-                // Get Dashboards
-                if (res.data && res.data.dashboards && res.data.dashboards.length > 0) {
+                if (res.data && res.data.dashboards) {
                     setAnalyticsData(res.data.dashboards);
                 } else {
-                    setAnalyticsData(fallbackAnalyticsData);
+                    setAnalyticsData([]); // Show "Nothing to see here" if no data at all
                 }
-
-
             } catch (error) {
-                console.warn("[Insights] Failed to fetch analytics, using fallback.", error);
-                setAnalyticsData(fallbackAnalyticsData);
+                console.warn("[Insights] Failed to fetch analytics from backend.", error);
+                setAnalyticsData([]); // Set empty to trigger "Nothing to see here"
             } finally {
                 setIsLoading(false);
             }
@@ -65,20 +63,25 @@ const Insights = observer(() => {
             </div>
 
             <div className={`insights-grid ${expandedCardId ? 'has-expanded' : ''}`}>
-                {analyticsData.map((data) => {
-                    const isExpanded = expandedCardId === data.id;
-                    // If a card is expanded, we hide all others to give a focused view.
-                    if (expandedCardId && !isExpanded) return null;
+                {analyticsData.length > 0 ? (
+                    analyticsData.map((data) => {
+                        const isExpanded = expandedCardId === data.id;
+                        if (expandedCardId && !isExpanded) return null;
 
-                    return (
-                        <MicroGraphicCard
-                            key={data.id}
-                            data={data}
-                            isExpanded={isExpanded}
-                            onClick={handleCardClick}
-                        />
-                    );
-                })}
+                        return (
+                            <MicroGraphicCard
+                                key={data.id}
+                                data={data}
+                                isExpanded={isExpanded}
+                                onClick={handleCardClick}
+                            />
+                        );
+                    })
+                ) : (
+                    <div className="nothing-to-see">
+                        <p>Nothing to see here</p>
+                    </div>
+                )}
             </div>
 
             {expandedCardId && (

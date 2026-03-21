@@ -1,0 +1,14 @@
+title: Scanning Orbit
+description: "A radar-like scanning visualization. Ideal for security monitoring, discovery processes, or representing an active search across a network or geographic area."
+data_requirements: ["value", "unit"]
+sql_aliases:
+  - value: "display value"
+  - unit: "unit label"
+data_structure_template:
+  value: "3"
+  unit: "active"
+grid_span: "default"
+color_theme: "theme-productivity"
+sdui:
+  mapping_mode: single
+  root_key: data

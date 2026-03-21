@@ -1,0 +1,81 @@
+/* Lead Clustering Styles */
+.clustering-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    gap: 10px;
+}
+
+.clustering-graph-wrapper {
+    flex: 0 0 60%;
+    width: 100%;
+}
+
+.leads-list-wrapper {
+    flex: 1;
+    width: 100%;
+    overflow-y: auto;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.leads-list-title {
+    color: #9CA3AF;
+    font-size: 10px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    letter-spacing: 0.05em;
+}
+
+.leads-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+}
+
+.lead-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.lead-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.lead-name {
+    color: #E5E7EB;
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.lead-meta {
+    color: #6B7280;
+    font-size: 8px;
+}
+
+.lead-status-badge {
+    font-size: 8px;
+    padding: 1px 3px;
+    border-radius: 2px;
+    font-weight: 600;
+}
+
+/* Custom scrollbar */
+.leads-list-wrapper::-webkit-scrollbar {
+    width: 4px;
+}
+
+.leads-list-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.leads-list-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}

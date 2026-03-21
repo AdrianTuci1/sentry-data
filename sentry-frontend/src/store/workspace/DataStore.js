@@ -16,12 +16,13 @@ export class DataStore {
     }
 
     // Computed properties for easy access to data subsets
-    get tables() { return this.data?.tables || []; }
-    get metricGroups() { return this.data?.metricGroups || []; }
-    get predictionModels() { return this.data?.predictionModels || []; }
-    get advancedAnalytics() { return this.data?.advancedAnalytics || []; }
-    get dashboards() { return this.data?.dashboards || []; }
-    get dashboardGroups() { return this.data?.dashboardGroups || []; }
+    // New hierarchy getters
+    get connector() { return this.data?.connector || []; }
+    get actionType() { return this.data?.actionType || []; }
+    get origin() { return this.data?.origin || []; }
+    get adjustedData() { return this.data?.adjustedData || []; }
+    get group() { return this.data?.group || []; }
+    get insight() { return this.data?.insight || []; }
+
     get metrics() { return this.data?.metrics || { precision: 0, recall: 0, roi: 0 }; }
-    get features() { return this.data?.features || []; }
 }

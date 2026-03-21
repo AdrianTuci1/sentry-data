@@ -1,0 +1,13 @@
+title: Waffle
+description: "A grid of squares where each square represents a portion of the whole (usually 1%). Best for showing progress against a goal or market share in a visually distinct way."
+data_requirements: ["label", "value", "percentage"]
+sql_aliases:
+  - name: "category label"
+  - val: "current count"
+  - pct: "percentage of total"
+data_structure_template:
+  data: [{ "name": "Success", "val": 85, "pct": 85 }]
+grid_span: "col-span-1"
+sdui:
+  mapping_mode: single
+  root_key: data

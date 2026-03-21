@@ -27,22 +27,17 @@ const ProjectDashboard = observer(() => {
                 if (projectId) {
                     const response = await ProjectService.getProject(projectId);
 
-                    // If project exists but has no custom ML metadata, check if there's a specific mock payload, if not fallback to the main JSON
                     if (response.data && response.data.discoveryMetadata) {
                         console.log(`[Dashboard] Using backend discovery for ${projectId}`);
-                        // Populate Workspace/MindMap
                         workspaceStore.data.setData(response.data.discoveryMetadata);
-                        return;
+                    } else {
+                        // Explicitly set null/empty to show "Please connect a source"
+                        workspaceStore.data.setData(null);
                     }
                 }
             } catch (err) {
-                console.warn("[Dashboard] Backend fetch failed, falling back to local mock data.", err);
-            }
-
-            // FALLBACK to local mock data
-            if (projectData.workspaceData) {
-                console.log("[Dashboard] Using local projectData.json fallback");
-                workspaceStore.data.setData(projectData.workspaceData);
+                console.warn("[Dashboard] Backend fetch failed.", err);
+                workspaceStore.data.setData(null);
             }
         };
 

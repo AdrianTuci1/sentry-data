@@ -1,0 +1,18 @@
+title: "Predictive Analytics Card"
+description: "A high-performance prediction card showing historical trends vs future forecasts with confidence intervals."
+data_requirements: ["historical_series", "forecast_series", "confidence_bounds"]
+sql_aliases:
+  - value: "primary current/predicted value"
+  - unit: "unit string"
+  - historical: "numeric array for historical trend"
+  - forecast: "numeric array for predicted trend"
+data_structure_template:
+  value: "$1,450"
+  unit: "est"
+  historical: [1100, 1150, 1200, 1180, 1250]
+  forecast: [1280, 1300, 1320, 1450]
+  confidenceRange: [40, 60, 80]
+grid_span: "col-span-2"
+sdui:
+  mapping_mode: "single" # Predictive often needs a specific single object state
+  root_key: "prediction"

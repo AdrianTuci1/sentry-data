@@ -32,12 +32,12 @@ const DATASETS: DatasetConfig[] = [
         type: 'parquet',
         cronSchedule: '0 2 * * *',
     },
-    {
-        name: 'Olist Order Items',
-        localFile: 'order_items.parquet',
-        type: 'parquet',
-        cronSchedule: '0 2 * * *',
-    },
+    // {
+    //     name: 'Olist Order Items',
+    //     localFile: 'order_items.parquet',
+    //     type: 'parquet',
+    //     cronSchedule: '0 2 * * *',
+    // },
     {
         name: 'Olist Products',
         localFile: 'products.parquet',
@@ -113,31 +113,29 @@ async function seed() {
 
         const boilerplatesPath = path.join(__dirname, '../../boilerplates');
 
-        const uploadSubDir = async (subDir: string, bucketPrefix: string, extensions: string[]) => {
-            const dirPath = path.join(boilerplatesPath, subDir);
-            if (!fs.existsSync(dirPath)) return;
+        const uploadDirectory = async (localDirPath: string, bucketPrefix: string) => {
+            if (!fs.existsSync(localDirPath)) return;
 
-            const files = fs.readdirSync(dirPath);
-            for (const file of files) {
-                if (extensions.some(ext => file.endsWith(ext))) {
-                    const filePath = path.join(dirPath, file);
-                    const key = `${bucketPrefix}/${file}`;
+            const items = fs.readdirSync(localDirPath, { withFileTypes: true });
+            for (const item of items) {
+                const fullLocalPath = path.join(localDirPath, item.name);
+                const bucketKey = `${bucketPrefix}/${item.name}`;
+
+                if (item.isDirectory()) {
+                    await uploadDirectory(fullLocalPath, bucketKey);
+                } else if (item.isFile()) {
                     await s3Client.send(new PutObjectCommand({
                         Bucket: config.r2.bucketData,
-                        Key: key,
-                        Body: fs.readFileSync(filePath)
+                        Key: bucketKey,
+                        Body: fs.readFileSync(fullLocalPath)
                     }));
-                    console.log(`[R2] Uploaded: ${key}`);
+                    console.log(`[R2] Uploaded: ${bucketKey}`);
                 }
             }
         };
 
-        console.log('\n[R2] Uploading System Boilerplates & Configs...');
-        await uploadSubDir('tasks', 'system/boilerplates/tasks', ['.py']);
-        await uploadSubDir('prompts', 'system/boilerplates/prompts', ['.txt']);
-        await uploadSubDir('config', 'system/config', ['.yml', '.json']);
-        await uploadSubDir('manager', 'system/boilerplates/manager', ['.py']);
-        await uploadSubDir('snippets/ml', 'system/boilerplates/snippets/ml', ['.py']);
+        console.log('\n[R2] Uploading System Boilerplates...');
+        await uploadDirectory(boilerplatesPath, 'system/boilerplates');
 
         // ── STEP 3: UPLOAD DATASETS & CREATE SOURCE CONNECTORS ──
 

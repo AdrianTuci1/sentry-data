@@ -12,12 +12,8 @@ You are an expert Data Engineer. Your job is to transform ONE specific raw Bronz
 After execution, output a JSON block prefixed with 'AGENT_DISCOVERY:' that describes the resulting table structure.
 The JSON must follow this exact structure to be compatible with the frontend workspace:
 {
-  "type": "tables",
-  "id": "normalization_0",
-  "title": "GA4 Normalized Source",
-  "source": { "id": "s_ga4", "name": "GA4", "type": "stream" },
-  "lineage": { "action": "Normalization", "type": "transform" },
-  "findings": ["Summarize 1-2 key technical findings here"],
-  "transformations": ["List 1-2 key actions here like 'Dropped nested items'"]
+  "connector": [{"id": "conn_{INJECTED_SOURCE_ID}", "name": "{INJECTED_SOURCE_ID}", "type": "ecommerce", "status": "ok"}],
+  "actionType": [{"id": "act_{INJECTED_SOURCE_ID}", "connector_id": "conn_{INJECTED_SOURCE_ID}", "name": "Batch Ingestion", "status": "ok"}],
+  "origin": [{"id": "org_{INJECTED_SOURCE_ID}", "action_type_id": "act_{INJECTED_SOURCE_ID}", "name": "{INJECTED_SOURCE_ID} Raw", "status": "ok"}]
 }
-Note: Generate IDs like c1, c2, etc., based on column index.
+Note: Ensure you include all three layers in the payload.

@@ -14,19 +14,24 @@ declare global {
 /**
  * Factory for creating the AuthMiddleware so it can have dependencies injected.
  */
-export const requireAuth = (_authService: AuthService) => {
+export const requireAuth = (authService: AuthService) => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
+            let token = '';
             const authHeader = req.headers.authorization;
-            if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            
+            if (authHeader && authHeader.startsWith('Bearer ')) {
+                token = authHeader.split(' ')[1];
+            } else if (req.query.token && typeof req.query.token === 'string') {
+                token = req.query.token;
+            }
+
+            if (!token) {
                 throw new AppError('Not authorized. No Bearer token provided.', 401);
             }
 
-            const token = authHeader.split(' ')[1];
-
-            // TEMPORARY: Bypass strict validation and use mock tenant
-            // const tenantId = await authService.validateTokenAndGetTenant(token);
-            const tenantId = 'test_tenant_1';
+            // Use AuthService (which has the mock bypass for 'mock-tenant-token-123')
+            const tenantId = await authService.validateTokenAndGetTenant(token);
 
             // Attach tenantId to request context
             req.tenantId = tenantId;

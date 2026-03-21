@@ -1,0 +1,13 @@
+title: Anomaly Stream
+description: "A real-time or historical feed of detected anomalies. Highlights deviations from normal patterns with severity levels and timestamps."
+data_requirements: ["timestamp", "message", "severity", "score"]
+sql_aliases:
+  - time: "timestamp of anomaly"
+  - msg: "description of the event"
+  - level: "severity (low, medium, high)"
+data_structure_template:
+  anomalies: [{ "time": "2024-03-24T10:00Z", "msg": "Traffic spike", "level": "high" }]
+grid_span: "col-span-2"
+sdui:
+  mapping_mode: list
+  root_key: anomalies

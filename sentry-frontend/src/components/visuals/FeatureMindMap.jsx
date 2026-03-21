@@ -12,22 +12,22 @@ const FeatureMindMap = observer(({ onNodeClick, showCosts = false }) => {
     // Destructure from sub-stores
     const { scale, pan, selectedItems: selectedColumns } = ui;
     const {
-        tables,
-        metricGroups,
-        predictionModels,
-        advancedAnalytics,
-        dashboards,
-        dashboardGroups
+        connector,
+        actionType,
+        origin,
+        adjustedData,
+        group,
+        insight
     } = data;
 
     // Layout Logic moved to hook
     const { layout } = useMindMapLayout({
-        tables,
-        metricGroups,
-        predictionModels,
-        advancedAnalytics,
-        dashboards,
-        dashboardGroups
+        connector,
+        actionType,
+        origin,
+        adjustedData,
+        group,
+        insight
     });
 
     const onToggleSelection = (id) => ui.toggleSelection(id);
@@ -39,6 +39,9 @@ const FeatureMindMap = observer(({ onNodeClick, showCosts = false }) => {
     const activeTrace = useMemo(() => {
         if (!hoveredNodeId) return null;
 
+        // Create a lookup map for faster node type checking
+        const nodeMap = new Map(layout.nodes.map(n => [n.id, n]));
+
         const visitedNodes = new Set([hoveredNodeId]);
         const visitedEdges = new Set();
         const queue = [hoveredNodeId];
@@ -46,18 +49,29 @@ const FeatureMindMap = observer(({ onNodeClick, showCosts = false }) => {
         // Trace Backwards (Target -> Source)
         while (queue.length > 0) {
             const currentId = queue.shift();
+            const currentNode = nodeMap.get(currentId);
+
+            if (!currentNode) continue;
 
             // Find all edges where target === currentId
             layout.edges.forEach(edge => {
                 if (edge.targetId === currentId) {
                     visitedEdges.add(edge.id);
-                    if (edge.sourceId && !visitedNodes.has(edge.sourceId)) {
-                        visitedNodes.add(edge.sourceId);
-
-                        // Check source node type to stop recursion at Metrics/Features (Layer 2)
-                        const sourceNode = layout.nodes.find(n => n.id === edge.sourceId);
-                        if (sourceNode && sourceNode.type !== 'idea') {
-                            queue.push(edge.sourceId);
+                    const sourceId = edge.sourceId;
+                    if (sourceId && !visitedNodes.has(sourceId)) {
+                        // Logic to stop propagation:
+                        // 1. If we are entering an 'idea' (column) node, we stop searching ITS parents.
+                        // 2. If we are entering a 'group' node from an insight, we stop searching ITS parents.
+                        const sourceNode = nodeMap.get(sourceId);
+                        
+                        visitedNodes.add(sourceId);
+                        
+                        // Stop if we reach a column (leaf), or a category (data source) 
+                        // This ensures the trace stays within the dashboard area when starting from insights.
+                        const isStopType = sourceNode?.type === 'idea' || sourceNode?.type === 'category';
+                        
+                        if (!isStopType) {
+                            queue.push(sourceId);
                         }
                     }
                 }
@@ -93,7 +107,7 @@ const FeatureMindMap = observer(({ onNodeClick, showCosts = false }) => {
                                     fill="none"
                                     stroke={isTrace ? "#A8C7FA" : "#505357"}
                                     strokeWidth={isTrace ? 2 : 1.5}
-                                    className={clsx("transition-all duration-300", isDimmed ? "opacity-10" : (isTrace ? "opacity-100" : "opacity-60"))}
+                                    className={clsx("transition-all duration-300", isDimmed ? "opacity-5" : (isTrace ? "opacity-100" : "opacity-30"))}
                                 />
                             );
                         })}
@@ -103,10 +117,10 @@ const FeatureMindMap = observer(({ onNodeClick, showCosts = false }) => {
                     {layout.nodes.map(node => {
                         const isTraceNode = activeTrace ? activeTrace.nodes.has(node.id) : false;
                         const isDimmedNode = activeTrace && !isTraceNode;
-                        const baseOpacity = isDimmedNode ? "opacity-20 blur-[1px]" : "opacity-100";
+                        const baseOpacity = isDimmedNode ? "opacity-5 blur-[2px]" : "opacity-100";
                         const baseTransition = "transition-all duration-300";
 
-                        // SOURCE NODE (Leftmost - Layer 0)
+                        // CONNECTION NODE (Far Left - Layer 0)
                         if (node.type === 'source') {
                             const Icon = node.iconType === 'db' ? Database :
                                 node.iconType === 'api' ? Globe :
@@ -144,7 +158,9 @@ const FeatureMindMap = observer(({ onNodeClick, showCosts = false }) => {
                             );
                         }
 
-                        // CATEGORY NODES (Middle)
+
+
+                        // CATEGORY NODES (Middle - Adjusted Data)
                         if (node.type === 'category') {
                             const childIds = node.data?.childIds || [];
                             const isClickable = childIds.length > 0;
@@ -162,11 +178,11 @@ const FeatureMindMap = observer(({ onNodeClick, showCosts = false }) => {
                                 >
                                     <div className={clsx(
                                         "w-3 h-3 rounded-full border z-10 shrink-0 mr-3 transition-colors",
-                                        isClickable ? "bg-[#444746] border-[#555] group-hover/cat:bg-[#555] group-hover/cat:border-[#777]" : "bg-[#444746] border-[#555]"
+                                        isClickable ? "bg-[#A8C7FA]/50 border-[#A8C7FA]/80 group-hover/cat:bg-[#A8C7FA] group-hover/cat:border-white" : "bg-[#444746] border-[#555]"
                                     )} />
                                     <span className={clsx(
-                                        "text-[#C4C7C5] font-medium text-sm transition-colors",
-                                        isClickable && "group-hover/cat:text-[#E3E3E3]"
+                                        "text-[#E3E3E3] font-semibold text-sm transition-colors",
+                                        isClickable && "group-hover/cat:text-white"
                                     )}>{node.label}</span>
                                 </div>
                             );
@@ -258,6 +274,21 @@ const FeatureMindMap = observer(({ onNodeClick, showCosts = false }) => {
                     })}
                 </div>
             </div>
+
+            {/* Empty State Overlay */}
+            {layout.nodes.length === 0 && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0B0D0E]/50 backdrop-blur-[2px] z-50 pointer-events-auto">
+                    <div className="flex flex-col items-center bg-[#1E1F20] border border-[#444746] p-10 rounded-3xl shadow-2xl max-w-md text-center">
+                        <div className="w-16 h-16 bg-[#2D2E30] rounded-2xl flex items-center justify-center mb-6 border border-[#444746]">
+                            <Database size={32} className="text-[#A8C7FA] opacity-50" />
+                        </div>
+                        <h3 className="text-[#E3E3E3] text-xl font-semibold mb-2">No Data Discovered Yet</h3>
+                        <p className="text-[#8E918F] text-sm leading-relaxed">
+                            Please connect a source and you will see data as we find it.
+                        </p>
+                    </div>
+                </div>
+            )}
         </div>
     );
 });

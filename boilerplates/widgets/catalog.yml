@@ -1,0 +1,161 @@
+3d-map:
+  description: Represents a geospatial visualization using Mapbox. Ideal for showing
+    events, locations, or spatiotemporal trends on a 3D terrain.
+  path: spatiotemporal/3d-map/manifest.yml
+animated-line:
+  description: A real-time flowing line chart for high-frequency data streams. Perfect
+    for monitoring live server load, stock prices, or sensor data.
+  path: operational/animated-line/manifest.yml
+anomaly-stream:
+  description: A real-time or historical feed of detected anomalies. Highlights deviations
+    from normal patterns with severity levels and timestamps.
+  path: ml/anomaly-stream/manifest.yml
+attribution:
+  description: Compares different attribution models (First Touch, Last Touch, Linear,
+    Time Decay) to show how they distribute credit across marketing channels.
+  path: marketing/attribution/manifest.yml
+audience-copilot:
+  description: An AI-powered conversational interface for exploring audience insights.
+    Provides natural language summaries and suggested actions based on segment data.
+  path: misc/audience-copilot/manifest.yml
+budget-sensitivity:
+  description: Analysis of how changes in budget allocation affect KPIs. Helps in
+    identifying the 'sweet spot' for ad spend vs return.
+  path: financial/budget-sensitivity/manifest.yml
+chrono-dial:
+  description: A radial visualization for time-based data. Best for showing cyclical
+    patterns or distribution of events across a 24-hour period or week.
+  path: misc/chrono-dial/manifest.yml
+cohorts:
+  description: A retention heatmap showing how groups of users (cohorts) behave over
+    time. Crucial for understanding long-term value and churn patterns.
+  path: marketing/cohorts/manifest.yml
+covariance:
+  description: A matrix showing how different variables change together. Useful for
+    identifying which features are strongly correlated (positive or negative) in a
+    dataset.
+  path: charts/covariance/manifest.yml
+creative-quadrant:
+  description: A 2x2 matrix plotting ad creatives based on 'Engagement' vs 'Cost Efficiency'.
+    Helps in identifying 'Winners', 'Budget Wasters', and 'Potentials'.
+  path: creative/creative-quadrant/manifest.yml
+emotion-wave:
+  description: Backend-driven widget for Emotion Wave.
+  path: misc/emotion-wave/manifest.yml
+funnel:
+  description: Visualizes the drop-off across sequential stages of a user journey
+    or process.
+  path: marketing/funnel/manifest.yml
+heatmap-cartesian:
+  description: Shows density or activity distribution across two dimensions (e.g.
+    time vs day, region vs category).
+  path: charts/heatmap-cartesian/manifest.yml
+incremental-lift:
+  description: Measures the 'true' lift provided by a campaign by comparing test vs
+    control groups. Essential for determining actual ROI beyond simple attribution.
+  path: marketing/incremental-lift/manifest.yml
+intensity-heat:
+  description: Shows density or activity distribution across two dimensions (e.g.
+    time vs day, region vs category).
+  path: charts/intensity-heat/manifest.yml
+intent-sunburst:
+  description: A multi-level pie chart visualizing the hierarchy of user intent or
+    interests. Shows how broad categories break down into specific sub-interests.
+  path: marketing/intent-sunburst/manifest.yml
+lead-clustering:
+  description: Visualizes groups of similar leads based on behavioral or demographic
+    features. Useful for segmenting audiences for targeted campaigns.
+  path: ml/lead-clustering/manifest.yml
+leads-list:
+  description: A table listing specific actionable entities (leads, users, devices)
+    with their status and scores.
+  path: operational/leads-list/manifest.yml
+liquid-gauge:
+  description: A visually appealing gauge that fills like liquid. Perfect for representing
+    tank levels, completion percentages, or budget consumption.
+  path: misc/liquid-gauge/manifest.yml
+market-evolution:
+  description: A dynamic area or line chart showing how market share or competitive
+    landscape has evolved over time. Tracks multiple competitors simultaneously.
+  path: marketing/market-evolution/manifest.yml
+market-radar:
+  description: A radar (spider) chart showing brand performance or sentiment across
+    multiple dimensions like 'Price', 'Quality', 'Service', and 'Innovation'.
+  path: marketing/market-radar/manifest.yml
+neural-nexus:
+  description: Visualizes complex relationships or network effects between entities
+    (users, nodes, transactions). Ideal for fraud detection, social network analysis,
+    or supply chain mapping.
+  path: ml/neural-nexus/manifest.yml
+optimal-time:
+  description: Identifies the best time to take an action (e.g. sending an email or
+    launching an ad) based on historical response rates across days and hours.
+  path: spatiotemporal/optimal-time/manifest.yml
+predictive:
+  description: A high-performance prediction card showing historical trends vs future
+    forecasts with confidence intervals.
+  path: predictive/predictive/manifest.yml
+pulse-circle:
+  description: A dynamic pulsing circle visualization used to represent a single real-time
+    metric or status. The intensity of the pulse can indicate activity level or health.
+  path: misc/pulse-circle/manifest.yml
+radar:
+  description: A radar chart comparing marketing channel performance across multiple
+    KPIs like 'CPA', 'LTV', 'CTR', and 'Volume'.
+  path: marketing/radar/manifest.yml
+range-area:
+  description: An area chart that highlights the gap between two series (upper and
+    lower bounds). Perfect for showing volatility, confidence intervals, or temperature
+    ranges.
+  path: charts/range-area/manifest.yml
+sankey:
+  description: Visualizes flow between categories. Ideal for showing funnel drop-offs,
+    user journey transitions, or budget allocations across departments.
+  path: charts/sankey/manifest.yml
+scanning-orbit:
+  description: A radar-like scanning visualization. Ideal for security monitoring,
+    discovery processes, or representing an active search across a network or geographic
+    area.
+  path: misc/scanning-orbit/manifest.yml
+scatter:
+  description: Shows relationship between two numeric variables (X and Y). Useful
+    for identifying correlations, clusters, or outliers in datasets like 'Profit vs
+    Ad Spend'.
+  path: charts/scatter/manifest.yml
+semi-circle:
+  description: A semi-circular gauge or donut chart. Good for showing a single percentage-based
+    metric in a space-efficient way, like 'Target vs Actual' or 'Conversion Rate'.
+  path: charts/semi-circle/manifest.yml
+shapley-attribution:
+  description: Uses Shapley values from cooperative game theory to fairly attribute
+    credit to various marketing channels or features. Highly precise for multi-touch
+    attribution.
+  path: ml/shapley-attribution/manifest.yml
+simple-graphics:
+  description: A collection of micro-visualizations (weather, natural patterns, color
+    sliders) for adding aesthetic highlights or simplified status indicators.
+  path: misc/simple-graphics/manifest.yml
+stream-graph:
+  description: A type of stacked area graph which is displaced around a central axis,
+    resulting in a flowing, organic shape. Ideal for visualizing high-volume time-series
+    data like 'Traffic Sources over Time' or 'Revenue Streams'.
+  path: charts/stream-graph/manifest.yml
+trend-spotter:
+  description: Identifies early-stage trends and topics by scanning social media or
+    search data. Highlights growing interest before it reaches mass market.
+  path: marketing/trend-spotter/manifest.yml
+vitals:
+  description: Real-time health monitoring for systems or processes. Displays critical
+    'up/down' status and key performance indicators like 'Latency', 'Error Rate',
+    and 'Uptime'.
+  path: operational/vitals/manifest.yml
+waffle:
+  description: A grid of squares where each square represents a portion of the whole
+    (usually 1%). Best for showing progress against a goal or market share in a visually
+    distinct way.
+  path: charts/waffle/manifest.yml
+waterfall:
+  description: Visualizes how an initial value is affected by a series of intermediate
+    positive or negative changes. Ideal for financial statements, profit-and-loss
+    analysis, or inventory changes.
+  path: financial/waterfall/manifest.yml

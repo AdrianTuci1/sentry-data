@@ -15,9 +15,11 @@ export class SSEManager {
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
+        // Prevent Nginx/Proxy buffering
+        res.setHeader('X-Accel-Buffering', 'no');
 
-        // Send initial heartbeat
-        res.write('data: {"message": "Connected to Sentry Analytics Stream"}\n\n');
+        // Send initial connection message immediately
+        res.write(`data: ${JSON.stringify({ type: 'connected', message: "Connected to Sentry Analytics Stream" })}\n\n`);
 
         const tenantClients = this.clients.get(tenantId) || [];
         tenantClients.push(res);
@@ -25,8 +27,14 @@ export class SSEManager {
 
         console.log(`[SSE] Client connected for Tenant: ${tenantId}. Total: ${tenantClients.length}`);
 
+        // Setup heartbeat interval (every 30 seconds) to prevent idle timeouts
+        const heartbeat = setInterval(() => {
+            res.write(': heartbeat\n\n');
+        }, 30000);
+
         // Cleanup on connection close
         req.on('close', () => {
+            clearInterval(heartbeat);
             this.removeClient(tenantId, res);
         });
     }

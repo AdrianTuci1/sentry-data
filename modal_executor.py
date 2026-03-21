@@ -24,15 +24,17 @@ def sandbox_executor(data: dict):
     """
     env_vars = data.get("envVars", {})
     
-    # Setăm variabilele de mediu (Prompts, R2 URIs etc.)
-    # Modal le va aplica procesului de execuție
+    # We must NOT mutate os.environ globally since Modal endpoints are 
+    # executed concurrently in the same process/container instance.
+    local_env = os.environ.copy()
     for key, val in env_vars.items():
-        os.environ[key] = str(val)
+        local_env[key] = str(val)
 
     try:
         # Fișierul este deja în /root/agent_manager.py datorită .add_local_file de mai sus!
         result = subprocess.run(
             ["python", "/root/agent_manager.py"],
+            env=local_env,
             capture_output=True,
             text=True,
             timeout=540  # 9 min — sub limita de 600s a funcției Modal

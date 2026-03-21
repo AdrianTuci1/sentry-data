@@ -1,62 +1,53 @@
 import os
 import duckdb
 import json
+from datetime import datetime
 
 # ==========================================
-# AGENT 1: DISCOVERY & NORMALIZATION
+# AGENT 1: DATA NORMALIZER (Bronze → Silver)
 # ==========================================
+# Infrastructure & Context
+tenant_id       = os.environ.get("tenantId", "unknown")
+project_id      = os.environ.get("projectId", "unknown")
+task_name       = os.environ.get("taskName", "Normalization_unknown")
+r2_bucket       = os.environ.get("R2_BUCKET", "statsparrot-data")
 
-INJECTED_RAW_URI = os.environ.get("INJECTED_RAW_URI") 
-INJECTED_NORMALIZED_URI = os.environ.get("INJECTED_NORMALIZED_URI")
+# Extract source_id (e.g. Normalization_Olist_Products -> Olist_Products)
+source_id       = task_name.replace("Normalization_", "") if "Normalization_" in task_name else "default"
+
+# Path Inference (Zero-Injection)
+current_date    = datetime.now().strftime("%Y-%m-%d")
+RAW_GLOB        = f"s3://{r2_bucket}/tenants/{tenant_id}/projects/{project_id}/bronze/{source_id}/*/*.parquet"
+NORMALIZED_URI  = f"s3://{r2_bucket}/tenants/{tenant_id}/projects/{project_id}/silver/{source_id}/{current_date}/normalized.parquet"
 
 def run_normalization():
     con = duckdb.connect(database=':memory:')
     con.execute("INSTALL httpfs; LOAD httpfs;")
     con.execute(f"SET s3_region='{os.environ.get('R2_REGION', 'auto')}';")
     con.execute(f"SET s3_endpoint='{os.environ.get('R2_ENDPOINT_CLEAN', '')}';")
-    con.execute(f"SET s3_access_key_id='{os.environ.get('R2_ACCESS_KEY_ID', '')}';")
+    con.execute(f"SET s3_access_key_id='{os.environ.get('R2_ACCES_KEY_ID') or os.environ.get('R2_ACCESS_KEY_ID', '')}';")
     con.execute(f"SET s3_secret_access_key='{os.environ.get('R2_SECRET_ACCESS_KEY', '')}';")
-    safe_columns = []
-    dropped_columns = []
-    
+    con.execute("SET s3_use_ssl=true;")
+    con.execute("SET s3_url_style='path';")
+
     try:
-        # Discovery Step
-        schema = con.execute(f"DESCRIBE SELECT * FROM read_parquet('{INJECTED_RAW_URI}')").fetchall()
-        
-        # Exclude complex nested types
-        for i, col in enumerate(schema):
-            col_name, col_type = col[0], col[1]
-            if not col_type.startswith('STRUCT') and not col_type.startswith('LIST'):
-                safe_columns.append(f'"{col_name}"')
-            else:
-                dropped_columns.append(col_name)
-                
-        cols_str = ", ".join(safe_columns) if safe_columns else "*"
-        
-        # Discovery Reporting (Frontend Compatibility)
-        discovery_info = {
-            "type": "tables",
-            "id": "normalization_0",
-            "title": "Normalized Source",
-            "source": { "id": "s_raw", "name": "Raw Source", "type": "parquet" },
-            "lineage": { "action": "Normalization", "type": "transform" },
-            "findings": [f"Discovered {len(schema)} columns in raw source"],
-            "transformations": [
-                f"Kept {len(safe_columns)} simple columns",
-                f"Dropped {len(dropped_columns)} complex nested columns" if dropped_columns else "No complex columns found"
-            ]
+        print("\n1. Discovery & Instructions:")
+        print("--- TASK_SPECIFIC_INSTRUCTIONS_START ---")
+        print("A. ANALYZE BRONZE: Use con.execute to analyze the 'RAW_GLOB' schema.")
+        print("B. NORMALIZE: Cast columns for consistency (dates, currencies, IDs).")
+        print("C. DE-DUPE: Remove duplicates based on primary keys if possible.")
+        print("D. SAVE TO SILVER: Store as a single Parquet file at 'NORMALIZED_URI'.")
+        print("E. DISCOVERY: Report project structure to MindMap using the following format:")
+        print(f'   AGENT_DISCOVERY:{{"connector": [{{"id": "conn_{source_id}", "name": "{source_id}", "type": "ecommerce", "status": "ok"}}], "actionType": [{{"id": "act_{source_id}", "connector_id": "conn_{source_id}", "name": "Batch Ingestion", "status": "ok"}}]}}')
+        print("--- TASK_SPECIFIC_INSTRUCTIONS_END ---")
+
+        # Example Output structure
+        result = {
+            "sourceId": source_id,
+            "success": True,
+            "silverUri": NORMALIZED_URI
         }
-        print(f"AGENT_DISCOVERY:{json.dumps(discovery_info)}")
-        
-        # EXECUTION: Create Silver Table
-        normalization_query = f"""
-            COPY (
-                SELECT {cols_str} FROM read_parquet('{INJECTED_RAW_URI}')
-            ) TO '{INJECTED_NORMALIZED_URI}' (FORMAT PARQUET);
-        """
-        con.execute(normalization_query)
-        
-        print(f"AGENT_RESULT:{{\"status\": \"success\", \"output_uri\": \"{INJECTED_NORMALIZED_URI}\"}}")
+        print(f"AGENT_RESULT:{json.dumps(result)}")
         
     except Exception as e:
         print(f"AGENT_ERROR:{str(e)}")

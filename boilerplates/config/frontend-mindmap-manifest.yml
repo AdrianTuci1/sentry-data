@@ -1,89 +1,67 @@
 # Frontend MindMap Node Manifest
-# This file describes the permitted node categories and their internal data structures
-# that the AI agents must use when generating discovery metadata for the FeatureMindMap.
+# ---------------------------------------------------------
+# HIERARCHY: connector > actionType > adjustedData > group > insight
 
-# 1. Sources (Layer 0)
-# Represents the origin of data
-sources:
-  types:
-    - db       # Database (e.g., PostgreSQL, Snowflake)
-    - api      # API Endpoint (e.g., Stripe, Shopify)
-    - stream   # Clickstream / Event Bus (e.g., Kafka, Segment)
-    - compute  # Compute Cluster (e.g., Spark, Dataflow)
-    - ml       # ML Platform (e.g., Sagemaker, Vertex)
-    - transform # Transform Engine (e.g., dbt)
-
-# 2. Categories (Middle Layers)
-# These are the main groupings that appear in the MindMap.
-# Each category contains a specific type of child nodes.
-categories:
-  tables:
-    description: "Raw or lightly normalized datasets (Silver Layer)."
-    children_key: "columns"
-    child_schema:
-      id: "string (unique)"
-      name: "string"
-      type: "string (Integer, Float, String, Date, Boolean)"
-      status: "enum (ok, warning, error)"
-      issue: "string (optional, required if status is warning/error)"
-
-  metricGroups:
-    description: "Business metrics and KPIs derived from tables (Gold Layer)."
-    children_key: "metrics"
-    child_schema:
-      id: "string (unique)"
-      name: "string"
-      value: "string (e.g., '$50k', '140%', 'Calculated')"
-      status: "enum (ok, warning, error)"
-      issue: "string (optional)"
-
-  predictionModels:
-    description: "ML predictions or forecasts."
-    children_key: "predictions"
-    child_schema:
-      id: "string (unique)"
-      name: "string"
-      status: "enum (ok, warning, error)"
-      issue: "string (optional)"
-
-  advancedAnalytics:
-    description: "Complex analytical outputs (Sentiment, Graphs, NLP)."
-    children_key: "items"
-    child_schema:
-      id: "string (unique)"
-      name: "string"
-      status: "enum (ok, warning, error)"
-      issue: "string (optional)"
-
-# 3. Aggregation (Layer 3)
-# Groups that aggregate metrics/columns/predictions to be displayed together on dashboards
-dashboardGroups:
-  description: "Logical groupings for dashboards (e.g., 'Executive Views', 'System Health')."
-  schema:
+# 1. CORE DISCOVERY SCHEMAS
+# ---------------------------------------------------------
+schemas:
+  status_node: &status_node
     id: "string (unique)"
-    title: "string"
-    sources: "array of strings (Must be IDs of columns, metrics, predictions, or items from the categories above)"
+    name: "string"
+    status: "enum (ok, warning, error)"
+    issue: "string (optional)"
 
-# Example Output from AI Agent (Data Normalizer / Silver Layer):
-# {
-#   "type": "tables",
-#   "id": "t1",
-#   "title": "Shopify Orders",
-#   "source": { "id": "s1", "name": "Shopify API", "type": "api" },
-#   "lineage": { "action": "API Ingestion", "type": "transform" },
-#   "columns": [
-#     { "id": "c1", "name": "revenue", "type": "Float", "status": "ok" }
-#   ]
-# }
+  column_node:
+    <<: *status_node
+    type: "string (Integer, Float, String, Date, Boolean)"
 
-# Example Output from AI Agent (Feature Engineer / Gold Layer):
-# {
-#   "type": "metricGroups",
-#   "id": "g1",
-#   "title": "Financial KPIs",
-#   "source": { "id": "t1", "name": "Shopify Orders", "type": "transform" },
-#   "lineage": { "action": "SQL Aggregation", "type": "job" },
-#   "metrics": [
-#     { "id": "m1", "name": "LTV", "value": "$450", "status": "ok" }
-#   ]
-# }
+  metric_node:
+    <<: *status_node
+    value: "string (e.g. '$1.2M', '98%', 'Calculated')"
+
+# 2. HIERARCHICAL LAYERS
+# ---------------------------------------------------------
+# These are the keys AI agents MUST use in AGENT_DISCOVERY: { ... }
+# Use prefixes (e.g. cnn_, act_, org_, adj_) to ensure uniqueness.
+
+layers:
+  connector:
+    description: "The primary data provider (e.g. Shopify, Google)."
+    schema: "status_node"
+  
+  actionType:
+    description: "The ingestion method (e.g. batch, stream)."
+    schema: "status_node"
+
+  adjustedData:
+    description: "The Gold Layer / Feature Engineered datasets."
+    items_key: "columns"
+    schema: "column_node"
+    lineage:
+      parent_key: "action_type_id"
+
+  group:
+    description: "Logical groupings for insights (e.g. Executive KPI)."
+    schema:
+      id: "string (unique)"
+      title: "string"
+      adjusted_data_ids: ["string (IDs of adjustedData used by insights in this group)"]
+
+  insight:
+    description: "Individual visual widgets (The WIDGET CATALOG)."
+    schema:
+      id: "string (unique)"
+      title: "string"
+      type: "string (WIDGET_ID)"
+      query: "string (DuckDB SQL)"
+      group_id: "string (Must match group.id)"
+      lineage:
+        source_keys: ["string (adjustedData_ids)"]
+      adjusted_data_columns: ["string (column names used in query)"]
+
+# ---------------------------------------------------------
+# SOVEREIGN REPORTING PROTOCOL
+# ---------------------------------------------------------
+# 1. CONTEXT: feature_engineer.py reports adjustedData + lineage (act > cnn).
+# 2. INSIGHTS: query_generator.py reports groups + insights.
+# 3. NO SILVER: Do NOT report raw tables/columns from Silver layer to MindMap.

@@ -3,6 +3,8 @@ import { ProjectRepository } from '../infrastructure/repositories/ProjectReposit
 import { TenantRepository } from '../infrastructure/repositories/TenantRepository';
 import { SourceRepository } from '../infrastructure/repositories/SourceRepository';
 import { AnalyticsService } from '../application/services/AnalyticsService';
+import { WidgetService } from '../application/services/WidgetService';
+import { WidgetRenderer } from '../application/utils/WidgetRenderer';
 import { AuthService } from '../application/services/AuthService';
 import { DashboardController } from '../api/controllers/DashboardController';
 import { HealthController } from '../api/controllers/HealthController';
@@ -46,7 +48,9 @@ export function initContainer() {
 
     // 3. Initialize Domain Services 
     const authService = new AuthService(tenantRepo);
-    const analyticsService = new AnalyticsService(projectRepo);
+    const widgetService = new WidgetService(r2StorageService);
+    const widgetRenderer = new WidgetRenderer(r2StorageService);
+    const analyticsService = new AnalyticsService(projectRepo, widgetService, widgetRenderer);
     
     // Pipeline Architectural Components
     const { AgentExecutor } = require('../application/pipeline/AgentExecutor');
@@ -54,14 +58,15 @@ export function initContainer() {
     const { MLPathRunner } = require('../application/pipeline/MLPathRunner');
     
     const agentExecutor = new AgentExecutor(sandboxProvider, r2StorageService);
-    const pipelineRunner = new PipelineRunner(agentExecutor, r2StorageService, sseManager, projectRepo);
-    const mlPathRunner = new MLPathRunner(agentExecutor, r2StorageService, sseManager);
+    const pipelineRunner = new PipelineRunner(agentExecutor, r2StorageService, sseManager, projectRepo, widgetService);
+    const mlPathRunner = new MLPathRunner(agentExecutor, r2StorageService, sseManager, widgetService, projectRepo);
     
     const orchestrationService = new OrchestrationService(
         pipelineRunner,
         mlPathRunner,
         projectRepo,
-        sseManager
+        sseManager,
+        widgetService
     );
     
     const pipelineOrchestratorService = new PipelineOrchestratorService(orchestrationService, sourceRepo);

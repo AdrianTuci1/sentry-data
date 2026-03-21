@@ -1,0 +1,18 @@
+title: Vitals
+description: "Real-time health monitoring for systems or processes. Displays critical 'up/down' status and key performance indicators like 'Latency', 'Error Rate', and 'Uptime'."
+data_requirements: ["metrics"]
+sql_aliases:
+  - name: "metric name"
+  - value: "metric value"
+  - status: "health status (good, warning, critical)"
+data_structure_template:
+  metrics:
+    - { "name": "LCP", "value": "1.2s", "status": "good" }
+    - { "name": "FID", "value": "14ms", "status": "good" }
+    - { "name": "CLS", "value": "0.04", "status": "good" }
+    - { "name": "Errors", "value": "0.1%", "status": "good" }
+grid_span: "default"
+color_theme: "theme-weather"
+sdui:
+  mapping_mode: single
+  root_key: metrics

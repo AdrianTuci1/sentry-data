@@ -1,0 +1,14 @@
+title: Animated Line
+description: "A real-time flowing line chart for high-frequency data streams. Perfect for monitoring live server load, stock prices, or sensor data."
+data_requirements: ["timestamp", "value"]
+sql_aliases:
+  - time: "temporal axis"
+  - val: "numeric stream value"
+data_structure_template:
+  value: "142"
+  unit: "req/s"
+  data: [65, 72, 68, 85, 92, 88, 110, 105, 120]
+grid_span: "col-span-2"
+sdui:
+  mapping_mode: single
+  root_key: data

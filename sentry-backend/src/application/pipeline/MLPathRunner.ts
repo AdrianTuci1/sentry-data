@@ -3,16 +3,28 @@ import { SSEManager } from '../../services/sse/SSEManager';
 import { AgentExecutor } from './AgentExecutor';
 import { PipelineContext, PipelineResult } from './types';
 import { config } from '../../config';
+import { WidgetService } from '../services/WidgetService';
+import { ProjectRepository } from '../../infrastructure/repositories/ProjectRepository';
 
 export class MLPathRunner {
     private agentExecutor: AgentExecutor;
     private r2StorageService: R2StorageService;
     private sseManager: SSEManager;
+    private widgetService: WidgetService;
+    private projectRepo: ProjectRepository;
 
-    constructor(agentExecutor: AgentExecutor, r2StorageService: R2StorageService, sseManager: SSEManager) {
+    constructor(
+        agentExecutor: AgentExecutor, 
+        r2StorageService: R2StorageService, 
+        sseManager: SSEManager, 
+        widgetService: WidgetService,
+        projectRepo: ProjectRepository
+    ) {
         this.agentExecutor = agentExecutor;
         this.r2StorageService = r2StorageService;
         this.sseManager = sseManager;
+        this.widgetService = widgetService;
+        this.projectRepo = projectRepo;
     }
 
     /**
@@ -23,11 +35,11 @@ export class MLPathRunner {
         console.log(`[MLPathRunner] Executing ML Path for Project ${ctx.projectId}`);
         const { tenantId, projectId } = ctx;
 
-        const systemBucket = config.r2.bucketData;
-        const boilerplatePrefix = `s3://${systemBucket}/system/boilerplates/tasks`;
-        const promptPrefix = `s3://${systemBucket}/system/boilerplates/prompts`;
-        const manifestUri = `s3://${systemBucket}/system/config/frontend-widget-manifest.yml`;
         const startTime = Date.now();
+
+        // OPTIMIZATION: Fetch existing scripts once to avoid redundant R2 calls
+        const existingScripts = await this.r2StorageService.listScripts(tenantId, projectId);
+        console.log(`[MLPathRunner] Found ${existingScripts.size} existing scripts in project.`);
 
         let cumulativeDiscovery: any = {
             sourceClassifications: [
@@ -41,8 +53,9 @@ export class MLPathRunner {
                 }
             ],
             predictionModels: [],
-            dashboardGroups: [],
-            dashboards: []
+            group: [],
+            insight: [],
+            tables: []
         };
         let estimatedTokensUsed = 0;
         let tasksExecuted: string[] = [];
@@ -73,12 +86,7 @@ export class MLPathRunner {
             tenantId,
             projectId,
             taskName: mlArchitectTaskName,
-            systemPromptUri: `${promptPrefix}/ml_architect.txt`,
-            boilerplateUri: `${boilerplatePrefix}/ml_architect.py`,
-            additionalEnvVars: {
-                'INJECTED_GOLD_URIS': JSON.stringify(goldGlobUris),
-                'INJECTED_SCHEMA_JSON': JSON.stringify(goldSchemas)
-            },
+            existingScripts,
             forceRegenerate: ctx.forceRediscover
         });
 
@@ -105,6 +113,9 @@ export class MLPathRunner {
             status: 'completed'
         });
 
+        // GRANULAR BROADCAST: After ML Architect
+        this.broadcastDiscovery(tenantId, projectId, ctx.discovery, cumulativeDiscovery);
+
         // --- STEP 2: ML EVALUATION & TRAINING ---
         console.log(`[MLPathRunner] STEP 2: Evaluating & Training Models utilizing snippet: ${snippetName}...`);
         const mlTrainerTaskName = 'ML_Trainer';
@@ -114,15 +125,7 @@ export class MLPathRunner {
             tenantId,
             projectId,
             taskName: mlTrainerTaskName,
-            systemPromptUri: `${promptPrefix}/ml_trainer.txt`,
-            boilerplateUri: `s3://${systemBucket}/system/boilerplates/snippets/ml/${snippetName}.py`,
-            additionalEnvVars: {
-                'INJECTED_GOLD_URIS': JSON.stringify(goldGlobUris),
-                'INJECTED_MODEL_OUTPUT_URI': mlModelUri,
-                'INJECTED_TARGET_VARIABLE': targetVariable.replace(/'/g, "\\'"),
-                'INJECTED_STRATEGIC_REASON': strategicReason.replace(/'/g, "\\'"),
-                'INJECTED_SCHEMA_JSON': JSON.stringify(goldSchemas)
-            },
+            existingScripts,
             forceRegenerate: ctx.forceRediscover
         });
         
@@ -147,6 +150,9 @@ export class MLPathRunner {
             discovery: trainingResult.discovery
         });
 
+        // GRANULAR BROADCAST: After ML Trainer
+        this.broadcastDiscovery(tenantId, projectId, ctx.discovery, cumulativeDiscovery);
+
         // --- STEP 2: ML INFERENCE ---
         console.log(`[MLPathRunner] STEP 2: Running ML Inference...`);
         const today = new Date().toISOString().split('T')[0];
@@ -158,15 +164,7 @@ export class MLPathRunner {
             tenantId,
             projectId,
             taskName: mlInferenceTaskName,
-            systemPromptUri: `${promptPrefix}/ml_inference.txt`,
-            boilerplateUri: `${boilerplatePrefix}/ml_inference.py`,
-            additionalEnvVars: {
-                'INJECTED_NORMALIZED_URIS': JSON.stringify(effectiveSourceNames.map(name => this.r2StorageService.getSilverGlobUri(tenantId, projectId, name))),
-                'INJECTED_MODEL_URI': mlModelUri,
-                'INJECTED_PREDICTIONS_OUTPUT_URI': predictionsUri,
-                'INJECTED_TARGET_VARIABLE': targetVariable.replace(/'/g, "\\'"),
-                'INJECTED_SCHEMA_JSON': JSON.stringify(goldSchemas)
-            },
+            existingScripts,
             forceRegenerate: ctx.forceRediscover
         });
 
@@ -179,6 +177,23 @@ export class MLPathRunner {
             status: 'completed'
         });
 
+        // GRANULAR BROADCAST: After ML Inference
+        this.broadcastDiscovery(tenantId, projectId, ctx.discovery, cumulativeDiscovery);
+
+        // --- STEP 2.5: ML DISCOVERY (Virtual Table) ---
+        // We create a virtual table entry so the frontend recognizes "ML Insights Engine" as a connector
+        const mlPredictionTable = {
+            id: `gold_table_${modelId}`,
+            title: `ML Insights Engine > Prediction > ${snippetName.charAt(0).toUpperCase() + snippetName.slice(1)}`,
+            source: { id: 'ml_insights_engine', name: `ML Predictions (${targetVariable})`, type: 'ml_agent' },
+            lineage: { action: "ML Inference", type: "predict" },
+            columns: [
+                { id: `c_${modelId}_1`, name: targetVariable, title: targetVariable.replace(/_/g, ' ').toUpperCase(), type: 'Decimal', status: 'ok' },
+                { id: `c_${modelId}_2`, name: 'prediction_date', title: 'Prediction Date', type: 'String', status: 'ok' }
+            ]
+        };
+        cumulativeDiscovery.tables.push(mlPredictionTable);
+
         // --- STEP 3: QUERY GENERATOR V2 (Enhanced) ---
         console.log(`[MLPathRunner] STEP 3: Query Generation v2 (with ML predictions)...`);
         const qgTaskName = 'Query_Generator_V2';
@@ -188,17 +203,7 @@ export class MLPathRunner {
             tenantId,
             projectId,
             taskName: qgTaskName,
-            systemPromptUri: `${promptPrefix}/query_generator_v2.txt`,
-            boilerplateUri: `${boilerplatePrefix}/query_generator.py`,
-            additionalEnvVars: {
-                'INJECTED_GOLD_URIS': JSON.stringify(goldGlobUris),
-                'INJECTED_PREDICTIONS_URI': predictionsUri,
-                'INJECTED_MANIFEST_URI': manifestUri,
-                'INJECTED_MODEL_TYPE': snippetName,
-                'INJECTED_MODEL_ID': modelId,
-                'INJECTED_TARGET_VARIABLE': targetVariable.replace(/'/g, "\\'"),
-                'INJECTED_STRATEGIC_REASON': strategicReason.replace(/'/g, "\\'")
-            },
+            existingScripts,
             forceRegenerate: ctx.forceRediscover
         });
 
@@ -206,12 +211,10 @@ export class MLPathRunner {
         if (queriesResult.estimatedTokens === 0) hitCount++;
 
         if (queriesResult.discovery) {
-            if (queriesResult.discovery.dashboardGroups) {
-                cumulativeDiscovery.dashboardGroups = queriesResult.discovery.dashboardGroups;
-            }
-            if (queriesResult.discovery.dashboards) {
-                cumulativeDiscovery.dashboards = queriesResult.discovery.dashboards;
-            }
+            const dg = queriesResult.discovery.group || queriesResult.discovery.dashboardGroups;
+            const db = queriesResult.discovery.insight || queriesResult.discovery.dashboards;
+            if (dg) cumulativeDiscovery.group = Array.isArray(dg) ? dg : [dg];
+            if (db) cumulativeDiscovery.insight = Array.isArray(db) ? db : [db];
         }
 
         this.sseManager.broadcastToTenant(tenantId, 'pipeline_progress', {
@@ -220,6 +223,9 @@ export class MLPathRunner {
             status: 'completed',
             discovery: { queries: queriesResult.discovery }
         });
+
+        // GRANULAR BROADCAST: After ML Query Generation
+        this.broadcastDiscovery(tenantId, projectId, ctx.discovery, cumulativeDiscovery);
 
         const endTime = Date.now();
         console.log(`[MLPathRunner] ML Pipeline ${projectId} Fully Operational. Tokens: ~${estimatedTokensUsed}`);
@@ -237,5 +243,39 @@ export class MLPathRunner {
                 completedAt: new Date(endTime).toISOString()
             }
         };
+    }
+
+    private async broadcastDiscovery(tenantId: string, projectId: string, baseDiscovery: any, mlDiscovery: any) {
+        // Merge using modern keys only
+        const merged = {
+            ...(baseDiscovery || {}),
+            tables: [...(baseDiscovery?.tables || []), ...(mlDiscovery.tables || [])],
+            metricGroups: [...(baseDiscovery?.metricGroups || []), ...(mlDiscovery.metricGroups || [])],
+            group: [...(baseDiscovery?.group || []), ...(mlDiscovery.group || [])],
+            insight: [...(baseDiscovery?.insight || []), ...(mlDiscovery.insight || [])],
+            sourceClassifications: [...(baseDiscovery?.sourceClassifications || []), ...(mlDiscovery.sourceClassifications || [])],
+            predictionModels: [...(baseDiscovery?.predictionModels || []), ...(mlDiscovery.predictionModels || [])]
+        };
+
+        // SSE notification only (frontend fetches from DB)
+        this.sseManager.broadcastToTenant(tenantId, 'discovery_updated', {
+            projectId
+        });
+
+        // PERSISTENCE (R2 & DB):
+        // 1. Save to R2 so Sovereign Agents can pull it (Zero-Injection Context)
+        await this.r2StorageService.saveDiscovery(tenantId, projectId, merged);
+
+        // 2. Save to DB for backend state
+        try {
+            const project = await this.projectRepo.findById(tenantId, projectId);
+            if (project) {
+                project.discoveryMetadata = merged;
+                await this.projectRepo.createOrUpdate(project);
+                console.log(`[MLPathRunner] Granular discovery persisted for ${projectId}`);
+            }
+        } catch (err: any) {
+            console.warn(`[MLPathRunner] Failed to persist granular discovery: ${err.message}`);
+        }
     }
 }

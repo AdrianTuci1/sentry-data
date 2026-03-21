@@ -1,465 +1,245 @@
 
 import { useMemo } from 'react';
 
-export const useMindMapLayout = ({ tables = [], metricGroups = [], predictionModels = [], advancedAnalytics = [], dashboards = [], dashboardGroups = [], title = "Prediction Model" }) => {
+export const useMindMapLayout = ({ 
+    connector = [], 
+    actionType = [], 
+    origin = [],
+    adjustedData = [], 
+    group = [], 
+    insight = [],
+    title = "Data Pipeline" 
+}) => {
     // Stats Calculation
     const stats = useMemo(() => {
         let errors = 0;
         let warnings = 0;
-        // Check tables
-        tables.forEach(t => (t.columns || []).forEach(c => {
+        
+        const checkStatus = (list) => list.forEach(item => {
+            if (item.status === 'error') errors++;
+            if (item.status === 'warning') warnings++;
+        });
+
+        checkStatus(connector);
+        checkStatus(actionType);
+        adjustedData.forEach(adj => (adj.columns || []).forEach(c => {
             if (c.status === 'error') errors++;
             if (c.status === 'warning') warnings++;
         }));
-        // Check metric groups
-        metricGroups.forEach(g => (g.metrics || []).forEach(m => {
-            if (m.status === 'error') errors++;
-            if (m.status === 'warning') warnings++;
-        }));
-        // Check prediction models
-        predictionModels.forEach(m => (m.predictions || []).forEach(p => {
-            if (p.status === 'error') errors++;
-            if (p.status === 'warning') warnings++;
-        }));
-        // Check advanced analytics
-        advancedAnalytics.forEach(g => (g.items || []).forEach(i => {
-            if (i.status === 'error') errors++;
-            if (i.status === 'warning') warnings++;
-        }));
-        // Check dashboards
-        dashboards.forEach(g => (g.items || []).forEach(i => {
-            if (i.status === 'error') errors++;
-            if (i.status === 'warning') warnings++;
-        }));
+        checkStatus(insight);
+
         return { errors, warnings };
-    }, [tables, metricGroups, predictionModels, advancedAnalytics, dashboards]);
+    }, [connector, actionType, origin, adjustedData, group, insight]);
 
     // Layout Calculation
     const layout = useMemo(() => {
         const nodes = [];
         const edges = [];
 
-        // Config
-        const ROOT_X = -450; // Central Hub
-        const CATEGORY_X = -200; // Features Column
-        const FEATURE_X = 220; // Leaf Nodes (Layer 2)
-        const GROUP_X = 600; // New Dashboard Groups (Layer 3)
-        const DASHBOARD_X = 950; // Dashboards (Layer 4)
+        // X-Coordinates for Layers
+        const X_CONNECTOR  = -800;
+        const X_ACTION     = -550;
+        const X_ORIGIN     = -325;
+        const X_ADJUSTED   = -100;
+        const X_COLUMNS    = 250;
+        const X_GROUP      = 650;
+        const X_INSIGHT    = 1000;
 
         const ITEM_HEIGHT = 55;
         const GROUP_GAP = 90;
 
-        // Helper: Calculate total height of a set of tables/groups
-        const getSetHeight = (items) => items.reduce((acc, t) => acc + (t.columns?.length || t.metrics?.length || t.items?.length || 0), 0) * ITEM_HEIGHT;
+        // 1. DATA (CENTER BRANCH) - Centered around Y=0
+        let startY = 0;
+        
+        // We'll calculate total height of adjustedData to center it
+        const totalAdjHeight = adjustedData.reduce((acc, adj) => acc + (adj.columns?.length || 1) * ITEM_HEIGHT, 0) + (adjustedData.length - 1) * GROUP_GAP;
+        startY = -(totalAdjHeight / 2);
 
-        // Calculate vertical offsets
-        const tablesTotalHeight = getSetHeight(tables);
-        const metricsTotalHeight = getSetHeight(metricGroups);
-        const predictionsTotalHeight = getSetHeight(predictionModels);
-        const analyticsTotalHeight = getSetHeight(advancedAnalytics);
-
-        // Calculate height for 3rd layer (Groups)
-        const groupItemHeight = 70;
-        const totalGroupHeight = dashboardGroups.reduce((acc, group) => {
-            // Support both snake_case (group_id from agent) and camelCase (groupId)
-            const groupDashboards = dashboards.filter(db => db && (db.group_id === group.id || db.groupId === group.id));
-            const dbHeight = groupDashboards.length * 70;
-            return acc + Math.max(groupItemHeight, dbHeight + 30);
-        }, 0);
-
-        // Calculate height for 4th layer (Dashboards) - approximate for centering
-        // Or we can center groups based on their own content?
-        // Let's base the main startY on the Layer 2 content (Features) as that's the anchor
-        const totalContentHeight = tablesTotalHeight + metricsTotalHeight + predictionsTotalHeight + analyticsTotalHeight + (GROUP_GAP * 3);
-        let startY = -(totalContentHeight / 2);
-
-        // --- 1. Layer 2 Generation (Features / metrics / etc) ---
-        const featureNodes = [];
-
-        // Helper to find Y of a node we just pushed
-        function featNodeY(allNodes, id) {
-            const n = allNodes.find(n => n.id === id);
-            return n ? n.y : 0;
-        }
-
-        // Tables
-        tables.forEach((table) => {
-            const tableFeatures = table.columns || [];
-            const validChildIds = tableFeatures.filter(c => c.status !== 'error').map(c => c.id);
-            const tableStartY = startY;
-
-            tableFeatures.forEach((col) => {
-                const featNode = {
-                    id: col.id,
+        adjustedData.forEach((adj) => {
+            const columns = adj.columns || [];
+            const adjStartY = startY;
+            
+            columns.forEach((col) => {
+                const uniqueColId = `${adj.id}-${col.id}`;
+                const colNode = {
+                    id: uniqueColId,
                     type: 'idea',
-                    label: col.name,
+                    label: col.title || col.name,
                     data: col,
-                    x: FEATURE_X,
+                    x: X_COLUMNS,
                     y: startY,
-                    parentId: `table-${table.id}`
+                    parentId: `adj-${adj.id}`
                 };
-                nodes.push(featNode);
+                nodes.push(colNode);
                 startY += ITEM_HEIGHT;
             });
 
-            const tableEndY = startY - ITEM_HEIGHT;
-            const tableY = (tableStartY + tableEndY) / 2;
+            const adjEndY = startY - ITEM_HEIGHT;
+            const adjY = (adjStartY + adjEndY) / 2;
 
-            const catNode = {
-                id: `table-${table.id}`,
+            const adjNode = {
+                id: `adj-${adj.id}`,
                 type: 'category',
-                label: table.title,
-                x: CATEGORY_X,
-                y: tableY,
-                parentId: 'root',
-                data: { childIds: validChildIds }
+                label: adj.title || adj.name,
+                x: X_ADJUSTED,
+                y: adjY,
+                parentId: `org-${adj.origin_id || 'root'}`,
+                data: { childIds: columns.map(c => c.id), ...adj }
             };
-            nodes.push(catNode);
-            featureNodes.push(catNode);
+            nodes.push(adjNode);
 
-            tableFeatures.forEach(col => {
+            columns.forEach(col => {
+                const uniqueColId = `${adj.id}-${col.id}`;
                 edges.push({
-                    id: `edge-${table.id}-${col.id}`,
-                    sourceId: `table-${table.id}`,
-                    targetId: col.id,
-                    source: { x: CATEGORY_X, y: tableY },
-                    target: { x: FEATURE_X, y: featNodeY(nodes, col.id) }
+                    id: `edge-adj-${adj.id}-${col.id}`,
+                    sourceId: `adj-${adj.id}`,
+                    targetId: uniqueColId,
+                    source: { x: X_ADJUSTED, y: adjY },
+                    target: { x: X_COLUMNS, y: nodes.find(n => n.id === uniqueColId).y }
                 });
             });
+
+            startY += GROUP_GAP;
         });
 
-        if (tables.length > 0) startY += GROUP_GAP;
+        // 2. LINEAGE (LEFT SIDE: Origin > ActionType > Connector)
+        // Position based on the adjustedData Y positions
+        adjustedData.forEach(adj => {
+            const adjNode = nodes.find(n => n.id === `adj-${adj.id}`);
+            if (!adjNode) return;
 
-        // Metric Groups
-        // NOTE: Skip groups that only have 'columns' (not 'metrics') — those are Gold table
-        // schema repeated by the feature_engineer and would duplicate the tables layer.
-        const metricGroupNodes = [];
-        metricGroups.forEach((group) => {
-            const groupMetrics = group.metrics || [];
-            // If there are no real business metrics (only columns), skip rendering
-            if (groupMetrics.length === 0) return;
-
-            const validChildIds = groupMetrics.filter(m => m.status !== 'error').map(m => m.id);
-            const groupStartY = startY;
-
-            groupMetrics.forEach((metric) => {
-                const metricNode = {
-                    id: metric.id,
-                    type: 'idea',
-                    label: metric.name,
-                    data: { ...metric, isMetric: true },
-                    x: FEATURE_X,
-                    y: startY,
-                    parentId: `group-${group.id}`
-                };
-                nodes.push(metricNode);
-                startY += ITEM_HEIGHT;
-            });
-
-            const groupEndY = startY - ITEM_HEIGHT;
-            const groupY = (groupStartY + groupEndY) / 2;
-
-            const groupNode = {
-                id: `group-${group.id}`,
-                type: 'category',
-                label: group.title,
-                x: CATEGORY_X,
-                y: groupY,
-                parentId: 'root',
-                data: { childIds: validChildIds }
-            };
-            nodes.push(groupNode);
-            metricGroupNodes.push(groupNode);
-
-            groupMetrics.forEach(metric => {
-                edges.push({
-                    id: `edge-${group.id}-${metric.id}`,
-                    sourceId: `group-${group.id}`,
-                    targetId: metric.id,
-                    source: { x: CATEGORY_X, y: groupY },
-                    target: { x: FEATURE_X, y: featNodeY(nodes, metric.id) }
-                });
-            });
-        });
-
-        if (metricGroups.length > 0) startY += GROUP_GAP;
-
-        // Prediction Models
-        const predictionNodes = [];
-        predictionModels.forEach((model) => {
-            const predictions = model.predictions || [];
-            const validChildIds = predictions.filter(p => p.status !== 'error').map(p => p.id);
-            const modelStartY = startY;
-
-            predictions.forEach((pred) => {
-                const predNode = {
-                    id: pred.id,
-                    type: 'idea',
-                    label: pred.name,
-                    data: { ...pred, isPrediction: true },
-                    x: FEATURE_X,
-                    y: startY,
-                    parentId: `model-${model.id}`
-                };
-                nodes.push(predNode);
-                startY += ITEM_HEIGHT;
-            });
-
-            const modelEndY = startY - ITEM_HEIGHT;
-            const modelY = (modelStartY + modelEndY) / 2;
-
-            const modelNode = {
-                id: `model-${model.id}`,
-                type: 'category',
-                label: model.title,
-                x: CATEGORY_X,
-                y: modelY,
-                parentId: 'root',
-                data: { childIds: validChildIds }
-            };
-            nodes.push(modelNode);
-            predictionNodes.push(modelNode);
-
-            predictions.forEach(pred => {
-                edges.push({
-                    id: `edge-${model.id}-${pred.id}`,
-                    sourceId: `model-${model.id}`,
-                    targetId: pred.id,
-                    source: { x: CATEGORY_X, y: modelY },
-                    target: { x: FEATURE_X, y: featNodeY(nodes, pred.id) }
-                });
-            });
-        });
-
-        if (predictionModels.length > 0) startY += GROUP_GAP;
-
-        // Advanced Analytics
-        const analyticsNodes = [];
-        advancedAnalytics.forEach((group) => {
-            const items = group.items || [];
-            const validChildIds = items.filter(i => i.status !== 'error').map(i => i.id);
-            const groupStartY = startY;
-
-            items.forEach((item) => {
-                const itemNode = {
-                    id: item.id,
-                    type: 'idea',
-                    label: item.name,
-                    data: { ...item, isAnalytics: true },
-                    x: FEATURE_X,
-                    y: startY,
-                    parentId: `analytics-${group.id}`
-                };
-                nodes.push(itemNode);
-                startY += ITEM_HEIGHT;
-            });
-
-            const groupEndY = startY - ITEM_HEIGHT;
-            const groupY = (groupStartY + groupEndY) / 2;
-
-            const groupNode = {
-                id: `analytics-${group.id}`,
-                type: 'category',
-                label: group.title,
-                x: CATEGORY_X,
-                y: groupY,
-                parentId: 'root',
-                data: { childIds: validChildIds }
-            };
-            nodes.push(groupNode);
-            analyticsNodes.push(groupNode);
-
-            items.forEach(item => {
-                edges.push({
-                    id: `edge-${group.id}-${item.id}`,
-                    sourceId: `analytics-${group.id}`,
-                    targetId: item.id,
-                    source: { x: CATEGORY_X, y: groupY },
-                    target: { x: FEATURE_X, y: featNodeY(nodes, item.id) }
-                });
-            });
-        });
-
-        // --- 2. Layer 3: Dashboard Groups ---
-        // We need to position these groups. Let's center them vertically around the same center, but maybe spaced out?
-        // Or list them out like we did for categories?
-        // Let's list them out
-        let groupY = -(totalGroupHeight / 2);
-
-        dashboardGroups.forEach(group => {
-            const groupNode = {
-                id: group.id,
-                type: 'group', // New type
-                label: group.title,
-                x: GROUP_X,
-                y: groupY,
-                parentId: 'root', // Effectively root relative
-            };
-            nodes.push(groupNode);
-
-            // Edges: adjusted_data_columns → Group
-            // group.sources contains insight IDs (not column IDs), so we use
-            // each dashboard's adjusted_data_columns to find the actual column nodes.
-            const adjustedColIds = new Set();
-            const previewDashboards = dashboards.filter(
-                db => db && (db.group_id === group.id || db.groupId === group.id)
-            );
-            previewDashboards.forEach(db => {
-                (db.adjusted_data_columns || []).forEach(colName => {
-                    // Column nodes are keyed by id (c_0, c_1...) but their label/name is the column name
-                    const colNode = nodes.find(n => n.label === colName || n.data?.name === colName);
-                    if (colNode) adjustedColIds.add(colNode.id);
-                });
-            });
-            adjustedColIds.forEach(colId => {
-                const sourceNode = nodes.find(n => n.id === colId);
-                if (sourceNode) {
-                    edges.push({
-                        id: `edge-${colId}-${group.id}`,
-                        sourceId: colId,
-                        targetId: group.id,
-                        source: { x: sourceNode.x, y: sourceNode.y },
-                        target: { x: GROUP_X, y: groupY },
-                        isGroupConnection: true
-                    });
-                }
-            });
-
-            // Find dashboards that belong to this group.
-            // Agent uses snake_case group_id; support both snake_case and camelCase for safety.
-            const groupDashboards = dashboards.filter(db => db && (db.group_id === group.id || db.groupId === group.id));
-
-            // Position dashboards to the right of this group
-            // Spread them vertically centered around the groupY?
-            const dbItemHeight = 60;
-            const totalDbHeight = groupDashboards.length * dbItemHeight;
-            let dbY = groupY - (totalDbHeight / 2) + (dbItemHeight / 2);
-
-            // Adjust groupY step to encompass its children? 
-            // Better: Simple tree layout. If we have multiple children, spread them.
-            // For now, let's keep it simple.
-
-            groupDashboards.forEach(db => {
-                const dbNode = {
-                    id: db.id,
-                    type: 'card',
-                    label: db.title || db.name, // Fix: Use title from agent discovery
-                    data: { ...db, isDashboard: true },
-                    x: DASHBOARD_X,
-                    y: dbY,
-                    parentId: group.id
-                };
-                nodes.push(dbNode);
-
-                // Edge: Group -> Dashboard
-                edges.push({
-                    id: `edge-${group.id}-${db.id}`,
-                    sourceId: group.id,
-                    targetId: db.id,
-                    source: { x: GROUP_X, y: groupY },
-                    target: { x: DASHBOARD_X, y: dbY },
-                    isDashboardConnection: true
-                });
-
-                dbY += dbItemHeight;
-            });
-
-            // Move groupY down
-            // If the dashboards take up more space than the group itself (usually yes), we should increment by that height?
-            const verticalSpace = Math.max(groupItemHeight, totalDbHeight + 20);
-            groupY += verticalSpace;
-        });
-
-
-        // --- 4. Layer 0 & 1: Sources & Transformations (Replaces Root) ---
-        // Iterate tables to generate Sources and Actions to the left
-        const SOURCE_X = -600;
-        const ACTION_X = -400;
-
-        // Create a unified list of all second-layer categories to process
-        const allCategories = [
-            ...tables.map(t => ({ ...t, catId: `table-${t.id}` })),
-            ...metricGroups.map(g => ({ ...g, catId: `group-${g.id}` })),
-            ...predictionModels.map(m => ({ ...m, catId: `model-${m.id}` })),
-            ...advancedAnalytics.map(a => ({ ...a, catId: `analytics-${a.id}` }))
-        ];
-
-        allCategories.forEach(item => {
-            if (item.source) {
-                // 1. Source Node
-                let sourceNode = nodes.find(n => n.id === item.source.id);
-
-                // If source node exists, check if we need to adjust its position?
-                // Ideally it sits centrally relative to all its children. 
-                // For simplicity, we create it at the Y of the first child encountered if not exists.
-                const categoryNode = nodes.find(n => n.id === item.catId);
-
-                if (!sourceNode && categoryNode) {
-                    sourceNode = {
-                        id: item.source.id,
-                        type: 'source',
-                        label: item.source.name,
-                        iconType: item.source.type,
-                        x: SOURCE_X,
-                        y: categoryNode.y
-                    };
-                    nodes.push(sourceNode);
-                }
-
-
-                // 2. Action Node
-                // Action is usually 1:1 with the Category (Transform job -> File/MetricSet)
-                if (item.lineage && categoryNode && sourceNode) {
-                    const actionId = `action-${item.id}`;
-
-                    const actionNode = {
-                        id: actionId,
+            // 1. ActionType
+            const act = actionType.find(a => a.id === adj.action_type_id) || actionType.find(a => origin.find(o => o.id === adj.origin_id)?.action_type_id === a.id);
+            if (act) {
+                let actNode = nodes.find(n => n.id === `act-${act.id}`);
+                if (!actNode) {
+                    actNode = {
+                        id: `act-${act.id}`,
                         type: 'action',
-                        label: item.lineage.action,
-                        x: ACTION_X,
-                        y: categoryNode.y
+                        label: act.name,
+                        x: X_ACTION,
+                        y: adjNode.y,
+                        data: act
                     };
-                    nodes.push(actionNode);
+                    nodes.push(actNode);
+                }
 
-                    // Edge: Source -> Action
-                    edges.push({
-                        id: `edge-${sourceNode.id}-${actionId}`,
-                        sourceId: sourceNode.id,
-                        targetId: actionId,
-                        source: { x: sourceNode.x, y: sourceNode.y },
-                        target: { x: actionNode.x, y: actionNode.y }
-                    });
+                edges.push({
+                    id: `edge-act-${act.id}-adj-${adj.id}`,
+                    sourceId: `act-${act.id}`,
+                    targetId: `adj-${adj.id}`,
+                    source: { x: X_ACTION, y: actNode.y },
+                    target: { x: X_ADJUSTED, y: adjNode.y }
+                });
 
-                    // Edge: Action -> Category Node
+                // 2. Connector
+                const conn = connector.find(c => c.id === act.connector_id) || connector[0];
+                if (conn) {
+                    let connNode = nodes.find(n => n.id === `conn-${conn.id}`);
+                    if (!connNode) {
+                        connNode = {
+                            id: `conn-${conn.id}`,
+                            type: 'source',
+                            label: conn.name,
+                            iconType: conn.type,
+                            x: X_CONNECTOR,
+                            y: actNode.y,
+                            data: conn
+                        };
+                        nodes.push(connNode);
+                    }
+
                     edges.push({
-                        id: `edge-${actionId}-${categoryNode.id}`,
-                        sourceId: actionId,
-                        targetId: categoryNode.id,
-                        source: { x: actionNode.x, y: actionNode.y },
-                        target: { x: categoryNode.x, y: categoryNode.y }
-                    });
-                } else if (sourceNode && categoryNode) {
-                    // Direct Source -> Category
-                    edges.push({
-                        id: `edge-${sourceNode.id}-${categoryNode.id}`,
-                        sourceId: sourceNode.id,
-                        targetId: categoryNode.id,
-                        source: { x: sourceNode.x, y: sourceNode.y },
-                        target: { x: categoryNode.x, y: categoryNode.y }
+                        id: `edge-conn-${conn.id}-act-${act.id}`,
+                        sourceId: `conn-${conn.id}`,
+                        targetId: `act-${act.id}`,
+                        source: { x: X_CONNECTOR, y: connNode.y },
+                        target: { x: X_ACTION, y: actNode.y }
                     });
                 }
             }
         });
 
-        // For other categories (Metrics, Models, etc.), they don't have explicit sources in this mock.
-        // We can leave them unconnected to the left, or connect them to a generic "Data Warehouse" node if we wanted.
-        // For now, let's leave them "floating" on the left or maybe connect them to "Internal DB" if appropriate?
-        // User asked specifically for the "files" flow.
+        // 3. INSIGHTS (RIGHT BRANCH: Group > Insight)
+        // Groups connect to adjustedData via adjusted_data_ids
+        const totalInsightHeight = insight.length * ITEM_HEIGHT + (group.length * GROUP_GAP);
+        let groupStartY = -(totalInsightHeight / 2);
 
-        // Remove old Root Logic
+        group.forEach(grp => {
+            const grpInsights = insight.filter(ins => ins.group_id === grp.id);
+            const grpY = groupStartY + (grpInsights.length * ITEM_HEIGHT) / 2;
+
+            const grpNode = {
+                id: `grp-${grp.id}`,
+                type: 'group',
+                label: grp.title || grp.name,
+                x: X_GROUP,
+                y: grpY,
+                data: grp
+            };
+            nodes.push(grpNode);
+
+            /* 
+            // Connect group to its source adjustedData nodes
+            (grp.adjusted_data_ids || []).forEach(adjId => {
+                const adjNode = nodes.find(n => n.id === `adj-${adjId}`);
+                if (adjNode) {
+                    edges.push({
+                        id: `edge-adj-${adjId}-grp-${grp.id}`,
+                        sourceId: `adj-${adjId}`,
+                        targetId: `grp-${grp.id}`,
+                        source: { x: X_ADJUSTED, y: adjNode.y },
+                        target: { x: X_GROUP, y: grpY },
+                        isDashboardConnection: true
+                    });
+                }
+            });
+            */
+
+            grpInsights.forEach(ins => {
+                const insNode = {
+                    id: ins.id,
+                    type: 'card',
+                    label: ins.title || ins.name,
+                    data: ins,
+                    x: X_INSIGHT,
+                    y: groupStartY + (ITEM_HEIGHT / 2),
+                    parentId: `grp-${grp.id}`
+                };
+                nodes.push(insNode);
+
+                edges.push({
+                    id: `edge-grp-${grp.id}-ins-${ins.id}`,
+                    sourceId: `grp-${grp.id}`,
+                    targetId: ins.id,
+                    source: { x: X_GROUP, y: grpY },
+                    target: { x: X_INSIGHT, y: insNode.y }
+                });
+
+                // Lineage: columns -> Group (tracing lines)
+                (ins.adjusted_data_columns || []).forEach(adjColName => {
+                    const colNode = nodes.find(n => n.data?.name === adjColName && n.type === 'idea' && (ins.lineage?.source_keys || []).some(srcId => n.parentId === `adj-${srcId}`));
+                    if (colNode) {
+                        edges.push({
+                            id: `edge-lin-${colNode.id}-grp-${grp.id}`,
+                            sourceId: colNode.id,
+                            targetId: `grp-${grp.id}`,
+                            source: { x: colNode.x, y: colNode.y },
+                            target: { x: X_GROUP, y: grpY },
+                            isDashboardConnection: true,
+                            isTracingOnly: true
+                        });
+                    }
+                });
+
+                groupStartY += ITEM_HEIGHT;
+            });
+
+            groupStartY += GROUP_GAP;
+        });
 
         return { nodes, edges };
-    }, [tables, metricGroups, predictionModels, advancedAnalytics, dashboards, dashboardGroups, title]);
+    }, [connector, actionType, adjustedData, group, insight, title]);
 
     return { stats, layout };
 };

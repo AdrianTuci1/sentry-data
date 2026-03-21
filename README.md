@@ -63,7 +63,7 @@ Running LLMs on raw code generation is expensive and error-prone. Stats Parrot u
 ### 3. Data Engineering Hot Path (Zero-Token Execution)
 To avoid running expensive LLMs on every ingestion tick, the system utilizes a high-performance **Hot Path**.
 *   **Verified Script Caching:** Once an LLM agent successfully generates a transformation script, it is persisted to Cloudflare R2 as a "Verified Script".
-*   **Zero Token Usage:** If the Bronze schema fingerprint matches the cached state in DynamoDB, the `AgentExecutor` skips the LLM reasoning phase entirely and executes the verified Python script directly.
+*   **Zero Token Usage:** If the Bronze schema fingerprint matches the cached state in DynamoDB, the `Analytics Engine` (triggered by the Orchestrator) skips the LLM reasoning phase entirely and executes the verified Python script directly.
 *   **Self-Healing:** If a schema drifts (e.g., new column), the system automatically falls back to the Cold Path to "self-heal" the logic and update the cached script.
 
 ```json
@@ -112,7 +112,7 @@ Dashboards don't cache stale data; they store SQL templates in DynamoDB.
 }
 ```
 
-*   **DuckDB In-Memory:** When a user opens a dashboard, the Node.js backend (`sentry-analytics-worker`) reads the SQL template and executes it directly against the time-partitioned Gold Parquet files (`gold/*/*.parquet`) via Cloudflare R2.
+*   **Execution Engine:** When a user opens a dashboard, the centralized `Analytics Engine` (Python + DuckDB) reads the SQL template and executes it directly against the time-partitioned Gold Parquet files (`gold/*/*.parquet`) via Cloudflare R2.
 *   **Result:** Live, sub-second analytics without a dedicated data warehouse.
 
 ### 7. Multi-Tenant Security & Code Portability
@@ -127,78 +127,61 @@ Dashboards don't cache stale data; they store SQL templates in DynamoDB.
 
 ```mermaid
 graph TD
-    A[User / UI] -->|1. Request Dashboard| B{Central Backend<br/>Node.js}
+    subgraph command_center [Command Center]
+        A[User / UI]
+        B{Central Backend<br/>Node.js}
+    end
     
-    %% Database & Metadata
-    B <-->|Auth, Projects, Query Configs| Dynamo[(DynamoDB)]
+    subgraph left_panel [Ingestion & System State]
+        Meltano[Ingestion Server<br/>Meltano + Cron]
+        Dynamo[(DynamoDB)]
+        R2_System[(Cloudflare R2<br/>SYSTEM)]
+    end
     
-    %% Separate Ingestion & Storage Layers
-    Meltano[Ingestion Server<br/>Meltano + Cron] -->|Extracts & Uploads| D[(Cloudflare R2<br/>BRONZE)]
-    R2_Silver[(Cloudflare R2<br/>SILVER)]
-    R2_Gold[(Cloudflare R2<br/>GOLD)]
-    
-    %% Sandbox - AI Agent (Cold Path)
-    subgraph ai_engine [AI Data Engineering - Cold Path]
-        B <-->|Webhook Trigger & SSE Streaming| E2B[Modal Sandbox<br/>AI Agents]
-        D -.->|Reads Raw Parquet| E2B
-        E2B <-->|Reads & Writes Clean Parquet| R2_Silver
-        E2B -->|Writes Aggregated Parquet| R2_Gold
-        E2B <-->|Reads/Saves DAG State & SQL| Dynamo
+    subgraph query_engine [Query Engine]
+        subgraph ai_engine [AI Data Engineering - Cold Path]
+            E2B[Modal Sandbox<br/>AI Agents]
+        end
+        subgraph direct_analytics ["Analytics & Execution Engine - Hot & Cold Path<br/><i>(PySpark, DuckDB, Duck Swarm, etc.)</i>"]
+            Analytics[Analytics Server<br/>Python + DuckDB]
+        end
     end
 
-    %% Analytics Engine (Hot Path)
-    subgraph direct_analytics [Direct Analytics Engine - Hot Path]
-        Analytics[Analytics Server<br/>Node.js + DuckDB]
+    subgraph warehouse [Data Warehouse]
+        D[(Cloudflare R2<br/>BRONZE)]
+        R2_Silver[(Cloudflare R2<br/>SILVER)]
+        R2_Gold[(Cloudflare R2<br/>GOLD)]
     end
-    
-    B -->|2. Sends Queries + Tenant ID| Analytics
-    Analytics -->|3. Reads Partitioned Parquet| R2_Gold
-    Analytics -->|4. Returns Calculated JSON| B
+
+    %% Layout Enforcement (Invisible Links)
+    B ~~~ E2B
+    B ~~~ Analytics
+    Analytics ~~~ R2_Silver
+    Analytics ~~~ R2_Gold
+
+    %% Command Center Flow
+    A -->|1. Request Dashboard| B
     B -->|5. Responds with analyticsData.json| A
+    
+    %% Ingestion & Metadata
+    Meltano -->|Extracts & Uploads| D
+    B <-->|Auth, Projects, Query Configs| Dynamo
+    B <-->|Manages Verified Scripts| R2_System
+    E2B <-->|Reads/Writes Cached Scripts| R2_System
+
+    %% AI Sandbox (Cold Path Logic Generation)
+    B <-->|Webhook Trigger & SSE Streaming| E2B
+    E2B <-->|Reads/Saves DAG State & SQL| Dynamo
+    E2B -->|Submits Transformation Queries| Analytics
+
+    %% Analytics Engine Data Access (Hot & Cold Paths Execution)
+    Analytics -.->|Reads Raw Parquet| D
+    Analytics <-->|Reads & Writes Clean Parquet| R2_Silver
+    
+    %% Hot Path (Dashboard Flow & Query Output)
+    B -->|2. Sends Queries + Tenant ID| Analytics
+    Analytics <-->|3. Reads/Writes Aggregated Parquet| R2_Gold
+    Analytics -->|4. Returns Calculated JSON| B
 ```
 
 ---
-
-## ⚙️ 8. Orchestration & Autonomous DAG
-
-The **Orchestration Service** governs data flow by routing through three distinct execution paths based on system state.
-
-### 🔄 Multi-Path Execution Logic
-1.  **🔥 Hot Path (Cached):** Triggered when the incoming schema matches the `schemaFingerprint` in DynamoDB. Skips LLM reasoning to execute **Verified Scripts** directly in Modal sandboxes (Zero Token overhead).
-2.  **❄️ Cold Path (Self-Healing):** Triggered by schema drift. LLM agents dynamically reinvent the transformation logic, updating the R2 script cache and DynamoDB fingerprints.
-3.  **🤖 ML Path (Concept Drift):** Monitors statistical health (Accuracy, RMSE). If drift is detected, it executes a "Challenger" training cycle to replace stale models.
-
-### 📊 DynamoDB: The System Brain
-DynamoDB acts as the Source of Truth for the entire DAG lifecycle:
-*   **Stateful Orchestration:** Stores `cronSchedule`, `schemaFingerprint`, and **Model Health Metrics** to determine the optimal path before execution.
-*   **Discovery Persistence:** Post-execution, it captures new discovery metadata (Lineage, SQL templates) and telemetry, allowing the **Analytics Hot Path** to serve live data without manual SQL updates.
-*   **Scheduling:** Acts as a passive state store; external triggers (Meltano/EventBridge) hit the `/ingestion-complete` hook to initiate the DAG.
-
-
-```mermaid
-graph TD
-    Trigger[Ingestion Trigger<br/>Cron / Webhook] --> FetchState[Fetch Project State<br/>from DynamoDB]
-    FetchState --> CompareFingerprint{Schema<br/>Fingerprint Match?}
-    
-    %% Hot Path
-    CompareFingerprint -- Yes --> HotPath[<b>🔥 Hot Path</b><br/>Zero-Token Execution]
-    HotPath --> ExecuteCached[Execute Verified Script<br/>in Modal Sandbox]
-    ExecuteCached --> UpdateLastRun[Update lastRunAt<br/>in DynamoDB]
-    
-    %% Cold Path
-    CompareFingerprint -- No --> ColdPath[<b>❄️ Cold Path</b><br/>LLM Discovery & Healing]
-    ColdPath --> LLMReasoning[LLM Infers New Schema<br/>& Writes Python Logic]
-    LLMReasoning --> SaveVerified[Save New Verified<br/>Script to R2 Cache]
-    SaveVerified --> UpdateFingerprint[Update schemaFingerprint<br/>in DynamoDB]
-    
-    %% ML Monitoring
-    UpdateLastRun --> MonitorDrift{Detect Concept<br/>Drift?}
-    UpdateFingerprint --> MonitorDrift
-    
-    MonitorDrift -- Yes --> MLPath[<b>🤖 ML Path</b><br/>Model Retraining]
-    MLPath --> TrainChallenger[Train Challenger Model<br/>in Micro-VM]
-    TrainChallenger --> DeployModel[Promote to Champion<br/>in DynamoDB]
-    
-    MonitorDrift -- No --> Finish[Pipeline Operational]
-    DeployModel --> Finish
-```

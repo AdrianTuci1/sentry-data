@@ -12,6 +12,7 @@ export class ProjectStore {
         this.rootStore = rootStore;
         makeAutoObservable(this);
         this.loadProjectsForOrg('org_sentry'); // Load initial mock data
+        this.sseCloser = null;
     }
 
     get currentProject() {
@@ -24,6 +25,50 @@ export class ProjectStore {
 
     selectProject(projectId) {
         this.currentProjectId = projectId;
+        this.reconnectSSE();
+    }
+
+    reconnectSSE() {
+        if (this.sseCloser) {
+            this.sseCloser();
+            this.sseCloser = null;
+        }
+
+        if (this.currentProjectId) {
+            this.sseCloser = ProjectService.connectToPipelineStream(
+                (message) => this.handleSSEMessage(message),
+                (error) => console.error("[ProjectStore] SSE Error:", error)
+            );
+        }
+    }
+
+    async fetchProjectDiscovery(projectId) {
+        try {
+            const res = await ProjectService.getLineage(projectId);
+            if (res && res.data) {
+                runInAction(() => {
+                    this.rootStore.workspaceStore.data.setData(res.data);
+                });
+            }
+        } catch (error) {
+            console.error("[ProjectStore] Failed to fetch latest discovery:", error);
+        }
+    }
+
+    handleSSEMessage(envelope) {
+        const { type, data } = envelope;
+
+        if (type === 'discovery_updated') {
+            const { projectId } = data;
+            if (projectId === this.currentProjectId) {
+                console.log("[ProjectStore] Discovery update notification received, fetching full state from DB...");
+                this.fetchProjectDiscovery(projectId);
+            }
+        }
+
+        if (type === 'pipeline_progress') {
+            console.log("[ProjectStore] Pipeline Progress:", data.step, `${data.progress}%`);
+        }
     }
 
     async loadProjectsForOrg(orgId) {
