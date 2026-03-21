@@ -12,7 +12,7 @@ project_id      = os.environ.get("projectId", "unknown")
 task_name       = os.environ.get("taskName", "FeatureEngineering_unknown")
 r2_bucket       = os.environ.get("R2_BUCKET", "statsparrot-data")
 
-# Extract source_id (e.g. Feature_Engineering_Olist_Products -> Olist_Products)
+# Extract source_id (e.g. Feature_Engineering_Shopify_Orders -> Shopify_Orders)
 source_id       = task_name.replace("Feature_Engineering_", "") if "Feature_Engineering_" in task_name else "default"
 
 def run_feature_engineering():
@@ -35,8 +35,7 @@ def run_feature_engineering():
         print(f"A. ANALYZE SILVER: Read from {normalized_glob}.")
         print("B. FEATURE ENG: Create calculated columns, enrich data, and join if necessary.")
         print(f"C. SAVE TO GOLD: Write final engineered table to {target_gold_uri}.")
-        print('D. REPORT DISCOVERY: Report the GOLD layer structure to the MindMap.')
-        print(f'   AGENT_DISCOVERY:{{"adjustedData": [{{"id": "gold_table_{source_id}", "action_type_id": "act_{source_id}", "name": "Ecommerce > {source_id}", "title": "Engineered {source_id.replace("_", " ")}", "columns": [{{"id": "c_0", "name": "product_name", "type": "VARCHAR", "status": "ok", "title": "Product Name"}}]}}]}}')
+        print('D. REPORT DISCOVERY: Populate and print the AGENT_DISCOVERY JSON using the provided scaffolding at the bottom of this script.')
         print("--- TASK_SPECIFIC_INSTRUCTIONS_END ---")
 
         # Discovery check
@@ -46,13 +45,38 @@ def run_feature_engineering():
         except Exception as e:
             print(f"[Feature Engineer] Warning: Input check failed: {e}")
 
-        # Final result structure for the backend pipeline status
+        # ==========================================
+        # AGENT SCAFFOLDING
+        # ==========================================
         result = {
             "sourceId": source_id,
             "success": True,
             "goldUri": target_gold_uri
         }
+        
+        discovery_columns = []
+        if 'res' in locals() and hasattr(res, 'iterrows'):
+            for idx, row in res.iterrows():
+                discovery_columns.append({
+                    "id": f"c_{idx}",
+                    "name": str(row.get('column_name', '')),
+                    "type": str(row.get('column_type', '')),
+                    "status": "ok",
+                    "title": str(row.get('column_name', '')).replace('_', ' ').title()
+                })
+                
+        discovery = {
+            "adjustedData": [{
+                "id": f"gold_table_{source_id}",
+                "action_type_id": f"act_{source_id}",
+                "name": f"Ecommerce > {source_id}",
+                "title": f"Engineered {source_id.replace('_', ' ')}",
+                "columns": discovery_columns
+            }]
+        }
+        
         print(f"AGENT_RESULT:{json.dumps(result)}")
+        print(f"AGENT_DISCOVERY:{json.dumps(discovery)}")
         
     except Exception as e:
         print(f"AGENT_ERROR:{str(e)}")

@@ -1,8 +1,0 @@
-name: "3D Engagement Map"
-type: "3d-map"
-description: "Mapbox-powered 3D visualization of local engagement."
-grid_span: "col-span-2 row-span-2"
-color_theme: "theme-audience"
-sdui:
-  mapping_mode: "list"
-  root_key: "locations"

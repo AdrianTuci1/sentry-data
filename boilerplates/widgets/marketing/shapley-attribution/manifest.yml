@@ -1,0 +1,10 @@
+title: "Shapley Attribution"
+description: "A boxplot representation of variance across multiple simulation runs for channel attribution."
+data_structure_template:
+  data:
+    - ['Email', 25.4, 2022]
+    - ['Search', 38.1, 2022]
+grid_span: "col-span-2 row-span-2"
+sdui:
+  mapping_mode: "list"
+  root_key: "shapley"

@@ -1,12 +1,8 @@
-title: Budget Sensitivity
-description: "Analysis of how changes in budget allocation affect KPIs. Helps in identifying the 'sweet spot' for ad spend vs return."
-data_requirements: ["spend_delta", "kpi_delta"]
-sql_aliases:
-  - spend: "budget change"
-  - impact: "estimated KPI change"
+title: "Budget Sensitivity"
+description: "Analysis of how changes in budget allocation affect KPIs."
 data_structure_template:
-  data: [{ "spend": 1000, "impact": 150 }]
+  data: [[0, 0.66], [2, 0.81], [4, 1.2]]
 grid_span: "col-span-2"
 sdui:
-  mapping_mode: single
-  root_key: data
+  mapping_mode: "list"
+  root_key: "curvePoints"

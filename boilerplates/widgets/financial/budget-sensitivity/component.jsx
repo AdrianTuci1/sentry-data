@@ -1,18 +1,18 @@
 import React from 'react';
 import ReactECharts from 'echarts-for-react';
 import * as echarts from 'echarts';
+import './style.css';
 
-const BudgetSensitivity = ({ data = {} }) => {
-    const curvePoints = (Array.isArray(data.results) && data.results.length > 0 ? data.results : null) || 
-                        (Array.isArray(data.data) && data.data.length > 0 ? data.data : null) || 
-                        (Array.isArray(data.curvePoints) && data.curvePoints.length > 0 ? data.curvePoints : null) || (() => {
-                            const points = [];
-                            for (let x = 0; x <= 100; x += 2) {
-                                const y = 100 / (1 + Math.exp(-0.1 * (x - 50)));
-                                points.push([x, y]);
-                            }
-                            return points;
-                        })();
+const BudgetSensitivity = ({ data = {}, isMock = false }) => {
+    const curvePoints = (Array.isArray(data.curvePoints) && data.curvePoints.length > 0 ? data.curvePoints : null) || 
+                        (Array.isArray(data.data) && data.data.length > 0 ? data.data : null) || (() => {
+        const points = [];
+        for (let x = 0; x <= 100; x += 2) {
+            const y = 100 / (1 + Math.exp(-0.1 * (x - 50)));
+            points.push([x, y]);
+        }
+        return points;
+    })();
 
     const option = {
         grid: {

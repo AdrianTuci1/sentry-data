@@ -1,0 +1,10 @@
+title: "Live Traffic Chart"
+description: "Shows real-time or simulated real-time activity trends."
+data_structure_template:
+  dataPoints: [60, 50, 70, 65, 80]
+  value: "950"
+  unit: "usr"
+grid_span: "default"
+sdui:
+  mapping_mode: "list"
+  root_key: "traffic"

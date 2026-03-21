@@ -1,14 +1,9 @@
-title: Lead Clustering
-description: "Visualizes groups of similar leads based on behavioral or demographic features. Useful for segmenting audiences for targeted campaigns."
-data_requirements: ["cluster_id", "label", "member_count", "features"]
-sql_aliases:
-  - id: "cluster identifier"
-  - name: "display name for cluster"
-  - size: "number of items in cluster"
+title: "Lead Clustering"
+description: "Clusters leads based on engagement and conversion probability."
 data_structure_template:
-  clusters: [{ "id": 1, "name": "High Value", "size": 120 }]
+  data:
+    - [85, 0.92, "TechFlow Corp"]
 grid_span: "col-span-2 row-span-2"
-color_theme: "theme-audience"
 sdui:
-  mapping_mode: list
-  root_key: clusters
+  mapping_mode: "list"
+  root_key: "clusteringData"

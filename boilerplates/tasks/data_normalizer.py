@@ -12,7 +12,7 @@ project_id      = os.environ.get("projectId", "unknown")
 task_name       = os.environ.get("taskName", "Normalization_unknown")
 r2_bucket       = os.environ.get("R2_BUCKET", "statsparrot-data")
 
-# Extract source_id (e.g. Normalization_Olist_Products -> Olist_Products)
+# Extract source_id (e.g. Normalization_Shopify_Orders -> Shopify_Orders)
 source_id       = task_name.replace("Normalization_", "") if "Normalization_" in task_name else "default"
 
 # Path Inference (Zero-Injection)
@@ -37,17 +37,25 @@ def run_normalization():
         print("B. NORMALIZE: Cast columns for consistency (dates, currencies, IDs).")
         print("C. DE-DUPE: Remove duplicates based on primary keys if possible.")
         print("D. SAVE TO SILVER: Store as a single Parquet file at 'NORMALIZED_URI'.")
-        print("E. DISCOVERY: Report project structure to MindMap using the following format:")
-        print(f'   AGENT_DISCOVERY:{{"connector": [{{"id": "conn_{source_id}", "name": "{source_id}", "type": "ecommerce", "status": "ok"}}], "actionType": [{{"id": "act_{source_id}", "connector_id": "conn_{source_id}", "name": "Batch Ingestion", "status": "ok"}}]}}')
+        print("E. DISCOVERY: Populate and print the AGENT_DISCOVERY JSON using the provided scaffolding at the bottom of this script.")
         print("--- TASK_SPECIFIC_INSTRUCTIONS_END ---")
 
-        # Example Output structure
+        # ==========================================
+        # AGENT SCAFFOLDING
+        # ==========================================
         result = {
             "sourceId": source_id,
             "success": True,
             "silverUri": NORMALIZED_URI
         }
+        
+        discovery = {
+            "connector": [{"id": f"conn_{source_id}", "name": source_id, "type": "ecommerce", "status": "ok"}],
+            "actionType": [{"id": f"act_{source_id}", "connector_id": f"conn_{source_id}", "name": "Batch Ingestion", "status": "ok"}]
+        }
+        
         print(f"AGENT_RESULT:{json.dumps(result)}")
+        print(f"AGENT_DISCOVERY:{json.dumps(discovery)}")
         
     except Exception as e:
         print(f"AGENT_ERROR:{str(e)}")

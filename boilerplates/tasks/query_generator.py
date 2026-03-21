@@ -117,12 +117,7 @@ def run_query_generation():
         print("D. BATCH FETCH MANIFESTS: Use fetch_batch_from_r2([f's3://{r2_bucket}/system/widgets/{p}' for p in paths]).")
         print("E. CONTRACT COMPLIANCE: Use 'sql_aliases' and 'data_structure_template' from manifests.")
         print("F. IMPLEMENT: Write final SQL queries tailored for DuckDB and report results.")
-        print("G. SINGLE JSON OUTPUT: You MUST print EXACTLY ONE JSON block at the very end in this format:")
-        print("AGENT_DISCOVERY: {")
-        print('  "metricGroups": [{"name": "total_revenue", "sql": "SUM(price)"}],')
-        print('  "group": [{"id": "grp_1", "name": "Sales Overview", "title": "Sales Overview", "adjusted_data_ids": ["gold_Olist_Orders"]}],')
-        print('  "insight": [{"id": "ins_1", "group_id": "grp_1", "name": "Revenue Trend", "title": "Revenue Trend", "type": "animated-line", "query": "SELECT ...", "lineage": {"source_keys": ["gold_Olist_Orders"]}, "adjusted_data_columns": ["revenue", "order_date"]}]')
-        print("}")
+        print("G. SINGLE JSON OUTPUT: Populate and print the AGENT_DISCOVERY JSON using the provided scaffolding at the bottom of this script.")
         print("--- TASK_SPECIFIC_INSTRUCTIONS_END ---")
 
         # ==========================================
@@ -147,8 +142,20 @@ def run_query_generation():
                     except: pass
             print("--- SELECTED_WIDGETS_MANIFESTS_END ---")
 
-        # The Agent will now use its reasoning to complete the query generation
+        # 2. Final Output Scaffolding
+        # Fill these lists with your generated insights
+        generated_groups = [] # e.g. [{"id": "grp_1", "name": "Sales Overview", "title": "Sales Overview", "adjusted_data_ids": ["gold_Olist_Orders"]}]
+        generated_insights = [] # e.g. [{"id": "ins_1", "group_id": "grp_1", "name": "Revenue Trend", "title": "Revenue Trend", "type": "animated-line", "query": "SELECT ...", "lineage": {"source_keys": ["gold_Olist_Orders"]}, "adjusted_data_columns": ["revenue", "order_date"]}]
+        generated_metrics = [] # e.g. [{"name": "total_revenue", "sql": "SUM(price)"}]
+        
+        discovery = {
+            "group": generated_groups,
+            "insight": generated_insights,
+            "metricGroups": generated_metrics
+        }
+        
         print("\nGenerating dashboard configuration based on discovered metadata...")
+        print(f"AGENT_DISCOVERY:{json.dumps(discovery)}")
         
     except Exception as e:
         print(f"AGENT_ERROR:{str(e)}")

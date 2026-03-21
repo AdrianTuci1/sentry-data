@@ -1,13 +1,9 @@
-title: Covariance
-description: "A matrix showing how different variables change together. Useful for identifying which features are strongly correlated (positive or negative) in a dataset."
-data_requirements: ["correlation_matrix", "labels"]
-sql_aliases:
-  - row: "variable A"
-  - col: "variable B"
-  - value: "correlation score (-1 to 1)"
+title: "Covariance Matrix"
+description: "A matrix showing how different variables change together."
 data_structure_template:
-  data: [{ "row": "CPC", "col": "ROAS", "value": -0.85 }]
-grid_span: "col-span-2"
+  fields: ['Spend', 'Impr', 'Clicks', 'Conv']
+  matrix: [[0, 0, 1], [0, 1, 0.8]]
+grid_span: "col-span-2 row-span-2"
 sdui:
-  mapping_mode: single
-  root_key: data
+  mapping_mode: "list"
+  root_key: "matrix"

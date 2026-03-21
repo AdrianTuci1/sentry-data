@@ -5,13 +5,11 @@
     align-items: center;
     justify-content: center;
 }
-
 .pulse-main {
     position: relative;
     width: 60px;
     height: 60px;
 }
-
 .pulse-center {
     position: absolute;
     top: 50%;
@@ -27,13 +25,11 @@
     z-index: 4;
     box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
 }
-
 .pulse-val {
     font-size: 1rem;
     font-weight: 800;
     color: #fff;
 }
-
 .pulse-ring {
     position: absolute;
     top: 0;
@@ -45,25 +41,10 @@
     animation: pulseExpand 3s infinite cubic-bezier(0.2, 0, 0.2, 1);
     opacity: 0;
 }
-
-.ring-2 {
-    animation-delay: 1s;
-}
-
-.ring-3 {
-    animation-delay: 2s;
-}
+.ring-2 { animation-delay: 1s; }
+.ring-3 { animation-delay: 2s; }
 
 @keyframes pulseExpand {
-    0% {
-        transform: scale(0.6);
-        opacity: 0.8;
-        border-width: 4px;
-    }
-
-    100% {
-        transform: scale(2.2);
-        opacity: 0;
-        border-width: 1px;
-    }
+    0% { transform: scale(0.6); opacity: 0.8; border-width: 4px; }
+    100% { transform: scale(2.2); opacity: 0; border-width: 1px; }
 }

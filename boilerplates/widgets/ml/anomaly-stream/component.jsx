@@ -2,28 +2,24 @@ import React from 'react';
 import ReactECharts from 'echarts-for-react';
 import './style.css';
 
-const AnomalyStream = ({ data = {} }) => {
+const AnomalyStream = ({ data = {}, isMock = false }) => {
     const services = ['Google Ads', 'Meta Ads', 'SEO', 'Email Marketing', 'Direct Traffic', 'Affiliate', 'Display Ads'];
 
-    // Use results/data from backend or generate mock
-    const dispersionData = (data.dispersionData?.length > 0 ? data.dispersionData : null) || 
-                           (data.data?.length > 0 ? data.data : null) || 
-                           (data.results?.length > 0 ? data.results : null) || (() => {
-                               const generated = [];
-                               for (let i = 0; i < 250; i++) {
-                                   const service = services[Math.floor(Math.random() * services.length)];
-                                   const x = Math.random() * 1000;
-                                   const y = Math.random() * 100000 + 20000;
-                                   generated.push([x, y, service]);
-                               }
-                               // Add specific anomalies
-                               generated.push(
-                                   [900, 150000, 'Meta Ads (Spike)'],
-                                   [100, 160000, 'Google Ads (Alert)'],
-                                   [500, 10000, 'SEO (Anomaly)']
-                               );
-                               return generated;
-                           })();
+    const dispersionData = (Array.isArray(data.data) && data.data.length > 0 ? data.data : null) || (() => {
+        const generated = [];
+        for (let i = 0; i < 250; i++) {
+            const service = services[Math.floor(Math.random() * services.length)];
+            const x = Math.random() * 1000;
+            const y = Math.random() * 100000 + 20000;
+            generated.push([x, y, service]);
+        }
+        generated.push(
+            [900, 150000, 'Meta Ads (Spike)'],
+            [100, 160000, 'Google Ads (Alert)'],
+            [500, 10000, 'SEO (Anomaly)']
+        );
+        return generated;
+    })();
 
     const option = {
         grid: {
@@ -87,7 +83,6 @@ const AnomalyStream = ({ data = {} }) => {
                 name: 'service-dispersion',
                 type: 'scatter',
                 symbolSize: (data) => {
-                    // Make anomalies larger
                     return data[1] > 140000 || data[1] < 15000 ? 8 : 4;
                 },
                 data: dispersionData,
@@ -99,7 +94,7 @@ const AnomalyStream = ({ data = {} }) => {
         animationDuration: 2000
     };
 
-    return <ReactECharts option={option} className="micro-anomaly-stream" style={{ height: '100%', width: '100%' }} />;
+    return <ReactECharts option={option} style={{ height: '100%', width: '100%' }} />;
 };
 
 export default AnomalyStream;

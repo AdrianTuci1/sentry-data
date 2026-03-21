@@ -1,0 +1,9 @@
+title: "Predictive Forecast"
+description: "A line chart showing historical performance trailing into a forecasted prediction line."
+data_structure_template:
+  historical: [320, 335, 310, 350, 380, 370, 400]
+  forecast: [410, 425, 440, 435, 452]
+grid_span: "col-span-2 row-span-2"
+sdui:
+  mapping_mode: "list"
+  root_key: "forecastData"

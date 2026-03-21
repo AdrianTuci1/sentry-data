@@ -1,9 +1,9 @@
 import React from 'react';
-import './ScanningOrbit.css';
+import './style.css';
 
-const ScanningOrbit = ({ data = {} }) => {
-    const value = data.value || data.results?.[0]?.value || data.data?.[0]?.value || 0;
-    const unit = data.unit || data.results?.[0]?.unit || data.data?.[0]?.unit || '';
+const ScanningOrbit = ({ data = {}, isMock = false }) => {
+    const value = data.value ?? data.data?.value ?? "14,500";
+    const unit = data.unit ?? data.data?.unit ?? "ops/sec";
 
     return (
         <div className="scanning-orbit-container">

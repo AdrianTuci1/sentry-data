@@ -2,10 +2,10 @@ import React from 'react';
 import ReactECharts from 'echarts-for-react';
 import './style.css';
 
-const StreamGraph = ({ data = {} }) => {
-    const streamData = (data.streamData?.length > 0 ? data.streamData : null) || 
-                       (data.data?.length > 0 ? data.data : null) || 
-                       (data.results?.length > 0 ? data.results : null) || [
+const StreamGraph = ({ data = {}, isMock = false }) => {
+    const streamData = (Array.isArray(data.streamData) && data.streamData.length > 0 ? data.streamData : null) || 
+                       (Array.isArray(data.data) && data.data.length > 0 && Array.isArray(data.data[0]) ? data.data : null) || 
+                       [
                            ['2026/03/01', 10, 'Search'], ['2026/03/02', 15, 'Search'], ['2026/03/03', 20, 'Search'], ['2026/03/04', 18, 'Search'], ['2026/03/05', 25, 'Search'],
                            ['2026/03/01', 5, 'Direct'], ['2026/03/02', 8, 'Direct'], ['2026/03/03', 12, 'Direct'], ['2026/03/04', 10, 'Direct'], ['2026/03/05', 15, 'Direct'],
                            ['2026/03/01', 8, 'Social'], ['2026/03/02', 14, 'Social'], ['2026/03/03', 18, 'Social'], ['2026/03/04', 22, 'Social'], ['2026/03/05', 20, 'Social']

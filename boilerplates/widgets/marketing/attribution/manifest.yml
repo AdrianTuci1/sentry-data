@@ -1,14 +1,12 @@
-title: Attribution
-description: "Compares different attribution models (First Touch, Last Touch, Linear, Time Decay) to show how they distribute credit across marketing channels."
-data_requirements: ["channel", "model_a_value", "model_b_value"]
-sql_aliases:
-  - name: "marketing channel"
-  - val1: "model A attribution"
-  - val2: "model B attribution"
+title: "Marketing Attribution"
+description: "Compares different attribution models (First Touch, Last Touch, Linear)."
 data_structure_template:
-  data: [{ "name": "PPC", "val1": 120, "val2": 150 }]
+  data:
+    - channel: "Google"
+      first: 35
+      last: 45
+      linear: 40
 grid_span: "col-span-2"
-color_theme: "theme-productivity"
 sdui:
-  mapping_mode: single
-  root_key: data
+  mapping_mode: "list"
+  root_key: "models"

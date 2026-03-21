@@ -3,23 +3,22 @@ import ReactECharts from 'echarts-for-react';
 import * as echarts from 'echarts';
 import './style.css';
 
-const RangeAreaChart = ({ data = {} }) => {
-    const dates = (data.labels?.length > 0 ? data.labels : null) || 
-                  (data.dates?.length > 0 ? data.dates : null) || 
+const RangeAreaChart = ({ data = {}, isMock = false }) => {
+    const dates = (Array.isArray(data.dates) && data.dates.length > 0 ? data.dates : null) || 
+                  (Array.isArray(data.data?.dates) && data.data?.dates.length > 0 ? data.data.dates : null) || 
                   ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00'];
-    
-    const rawValues = (data.results?.length > 0 ? data.results : null) || 
-                      (data.data?.length > 0 ? data.data : null) || 
-                      (data.dataPoints?.length > 0 ? data.dataPoints : null) || [];
-
-    const maxData = (data.maxData?.length > 0 ? data.maxData : null) || 
-                    (rawValues.length > 0 ? rawValues.map(v => (typeof v === 'number' ? v : parseFloat(v || 0)) * 1.2) : [120, 150, 200, 180, 220, 250, 210]);
-    
-    const avgData = (data.avgData?.length > 0 ? data.avgData : null) || 
-                    (rawValues.length > 0 ? rawValues : [80, 110, 150, 130, 180, 190, 160]);
-    
-    const minData = (data.minData?.length > 0 ? data.minData : null) || 
-                    (rawValues.length > 0 ? rawValues.map(v => (typeof v === 'number' ? v : parseFloat(v || 0)) * 0.8) : [40, 70, 100, 80, 140, 130, 110]);
+                  
+    const maxData = (Array.isArray(data.maxData) && data.maxData.length > 0 ? data.maxData : null) || 
+                    (Array.isArray(data.data?.maxData) && data.data?.maxData.length > 0 ? data.data.maxData : null) || 
+                    [120, 150, 200, 180, 220, 250, 210];
+                    
+    const avgData = (Array.isArray(data.avgData) && data.avgData.length > 0 ? data.avgData : null) || 
+                    (Array.isArray(data.data?.avgData) && data.data?.avgData.length > 0 ? data.data.avgData : null) || 
+                    [80, 110, 150, 130, 180, 190, 160];
+                    
+    const minData = (Array.isArray(data.minData) && data.minData.length > 0 ? data.minData : null) || 
+                    (Array.isArray(data.data?.minData) && data.data?.minData.length > 0 ? data.data.minData : null) || 
+                    [40, 70, 100, 80, 140, 130, 110];
 
     const option = {
         tooltip: {
@@ -51,7 +50,6 @@ const RangeAreaChart = ({ data = {} }) => {
             {
                 name: 'Range',
                 type: 'line',
-                // We subtract minData from maxData to get the band height relative to minData
                 data: maxData.map((val, i) => val - minData[i]),
                 lineStyle: { opacity: 0 },
                 areaStyle: {

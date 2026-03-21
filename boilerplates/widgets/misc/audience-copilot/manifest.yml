@@ -1,12 +1,14 @@
-title: Audience Copilot
-description: "An AI-powered conversational interface for exploring audience insights. Provides natural language summaries and suggested actions based on segment data."
-data_requirements: ["insights", "suggestions"]
-sql_aliases:
-  - text: "insight summary"
-  - actions: "list of recommended steps"
+title: "Audience Copilot"
+description: "An AI-powered conversational interface for exploring audience insights."
 data_structure_template:
-  data: { "text": "Audience interest in tech is rising.", "actions": ["Increase ad spend"] }
-grid_span: "col-span-2"
+  data:
+    - segment: "High Intent Visitors"
+      actionType: "create"
+      action: "Create Lookalike"
+      modification: "+20% Bid"
+      impactTrend: "positive"
+      impact: "+15% Conv"
+grid_span: "default"
 sdui:
-  mapping_mode: single
-  root_key: data
+  mapping_mode: "list"
+  root_key: "recommendations"

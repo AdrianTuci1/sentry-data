@@ -1,19 +1,16 @@
-/* Market Evolution Styles */
-.evolution-container {
+.market-evol-container {
     display: flex;
     flex-direction: column;
     height: 100%;
     width: 100%;
     gap: 10px;
 }
-
-.evolution-graph-wrapper {
+.market-evol-chart {
     flex: 0 0 70%;
     width: 100%;
     position: relative;
 }
-
-.evolution-badge-overlay {
+.market-evol-legend {
     position: absolute;
     top: 10px;
     left: 10px;
@@ -22,8 +19,7 @@
     flex-direction: column;
     gap: 4px;
 }
-
-.convergence-badge {
+.market-evol-badge {
     font-size: 9px;
     color: #9CA3AF;
     background: rgba(255, 255, 255, 0.05);
@@ -33,24 +29,12 @@
     align-items: center;
     gap: 6px;
 }
-
-.badge-dot {
+.market-evol-dot {
     width: 3px;
     height: 3px;
     border-radius: 50%;
     background: #3B82F6;
 }
-
-/* Custom scrollbar for trend list if added later */
-.evolution-container ::-webkit-scrollbar {
-    width: 3px;
-}
-
-.evolution-container ::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.evolution-container ::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.05);
-    border-radius: 10px;
-}
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); border-radius: 10px; }

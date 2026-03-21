@@ -1,12 +1,11 @@
 import React from 'react';
 import ReactECharts from 'echarts-for-react';
-import * as echarts from 'echarts';
 import './style.css';
 
-const MarketEvolution = ({ data: componentData = {} }) => {
-    const channels = (componentData.channels?.length > 0 ? componentData.channels : null) || 
-                     (componentData.data?.length > 0 ? componentData.data : null) || 
-                     (componentData.results?.length > 0 ? componentData.results : null) || [
+const MarketEvolution = ({ data = {}, isMock = false }) => {
+    const channels = (Array.isArray(data.channels) && data.channels.length > 0 ? data.channels : null) || 
+                     (Array.isArray(data.data?.channels) && data.data?.channels.length > 0 ? data.data.channels : null) || 
+                     [
                          { name: 'Paid Search', color: '#3B82F6', value: 85, synergy: 'High' },
                          { name: 'Social Ads', color: '#10B981', value: 72, synergy: 'High' },
                          { name: 'Retargeting', color: '#F59E0B', value: 94, synergy: 'Critical' },
@@ -16,22 +15,12 @@ const MarketEvolution = ({ data: componentData = {} }) => {
                          { name: 'Influencer', color: '#06B6D4', value: 65, synergy: 'High' }
                      ];
 
-    const links = (componentData.links?.length > 0 ? componentData.links : null) || [
-        { source: 'Paid Search', target: 'Organic SEO', value: 5 },
-        { source: 'Social Ads', target: 'Retargeting', value: 8 },
-        { source: 'Email Flow', target: 'Retargeting', value: 6 },
-        { source: 'Organic SEO', target: 'Direct', value: 4 },
-        { source: 'Influencer', target: 'Social Ads', value: 9 },
-        { source: 'Paid Search', target: 'Retargeting', value: 7 },
-        { source: 'Organic SEO', target: 'Social Ads', value: 5 }
-    ];
-
     const nodes = channels.map((c) => ({
         name: c.name,
-        symbolSize: (c.value || 50) / 1.5,
+        symbolSize: c.value / 1.5,
         value: c.value,
         itemStyle: {
-            color: c.color || '#3B82F6',
+            color: c.color,
             borderColor: 'rgba(255,255,255,0.1)',
             borderWidth: 1
         },
@@ -43,6 +32,18 @@ const MarketEvolution = ({ data: componentData = {} }) => {
             fontWeight: '600'
         }
     }));
+
+    const links = (Array.isArray(data.links) && data.links.length > 0 ? data.links : null) || 
+                  (Array.isArray(data.data?.links) && data.data?.links.length > 0 ? data.data.links : null) || 
+                  [
+                      { source: 'Paid Search', target: 'Organic SEO', value: 5 },
+                      { source: 'Social Ads', target: 'Retargeting', value: 8 },
+                      { source: 'Email Flow', target: 'Retargeting', value: 6 },
+                      { source: 'Organic SEO', target: 'Direct', value: 4 },
+                      { source: 'Influencer', target: 'Social Ads', value: 9 },
+                      { source: 'Paid Search', target: 'Retargeting', value: 7 },
+                      { source: 'Organic SEO', target: 'Social Ads', value: 5 }
+                  ];
 
     const option = {
         backgroundColor: 'transparent',
@@ -67,9 +68,9 @@ const MarketEvolution = ({ data: componentData = {} }) => {
                 edgeLength: 100,
                 gravity: 0.2
             },
-            roam: false, // Disabled zoom/pan
-            draggable: false, // Disabled node drag
-            silent: false, // Enable tooltips only
+            roam: false,
+            draggable: false,
+            silent: false,
             lineStyle: {
                 color: 'rgba(255, 255, 255, 0.05)',
                 width: 1.5,
@@ -89,15 +90,15 @@ const MarketEvolution = ({ data: componentData = {} }) => {
     };
 
     return (
-        <div className="evolution-container">
-            <div className="evolution-graph-wrapper">
-                <div className="evolution-badge-overlay">
-                    <span className="convergence-badge">
-                        <div className="badge-dot" />
+        <div className="market-evol-container">
+            <div className="market-evol-chart">
+                <div className="market-evol-legend">
+                    <span className="market-evol-badge">
+                        <div className="market-evol-dot" />
                         Channel Convergence Model
                     </span>
                 </div>
-                <ReactECharts option={option} className="micro-evolution" style={{ height: '100%', width: '100%' }} />
+                <ReactECharts option={option} style={{ height: '100%', width: '100%' }} />
             </div>
         </div>
     );

@@ -1,0 +1,9 @@
+title: "Activity Heatmap"
+description: "Shows density or activity distribution across time vs day."
+data_requirements: ["heatmapData"]
+data_structure_template:
+  data: [[0, 0, 5], [1, 0, 3], [2, 0, 0]]
+grid_span: "default"
+sdui:
+  mapping_mode: "list"
+  root_key: "heatmap"

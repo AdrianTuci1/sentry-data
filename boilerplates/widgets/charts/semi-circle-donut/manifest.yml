@@ -1,0 +1,11 @@
+title: "Semi-Circle Donut"
+description: "A gauge-style donut chart showing proportions of a whole."
+data_structure_template:
+  platforms:
+    - name: 'Google'
+      value: 45
+      color: '#4285F4'
+grid_span: "col-span-2 row-span-2"
+sdui:
+  mapping_mode: "list"
+  root_key: "platformsData"

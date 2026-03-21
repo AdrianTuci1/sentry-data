@@ -144,18 +144,18 @@ export class PipelineRunner {
                             const items = Array.isArray(disco[sourceKey]) ? disco[sourceKey] : [disco[sourceKey]];
                             if (items.length > 0) {
                                 cumulativeDiscovery[key] = cumulativeDiscovery[key] || [];
-                                if (key === 'connector') {
-                                    items.forEach((newItem: any) => {
+                                items.forEach((newItem: any) => {
+                                    if (newItem.id != null) {
                                         const existingIndex = cumulativeDiscovery[key].findIndex((c: any) => c.id === newItem.id);
                                         if (existingIndex >= 0) {
                                             cumulativeDiscovery[key][existingIndex] = { ...cumulativeDiscovery[key][existingIndex], ...newItem };
                                         } else {
                                             cumulativeDiscovery[key].push(newItem);
                                         }
-                                    });
-                                } else {
-                                    cumulativeDiscovery[key].push(...items);
-                                }
+                                    } else {
+                                        cumulativeDiscovery[key].push(newItem);
+                                    }
+                                });
                             }
                         }
                     }

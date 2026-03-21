@@ -2,10 +2,10 @@ import React from 'react';
 import ReactECharts from 'echarts-for-react';
 import './style.css';
 
-const FunnelChart = ({ data = {} }) => {
-    const funnelData = (data.funnel?.length > 0 ? data.funnel : null) || 
-                       (data.data?.length > 0 ? data.data : null) || 
-                       (data.results?.length > 0 ? data.results : null) || [
+const FunnelChart = ({ data = {}, isMock = false }) => {
+    const funnelData = (Array.isArray(data.funnel) && data.funnel.length > 0 ? data.funnel : null) || 
+                       (Array.isArray(data.data) && data.data.length > 0 ? data.data : null) || 
+                       [
                            { value: 100, name: 'Visits' },
                            { value: 80, name: 'Inquiry' },
                            { value: 60, name: 'Lead' },
@@ -13,7 +13,7 @@ const FunnelChart = ({ data = {} }) => {
                            { value: 10, name: 'Purchase' }
                        ];
 
-    const gridSpan = data?.gridSpan || '';
+    const gridSpan = data.gridSpan || 'col-span-2';
     const isHorizontal = gridSpan.includes('col-span-2');
 
     const option = {
@@ -45,6 +45,7 @@ const FunnelChart = ({ data = {} }) => {
                 data: funnelData
             }
         ],
+        // Ensuring multiple colors so the funnel looks distinct
         color: ['#34D399', '#38BDF8', '#818CF8', '#A78BFA', '#F472B6']
     };
 

@@ -1,14 +1,8 @@
-title: Emotion Wave
-description: "A sentiment visualization with animated waves inside a circle. The wave level and color indicate sentiment state (positive, neutral, crisis)."
-data_requirements: ["sentimentScore"]
-sql_aliases:
-  - sentimentScore: "sentiment percentage (0-100)"
-  - emoji: "optional emoji override"
+title: "Emotion Wave"
+description: "Backend-driven widget for Emotion Wave."
 data_structure_template:
-  sentimentScore: 75
-  emoji: "😊"
+  sentimentScore: 78
 grid_span: "default"
-color_theme: "theme-audience"
 sdui:
-  mapping_mode: single
-  root_key: data
+  mapping_mode: "single"
+  root_key: "sentiment"

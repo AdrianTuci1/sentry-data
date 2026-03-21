@@ -1,15 +1,11 @@
 import React from 'react';
-import './ChronoDial.css';
+import './style.css';
 
-const ChronoDial = ({ data = {} }) => {
-    const sliderValue = data.sliderValue || 
-                        (typeof data.value === 'number' ? data.value : null) || 
-                        data.data?.[0]?.value || 
-                        data.results?.[0]?.value || 50;
-
+const ChronoDial = ({ data = {}, isMock = false }) => {
+    const sliderValue = data.sliderValue ?? data.data?.sliderValue ?? 50;
+    
     return (
         <div className="premium-glow-container">
-            {/* Removed internal glow-header as it conflicts with card header */}
             <div className="glow-center">
                 <div className="glow-dot shadow-glow"></div>
                 <div className="glow-halo">
@@ -32,7 +28,6 @@ const ChronoDial = ({ data = {} }) => {
                     style={{ left: `${sliderValue}%` }}
                 />
             </div>
-            {/* Removed internal glow-footer for consistency */}
         </div>
     );
 };

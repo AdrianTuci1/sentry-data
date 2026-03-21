@@ -1,12 +1,12 @@
-title: "Conversion Funnel"
+title: "Sales Funnel"
 description: "Visualizes the drop-off across sequential stages of a user journey or process."
-data_requirements: ["stage_names", "stage_counts"]
-sql_aliases:
-  - name: "stage name"
-  - value: "numeric count/value"
 data_structure_template:
-  funnel: [ { name: "Viewed", value: 1200 }, { name: "Added", value: 800 } ]
+  funnel:
+    - value: 100
+      name: "Visits"
+    - value: 85
+      name: "Inquiry"
 grid_span: "col-span-2"
 sdui:
-  mapping_mode: "matrix"
+  mapping_mode: "list"
   root_key: "funnel"

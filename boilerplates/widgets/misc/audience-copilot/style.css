@@ -61,7 +61,6 @@
     gap: 10px;
 }
 
-/* Scrollbar hiding for clean look */
 .recommendations-list::-webkit-scrollbar {
     display: none;
 }
@@ -164,18 +163,7 @@
 }
 
 @keyframes pulse {
-    0% {
-        opacity: 1;
-        transform: scale(1);
-    }
-
-    50% {
-        opacity: 0.6;
-        transform: scale(1.2);
-    }
-
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.2); }
+    100% { opacity: 1; transform: scale(1); }
 }

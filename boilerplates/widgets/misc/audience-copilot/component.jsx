@@ -1,14 +1,13 @@
 import React from 'react';
-import './AudienceCopilot.css';
+import './style.css';
 
-const AudienceCopilot = ({ data = {} }) => {
-    const recommendations = (data.recommendations?.length > 0 ? data.recommendations : null) || 
-                            (data.data?.length > 0 ? data.data : null) || 
-                            (data.results?.length > 0 ? data.results : null) || [
-        { segment: 'Tech Enthusiasts', action: 'Increase Bid', actionType: 'bid', modification: '+15% CPM', impact: 'Est. +250 Conv', impactTrend: 'positive' },
-        { segment: 'Cart Abandoners', action: 'New Creative', actionType: 'creative', modification: 'UGC Video', impact: 'Est. -12% CPA', impactTrend: 'positive' },
-        { segment: 'Lapsed Users', action: 'Discount Code', actionType: 'promo', modification: 'SAVE20', impact: 'Est. 5.2x ROAS', impactTrend: 'positive' }
-    ];
+const AudienceCopilot = ({ data = {}, isMock = false }) => {
+    const recommendations = (Array.isArray(data.recommendations) && data.recommendations.length > 0 ? data.recommendations : null) ||
+                            (Array.isArray(data.data) && data.data.length > 0 ? data.data : null) || 
+                            [
+                                { segment: "High Intent Visitors", actionType: "create", action: "Create Lookalike", modification: "+20% Bid", impactTrend: "positive", impact: "+15% Conv" },
+                                { segment: "Bounced Carts", actionType: "modify", action: "Increase Retargeting", modification: "+10% Bid", impactTrend: "positive", impact: "+5% Ret" }
+                            ];
 
     return (
         <div className="audience-copilot-container">

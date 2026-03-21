@@ -1,0 +1,10 @@
+title: "Interest Radar"
+description: "A radar chart showing multivariate interest profiles."
+data_structure_template:
+  data:
+    - value: [85, 30, 70, 45, 60, 20]
+      name: "High Intent"
+grid_span: "col-span-2 row-span-2"
+sdui:
+  mapping_mode: "list"
+  root_key: "radarData"

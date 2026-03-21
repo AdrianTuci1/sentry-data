@@ -120,7 +120,7 @@ export class AnalyticsService {
 
                 return {
                     ...baseWidget,
-                    data: mappedData,
+                    ...mappedData,
                     results: result.data,
                     isMock: false,
                     latency: result.latency_ms
@@ -227,7 +227,7 @@ export class AnalyticsService {
                 ...meta,
                 gridSpan: meta.grid_span || meta.gridSpan || 'col-span-1',
                 colorTheme: meta.color_theme || meta.colorTheme || 'theme-productivity',
-                data: mappedData
+                ...mappedData
             };
         }
 
@@ -240,7 +240,7 @@ export class AnalyticsService {
             title: widgetMetadata.title || definition.title || widgetType,
             gridSpan: widgetMetadata.grid_span || widgetMetadata.gridSpan || definition.grid_span || 'col-span-1',
             colorTheme: widgetMetadata.color_theme || widgetMetadata.colorTheme || definition.color_theme || 'theme-productivity',
-            data: mappedData,
+            ...mappedData,
             results: result.data,
             isMock: (Array.isArray(result.data) && result.data.length === 0),
             componentCode

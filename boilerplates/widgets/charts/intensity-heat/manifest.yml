@@ -1,15 +1,8 @@
-title: Intensity Heat
-description: "Shows density or activity distribution across two dimensions (e.g. time vs day, region vs category)."
-data_requirements: ["value"]
-sql_aliases:
-  - value: "intensity metric"
-  - unit: "unit label"
+title: "Intensity Heat"
+description: "Shows density or activity distribution across a line (Ad Fatigue)"
 data_structure_template:
   value: "29"
-  unit: "deg"
-  footerText: "High Rotation Suggested"
 grid_span: "default"
-color_theme: "theme-red"
 sdui:
-  mapping_mode: single
-  root_key: data
+  mapping_mode: "single"
+  root_key: "heat"

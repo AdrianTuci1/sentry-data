@@ -2,10 +2,10 @@ import React from 'react';
 import ReactECharts from 'echarts-for-react';
 import './style.css';
 
-const IntentSunburst = ({ data = {} }) => {
-    const sunburstData = (data.sunburstData?.length > 0 ? data.sunburstData : null) || 
-                         (data.data?.length > 0 ? data.data : null) || 
-                         (data.results?.length > 0 ? data.results : null) || [
+const IntentSunburst = ({ data = {}, isMock = false }) => {
+    const sunburstData = (Array.isArray(data.sunburstData) && data.sunburstData.length > 0 ? data.sunburstData : null) || 
+                         (Array.isArray(data.data) && data.data.length > 0 ? data.data : null) || 
+                         [
                              {
                                  name: 'Ready to Buy',
                                  itemStyle: { color: '#10B981' },

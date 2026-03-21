@@ -1,0 +1,9 @@
+title: "Simple Micrographics"
+description: "A collection of miniature UI components (slider, progress, campaign list)."
+data_structure_template:
+  view: "color"
+  sliderValue: 45
+grid_span: "default"
+sdui:
+  mapping_mode: "single"
+  root_key: "micro"

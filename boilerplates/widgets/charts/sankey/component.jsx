@@ -2,10 +2,9 @@ import React from 'react';
 import ReactECharts from 'echarts-for-react';
 import './style.css';
 
-const SankeyChart = ({ data = {} }) => {
-    const nodes = (data.nodes?.length > 0 ? data.nodes : null) || 
-                  (data.results?.length > 0 ? data.results.map(r => ({ name: r.source || r.label || Object.values(r)[0] })) : null) || 
-                  (data.data?.length > 0 ? data.data.map(r => ({ name: r.label || 'Step' })) : null) || 
+const SankeyChart = ({ data = {}, isMock = false }) => {
+    const nodes = (Array.isArray(data.nodes) && data.nodes.length > 0 ? data.nodes : null) || 
+                  (Array.isArray(data.data?.nodes) && data.data?.nodes.length > 0 ? data.data.nodes : null) || 
                   [
                       { name: 'Targeting' },
                       { name: 'Impressions' },
@@ -13,12 +12,8 @@ const SankeyChart = ({ data = {} }) => {
                       { name: 'Conversions' }
                   ];
 
-    const links = (data.links?.length > 0 ? data.links : null) || 
-                  (data.results?.length > 0 && data.results[0].target ? data.results.map(r => ({
-                      source: r.source,
-                      target: r.target,
-                      value: r.value || 100
-                  })) : null) ||
+    const links = (Array.isArray(data.links) && data.links.length > 0 ? data.links : null) || 
+                  (Array.isArray(data.data?.links) && data.data?.links.length > 0 ? data.data.links : null) || 
                   [
                       { source: 'Targeting', target: 'Impressions', value: 1000 },
                       { source: 'Impressions', target: 'Clicks', value: 300 },
@@ -31,10 +26,15 @@ const SankeyChart = ({ data = {} }) => {
         series: {
             type: 'sankey',
             layout: 'none',
-            emphasis: { focus: 'adjacency' },
+            emphasis: {
+                focus: 'adjacency'
+            },
             data: nodes,
             links: links,
-            itemStyle: { borderWidth: 0, color: '#3B82F6' },
+            itemStyle: {
+                borderWidth: 0,
+                color: '#3B82F6'
+            },
             lineStyle: {
                 color: 'source',
                 curveness: 0.5,
@@ -48,7 +48,7 @@ const SankeyChart = ({ data = {} }) => {
         }
     };
 
-    return <ReactECharts option={option} className="micro-sankey" style={{ height: '100%', width: '100%' }} />;
+    return <ReactECharts option={option} style={{ height: '100%', width: '100%' }} />;
 };
 
 export default SankeyChart;

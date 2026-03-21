@@ -1,20 +1,16 @@
-title: Market Evolution
-description: "A dynamic area or line chart showing how market share or competitive landscape has evolved over time. Tracks multiple competitors simultaneously."
-data_requirements: ["channels", "links"]
-sql_aliases:
-  - name: "channel name"
-  - value: "influence percentage"
-  - color: "hex color"
-  - synergy: "synergy level (High, Mid, Critical)"
+title: "Market Evolution"
+description: "A force-directed graph showing relationships and synergy between marketing channels."
 data_structure_template:
   channels:
-    - { "name": "Paid Search", "color": "#3B82F6", "value": 85, "synergy": "High" }
-    - { "name": "Social Ads", "color": "#10B981", "value": 72, "synergy": "High" }
+    - name: 'Paid Search'
+      color: '#3B82F6'
+      value: 85
+      synergy: 'High'
   links:
-    - { "source": "Paid Search", "target": "Organic SEO", "value": 5 }
-    - { "source": "Social Ads", "target": "Retargeting", "value": 8 }
+    - source: 'Paid Search'
+      target: 'Organic SEO'
+      value: 5
 grid_span: "col-span-2 row-span-2"
-color_theme: "theme-audience"
 sdui:
-  mapping_mode: single
-  root_key: channels
+  mapping_mode: "element"
+  root_key: "marketGraph"

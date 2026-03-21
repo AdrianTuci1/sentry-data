@@ -1,17 +1,20 @@
 import React from 'react';
-import './IntensityHeat.css';
+import './style.css';
 
-const IntensityHeat = ({ data = {} }) => {
-    const value = data.value || (data.data?.length > 0 ? data.data[data.data.length - 1] : "0") || "0";
+const IntensityHeat = ({ data = {}, isMock = false }) => {
+    const val = data.value ?? data.data?.value ?? "29";
+    const numericVal = parseInt(val);
+    const scaleLen = 40;
+    const activeIndex = !isNaN(numericVal) ? Math.min(Math.floor((numericVal / 100) * scaleLen), scaleLen - 1) : 20;
+
     return (
         <div className="premium-pixel-container">
-            <div className="pixel-main-value">{value}</div>
-
+            <div className="pixel-main-value">{val}</div>
             <div className="pixel-scale">
-                {Array.from({ length: 40 }).map((_, i) => (
+                {Array.from({ length: scaleLen }).map((_, i) => (
                     <div
                         key={i}
-                        className={`pixel-tick ${i === 20 ? 'active' : ''}`}
+                        className={`pixel-tick ${i === activeIndex ? 'active' : ''}`}
                     />
                 ))}
             </div>

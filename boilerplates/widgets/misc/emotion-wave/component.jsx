@@ -1,13 +1,9 @@
 import React from 'react';
-import './EmotionWave.css';
+import './style.css';
 
-const EmotionWave = ({ data = {} }) => {
-    const score = (typeof data.sentimentScore === 'number' ? data.sentimentScore : null) || 
-                  (typeof data.value === 'number' ? data.value : null) || 
-                  (typeof data.data?.[0]?.value === 'number' ? data.data[0].value : null) || 
-                  (typeof data.results?.[0]?.value === 'number' ? data.results[0].value : null) || 50;
-
-    // Determine sentiment state
+const EmotionWave = ({ data = {}, isMock = false }) => {
+    const score = data.sentimentScore ?? data.data?.sentimentScore ?? data.value ?? 50;
+    
     let state = 'neutral';
     let emoji = '😐';
 
@@ -19,8 +15,7 @@ const EmotionWave = ({ data = {} }) => {
         emoji = '⚠️';
     }
 
-    // Use emoji from data if provided
-    const displayEmoji = data.emoji || data.results?.[0]?.emoji || data.data?.[0]?.emoji || emoji;
+    const displayEmoji = data.emoji ?? data.data?.emoji ?? emoji;
 
     return (
         <div className={`emotion-wave-container ${state}`}>

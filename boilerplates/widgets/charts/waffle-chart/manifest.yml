@@ -1,0 +1,9 @@
+title: "Waffle Chart"
+description: "A grid of squares representing a percentage out of 100."
+data_structure_template:
+  value: 68
+  colorTheme: "theme-emerald"
+grid_span: "col-span-1 row-span-1"
+sdui:
+  mapping_mode: "single"
+  root_key: "waffle"

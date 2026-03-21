@@ -30,13 +30,8 @@
 }
 
 @keyframes sweep {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .central-node {
@@ -73,25 +68,12 @@
     border-radius: 50%;
     box-shadow: 0 0 8px #3B82F6;
 }
-
-.sat-1 {
-    top: 0;
-    left: 50%;
-}
-
-.sat-2 {
-    bottom: 0;
-    right: 50%;
-}
+.sat-1 { top: 0; left: 50%; }
+.sat-2 { bottom: 0; right: 50%; }
 
 @keyframes rotateOrbit {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .orbit-content {

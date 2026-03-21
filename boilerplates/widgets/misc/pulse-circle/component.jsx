@@ -1,8 +1,8 @@
 import React from 'react';
-import './PulseCircle.css';
+import './style.css';
 
-const PulseCircle = ({ data = {} }) => {
-    const value = data.value || data.results?.[0]?.value || data.data?.[0]?.value || 0;
+const PulseCircle = ({ data = {}, isMock = false }) => {
+    const value = data.value ?? data.data?.value ?? "100%";
 
     return (
         <div className="pulse-circle-container">

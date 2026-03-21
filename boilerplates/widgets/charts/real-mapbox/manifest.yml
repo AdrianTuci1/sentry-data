@@ -1,0 +1,12 @@
+title: "Mapbox Heatmap"
+description: "A geographical heatmap powered by Mapbox GL."
+data_structure_template:
+  data:
+    - name: 'Bucharest Center'
+      longitude: 26.1039
+      latitude: 44.4275
+      intensity: 15
+grid_span: "col-span-2 row-span-2"
+sdui:
+  mapping_mode: "list"
+  root_key: "locations"

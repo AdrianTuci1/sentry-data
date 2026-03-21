@@ -1,0 +1,10 @@
+title: "Neural Nexus"
+description: "A dial displaying a central score with ticks forming an arc."
+data_structure_template:
+  value: 85
+  unit: "%"
+  sliderValue: 85
+grid_span: "default"
+sdui:
+  mapping_mode: "single"
+  root_key: "dial"

@@ -1,24 +1,24 @@
 import React from 'react';
 import ReactECharts from 'echarts-for-react';
 import * as echarts from 'echarts';
+import './style.css';
 
-const CreativeQuadrant = ({ data: componentData = {} }) => {
+const CreativeQuadrant = ({ data = {}, isMock = false }) => {
     // Top-tier marketing creatives: [CTR (%), Conv. Rate (%), Name, Type]
-    const creatives = (Array.isArray(componentData.creatives) && componentData.creatives.length > 0 ? componentData.creatives : null) || 
-                      (Array.isArray(componentData.data) && componentData.data.length > 0 ? componentData.data : null) || 
-                      (Array.isArray(componentData.results) && componentData.results.length > 0 ? componentData.results : null) || [
-        [4.2, 5.8, 'Video: Summer Lifestyle', 'Video'],
-        [3.8, 6.2, 'Static: Product Hero', 'Static'],
-        [1.2, 8.5, 'Testimonial: Andrei P.', 'Review'],
-        [5.5, 1.2, 'Clickbait: Huge Sale', 'Static'],
-        [2.1, 4.2, 'Video: Feature Walkthrough', 'Video'],
-        [0.8, 1.5, 'Static: Legacy Banner', 'Static'],
-        [4.8, 4.5, 'Video: User Story', 'Video'],
-        [3.2, 2.8, 'Static: Discount Code', 'Static'],
-        [1.5, 7.2, 'Review: Maria I.', 'Review'],
-        [6.2, 6.8, 'Hiring: Creative Lead', 'Static'],
-        [7.5, 0.5, 'Meme: Monday Coffee', 'Social']
-    ];
+    const creatives = (Array.isArray(data.creatives) && data.creatives.length > 0 ? data.creatives : null) ||
+                      (Array.isArray(data.data) && data.data.length > 0 ? data.data : null) || [
+                          [4.2, 5.8, 'Video: Summer Lifestyle', 'Video'],
+                          [3.8, 6.2, 'Static: Product Hero', 'Static'],
+                          [1.2, 8.5, 'Testimonial: Andrei P.', 'Review'],
+                          [5.5, 1.2, 'Clickbait: Huge Sale', 'Static'],
+                          [2.1, 4.2, 'Video: Feature Walkthrough', 'Video'],
+                          [0.8, 1.5, 'Static: Legacy Banner', 'Static'],
+                          [4.8, 4.5, 'Video: User Story', 'Video'],
+                          [3.2, 2.8, 'Static: Discount Code', 'Static'],
+                          [1.5, 7.2, 'Review: Maria I.', 'Review'],
+                          [6.2, 6.8, 'Hiring: Creative Lead', 'Static'],
+                          [7.5, 0.5, 'Meme: Monday Coffee', 'Social']
+                      ];
 
     const pieces = [
         { label: 'Heroes', color: '#10B981', note: 'Scale Now' },

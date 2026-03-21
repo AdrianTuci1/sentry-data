@@ -1,19 +1,12 @@
-title: Waterfall
-description: "Visualizes how an initial value is affected by a series of intermediate positive or negative changes. Ideal for financial statements, profit-and-loss analysis, or inventory changes."
-data_requirements: ["steps"]
-sql_aliases:
-  - name: "step label"
-  - value: "step amount (positive or negative)"
-  - isTotal: "boolean, true for total row"
+title: "Net Profit Bridge"
+description: "Visualizes how an initial value is affected by a series of intermediate positive or negative changes."
 data_structure_template:
   steps:
-    - { "name": "Gross Revenue", "value": 124000 }
-    - { "name": "COGS", "value": -45000 }
-    - { "name": "Ad Spend", "value": -28000 }
-    - { "name": "OpEx", "value": -8500 }
-    - { "name": "Net Profit", "isTotal": true }
+    - name: "Gross Revenue"
+      value: 124000
+    - name: "Net Profit"
+      isTotal: true
 grid_span: "col-span-2"
-color_theme: "theme-revenue"
 sdui:
-  mapping_mode: single
-  root_key: steps
+  mapping_mode: "list"
+  root_key: "steps"

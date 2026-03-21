@@ -1,14 +1,11 @@
-title: Cohorts
-description: "A retention heatmap showing how groups of users (cohorts) behave over time. Crucial for understanding long-term value and churn patterns."
-data_requirements: ["cohort_label", "time_period", "retention_value"]
-sql_aliases:
-  - cohort: "start month/group"
-  - step: "month offset (0, 1, 2...)"
-  - weight: "retention percentage"
+title: "Cohorts"
+description: "A retention heatmap showing how groups of users behave over time."
 data_structure_template:
-  data: [{ "cohort": "Jan 2024", "step": 1, "weight": 85 }]
-grid_span: "default"
-color_theme: "theme-audience"
+  cohorts:
+    - week: "Feb 01"
+      size: 1200
+      data: [100, 85, 70, 62]
+grid_span: "col-span-2 row-span-2"
 sdui:
-  mapping_mode: single
-  root_key: data
+  mapping_mode: "list"
+  root_key: "cohorts"

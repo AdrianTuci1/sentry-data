@@ -1,23 +1,10 @@
-title: Intent Sunburst
-description: "A multi-level pie chart visualizing the hierarchy of user intent or interests. Shows how broad categories break down into specific sub-interests."
-data_requirements: ["sunburstData"]
-sql_aliases:
-  - name: "intent category name"
-  - value: "volume or weight"
+title: "Intent Sunburst"
+description: "A hierarchical chart showing how user intent splits into different categories."
 data_structure_template:
-  sunburstData:
-    - name: "Ready to Buy"
-      itemStyle: { "color": "#10B981" }
-      children:
-        - { "name": "Product X", "value": 20 }
-        - { "name": "Checkout", "value": 25 }
-    - name: "Researching"
-      itemStyle: { "color": "#3B82F6" }
-      children:
-        - { "name": "Pricing", "value": 15 }
-        - { "name": "Features", "value": 15 }
+  data:
+    - name: 'Ready to Buy'
+      children: []
 grid_span: "col-span-2 row-span-2"
-color_theme: "theme-audience"
 sdui:
-  mapping_mode: single
-  root_key: sunburstData
+  mapping_mode: "list"
+  root_key: "sunburstData"

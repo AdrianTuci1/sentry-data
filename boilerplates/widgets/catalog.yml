@@ -1,161 +1,190 @@
-3d-map:
-  description: Represents a geospatial visualization using Mapbox. Ideal for showing
-    events, locations, or spatiotemporal trends on a 3D terrain.
-  path: spatiotemporal/3d-map/manifest.yml
-animated-line:
-  description: A real-time flowing line chart for high-frequency data streams. Perfect
-    for monitoring live server load, stock prices, or sensor data.
-  path: operational/animated-line/manifest.yml
-anomaly-stream:
-  description: A real-time or historical feed of detected anomalies. Highlights deviations
-    from normal patterns with severity levels and timestamps.
-  path: ml/anomaly-stream/manifest.yml
-attribution:
-  description: Compares different attribution models (First Touch, Last Touch, Linear,
-    Time Decay) to show how they distribute credit across marketing channels.
-  path: marketing/attribution/manifest.yml
-audience-copilot:
-  description: An AI-powered conversational interface for exploring audience insights.
-    Provides natural language summaries and suggested actions based on segment data.
-  path: misc/audience-copilot/manifest.yml
-budget-sensitivity:
-  description: Analysis of how changes in budget allocation affect KPIs. Helps in
-    identifying the 'sweet spot' for ad spend vs return.
-  path: financial/budget-sensitivity/manifest.yml
-chrono-dial:
-  description: A radial visualization for time-based data. Best for showing cyclical
-    patterns or distribution of events across a 24-hour period or week.
-  path: misc/chrono-dial/manifest.yml
-cohorts:
-  description: A retention heatmap showing how groups of users (cohorts) behave over
-    time. Crucial for understanding long-term value and churn patterns.
-  path: marketing/cohorts/manifest.yml
-covariance:
-  description: A matrix showing how different variables change together. Useful for
-    identifying which features are strongly correlated (positive or negative) in a
-    dataset.
-  path: charts/covariance/manifest.yml
-creative-quadrant:
-  description: A 2x2 matrix plotting ad creatives based on 'Engagement' vs 'Cost Efficiency'.
-    Helps in identifying 'Winners', 'Budget Wasters', and 'Potentials'.
-  path: creative/creative-quadrant/manifest.yml
-emotion-wave:
-  description: Backend-driven widget for Emotion Wave.
-  path: misc/emotion-wave/manifest.yml
-funnel:
-  description: Visualizes the drop-off across sequential stages of a user journey
-    or process.
-  path: marketing/funnel/manifest.yml
-heatmap-cartesian:
-  description: Shows density or activity distribution across two dimensions (e.g.
-    time vs day, region vs category).
-  path: charts/heatmap-cartesian/manifest.yml
-incremental-lift:
-  description: Measures the 'true' lift provided by a campaign by comparing test vs
-    control groups. Essential for determining actual ROI beyond simple attribution.
-  path: marketing/incremental-lift/manifest.yml
-intensity-heat:
-  description: Shows density or activity distribution across two dimensions (e.g.
-    time vs day, region vs category).
-  path: charts/intensity-heat/manifest.yml
-intent-sunburst:
-  description: A multi-level pie chart visualizing the hierarchy of user intent or
-    interests. Shows how broad categories break down into specific sub-interests.
-  path: marketing/intent-sunburst/manifest.yml
-lead-clustering:
-  description: Visualizes groups of similar leads based on behavioral or demographic
-    features. Useful for segmenting audiences for targeted campaigns.
-  path: ml/lead-clustering/manifest.yml
-leads-list:
-  description: A table listing specific actionable entities (leads, users, devices)
-    with their status and scores.
-  path: operational/leads-list/manifest.yml
-liquid-gauge:
-  description: A visually appealing gauge that fills like liquid. Perfect for representing
-    tank levels, completion percentages, or budget consumption.
-  path: misc/liquid-gauge/manifest.yml
-market-evolution:
-  description: A dynamic area or line chart showing how market share or competitive
-    landscape has evolved over time. Tracks multiple competitors simultaneously.
-  path: marketing/market-evolution/manifest.yml
-market-radar:
-  description: A radar (spider) chart showing brand performance or sentiment across
-    multiple dimensions like 'Price', 'Quality', 'Service', and 'Innovation'.
-  path: marketing/market-radar/manifest.yml
-neural-nexus:
-  description: Visualizes complex relationships or network effects between entities
-    (users, nodes, transactions). Ideal for fraud detection, social network analysis,
-    or supply chain mapping.
-  path: ml/neural-nexus/manifest.yml
-optimal-time:
-  description: Identifies the best time to take an action (e.g. sending an email or
-    launching an ad) based on historical response rates across days and hours.
-  path: spatiotemporal/optimal-time/manifest.yml
-predictive:
-  description: A high-performance prediction card showing historical trends vs future
-    forecasts with confidence intervals.
-  path: predictive/predictive/manifest.yml
-pulse-circle:
-  description: A dynamic pulsing circle visualization used to represent a single real-time
-    metric or status. The intensity of the pulse can indicate activity level or health.
-  path: misc/pulse-circle/manifest.yml
-radar:
-  description: A radar chart comparing marketing channel performance across multiple
-    KPIs like 'CPA', 'LTV', 'CTR', and 'Volume'.
-  path: marketing/radar/manifest.yml
-range-area:
-  description: An area chart that highlights the gap between two series (upper and
-    lower bounds). Perfect for showing volatility, confidence intervals, or temperature
-    ranges.
-  path: charts/range-area/manifest.yml
-sankey:
-  description: Visualizes flow between categories. Ideal for showing funnel drop-offs,
-    user journey transitions, or budget allocations across departments.
-  path: charts/sankey/manifest.yml
-scanning-orbit:
-  description: A radar-like scanning visualization. Ideal for security monitoring,
-    discovery processes, or representing an active search across a network or geographic
-    area.
-  path: misc/scanning-orbit/manifest.yml
-scatter:
-  description: Shows relationship between two numeric variables (X and Y). Useful
-    for identifying correlations, clusters, or outliers in datasets like 'Profit vs
-    Ad Spend'.
-  path: charts/scatter/manifest.yml
-semi-circle:
-  description: A semi-circular gauge or donut chart. Good for showing a single percentage-based
-    metric in a space-efficient way, like 'Target vs Actual' or 'Conversion Rate'.
-  path: charts/semi-circle/manifest.yml
-shapley-attribution:
-  description: Uses Shapley values from cooperative game theory to fairly attribute
-    credit to various marketing channels or features. Highly precise for multi-touch
-    attribution.
-  path: ml/shapley-attribution/manifest.yml
-simple-graphics:
-  description: A collection of micro-visualizations (weather, natural patterns, color
-    sliders) for adding aesthetic highlights or simplified status indicators.
-  path: misc/simple-graphics/manifest.yml
-stream-graph:
-  description: A type of stacked area graph which is displaced around a central axis,
-    resulting in a flowing, organic shape. Ideal for visualizing high-volume time-series
-    data like 'Traffic Sources over Time' or 'Revenue Streams'.
-  path: charts/stream-graph/manifest.yml
-trend-spotter:
-  description: Identifies early-stage trends and topics by scanning social media or
-    search data. Highlights growing interest before it reaches mass market.
-  path: marketing/trend-spotter/manifest.yml
-vitals:
-  description: Real-time health monitoring for systems or processes. Displays critical
-    'up/down' status and key performance indicators like 'Latency', 'Error Rate',
-    and 'Uptime'.
-  path: operational/vitals/manifest.yml
-waffle:
-  description: A grid of squares where each square represents a portion of the whole
-    (usually 1%). Best for showing progress against a goal or market share in a visually
-    distinct way.
-  path: charts/waffle/manifest.yml
-waterfall:
-  description: Visualizes how an initial value is affected by a series of intermediate
-    positive or negative changes. Ideal for financial statements, profit-and-loss
-    analysis, or inventory changes.
-  path: financial/waterfall/manifest.yml
+widgets:
+  - id: "ActivityHeatmap"
+    path: "charts/activity-heatmap"
+    title: "Activity Heatmap"
+    description: "Shows density or activity distribution across time vs day. Expects a two-dimensional array of coordinates and values (e.g., [day, hour, value]) to render the heatmap's hot spots."
+
+  - id: "Covariance"
+    path: "charts/covariance"
+    title: "Covariance Matrix"
+    description: "A matrix highlighting how multiple indicators vary simultaneously. Expects an array for categories (fields) and an NXN matrix containing the covariance levels (e.g., 0.8 between Spend and Clicks)."
+
+  - id: "IntensityHeat"
+    path: "charts/intensity-heat"
+    title: "Intensity Heat"
+    description: "Displays saturation or fatigue levels (e.g., Ad Fatigue). Expects a single numerical value or string (e.g., '29') representing the overall score."
+
+  - id: "LiquidGauge"
+    path: "charts/liquid-gauge"
+    title: "Liquid Gauge"
+    description: "A liquid-like fluid representation of a percentage out of 100. Expects a sliderValue between 0 and 100 and a unit (e.g., '%')."
+
+  - id: "LiveTraffic"
+    path: "charts/live-traffic"
+    title: "Live Traffic Chart"
+    description: "Simulates or tracks live traffic rhythm. Uses an array of data points representing real-time traffic history over time."
+
+  - id: "OptimalTime"
+    path: "charts/optimal-time"
+    title: "Optimal Time Heatmap"
+    description: "A focus-heatmap to find the perfect action time. The widget expects an array of matrix data (similar to ActivityHeatmap) but visually stylized to highlight the 'hottest moment'."
+
+  - id: "RangeArea"
+    path: "charts/range-area"
+    title: "Range Area Chart"
+    description: "A line chart visually bounding max, min, and average value areas. Requires separate arrays for dates (X-axis) and the min, max, avg data."
+
+  - id: "RealMapbox"
+    path: "charts/real-mapbox"
+    title: "Mapbox Heatmap"
+    description: "A Mapbox geospatial representation for physical heatmaps. Expects an array of coordinates where each marker has a latitude, longitude, and an intensity value."
+
+  - id: "Sankey"
+    path: "charts/sankey"
+    title: "Sankey Flow"
+    description: "A node-link flow diagram illustrating volume across complex funnels. Expects 'nodes' (stages) and 'links' (connections between source and target dictating volume size)."
+
+  - id: "ScatterPlot"
+    path: "charts/scatter-plot"
+    title: "Scatter Plot"
+    description: "A direct data point distribution map. Expects typical two-dimensional value arrays to calculate Cartesian positions along two axes (plus a trendline)."
+
+  - id: "SemiCircleDonut"
+    path: "charts/semi-circle-donut"
+    title: "Semi-Circle Donut"
+    description: "A half-circle donut chart displaying 100% distribution proportions. Expects a list of platforms containing name, value, and color."
+
+  - id: "StreamGraph"
+    path: "charts/stream-graph"
+    title: "Stream Graph"
+    description: "A solid and fluid line chart with multiple trend layers evolving over time. Expects a three-dimensional stream structure: [date, amount, category]."
+
+  - id: "WaffleChart"
+    path: "charts/waffle-chart"
+    title: "Waffle Chart"
+    description: "Presents what percentage of a total is occupied by a single constant variable across a 10x10 matrix. Expects a global 'value' (0-100) and an optional color theme."
+
+  - id: "CreativeQuadrant"
+    path: "creative/creative-quadrant"
+    title: "Creative Performance Quadrant"
+    description: "A 2x2 matrix plotting ad creatives based on Engagement vs Cost Efficiency. Expects a list of distinct items (e.g., [ROAS, CPA, video_name, type])."
+
+  - id: "BudgetSensitivity"
+    path: "financial/budget-sensitivity"
+    title: "Budget Sensitivity"
+    description: "A mathematical illustration of an economic utility curve. Expects data formatted as test results plotted against budget thresholds vs expected outcomes (e.g., [budget_drop, conversion_drop])."
+
+  - id: "Waterfall"
+    path: "financial/waterfall"
+    title: "Net Profit Bridge"
+    description: "A waterfall chart applying a Net Profit model where financial data undergoes steps of changes to connect gross revenue with net profit. Expects a 'steps' array."
+
+  - id: "Attribution"
+    path: "marketing/attribution"
+    title: "Marketing Attribution"
+    description: "A bar chart comparing channel scores across different models. Expects an array detailing First Click, Last Click, and Linear Attribution per channel."
+
+  - id: "Cohorts"
+    path: "marketing/cohorts"
+    title: "Cohorts"
+    description: "A retention heatmap showing how user groups behave over time. Expects a 'cohorts' array identifying the starting week cohort and its retention rates month over month."
+
+  - id: "Funnel"
+    path: "marketing/funnel"
+    title: "Sales Funnel"
+    description: "Visualizes the drop-off across sequential stages of a user journey. Expects a linear list of steps per stage containing a value and a name."
+
+  - id: "IncrementalLift"
+    path: "marketing/incremental-lift"
+    title: "Incremental Lift"
+    description: "Highlights the absolute incremental value from an A/B Test. Expects values for Control, Test, and the backend-calculated Incremental lift."
+
+  - id: "IntentSunburst"
+    path: "marketing/intent-sunburst"
+    title: "Intent Sunburst"
+    description: "A radial hierarchical graph mapping how user intent splits into categories. Expects an object tree featuring parents and 'children' for deep-diving behavioral categories."
+
+  - id: "InterestRadar"
+    path: "marketing/interest-radar"
+    title: "Interest Radar"
+    description: "A radar chart displaying multidimensional psychographic or audience profiles. Expects data to be aligned with a predefined set of internal axes/indicators."
+
+  - id: "MarketEvolution"
+    path: "marketing/market-evolution"
+    title: "Market Evolution"
+    description: "A force-directed dynamic layout in Echarts. Visualizes traffic categories as 'Nodes' and their gravitational interactions representing performance as 'Links'."
+
+  - id: "MarketSentiment"
+    path: "marketing/market-sentiment"
+    title: "Market Sentiment Radar"
+    description: "Renders perceived sentiment from backend scores onto a radar graph where max indicator bounds are predefined and data paints the brand's evolutionary snapshot."
+
+  - id: "ShapleyAttribution"
+    path: "marketing/shapley-attribution"
+    title: "Shapley Attribution"
+    description: "A mathematical box-plot evaluating variance over multiple simulation runs. Generates quartile data from millions of Shapley attribution inputs mapping channels vs score variance."
+
+  - id: "AudienceCopilot"
+    path: "misc/audience-copilot"
+    title: "Audience Copilot"
+    description: "An AI-powered conversational interface for generating actionable insights text. Expects a textual segment, action type, and generated impact percentages."
+
+  - id: "ChronoDial"
+    path: "misc/chrono-dial"
+    title: "Chrono Dial"
+    description: "A rapid dashboard radial dial from 0 to 100%. Displays a single numerical value computed by the API using a dynamic pendulum UI."
+
+  - id: "EmotionWave"
+    path: "misc/emotion-wave"
+    title: "Emotion Wave"
+    description: "Visualizes emotion intensity through CSS pre-animated waves. Expects only a simple sentiment score (e.g., 78) which regulates the background UI state."
+
+  - id: "LeadsList"
+    path: "misc/leads-list"
+    title: "Leads List"
+    description: "A compact live-feed widget for freshly acquired leads. Expects arrays containing CRM-like user info (name, status hot/cold, acquisition channel, timestamp)."
+
+  - id: "NeuralNexus"
+    path: "misc/neural-nexus"
+    title: "Neural Nexus"
+    description: "An unusual UI meter where progress is drawn semi-circularly through distinctive ticks. Expects a core neural score indicator from the API."
+
+  - id: "PulseCircle"
+    path: "misc/pulse-circle"
+    title: "Pulse Circle"
+    description: "Simulates living status breathing through an animated ring. Expects a single qualitative integer representing global 'health loop' validity."
+
+  - id: "ScanningOrbit"
+    path: "misc/scanning-orbit"
+    title: "Scanning Orbit"
+    description: "A small live-generator widget. Features a background radar with single dynamic metrics (e.g., 14,000 ops/sec) meant to convey a sci-fi scanning aesthetic."
+
+  - id: "SimpleMicro"
+    path: "misc/simple-micro"
+    title: "Simple Micrographics"
+    description: "A collection of 5 ultra-simple widget card layouts selected via a 'view' parameter. Transforms compact API values into immediate and distinct visuals."
+
+  - id: "TechnicalHealth"
+    path: "misc/technical-health"
+    title: "Technical Health"
+    description: "A short matrix dashboard presenting server technical sensor status. Expects a predefined list of attributes (uptime, latency) annotated with good/warning tags."
+
+  - id: "TrendSpotter"
+    path: "misc/trend-spotter"
+    title: "Trend Spotter"
+    description: "Emerging thematic clouds drawn via invisibly guided proportionally larger texts. Expects keywords mapped with relative weight numbers and trend vectors for color-coding."
+
+  - id: "AnomalyStream"
+    path: "ml/anomaly-stream"
+    title: "Anomaly Pulse"
+    description: "A notification feed strictly for critical ML flag anomalies. Uses the backend timeline to quickly stack newly detected risks as raw streaming logs."
+
+  - id: "LeadClustering"
+    path: "ml/lead-clustering"
+    title: "Lead Clustering"
+    description: "Supervised clustering applied to user leads, organized on a Cartesian plane emphasizing value. Expects an array containing full DB characteristics matched against K-means clusters."
+
+  - id: "Forecast"
+    path: "predictive/forecast"
+    title: "Predictive Forecast"
+    description: "Predictive ML extrapolation connected to the frontend's raw tracking series. Displays parallel arrays (history array and dotted prediction array) rendered beneath a dashed UI highlight."

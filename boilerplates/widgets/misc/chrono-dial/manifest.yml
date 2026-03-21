@@ -1,17 +1,8 @@
-title: Chrono Dial
-description: "A radial visualization for time-based data. Best for showing cyclical patterns or distribution of events across a 24-hour period or week."
-data_requirements: ["sliderValue"]
-sql_aliases:
-  - sliderValue: "position percentage (0-100)"
-  - value: "status text"
-  - unit: "unit label"
+title: "Chrono Dial"
+description: "A radial visualization for time-based data. Best for showing cyclical patterns."
 data_structure_template:
-  value: "Active"
-  unit: "Opt"
-  sliderValue: 35
-  footerText: "Scheduled for Monday"
+  sliderValue: 50
 grid_span: "default"
-color_theme: "theme-color"
 sdui:
-  mapping_mode: single
-  root_key: data
+  mapping_mode: "single"
+  root_key: "chrono"
