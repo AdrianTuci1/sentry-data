@@ -37,6 +37,13 @@ class Config:
         self.task_name = os.environ.get("taskName", "unknown")
         self.tenant_id = os.environ.get("tenantId", "unknown")
         self.project_id = os.environ.get("projectId", "unknown")
+        
+        # Sentinel RL Goals
+        raw_goals = os.environ.get("SENTINEL_GOALS", "[]")
+        try:
+            self.sentinel_goals = json.loads(raw_goals)
+        except:
+            self.sentinel_goals = []
 
         # R2 Credentials
         self.region = os.environ.get("R2_REGION", "auto")
@@ -148,9 +155,13 @@ class AgentOrchestrator:
         }
         ctx_str = f"Task: {self.config.task_name}\nProject: {self.config.project_id}\nTenant: {self.config.tenant_id}"
         infra_str = "\n".join([f"{k} = {v}" for k, v in r2_vars.items()])
+        
+        sentinel_str = ""
+        if self.config.sentinel_goals:
+            sentinel_str = "\n\nSENTINEL MANDATES (MUST FOLLOW):\n- " + "\n- ".join(self.config.sentinel_goals)
 
         user_msg = (
-            f"CONTEXT:\n{ctx_str}\n\nINFRASTRUCTURE:\n{infra_str}\n\n"
+            f"CONTEXT:\n{ctx_str}\n\nINFRASTRUCTURE:\n{infra_str}{sentinel_str}\n\n"
             f"BOILERPLATE:\n```python\n{boilerplate_code}\n```\n"
             "Execute and complete the task."
         )
@@ -267,11 +278,12 @@ def main():
         cfg = Config()
         r2 = R2Service(cfg)
         
-        # Phase 1: Smart Cache check
-        cache_uri = f"s3://{cfg.bucket}/tenants/{cfg.tenant_id}/projects/{cfg.project_id}/system/scripts/{cfg.task_name}.py"
-        if r2.exists(cache_uri):
-            print(f"[Main] CACHE HIT: {cache_uri}")
-            code = r2.fetch_text(cache_uri)
+        # Phase 1: Sovereign Agent check (Workspace Isolation)
+        # We check the 'agents' folder instead of the legacy 'system/scripts' cache
+        agent_uri = f"s3://{cfg.bucket}/tenants/{cfg.tenant_id}/projects/{cfg.project_id}/agents/{cfg.task_name}.py"
+        if r2.exists(agent_uri):
+            print(f"[Main] SOVEREIGN AGENT HIT: {agent_uri}")
+            code = r2.fetch_text(agent_uri)
             print(f"--- AGENT_EXECUTION_STDOUT ---\n{ScriptExecutor.run(code)}")
             return
 

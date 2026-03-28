@@ -44,7 +44,7 @@ export class R2StorageService {
      * Check if a script already exists (deprecated in favor of listScripts for bulk).
      */
     public async scriptExists(tenantId: string, projectId: string, taskName: string): Promise<boolean> {
-        const key = this.getS3Key(tenantId, projectId, 'system', 'scripts', `${taskName}.py`);
+        const key = this.getS3Key(tenantId, projectId, 'agents', `${taskName}.py`);
         try {
             await this.client.send(new HeadObjectCommand({ Bucket: this.dataBucket, Key: key }));
             return true;
@@ -58,17 +58,17 @@ export class R2StorageService {
      * Bulk check for scripts to avoid N R2 calls.
      */
     public async listScripts(tenantId: string, projectId: string): Promise<Set<string>> {
-        const prefix = `${this.getProjectBase(tenantId, projectId)}/system/scripts/`;
+        const prefix = `${this.getProjectBase(tenantId, projectId)}/agents/`;
         const keys = await this.listAllUnder(prefix);
         return new Set(keys.map(k => k.split('/').pop()?.replace('.py', '') || ''));
     }
 
     public getScriptUri(tenantId: string, projectId: string, taskName: string): string {
-        return this.getS3Uri(tenantId, projectId, 'system', 'scripts', `${taskName}.py`);
+        return this.getS3Uri(tenantId, projectId, 'agents', `${taskName}.py`);
     }
 
     public async saveScript(tenantId: string, projectId: string, taskName: string, content: string): Promise<void> {
-        const key = this.getS3Key(tenantId, projectId, 'system', 'scripts', `${taskName}.py`);
+        const key = this.getS3Key(tenantId, projectId, 'agents', `${taskName}.py`);
         await this.client.send(new PutObjectCommand({
             Bucket: this.dataBucket,
             Key: key,

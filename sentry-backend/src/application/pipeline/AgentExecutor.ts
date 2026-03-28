@@ -1,15 +1,23 @@
 import { ISandboxProvider } from '../../infrastructure/providers/ISandboxProvider';
 import { R2StorageService } from '../../infrastructure/storage/R2StorageService';
 import { AgentTaskParams, AgentTaskResult } from './types';
-import { config } from '../../config';
+import { AgentParser } from './engine/AgentParser';
+import { AgentDiscoveryExtractor } from './engine/AgentDiscoveryExtractor';
+import { AgentTaskStrategy, DefaultAgentTaskStrategy } from './engine/AgentTaskStrategy';
 
 export class AgentExecutor {
     private sandboxProvider: ISandboxProvider;
     private r2StorageService: R2StorageService;
+    private strategy: AgentTaskStrategy;
 
-    constructor(sandboxProvider: ISandboxProvider, r2StorageService: R2StorageService) {
+    constructor(
+        sandboxProvider: ISandboxProvider,
+        r2StorageService: R2StorageService,
+        strategy: AgentTaskStrategy = new DefaultAgentTaskStrategy()
+    ) {
         this.sandboxProvider = sandboxProvider;
         this.r2StorageService = r2StorageService;
+        this.strategy = strategy;
     }
 
     /**
@@ -23,31 +31,12 @@ export class AgentExecutor {
         const startMs = Date.now();
 
         // 1. Check for cached script
-        let hasCache = false;
-        if (params.existingScripts) {
-            hasCache = params.existingScripts.has(taskName);
-        } else {
-            hasCache = await this.r2StorageService.scriptExists(tenantId, projectId, taskName);
-        }
-
-        // GRANULAR CACHING: Override cache if regeneration is explicitly requested
-        if (params.forceRegenerate) {
-            console.log(`[AgentExecutor] forceRegenerate is TRUE. Bypassing cache for ${taskName}.`);
-            hasCache = false;
-        }
-
-        if (hasCache) {
-            console.log(`[AgentExecutor] CACHE HIT for ${taskName}. Skipping LLM generation.`);
-        } else {
-            console.log(`[AgentExecutor] CACHE MISS (or forced) for ${taskName}. Will trigger LLM Discovery.`);
-        }
+        let hasCache = await this.checkCache(params);
 
         const sandboxConfig = {
-            template: 'sentry-agent-v1',
+            template: this.strategy.getTemplateName(),
             envVars: {
-                'tenantId': tenantId,
-                'projectId': projectId,
-                'taskName': taskName,
+                ...this.strategy.getEnvVars(params),
             }
         };
 
@@ -55,7 +44,7 @@ export class AgentExecutor {
 
         try {
             console.log(`[AgentExecutor] Executing in sandbox ${sandboxId}...`);
-            const execution = await this.sandboxProvider.executeTask(sandboxId, "python /root/agent_manager.py");
+            const execution = await this.sandboxProvider.executeTask(sandboxId, this.strategy.getCommand());
 
             const endMs = Date.now();
             const durationMs = endMs - startMs;
@@ -78,96 +67,23 @@ export class AgentExecutor {
             }
 
             // 3. Estimate Tokens Used
-            // Using real Gemini usage metadata if agent_manager prints it, otherwise estimating from log size
-            let estimatedTokens = 0;
-            const tokenMatch = execution.logs.match(/AGENT_TOKENS:(.*?)(?=\n|$)/);
-            if (tokenMatch && tokenMatch[1]) {
-                try {
-                    const usageData = JSON.parse(tokenMatch[1].trim());
-                    // gemini returns total_token_count or similar
-                    if (usageData.total_token_count) {
-                        estimatedTokens = usageData.total_token_count;
-                    }
-                } catch (e) { }
-            }
-            if (estimatedTokens === 0 && !hasCache) {
-                // Fallback estimate (~4 chars per token)
-                estimatedTokens = Math.ceil(execution.logs.length / 4);
-            }
+            const estimatedTokens = AgentParser.estimateTokens(execution.logs, hasCache);
 
-            // 4. Parse LLM-generated discovery (from agent_manager reasoning)
-            const llmMatch = [...execution.logs.matchAll(/--- AGENT_DISCOVERY_METADATA ---\n([\s\S]*?)(\n---|$)/g)];
-            let llmDiscovery = {};
-            llmMatch.forEach(m => {
-                try {
-                    Object.assign(llmDiscovery, JSON.parse(m[1].trim()));
-                } catch (e) { }
-            });
+            // 4. Extract standard output for parsing
+            const stdoutLogs = AgentParser.extractStdout(execution.logs);
 
-            // Extract only the execution phase stdout to avoid parsing the LLM-generated script containing print() statements
-            let stdoutLogs = execution.logs;
-            if (stdoutLogs.includes('--- AGENT_EXECUTION_STDOUT ---')) {
-                // Take everything after the execution start marker
-                stdoutLogs = stdoutLogs.split('--- AGENT_EXECUTION_STDOUT ---').pop() || '';
-            }
-            if (stdoutLogs.includes('--- STDOUT ---')) {
-                // Further narrow down to the actual script output
-                stdoutLogs = stdoutLogs.split('--- STDOUT ---')[1];
-            }
+            // 5. Parse Discovery (LLM + Code generated)
+            const discoveryMetadata = AgentDiscoveryExtractor.extract(execution.logs, stdoutLogs);
 
-            // 5. Parse Code-generated discovery (prefixed with AGENT_DISCOVERY:)
-            const discoveryMatch = [...stdoutLogs.matchAll(/AGENT_DISCOVERY:(.*?)(?=\nAGENT_|$)/gs)];
-            let codeDiscovery = {};
-            if (discoveryMatch.length > 0) {
-                for (const match of discoveryMatch) {
-                    const rawContent = match[1].trim();
-                    try {
-                        Object.assign(codeDiscovery, JSON.parse(rawContent));
-                    } catch (e: any) {
-                        const jsonCandidate = rawContent.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
-                        if (jsonCandidate) {
-                            try {
-                                Object.assign(codeDiscovery, JSON.parse(jsonCandidate[0]));
-                            } catch (e2: any) {
-                                console.warn(`[AgentExecutor] Failed to parse AGENT_DISCOVERY: ${e2.message}`);
-                            }
-                        }
-                    }
-                }
-            }
+            // 6. Parse Agent Result
+            const agentResult = AgentParser.parseResult(stdoutLogs, taskName);
 
-            // Merge discoveries
-            const discoveryMetadata = {
-                ...llmDiscovery,
-                ...codeDiscovery
-            };
-
-            const resultMatch = [...stdoutLogs.matchAll(/AGENT_RESULT:(.*?)(?=\nAGENT_|$)/gs)];
-            let agentResult = null;
-            if (resultMatch.length > 0) {
-                const rawContent = resultMatch[resultMatch.length - 1][1].trim();
-                try {
-                    agentResult = JSON.parse(rawContent);
-                } catch (e: any) {
-                    // Fallback: search for first valid JSON object/array if there's trailing noise
-                    const jsonCandidate = rawContent.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
-                    if (jsonCandidate) {
-                        try {
-                            agentResult = JSON.parse(jsonCandidate[0]);
-                        } catch (e2: any) {
-                            console.warn(`[AgentExecutor] Failed to parse AGENT_RESULT for ${taskName}: ${e2.message}`);
-                        }
-                    }
-                }
-            }
-
-            const hasAnyDiscovery = Object.keys(discoveryMetadata).length > 0;
             console.log(`[AgentExecutor] Task ${taskName} complete (${durationMs}ms). Cache hit: ${hasCache}. Tokens: ~${estimatedTokens}`);
 
             return {
                 success: true,
                 result: agentResult,
-                discovery: hasAnyDiscovery ? discoveryMetadata : null,
+                discovery: Object.keys(discoveryMetadata).length > 0 ? discoveryMetadata : null,
                 logs: execution.logs,
                 timing: { startMs, endMs, durationMs },
                 estimatedTokens
@@ -176,5 +92,24 @@ export class AgentExecutor {
         } finally {
             await this.sandboxProvider.stopSandbox(sandboxId);
         }
+    }
+
+    private async checkCache(params: AgentTaskParams): Promise<boolean> {
+        const { tenantId, projectId, taskName, existingScripts, forceRegenerate } = params;
+        let hasCache = false;
+
+        if (existingScripts) {
+            hasCache = existingScripts.has(taskName);
+        } else {
+            hasCache = await this.r2StorageService.scriptExists(tenantId, projectId, taskName);
+        }
+
+        if (forceRegenerate) {
+            console.log(`[AgentExecutor] forceRegenerate is TRUE. Bypassing cache for ${taskName}.`);
+            return false;
+        }
+
+        console.log(`[AgentExecutor] ${hasCache ? 'CACHE HIT' : 'CACHE MISS'} for ${taskName}.`);
+        return hasCache;
     }
 }

@@ -8,6 +8,9 @@ export interface PipelineContext {
     forceRediscover?: boolean;
     invalidatedSources?: string[];
     discovery?: CumulativeDiscovery;
+    pipelineConfig?: {
+        enableMlLab?: boolean;
+    };
 }
 
 export interface PipelineVitals {
@@ -45,6 +48,7 @@ export interface AgentTaskParams {
     taskName: string;
     forceRegenerate?: boolean;
     existingScripts?: Set<string>;
+    sentinelGoals?: string[];
 }
 
 export interface AgentTaskResult {
