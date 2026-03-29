@@ -88,6 +88,12 @@ Vezi cum insights-urile de ML sunt traduse în task-uri concrete pentru alți ag
 python3 ml-lab/align_demo.py
 ```
 
+### 5. Generare bundle de antrenare
+Pregătește dataset-uri multi-domain pentru detectie de domenii, recomandare de widget-uri, query/script generation și feedback RL.
+```bash
+python3 ml-lab/datasets/generate_bundle.py --output-dir ml-lab/datasets/training_bundle --rows-per-source 240
+```
+
 ---
 
 ## 📊 Date pentru Antrenare
@@ -118,3 +124,11 @@ Sistemul generează două tipuri de insights:
 2. **Technical Anomaly**: Erori de execuție sau transformare (Isolation Forest + Heuristics).
 
 Toate aceste insights sunt agregate de `GeminiFlashEngine` pentru a produce **Aligned Goals**.
+
+### Training bundle extins
+Generatorul din `ml-lab/datasets/` poate materializa:
+- surse sintetice pentru SaaS, product analytics, web analytics, marketing, commerce, sales, support, observability, FinOps, cybersecurity și IoT;
+- spec-uri ideale pentru field-uri, cu reguli de validare, normalizare și mapare către widget-uri;
+- un catalog de 44 widget-uri analitice pentru selecție automată;
+- scenarii de antrenare pentru agenți care trebuie să producă SQL/Python profesional;
+- profile și evenimente de reinforcement learning pentru multi-point clustering și adaptare colectivă per field.

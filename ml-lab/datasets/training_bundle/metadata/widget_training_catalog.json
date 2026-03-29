@@ -1,0 +1,1506 @@
+[
+  {
+    "id": "north_star_kpi_board",
+    "title": "North Star KPI Board",
+    "family": "scorecard-grid",
+    "domains": [
+      "saas_metrics",
+      "web_analytics",
+      "commerce"
+    ],
+    "required_roles": [
+      "financial_metric",
+      "conversion_metric"
+    ],
+    "optional_roles": [
+      "traffic_metric",
+      "adoption_metric"
+    ],
+    "grain": "day",
+    "query_pattern": "multi_cte_metric_board",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "revenue_growth_waterfall",
+    "title": "Revenue Growth Waterfall",
+    "family": "waterfall",
+    "domains": [
+      "saas_metrics",
+      "commerce",
+      "sales_pipeline"
+    ],
+    "required_roles": [
+      "financial_metric"
+    ],
+    "optional_roles": [
+      "conversion_metric"
+    ],
+    "grain": "month",
+    "query_pattern": "variance_bridge_by_period",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "mrr_retention_curve",
+    "title": "MRR Retention Curve",
+    "family": "line-ribbon",
+    "domains": [
+      "saas_metrics"
+    ],
+    "required_roles": [
+      "financial_metric",
+      "quality_metric"
+    ],
+    "optional_roles": [
+      "adoption_metric"
+    ],
+    "grain": "month",
+    "query_pattern": "time_series_with_baseline_and_forecast",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "ltv_cac_radar",
+    "title": "LTV CAC Radar",
+    "family": "radar",
+    "domains": [
+      "saas_metrics",
+      "marketing_attribution",
+      "sales_pipeline"
+    ],
+    "required_roles": [
+      "financial_metric",
+      "marketing_spend"
+    ],
+    "optional_roles": [
+      "conversion_metric"
+    ],
+    "grain": "month",
+    "query_pattern": "normalized_metric_comparison",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "activation_funnel",
+    "title": "Activation Funnel",
+    "family": "funnel",
+    "domains": [
+      "product_analytics",
+      "web_analytics",
+      "saas_metrics"
+    ],
+    "required_roles": [
+      "conversion_metric",
+      "adoption_metric"
+    ],
+    "optional_roles": [
+      "traffic_metric"
+    ],
+    "grain": "week",
+    "query_pattern": "ordered_stage_conversion_query",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "cohort_retention_heatmap",
+    "title": "Cohort Retention Heatmap",
+    "family": "heatmap",
+    "domains": [
+      "saas_metrics",
+      "product_analytics"
+    ],
+    "required_roles": [
+      "adoption_metric",
+      "quality_metric"
+    ],
+    "optional_roles": [
+      "financial_metric"
+    ],
+    "grain": "week",
+    "query_pattern": "matrix_aggregate_by_segment_and_period",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "expansion_vs_contraction",
+    "title": "Expansion vs Contraction",
+    "family": "line-ribbon",
+    "domains": [
+      "saas_metrics"
+    ],
+    "required_roles": [
+      "financial_metric"
+    ],
+    "optional_roles": [
+      "quality_metric"
+    ],
+    "grain": "month",
+    "query_pattern": "time_series_with_baseline_and_forecast",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "pipeline_velocity_board",
+    "title": "Pipeline Velocity Board",
+    "family": "scorecard-grid",
+    "domains": [
+      "sales_pipeline"
+    ],
+    "required_roles": [
+      "conversion_metric",
+      "financial_metric"
+    ],
+    "optional_roles": [
+      "quality_metric"
+    ],
+    "grain": "week",
+    "query_pattern": "multi_cte_metric_board",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "win_rate_vs_cycle_time",
+    "title": "Win Rate vs Cycle Time",
+    "family": "scatter",
+    "domains": [
+      "sales_pipeline"
+    ],
+    "required_roles": [
+      "quality_metric",
+      "performance_metric"
+    ],
+    "optional_roles": [
+      "financial_metric"
+    ],
+    "grain": "month",
+    "query_pattern": "correlation_and_outlier_detection",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "demand_generation_mix",
+    "title": "Demand Generation Mix",
+    "family": "treemap",
+    "domains": [
+      "marketing_attribution",
+      "web_analytics"
+    ],
+    "required_roles": [
+      "marketing_spend",
+      "traffic_metric"
+    ],
+    "optional_roles": [
+      "conversion_metric"
+    ],
+    "grain": "week",
+    "query_pattern": "hierarchical_share_of_total",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "spend_efficiency_frontier",
+    "title": "Spend Efficiency Frontier",
+    "family": "scatter",
+    "domains": [
+      "marketing_attribution",
+      "commerce"
+    ],
+    "required_roles": [
+      "marketing_spend",
+      "financial_metric"
+    ],
+    "optional_roles": [
+      "conversion_metric"
+    ],
+    "grain": "week",
+    "query_pattern": "correlation_and_outlier_detection",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "campaign_fatigue_monitor",
+    "title": "Campaign Fatigue Monitor",
+    "family": "line-ribbon",
+    "domains": [
+      "marketing_attribution"
+    ],
+    "required_roles": [
+      "marketing_spend",
+      "traffic_metric"
+    ],
+    "optional_roles": [
+      "quality_metric"
+    ],
+    "grain": "day",
+    "query_pattern": "time_series_with_baseline_and_forecast",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "roas_treemap",
+    "title": "ROAS Treemap",
+    "family": "treemap",
+    "domains": [
+      "marketing_attribution",
+      "commerce"
+    ],
+    "required_roles": [
+      "marketing_spend",
+      "financial_metric"
+    ],
+    "optional_roles": [
+      "conversion_metric"
+    ],
+    "grain": "week",
+    "query_pattern": "hierarchical_share_of_total",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "session_quality_breakdown",
+    "title": "Session Quality Breakdown",
+    "family": "scorecard-grid",
+    "domains": [
+      "web_analytics"
+    ],
+    "required_roles": [
+      "traffic_metric",
+      "quality_metric"
+    ],
+    "optional_roles": [
+      "conversion_metric"
+    ],
+    "grain": "day",
+    "query_pattern": "multi_cte_metric_board",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "landing_page_dropoff_sankey",
+    "title": "Landing Page Dropoff Sankey",
+    "family": "sankey",
+    "domains": [
+      "web_analytics"
+    ],
+    "required_roles": [
+      "traffic_metric",
+      "conversion_metric"
+    ],
+    "optional_roles": [
+      "quality_metric"
+    ],
+    "grain": "day",
+    "query_pattern": "stage_transition_edges",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "path_to_conversion_funnel",
+    "title": "Path to Conversion Funnel",
+    "family": "funnel",
+    "domains": [
+      "web_analytics",
+      "commerce",
+      "sales_pipeline"
+    ],
+    "required_roles": [
+      "traffic_metric",
+      "conversion_metric"
+    ],
+    "optional_roles": [
+      "financial_metric"
+    ],
+    "grain": "week",
+    "query_pattern": "ordered_stage_conversion_query",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "checkout_friction_matrix",
+    "title": "Checkout Friction Matrix",
+    "family": "heatmap",
+    "domains": [
+      "commerce"
+    ],
+    "required_roles": [
+      "conversion_metric",
+      "quality_metric"
+    ],
+    "optional_roles": [
+      "traffic_metric"
+    ],
+    "grain": "day",
+    "query_pattern": "matrix_aggregate_by_segment_and_period",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "customer_segment_clusters",
+    "title": "Customer Segment Clusters",
+    "family": "clusters",
+    "domains": [
+      "commerce",
+      "saas_metrics",
+      "product_analytics"
+    ],
+    "required_roles": [
+      "financial_metric",
+      "adoption_metric"
+    ],
+    "optional_roles": [
+      "traffic_metric",
+      "quality_metric"
+    ],
+    "grain": "month",
+    "query_pattern": "embedding_or_feature_space_projection",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "churn_risk_bubble_map",
+    "title": "Churn Risk Bubble Map",
+    "family": "scatter",
+    "domains": [
+      "saas_metrics",
+      "customer_support",
+      "product_analytics"
+    ],
+    "required_roles": [
+      "quality_metric",
+      "adoption_metric"
+    ],
+    "optional_roles": [
+      "financial_metric"
+    ],
+    "grain": "month",
+    "query_pattern": "correlation_and_outlier_detection",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "customer_health_command",
+    "title": "Customer Health Command",
+    "family": "table",
+    "domains": [
+      "saas_metrics",
+      "customer_support",
+      "product_analytics"
+    ],
+    "required_roles": [
+      "adoption_metric",
+      "quality_metric"
+    ],
+    "optional_roles": [
+      "financial_metric",
+      "performance_metric"
+    ],
+    "grain": "week",
+    "query_pattern": "ranked_fact_table_with_explanations",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "support_burden_heatmap",
+    "title": "Support Burden Heatmap",
+    "family": "heatmap",
+    "domains": [
+      "customer_support"
+    ],
+    "required_roles": [
+      "conversion_metric",
+      "reliability_metric"
+    ],
+    "optional_roles": [
+      "quality_metric"
+    ],
+    "grain": "day",
+    "query_pattern": "matrix_aggregate_by_segment_and_period",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "csat_resolution_tradeoff",
+    "title": "CSAT Resolution Tradeoff",
+    "family": "scatter",
+    "domains": [
+      "customer_support"
+    ],
+    "required_roles": [
+      "quality_metric",
+      "performance_metric"
+    ],
+    "optional_roles": [
+      "conversion_metric"
+    ],
+    "grain": "week",
+    "query_pattern": "correlation_and_outlier_detection",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "incident_reliability_timeline",
+    "title": "Incident Reliability Timeline",
+    "family": "line-ribbon",
+    "domains": [
+      "observability"
+    ],
+    "required_roles": [
+      "reliability_metric",
+      "performance_metric"
+    ],
+    "optional_roles": [
+      "traffic_metric"
+    ],
+    "grain": "day",
+    "query_pattern": "time_series_with_baseline_and_forecast",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "slo_burn_down",
+    "title": "SLO Burn Down",
+    "family": "line-ribbon",
+    "domains": [
+      "observability",
+      "finops"
+    ],
+    "required_roles": [
+      "reliability_metric"
+    ],
+    "optional_roles": [
+      "performance_metric"
+    ],
+    "grain": "day",
+    "query_pattern": "time_series_with_baseline_and_forecast",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "latency_error_correlation",
+    "title": "Latency Error Correlation",
+    "family": "scatter",
+    "domains": [
+      "observability"
+    ],
+    "required_roles": [
+      "performance_metric",
+      "reliability_metric"
+    ],
+    "optional_roles": [
+      "traffic_metric"
+    ],
+    "grain": "day",
+    "query_pattern": "correlation_and_outlier_detection",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "deploy_vs_incident_scatter",
+    "title": "Deploy vs Incident Scatter",
+    "family": "scatter",
+    "domains": [
+      "observability"
+    ],
+    "required_roles": [
+      "performance_metric",
+      "reliability_metric"
+    ],
+    "optional_roles": [
+      "dimension"
+    ],
+    "grain": "week",
+    "query_pattern": "correlation_and_outlier_detection",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "cloud_cost_efficiency",
+    "title": "Cloud Cost Efficiency",
+    "family": "scorecard-grid",
+    "domains": [
+      "finops",
+      "observability"
+    ],
+    "required_roles": [
+      "cost_metric",
+      "performance_metric"
+    ],
+    "optional_roles": [
+      "traffic_metric",
+      "reliability_metric"
+    ],
+    "grain": "week",
+    "query_pattern": "multi_cte_metric_board",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "finops_waste_treemap",
+    "title": "FinOps Waste Treemap",
+    "family": "treemap",
+    "domains": [
+      "finops"
+    ],
+    "required_roles": [
+      "cost_metric"
+    ],
+    "optional_roles": [
+      "performance_metric"
+    ],
+    "grain": "month",
+    "query_pattern": "hierarchical_share_of_total",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "security_threat_surface",
+    "title": "Security Threat Surface",
+    "family": "scorecard-grid",
+    "domains": [
+      "cybersecurity"
+    ],
+    "required_roles": [
+      "security_metric"
+    ],
+    "optional_roles": [
+      "traffic_metric",
+      "quality_metric"
+    ],
+    "grain": "day",
+    "query_pattern": "multi_cte_metric_board",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "privileged_access_watchtower",
+    "title": "Privileged Access Watchtower",
+    "family": "table",
+    "domains": [
+      "cybersecurity"
+    ],
+    "required_roles": [
+      "security_metric"
+    ],
+    "optional_roles": [
+      "entity_id",
+      "dimension"
+    ],
+    "grain": "day",
+    "query_pattern": "ranked_fact_table_with_explanations",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "exfiltration_risk_chord",
+    "title": "Exfiltration Risk Chord",
+    "family": "network",
+    "domains": [
+      "cybersecurity",
+      "observability"
+    ],
+    "required_roles": [
+      "security_metric",
+      "traffic_metric"
+    ],
+    "optional_roles": [
+      "dimension"
+    ],
+    "grain": "day",
+    "query_pattern": "relationship_graph_extraction",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "anomaly_investigation_panel",
+    "title": "Anomaly Investigation Panel",
+    "family": "table",
+    "domains": [
+      "observability",
+      "cybersecurity",
+      "iot_operations"
+    ],
+    "required_roles": [
+      "reliability_metric",
+      "security_metric"
+    ],
+    "optional_roles": [
+      "sensor_metric",
+      "quality_metric"
+    ],
+    "grain": "day",
+    "query_pattern": "ranked_fact_table_with_explanations",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "demand_forecast_ribbon",
+    "title": "Demand Forecast Ribbon",
+    "family": "line-ribbon",
+    "domains": [
+      "commerce",
+      "sales_pipeline",
+      "saas_metrics"
+    ],
+    "required_roles": [
+      "financial_metric",
+      "conversion_metric"
+    ],
+    "optional_roles": [
+      "traffic_metric"
+    ],
+    "grain": "week",
+    "query_pattern": "time_series_with_baseline_and_forecast",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "inventory_pressure_matrix",
+    "title": "Inventory Pressure Matrix",
+    "family": "heatmap",
+    "domains": [
+      "commerce",
+      "iot_operations"
+    ],
+    "required_roles": [
+      "performance_metric",
+      "quality_metric"
+    ],
+    "optional_roles": [
+      "financial_metric"
+    ],
+    "grain": "day",
+    "query_pattern": "matrix_aggregate_by_segment_and_period",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "revenue_forecast_vs_capacity",
+    "title": "Revenue Forecast vs Capacity",
+    "family": "scatter",
+    "domains": [
+      "saas_metrics",
+      "sales_pipeline",
+      "finops"
+    ],
+    "required_roles": [
+      "financial_metric",
+      "performance_metric"
+    ],
+    "optional_roles": [
+      "cost_metric"
+    ],
+    "grain": "month",
+    "query_pattern": "correlation_and_outlier_detection",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "multi_touch_attribution_paths",
+    "title": "Multi Touch Attribution Paths",
+    "family": "sankey",
+    "domains": [
+      "marketing_attribution",
+      "web_analytics",
+      "sales_pipeline"
+    ],
+    "required_roles": [
+      "traffic_metric",
+      "conversion_metric",
+      "marketing_spend"
+    ],
+    "optional_roles": [
+      "financial_metric"
+    ],
+    "grain": "week",
+    "query_pattern": "stage_transition_edges",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "product_feature_adoption_mesh",
+    "title": "Product Feature Adoption Mesh",
+    "family": "heatmap",
+    "domains": [
+      "product_analytics"
+    ],
+    "required_roles": [
+      "adoption_metric"
+    ],
+    "optional_roles": [
+      "quality_metric",
+      "conversion_metric"
+    ],
+    "grain": "week",
+    "query_pattern": "matrix_aggregate_by_segment_and_period",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "seat_utilization_balance",
+    "title": "Seat Utilization Balance",
+    "family": "scatter",
+    "domains": [
+      "product_analytics",
+      "saas_metrics"
+    ],
+    "required_roles": [
+      "adoption_metric",
+      "financial_metric"
+    ],
+    "optional_roles": [
+      "quality_metric"
+    ],
+    "grain": "week",
+    "query_pattern": "correlation_and_outlier_detection",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "workspace_growth_clusters",
+    "title": "Workspace Growth Clusters",
+    "family": "clusters",
+    "domains": [
+      "product_analytics",
+      "saas_metrics"
+    ],
+    "required_roles": [
+      "adoption_metric",
+      "financial_metric"
+    ],
+    "optional_roles": [
+      "traffic_metric",
+      "quality_metric"
+    ],
+    "grain": "month",
+    "query_pattern": "embedding_or_feature_space_projection",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "reinforcement_policy_map",
+    "title": "Reinforcement Policy Map",
+    "family": "clusters",
+    "domains": [
+      "rl_control"
+    ],
+    "required_roles": [
+      "dimension",
+      "quality_metric"
+    ],
+    "optional_roles": [
+      "financial_metric",
+      "performance_metric"
+    ],
+    "grain": "week",
+    "query_pattern": "embedding_or_feature_space_projection",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "collective_deviation_compass",
+    "title": "Collective Deviation Compass",
+    "family": "network",
+    "domains": [
+      "rl_control",
+      "observability",
+      "product_analytics"
+    ],
+    "required_roles": [
+      "dimension",
+      "quality_metric"
+    ],
+    "optional_roles": [
+      "performance_metric",
+      "adoption_metric"
+    ],
+    "grain": "week",
+    "query_pattern": "relationship_graph_extraction",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "source_quality_lineage",
+    "title": "Source Quality Lineage",
+    "family": "network",
+    "domains": [
+      "rl_control",
+      "observability",
+      "customer_support"
+    ],
+    "required_roles": [
+      "reliability_metric",
+      "dimension"
+    ],
+    "optional_roles": [
+      "quality_metric"
+    ],
+    "grain": "day",
+    "query_pattern": "relationship_graph_extraction",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "schema_drift_radar",
+    "title": "Schema Drift Radar",
+    "family": "radar",
+    "domains": [
+      "rl_control",
+      "observability",
+      "cybersecurity"
+    ],
+    "required_roles": [
+      "reliability_metric",
+      "dimension"
+    ],
+    "optional_roles": [
+      "security_metric",
+      "adoption_metric"
+    ],
+    "grain": "week",
+    "query_pattern": "normalized_metric_comparison",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  },
+  {
+    "id": "executive_mixed_signal_wall",
+    "title": "Executive Mixed Signal Wall",
+    "family": "scorecard-grid",
+    "domains": [
+      "saas_metrics",
+      "marketing_attribution",
+      "customer_support",
+      "observability",
+      "finops"
+    ],
+    "required_roles": [
+      "financial_metric",
+      "performance_metric"
+    ],
+    "optional_roles": [
+      "marketing_spend",
+      "quality_metric",
+      "adoption_metric"
+    ],
+    "grain": "week",
+    "query_pattern": "multi_cte_metric_board",
+    "script_expectations": [
+      "emit_clean_fact_table",
+      "annotate_quality_checks",
+      "return_widget_ready_payload"
+    ],
+    "clustering_axes": [
+      "business_impact",
+      "actionability",
+      "data_readiness"
+    ],
+    "ranking_features": {
+      "domain_overlap_weight": 0.45,
+      "field_role_match_weight": 0.35,
+      "freshness_weight": 0.12,
+      "explainability_weight": 0.08
+    }
+  }
+]

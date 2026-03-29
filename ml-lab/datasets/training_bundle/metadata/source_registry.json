@@ -1,0 +1,2433 @@
+[
+  {
+    "source_name": "banking_aml_alerts",
+    "domain": "banking_finance",
+    "grain": "day",
+    "description": "AML and sanctions investigation workload with suspicious transaction pressure.",
+    "row_count": 240,
+    "join_keys": [
+      "timestamp",
+      "corridor"
+    ],
+    "schema": [
+      {
+        "name": "timestamp",
+        "dtype": "datetime64[ns]",
+        "nullable_ratio": 0.0,
+        "min_value": 1.7466084e+18,
+        "max_value": 1.767258e+18,
+        "sample_values": [
+          "2025-05-07T09:00:00",
+          "2025-05-08T09:00:00",
+          "2025-05-09T09:00:00",
+          "2025-05-10T09:00:00"
+        ]
+      },
+      {
+        "name": "corridor",
+        "dtype": "object",
+        "nullable_ratio": 0.0,
+        "min_value": null,
+        "max_value": null,
+        "sample_values": [
+          "na",
+          "apac",
+          "emea",
+          "na"
+        ]
+      },
+      {
+        "name": "aml_alert_count",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 266.0,
+        "max_value": 625.0,
+        "sample_values": [
+          354,
+          380,
+          345,
+          340
+        ]
+      },
+      {
+        "name": "suspicious_txn_usd",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 5171802.09,
+        "max_value": 12575412.3,
+        "sample_values": [
+          7138310.41,
+          7007793.19,
+          7155429.57,
+          6735079.41
+        ]
+      },
+      {
+        "name": "sanction_hits",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 4.0,
+        "max_value": 18.0,
+        "sample_values": [
+          9,
+          8,
+          8,
+          9
+        ]
+      },
+      {
+        "name": "case_backlog",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 142.0,
+        "max_value": 259.0,
+        "sample_values": [
+          198,
+          203,
+          216,
+          213
+        ]
+      },
+      {
+        "name": "investigation_time_hours",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 15.49,
+        "max_value": 27.87,
+        "sample_values": [
+          22.21,
+          20.02,
+          20.3,
+          22.49
+        ]
+      },
+      {
+        "name": "fraud_loss_usd",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 162295.75,
+        "max_value": 281346.66,
+        "sample_values": [
+          221555.8,
+          214205.25,
+          217962.66,
+          225738.19
+        ]
+      }
+    ]
+  },
+  {
+    "source_name": "banking_core_ledger",
+    "domain": "banking_finance",
+    "grain": "day",
+    "description": "Deposits, exposures, liquidity, and fraud pressure across retail banking.",
+    "row_count": 240,
+    "join_keys": [
+      "timestamp",
+      "branch_id"
+    ],
+    "schema": [
+      {
+        "name": "timestamp",
+        "dtype": "datetime64[ns]",
+        "nullable_ratio": 0.0,
+        "min_value": 1.7466084e+18,
+        "max_value": 1.767258e+18,
+        "sample_values": [
+          "2025-05-07T09:00:00",
+          "2025-05-08T09:00:00",
+          "2025-05-09T09:00:00",
+          "2025-05-10T09:00:00"
+        ]
+      },
+      {
+        "name": "branch_id",
+        "dtype": "object",
+        "nullable_ratio": 0.0,
+        "min_value": null,
+        "max_value": null,
+        "sample_values": [
+          "branch_01",
+          "branch_02",
+          "branch_03",
+          "branch_04"
+        ]
+      },
+      {
+        "name": "deposit_balance_usd",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 419180219.22,
+        "max_value": 508837700.27,
+        "sample_values": [
+          419180219.22,
+          429284409.56,
+          419708669.38,
+          424783601.58
+        ]
+      },
+      {
+        "name": "loan_exposure_usd",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 310940314.02,
+        "max_value": 378527188.54,
+        "sample_values": [
+          316070768.29,
+          316361515.1,
+          314029541.04,
+          316664470.61
+        ]
+      },
+      {
+        "name": "daily_txn_volume_usd",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 65590881.62,
+        "max_value": 104872895.32,
+        "sample_values": [
+          92817285.36,
+          96961958.88,
+          97703913.12,
+          95122382.25
+        ]
+      },
+      {
+        "name": "net_interest_margin",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.0263,
+        "max_value": 0.03512,
+        "sample_values": [
+          0.03316,
+          0.03305,
+          0.03147,
+          0.03275
+        ]
+      },
+      {
+        "name": "liquidity_coverage_ratio",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 1.0563,
+        "max_value": 1.3872,
+        "sample_values": [
+          1.3256,
+          1.3434,
+          1.293,
+          1.2973
+        ]
+      },
+      {
+        "name": "delinquency_rate",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.0177,
+        "max_value": 0.0373,
+        "sample_values": [
+          0.0253,
+          0.0243,
+          0.0233,
+          0.0255
+        ]
+      },
+      {
+        "name": "fraud_score",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.0948,
+        "max_value": 0.3455,
+        "sample_values": [
+          0.1955,
+          0.1911,
+          0.1947,
+          0.1953
+        ]
+      }
+    ]
+  },
+  {
+    "source_name": "cloud_finops",
+    "domain": "finops",
+    "grain": "day",
+    "description": "Platform costs, rightsizing, and efficiency pressure.",
+    "row_count": 240,
+    "join_keys": [
+      "timestamp",
+      "cloud_region"
+    ],
+    "schema": [
+      {
+        "name": "timestamp",
+        "dtype": "datetime64[ns]",
+        "nullable_ratio": 0.0,
+        "min_value": 1.7466084e+18,
+        "max_value": 1.767258e+18,
+        "sample_values": [
+          "2025-05-07T09:00:00",
+          "2025-05-08T09:00:00",
+          "2025-05-09T09:00:00",
+          "2025-05-10T09:00:00"
+        ]
+      },
+      {
+        "name": "cloud_region",
+        "dtype": "object",
+        "nullable_ratio": 0.0,
+        "min_value": null,
+        "max_value": null,
+        "sample_values": [
+          "ap-south",
+          "ap-south",
+          "ap-south",
+          "us-west"
+        ]
+      },
+      {
+        "name": "cloud_cost_usd",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 38931.35,
+        "max_value": 59021.77,
+        "sample_values": [
+          42286.64,
+          41075.27,
+          42238.62,
+          43387.32
+        ]
+      },
+      {
+        "name": "compute_cost_usd",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 20437.72,
+        "max_value": 30416.3,
+        "sample_values": [
+          23348.37,
+          23002.18,
+          24505.72,
+          24743.7
+        ]
+      },
+      {
+        "name": "storage_cost_usd",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 6037.87,
+        "max_value": 12519.66,
+        "sample_values": [
+          8649.58,
+          7729.66,
+          8773.06,
+          8716.22
+        ]
+      },
+      {
+        "name": "cost_per_request_usd",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.071464,
+        "max_value": 0.104546,
+        "sample_values": [
+          0.08132,
+          0.07894,
+          0.081124,
+          0.083276
+        ]
+      },
+      {
+        "name": "rightsizing_score",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.5352,
+        "max_value": 0.8088,
+        "sample_values": [
+          0.7113,
+          0.712,
+          0.7164,
+          0.7411
+        ]
+      },
+      {
+        "name": "error_budget_burn",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.2242,
+        "max_value": 0.4613,
+        "sample_values": [
+          0.3434,
+          0.3245,
+          0.3613,
+          0.3874
+        ]
+      }
+    ]
+  },
+  {
+    "source_name": "crm_pipeline",
+    "domain": "sales_pipeline",
+    "grain": "day",
+    "description": "B2B pipeline creation, conversion, and sales velocity.",
+    "row_count": 240,
+    "join_keys": [
+      "timestamp",
+      "owner_segment"
+    ],
+    "schema": [
+      {
+        "name": "timestamp",
+        "dtype": "datetime64[ns]",
+        "nullable_ratio": 0.0,
+        "min_value": 1.7466084e+18,
+        "max_value": 1.767258e+18,
+        "sample_values": [
+          "2025-05-07T09:00:00",
+          "2025-05-08T09:00:00",
+          "2025-05-09T09:00:00",
+          "2025-05-10T09:00:00"
+        ]
+      },
+      {
+        "name": "owner_segment",
+        "dtype": "object",
+        "nullable_ratio": 0.0,
+        "min_value": null,
+        "max_value": null,
+        "sample_values": [
+          "enterprise",
+          "mid_market",
+          "mid_market",
+          "smb"
+        ]
+      },
+      {
+        "name": "sqls",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 65.0,
+        "max_value": 102.0,
+        "sample_values": [
+          84,
+          86,
+          82,
+          81
+        ]
+      },
+      {
+        "name": "meetings_booked",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 27.0,
+        "max_value": 53.0,
+        "sample_values": [
+          39,
+          39,
+          36,
+          36
+        ]
+      },
+      {
+        "name": "opportunities_created",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 19.0,
+        "max_value": 41.0,
+        "sample_values": [
+          29,
+          28,
+          27,
+          27
+        ]
+      },
+      {
+        "name": "pipeline_value_usd",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 146058.81,
+        "max_value": 399189.57,
+        "sample_values": [
+          261551.24,
+          235909.81,
+          241151.93,
+          234277.93
+        ]
+      },
+      {
+        "name": "win_rate",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.1315,
+        "max_value": 0.2962,
+        "sample_values": [
+          0.2302,
+          0.2062,
+          0.2567,
+          0.2427
+        ]
+      },
+      {
+        "name": "sales_cycle_days",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 32.42,
+        "max_value": 56.93,
+        "sample_values": [
+          44.84,
+          46.46,
+          47.29,
+          45.51
+        ]
+      }
+    ]
+  },
+  {
+    "source_name": "ecommerce_orders",
+    "domain": "commerce",
+    "grain": "day",
+    "description": "Order, margin, and fulfillment patterns for commerce flows.",
+    "row_count": 240,
+    "join_keys": [
+      "timestamp",
+      "region"
+    ],
+    "schema": [
+      {
+        "name": "timestamp",
+        "dtype": "datetime64[ns]",
+        "nullable_ratio": 0.0,
+        "min_value": 1.7466084e+18,
+        "max_value": 1.767258e+18,
+        "sample_values": [
+          "2025-05-07T09:00:00",
+          "2025-05-08T09:00:00",
+          "2025-05-09T09:00:00",
+          "2025-05-10T09:00:00"
+        ]
+      },
+      {
+        "name": "region",
+        "dtype": "object",
+        "nullable_ratio": 0.0,
+        "min_value": null,
+        "max_value": null,
+        "sample_values": [
+          "emea",
+          "apac",
+          "na",
+          "na"
+        ]
+      },
+      {
+        "name": "orders",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 290.0,
+        "max_value": 463.0,
+        "sample_values": [
+          310,
+          315,
+          321,
+          333
+        ]
+      },
+      {
+        "name": "revenue",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 32916.96,
+        "max_value": 64205.23,
+        "sample_values": [
+          37224.63,
+          36041.99,
+          39271.15,
+          40142.85
+        ]
+      },
+      {
+        "name": "gross_margin",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 12908.5,
+        "max_value": 27987.08,
+        "sample_values": [
+          17924.2,
+          17406.42,
+          18883.06,
+          18995.05
+        ]
+      },
+      {
+        "name": "average_order_value",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 97.26,
+        "max_value": 138.59,
+        "sample_values": [
+          120.11,
+          114.26,
+          122.37,
+          120.68
+        ]
+      },
+      {
+        "name": "carts_started",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 898.0,
+        "max_value": 1634.0,
+        "sample_values": [
+          1031,
+          1049,
+          1017,
+          1073
+        ]
+      },
+      {
+        "name": "units_sold",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 362.0,
+        "max_value": 675.0,
+        "sample_values": [
+          432,
+          451,
+          460,
+          468
+        ]
+      },
+      {
+        "name": "return_rate",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.0337,
+        "max_value": 0.1203,
+        "sample_values": [
+          0.0522,
+          0.0575,
+          0.0548,
+          0.0574
+        ]
+      }
+    ]
+  },
+  {
+    "source_name": "enterprise_erp_finance",
+    "domain": "enterprise_bi",
+    "grain": "day",
+    "description": "Enterprise revenue planning, spend, and working capital signals.",
+    "row_count": 240,
+    "join_keys": [
+      "timestamp",
+      "business_unit"
+    ],
+    "schema": [
+      {
+        "name": "timestamp",
+        "dtype": "datetime64[ns]",
+        "nullable_ratio": 0.0,
+        "min_value": 1.7466084e+18,
+        "max_value": 1.767258e+18,
+        "sample_values": [
+          "2025-05-07T09:00:00",
+          "2025-05-08T09:00:00",
+          "2025-05-09T09:00:00",
+          "2025-05-10T09:00:00"
+        ]
+      },
+      {
+        "name": "business_unit",
+        "dtype": "object",
+        "nullable_ratio": 0.0,
+        "min_value": null,
+        "max_value": null,
+        "sample_values": [
+          "retail",
+          "shared_services",
+          "digital",
+          "retail"
+        ]
+      },
+      {
+        "name": "budget_usd",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 12001114.43,
+        "max_value": 16219541.82,
+        "sample_values": [
+          14532389.42,
+          14181070.49,
+          13457613.48,
+          14206607.6
+        ]
+      },
+      {
+        "name": "actual_spend_usd",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 10947308.51,
+        "max_value": 16484334.01,
+        "sample_values": [
+          14797240.24,
+          13997139.25,
+          13398041.57,
+          13964904.48
+        ]
+      },
+      {
+        "name": "revenue_forecast_usd",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 25318647.19,
+        "max_value": 32969362.06,
+        "sample_values": [
+          26542878.95,
+          26572859.11,
+          26846271.29,
+          27161284.01
+        ]
+      },
+      {
+        "name": "gross_margin_pct",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.2849,
+        "max_value": 0.4098,
+        "sample_values": [
+          0.3503,
+          0.3684,
+          0.3797,
+          0.3722
+        ]
+      },
+      {
+        "name": "working_capital_days",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 42.74,
+        "max_value": 61.83,
+        "sample_values": [
+          55.9,
+          52.67,
+          55.19,
+          53.32
+        ]
+      },
+      {
+        "name": "procurement_savings_usd",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 519656.98,
+        "max_value": 776586.6,
+        "sample_values": [
+          749670.14,
+          726270.3,
+          708096.68,
+          761780.68
+        ]
+      }
+    ]
+  },
+  {
+    "source_name": "enterprise_procurement_ops",
+    "domain": "enterprise_bi",
+    "grain": "day",
+    "description": "Procurement lead times, inventory turns, and delivery quality.",
+    "row_count": 240,
+    "join_keys": [
+      "timestamp",
+      "supplier_tier"
+    ],
+    "schema": [
+      {
+        "name": "timestamp",
+        "dtype": "datetime64[ns]",
+        "nullable_ratio": 0.0,
+        "min_value": 1.7466084e+18,
+        "max_value": 1.767258e+18,
+        "sample_values": [
+          "2025-05-07T09:00:00",
+          "2025-05-08T09:00:00",
+          "2025-05-09T09:00:00",
+          "2025-05-10T09:00:00"
+        ]
+      },
+      {
+        "name": "supplier_tier",
+        "dtype": "object",
+        "nullable_ratio": 0.0,
+        "min_value": null,
+        "max_value": null,
+        "sample_values": [
+          "preferred",
+          "preferred",
+          "preferred",
+          "strategic"
+        ]
+      },
+      {
+        "name": "open_po_count",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 960.0,
+        "max_value": 1385.0,
+        "sample_values": [
+          1185,
+          1166,
+          1160,
+          1199
+        ]
+      },
+      {
+        "name": "supplier_lead_time_days",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 14.64,
+        "max_value": 28.03,
+        "sample_values": [
+          20.64,
+          19.48,
+          21.24,
+          19.21
+        ]
+      },
+      {
+        "name": "inventory_turns",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 5.995,
+        "max_value": 8.418,
+        "sample_values": [
+          7.174,
+          7.372,
+          7.166,
+          7.611
+        ]
+      },
+      {
+        "name": "on_time_delivery_rate",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.829,
+        "max_value": 0.9769,
+        "sample_values": [
+          0.9323,
+          0.9374,
+          0.9353,
+          0.9286
+        ]
+      },
+      {
+        "name": "backorder_rate",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.0252,
+        "max_value": 0.0785,
+        "sample_values": [
+          0.0352,
+          0.0392,
+          0.0377,
+          0.0406
+        ]
+      },
+      {
+        "name": "purchase_commitment_usd",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 7054058.84,
+        "max_value": 9041202.96,
+        "sample_values": [
+          8194363.83,
+          8495355.14,
+          8505877.84,
+          8199534.83
+        ]
+      }
+    ]
+  },
+  {
+    "source_name": "ga4_web",
+    "domain": "web_analytics",
+    "grain": "day",
+    "description": "Traffic quality and onsite behavior from digital acquisition flows.",
+    "row_count": 240,
+    "join_keys": [
+      "timestamp",
+      "channel"
+    ],
+    "schema": [
+      {
+        "name": "timestamp",
+        "dtype": "datetime64[ns]",
+        "nullable_ratio": 0.0,
+        "min_value": 1.7466084e+18,
+        "max_value": 1.767258e+18,
+        "sample_values": [
+          "2025-05-07T09:00:00",
+          "2025-05-08T09:00:00",
+          "2025-05-09T09:00:00",
+          "2025-05-10T09:00:00"
+        ]
+      },
+      {
+        "name": "channel",
+        "dtype": "object",
+        "nullable_ratio": 0.0,
+        "min_value": null,
+        "max_value": null,
+        "sample_values": [
+          "direct",
+          "direct",
+          "organic",
+          "paid"
+        ]
+      },
+      {
+        "name": "sessions",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 7793.0,
+        "max_value": 10378.0,
+        "sample_values": [
+          8574,
+          8396,
+          8435,
+          8392
+        ]
+      },
+      {
+        "name": "page_views",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 20407.0,
+        "max_value": 30856.0,
+        "sample_values": [
+          22958,
+          22668,
+          24200,
+          23992
+        ]
+      },
+      {
+        "name": "engaged_sessions",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 4100.0,
+        "max_value": 6887.0,
+        "sample_values": [
+          5524,
+          5452,
+          5106,
+          5553
+        ]
+      },
+      {
+        "name": "bounce_rate",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.3031,
+        "max_value": 0.6333,
+        "sample_values": [
+          0.4542,
+          0.4224,
+          0.4438,
+          0.4443
+        ]
+      },
+      {
+        "name": "avg_session_duration_sec",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 72.87,
+        "max_value": 188.32,
+        "sample_values": [
+          168.45,
+          152.5,
+          156.88,
+          153.32
+        ]
+      },
+      {
+        "name": "demo_requests",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 47.0,
+        "max_value": 178.0,
+        "sample_values": [
+          134,
+          92,
+          121,
+          141
+        ]
+      }
+    ]
+  },
+  {
+    "source_name": "healthcare_capacity_planning",
+    "domain": "healthcare_operations",
+    "grain": "day",
+    "description": "Scheduling quality, OR utilization, claims friction, and care margin.",
+    "row_count": 240,
+    "join_keys": [
+      "timestamp",
+      "care_unit"
+    ],
+    "schema": [
+      {
+        "name": "timestamp",
+        "dtype": "datetime64[ns]",
+        "nullable_ratio": 0.0,
+        "min_value": 1.7466084e+18,
+        "max_value": 1.767258e+18,
+        "sample_values": [
+          "2025-05-07T09:00:00",
+          "2025-05-08T09:00:00",
+          "2025-05-09T09:00:00",
+          "2025-05-10T09:00:00"
+        ]
+      },
+      {
+        "name": "care_unit",
+        "dtype": "object",
+        "nullable_ratio": 0.0,
+        "min_value": null,
+        "max_value": null,
+        "sample_values": [
+          "surgery",
+          "ambulatory",
+          "ambulatory",
+          "er"
+        ]
+      },
+      {
+        "name": "scheduled_visits",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 1204.0,
+        "max_value": 1723.0,
+        "sample_values": [
+          1556,
+          1569,
+          1528,
+          1565
+        ]
+      },
+      {
+        "name": "no_show_rate",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.0639,
+        "max_value": 0.1211,
+        "sample_values": [
+          0.0942,
+          0.0957,
+          0.0887,
+          0.093
+        ]
+      },
+      {
+        "name": "operating_room_utilization",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.5969,
+        "max_value": 0.7996,
+        "sample_values": [
+          0.7034,
+          0.7263,
+          0.6744,
+          0.7195
+        ]
+      },
+      {
+        "name": "discharge_delay_hours",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 7.76,
+        "max_value": 16.63,
+        "sample_values": [
+          10.85,
+          10.73,
+          10.48,
+          11.62
+        ]
+      },
+      {
+        "name": "claim_denial_rate",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.0448,
+        "max_value": 0.0859,
+        "sample_values": [
+          0.0607,
+          0.065,
+          0.0638,
+          0.0638
+        ]
+      },
+      {
+        "name": "care_margin_usd",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 1089539.94,
+        "max_value": 1686104.01,
+        "sample_values": [
+          1460961.8,
+          1567210.53,
+          1563092.3,
+          1487504.71
+        ]
+      }
+    ]
+  },
+  {
+    "source_name": "healthcare_operations",
+    "domain": "healthcare_operations",
+    "grain": "day",
+    "description": "Patient flow, bed occupancy, safety events, and overtime pressure.",
+    "row_count": 240,
+    "join_keys": [
+      "timestamp",
+      "facility_id"
+    ],
+    "schema": [
+      {
+        "name": "timestamp",
+        "dtype": "datetime64[ns]",
+        "nullable_ratio": 0.0,
+        "min_value": 1.7466084e+18,
+        "max_value": 1.767258e+18,
+        "sample_values": [
+          "2025-05-07T09:00:00",
+          "2025-05-08T09:00:00",
+          "2025-05-09T09:00:00",
+          "2025-05-10T09:00:00"
+        ]
+      },
+      {
+        "name": "facility_id",
+        "dtype": "object",
+        "nullable_ratio": 0.0,
+        "min_value": null,
+        "max_value": null,
+        "sample_values": [
+          "facility_01",
+          "facility_02",
+          "facility_03",
+          "facility_04"
+        ]
+      },
+      {
+        "name": "patient_wait_minutes",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 23.94,
+        "max_value": 54.12,
+        "sample_values": [
+          37.34,
+          37.68,
+          39.73,
+          37.68
+        ]
+      },
+      {
+        "name": "bed_occupancy_rate",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.7208,
+        "max_value": 0.8846,
+        "sample_values": [
+          0.7893,
+          0.8348,
+          0.8289,
+          0.8236
+        ]
+      },
+      {
+        "name": "procedure_throughput",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 223.0,
+        "max_value": 304.0,
+        "sample_values": [
+          279,
+          271,
+          281,
+          260
+        ]
+      },
+      {
+        "name": "patient_safety_events",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 5.74,
+        "max_value": 12.0,
+        "sample_values": [
+          10.23,
+          9.93,
+          9.1,
+          9.97
+        ]
+      },
+      {
+        "name": "staff_overtime_hours",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 311.51,
+        "max_value": 503.55,
+        "sample_values": [
+          400.64,
+          398.18,
+          419.98,
+          413.55
+        ]
+      },
+      {
+        "name": "readmission_rate",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.075,
+        "max_value": 0.126,
+        "sample_values": [
+          0.0946,
+          0.0948,
+          0.091,
+          0.0893
+        ]
+      }
+    ]
+  },
+  {
+    "source_name": "infra_observability",
+    "domain": "observability",
+    "grain": "day",
+    "description": "Latency, reliability, deploy cadence, and operational load.",
+    "row_count": 240,
+    "join_keys": [
+      "timestamp",
+      "service_name"
+    ],
+    "schema": [
+      {
+        "name": "timestamp",
+        "dtype": "datetime64[ns]",
+        "nullable_ratio": 0.0,
+        "min_value": 1.7466084e+18,
+        "max_value": 1.767258e+18,
+        "sample_values": [
+          "2025-05-07T09:00:00",
+          "2025-05-08T09:00:00",
+          "2025-05-09T09:00:00",
+          "2025-05-10T09:00:00"
+        ]
+      },
+      {
+        "name": "service_name",
+        "dtype": "object",
+        "nullable_ratio": 0.0,
+        "min_value": null,
+        "max_value": null,
+        "sample_values": [
+          "etl",
+          "sync",
+          "api",
+          "dashboard"
+        ]
+      },
+      {
+        "name": "request_count",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 449250.0,
+        "max_value": 634508.0,
+        "sample_values": [
+          472709,
+          492539,
+          488244,
+          501922
+        ]
+      },
+      {
+        "name": "p95_latency_ms",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 214.44,
+        "max_value": 394.55,
+        "sample_values": [
+          265.69,
+          275.67,
+          286.66,
+          274.11
+        ]
+      },
+      {
+        "name": "error_rate",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.00896,
+        "max_value": 0.0305,
+        "sample_values": [
+          0.01432,
+          0.01351,
+          0.0132,
+          0.01483
+        ]
+      },
+      {
+        "name": "saturation_pct",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.4446,
+        "max_value": 0.6977,
+        "sample_values": [
+          0.5743,
+          0.6069,
+          0.5798,
+          0.582
+        ]
+      },
+      {
+        "name": "deploy_frequency",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 2.27,
+        "max_value": 4.14,
+        "sample_values": [
+          3.64,
+          3.44,
+          3.37,
+          3.64
+        ]
+      },
+      {
+        "name": "incident_count",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 3.07,
+        "max_value": 11.19,
+        "sample_values": [
+          4.51,
+          4.44,
+          4.3,
+          4.96
+        ]
+      }
+    ]
+  },
+  {
+    "source_name": "iot_telemetry",
+    "domain": "iot_operations",
+    "grain": "hour",
+    "description": "Industrial telemetry for throughput, quality, and asset degradation.",
+    "row_count": 240,
+    "join_keys": [
+      "timestamp",
+      "line_id"
+    ],
+    "schema": [
+      {
+        "name": "timestamp",
+        "dtype": "datetime64[ns]",
+        "nullable_ratio": 0.0,
+        "min_value": 1.7663976e+18,
+        "max_value": 1.767258e+18,
+        "sample_values": [
+          "2025-12-22T10:00:00",
+          "2025-12-22T11:00:00",
+          "2025-12-22T12:00:00",
+          "2025-12-22T13:00:00"
+        ]
+      },
+      {
+        "name": "line_id",
+        "dtype": "object",
+        "nullable_ratio": 0.0,
+        "min_value": null,
+        "max_value": null,
+        "sample_values": [
+          "line_a",
+          "line_c",
+          "line_b",
+          "line_a"
+        ]
+      },
+      {
+        "name": "temperature_c",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 60.67,
+        "max_value": 74.07,
+        "sample_values": [
+          66.67,
+          67.89,
+          69.68,
+          67.48
+        ]
+      },
+      {
+        "name": "vibration_mm_s",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 2.428,
+        "max_value": 7.614,
+        "sample_values": [
+          3.895,
+          3.958,
+          3.665,
+          3.731
+        ]
+      },
+      {
+        "name": "throughput_units",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 909.0,
+        "max_value": 1423.0,
+        "sample_values": [
+          1247,
+          1162,
+          1249,
+          1197
+        ]
+      },
+      {
+        "name": "defect_rate",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.0104,
+        "max_value": 0.0441,
+        "sample_values": [
+          0.02,
+          0.0185,
+          0.0198,
+          0.021
+        ]
+      },
+      {
+        "name": "energy_kwh",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 805.98,
+        "max_value": 1129.04,
+        "sample_values": [
+          1088.48,
+          1117.41,
+          1057.89,
+          1099.47
+        ]
+      }
+    ]
+  },
+  {
+    "source_name": "meta_ads",
+    "domain": "marketing_attribution",
+    "grain": "day",
+    "description": "Paid acquisition efficiency for Meta campaigns.",
+    "row_count": 240,
+    "join_keys": [
+      "timestamp",
+      "campaign_cluster"
+    ],
+    "schema": [
+      {
+        "name": "timestamp",
+        "dtype": "datetime64[ns]",
+        "nullable_ratio": 0.0,
+        "min_value": 1.7466084e+18,
+        "max_value": 1.767258e+18,
+        "sample_values": [
+          "2025-05-07T09:00:00",
+          "2025-05-08T09:00:00",
+          "2025-05-09T09:00:00",
+          "2025-05-10T09:00:00"
+        ]
+      },
+      {
+        "name": "campaign_cluster",
+        "dtype": "object",
+        "nullable_ratio": 0.0,
+        "min_value": null,
+        "max_value": null,
+        "sample_values": [
+          "prospecting",
+          "expansion",
+          "brand",
+          "prospecting"
+        ]
+      },
+      {
+        "name": "meta_spend_usd",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 4669.71,
+        "max_value": 7328.39,
+        "sample_values": [
+          5214.85,
+          5159.24,
+          5294.53,
+          5451.1
+        ]
+      },
+      {
+        "name": "meta_impressions",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 400000.0,
+        "max_value": 400000.0,
+        "sample_values": [
+          400000,
+          400000,
+          400000,
+          400000
+        ]
+      },
+      {
+        "name": "meta_clicks",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 7985.0,
+        "max_value": 18000.0,
+        "sample_values": [
+          14960,
+          14921,
+          17017,
+          16016
+        ]
+      },
+      {
+        "name": "meta_conversions",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 594.0,
+        "max_value": 2052.0,
+        "sample_values": [
+          1316,
+          1379,
+          1375,
+          1371
+        ]
+      },
+      {
+        "name": "meta_ctr",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.0149,
+        "max_value": 0.0267,
+        "sample_values": [
+          0.0235,
+          0.0239,
+          0.0257,
+          0.0239
+        ]
+      },
+      {
+        "name": "meta_cpc_usd",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.29,
+        "max_value": 0.6,
+        "sample_values": [
+          0.35,
+          0.35,
+          0.31,
+          0.34
+        ]
+      },
+      {
+        "name": "meta_cac_usd",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 6.0,
+        "max_value": 9.74,
+        "sample_values": [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      },
+      {
+        "name": "meta_attributed_revenue",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 93688.93,
+        "max_value": 366810.04,
+        "sample_values": [
+          233532.35,
+          250592.16,
+          237840.6,
+          242215.27
+        ]
+      }
+    ]
+  },
+  {
+    "source_name": "product_usage",
+    "domain": "product_analytics",
+    "grain": "day",
+    "description": "Adoption and workspace engagement signals for product-led workflows.",
+    "row_count": 240,
+    "join_keys": [
+      "timestamp",
+      "workspace_id"
+    ],
+    "schema": [
+      {
+        "name": "timestamp",
+        "dtype": "datetime64[ns]",
+        "nullable_ratio": 0.0,
+        "min_value": 1.7466084e+18,
+        "max_value": 1.767258e+18,
+        "sample_values": [
+          "2025-05-07T09:00:00",
+          "2025-05-08T09:00:00",
+          "2025-05-09T09:00:00",
+          "2025-05-10T09:00:00"
+        ]
+      },
+      {
+        "name": "workspace_id",
+        "dtype": "object",
+        "nullable_ratio": 0.0,
+        "min_value": null,
+        "max_value": null,
+        "sample_values": [
+          "ws_1000",
+          "ws_1001",
+          "ws_1002",
+          "ws_1003"
+        ]
+      },
+      {
+        "name": "weekly_active_teams",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 1575.0,
+        "max_value": 2132.0,
+        "sample_values": [
+          1583,
+          1576,
+          1647,
+          1589
+        ]
+      },
+      {
+        "name": "feature_adoption_rate",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.2514,
+        "max_value": 0.6011,
+        "sample_values": [
+          0.5217,
+          0.5221,
+          0.5504,
+          0.5948
+        ]
+      },
+      {
+        "name": "activation_rate",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.232,
+        "max_value": 0.391,
+        "sample_values": [
+          0.3211,
+          0.3135,
+          0.308,
+          0.3247
+        ]
+      },
+      {
+        "name": "seats_provisioned",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 10944.0,
+        "max_value": 12631.0,
+        "sample_values": [
+          11072,
+          10944,
+          11188,
+          11055
+        ]
+      },
+      {
+        "name": "seats_active",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 7446.0,
+        "max_value": 9592.0,
+        "sample_values": [
+          8320,
+          8154,
+          8238,
+          8190
+        ]
+      },
+      {
+        "name": "workspace_growth_rate",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.005,
+        "max_value": 0.031,
+        "sample_values": [
+          0.0192,
+          0.019,
+          0.0232,
+          0.0212
+        ]
+      }
+    ]
+  },
+  {
+    "source_name": "saas_billing",
+    "domain": "saas_metrics",
+    "grain": "day",
+    "description": "Recurring revenue, signups, and retention indicators.",
+    "row_count": 240,
+    "join_keys": [
+      "timestamp",
+      "tenant_id"
+    ],
+    "schema": [
+      {
+        "name": "timestamp",
+        "dtype": "datetime64[ns]",
+        "nullable_ratio": 0.0,
+        "min_value": 1.7466084e+18,
+        "max_value": 1.767258e+18,
+        "sample_values": [
+          "2025-05-07T09:00:00",
+          "2025-05-08T09:00:00",
+          "2025-05-09T09:00:00",
+          "2025-05-10T09:00:00"
+        ]
+      },
+      {
+        "name": "tenant_id",
+        "dtype": "object",
+        "nullable_ratio": 0.0,
+        "min_value": null,
+        "max_value": null,
+        "sample_values": [
+          "tenant_growth_lab",
+          "tenant_growth_lab",
+          "tenant_growth_lab",
+          "tenant_growth_lab"
+        ]
+      },
+      {
+        "name": "plan_name",
+        "dtype": "object",
+        "nullable_ratio": 0.0,
+        "min_value": null,
+        "max_value": null,
+        "sample_values": [
+          "starter",
+          "scale",
+          "enterprise",
+          "growth"
+        ]
+      },
+      {
+        "name": "mrr",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 69687.27,
+        "max_value": 91012.3,
+        "sample_values": [
+          72426.6,
+          71005.25,
+          73969.81,
+          74687.43
+        ]
+      },
+      {
+        "name": "arr",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 836247.25,
+        "max_value": 1092147.58,
+        "sample_values": [
+          869119.25,
+          852062.96,
+          887637.78,
+          896249.17
+        ]
+      },
+      {
+        "name": "expansion_mrr",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 4782.81,
+        "max_value": 7559.72,
+        "sample_values": [
+          6901.39,
+          7251.32,
+          6958.98,
+          7119.81
+        ]
+      },
+      {
+        "name": "contraction_mrr",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 1399.64,
+        "max_value": 2982.3,
+        "sample_values": [
+          2015.03,
+          2131.37,
+          1829.31,
+          1903.14
+        ]
+      },
+      {
+        "name": "new_signups",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 97.0,
+        "max_value": 169.0,
+        "sample_values": [
+          151,
+          141,
+          135,
+          142
+        ]
+      },
+      {
+        "name": "active_seats",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 9556.0,
+        "max_value": 11891.0,
+        "sample_values": [
+          9862,
+          9988,
+          9820,
+          9886
+        ]
+      },
+      {
+        "name": "trial_to_paid_rate",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.149,
+        "max_value": 0.2336,
+        "sample_values": [
+          0.1768,
+          0.1862,
+          0.1963,
+          0.1921
+        ]
+      },
+      {
+        "name": "churn_rate",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.0149,
+        "max_value": 0.0556,
+        "sample_values": [
+          0.0277,
+          0.0306,
+          0.0265,
+          0.0339
+        ]
+      },
+      {
+        "name": "net_revenue_retention",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.9901,
+        "max_value": 1.1097,
+        "sample_values": [
+          1.035,
+          1.0424,
+          1.0499,
+          1.0701
+        ]
+      }
+    ]
+  },
+  {
+    "source_name": "security_events",
+    "domain": "cybersecurity",
+    "grain": "day",
+    "description": "Authentication pressure, exfiltration indicators, and privilege risk.",
+    "row_count": 240,
+    "join_keys": [
+      "timestamp",
+      "auth_region"
+    ],
+    "schema": [
+      {
+        "name": "timestamp",
+        "dtype": "datetime64[ns]",
+        "nullable_ratio": 0.0,
+        "min_value": 1.7466084e+18,
+        "max_value": 1.767258e+18,
+        "sample_values": [
+          "2025-05-07T09:00:00",
+          "2025-05-08T09:00:00",
+          "2025-05-09T09:00:00",
+          "2025-05-10T09:00:00"
+        ]
+      },
+      {
+        "name": "auth_region",
+        "dtype": "object",
+        "nullable_ratio": 0.0,
+        "min_value": null,
+        "max_value": null,
+        "sample_values": [
+          "na",
+          "remote",
+          "eu",
+          "na"
+        ]
+      },
+      {
+        "name": "failed_logins",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 152.0,
+        "max_value": 770.0,
+        "sample_values": [
+          233,
+          229,
+          217,
+          227
+        ]
+      },
+      {
+        "name": "suspicious_ips",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 13.0,
+        "max_value": 57.0,
+        "sample_values": [
+          18,
+          19,
+          20,
+          18
+        ]
+      },
+      {
+        "name": "privileged_actions",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 32.0,
+        "max_value": 51.0,
+        "sample_values": [
+          47,
+          47,
+          46,
+          48
+        ]
+      },
+      {
+        "name": "bytes_out",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 4096544650.72,
+        "max_value": 5929999731.88,
+        "sample_values": [
+          4675037636.24,
+          4661993291.34,
+          4965214655.89,
+          4767753204.89
+        ]
+      },
+      {
+        "name": "threat_score",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.2134,
+        "max_value": 0.6898,
+        "sample_values": [
+          0.3395,
+          0.3791,
+          0.3781,
+          0.3664
+        ]
+      }
+    ]
+  },
+  {
+    "source_name": "support_operations",
+    "domain": "customer_support",
+    "grain": "day",
+    "description": "Support load, satisfaction, and service performance.",
+    "row_count": 240,
+    "join_keys": [
+      "timestamp",
+      "support_tier"
+    ],
+    "schema": [
+      {
+        "name": "timestamp",
+        "dtype": "datetime64[ns]",
+        "nullable_ratio": 0.0,
+        "min_value": 1.7466084e+18,
+        "max_value": 1.767258e+18,
+        "sample_values": [
+          "2025-05-07T09:00:00",
+          "2025-05-08T09:00:00",
+          "2025-05-09T09:00:00",
+          "2025-05-10T09:00:00"
+        ]
+      },
+      {
+        "name": "support_tier",
+        "dtype": "object",
+        "nullable_ratio": 0.0,
+        "min_value": null,
+        "max_value": null,
+        "sample_values": [
+          "self_serve",
+          "self_serve",
+          "premium",
+          "self_serve"
+        ]
+      },
+      {
+        "name": "tickets_opened",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 141.0,
+        "max_value": 231.0,
+        "sample_values": [
+          186,
+          184,
+          196,
+          183
+        ]
+      },
+      {
+        "name": "backlog_size",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 335.0,
+        "max_value": 570.0,
+        "sample_values": [
+          436,
+          446,
+          432,
+          462
+        ]
+      },
+      {
+        "name": "resolution_time_hours",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 10.36,
+        "max_value": 17.31,
+        "sample_values": [
+          13.18,
+          13.94,
+          13.58,
+          12.74
+        ]
+      },
+      {
+        "name": "csat_score",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 3.838,
+        "max_value": 4.551,
+        "sample_values": [
+          4.442,
+          4.451,
+          4.441,
+          4.46
+        ]
+      },
+      {
+        "name": "escalation_rate",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.0477,
+        "max_value": 0.1144,
+        "sample_values": [
+          0.0744,
+          0.0811,
+          0.0788,
+          0.0827
+        ]
+      }
+    ]
+  },
+  {
+    "source_name": "telecom_network_health",
+    "domain": "telecom_network",
+    "grain": "hour",
+    "description": "Dropped calls, packet loss, repair time, and network availability.",
+    "row_count": 240,
+    "join_keys": [
+      "timestamp",
+      "tower_cluster"
+    ],
+    "schema": [
+      {
+        "name": "timestamp",
+        "dtype": "datetime64[ns]",
+        "nullable_ratio": 0.0,
+        "min_value": 1.7663976e+18,
+        "max_value": 1.767258e+18,
+        "sample_values": [
+          "2025-12-22T10:00:00",
+          "2025-12-22T11:00:00",
+          "2025-12-22T12:00:00",
+          "2025-12-22T13:00:00"
+        ]
+      },
+      {
+        "name": "tower_cluster",
+        "dtype": "object",
+        "nullable_ratio": 0.0,
+        "min_value": null,
+        "max_value": null,
+        "sample_values": [
+          "regional",
+          "metro",
+          "metro",
+          "metro"
+        ]
+      },
+      {
+        "name": "dropped_call_rate",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.0049,
+        "max_value": 0.03308,
+        "sample_values": [
+          0.01579,
+          0.01221,
+          0.01382,
+          0.01324
+        ]
+      },
+      {
+        "name": "packet_loss_pct",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.1883,
+        "max_value": 1.0523,
+        "sample_values": [
+          0.5655,
+          0.5035,
+          0.4843,
+          0.6656
+        ]
+      },
+      {
+        "name": "network_latency_ms",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 41.14,
+        "max_value": 64.27,
+        "sample_values": [
+          60.9,
+          61.21,
+          58.09,
+          60.24
+        ]
+      },
+      {
+        "name": "tower_availability_pct",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.96901,
+        "max_value": 0.99832,
+        "sample_values": [
+          0.99291,
+          0.99555,
+          0.99368,
+          0.99424
+        ]
+      },
+      {
+        "name": "mean_time_to_repair_hours",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 3.5,
+        "max_value": 6.05,
+        "sample_values": [
+          4.83,
+          5.09,
+          4.78,
+          4.54
+        ]
+      },
+      {
+        "name": "subscriber_outage_minutes",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 1124.13,
+        "max_value": 1756.37,
+        "sample_values": [
+          1665.29,
+          1657.61,
+          1575.81,
+          1659.29
+        ]
+      }
+    ]
+  },
+  {
+    "source_name": "telecom_subscriber_usage",
+    "domain": "telecom_network",
+    "grain": "day",
+    "description": "Subscriber usage, ARPU, top-up behavior, and churn pressure.",
+    "row_count": 240,
+    "join_keys": [
+      "timestamp",
+      "subscriber_segment"
+    ],
+    "schema": [
+      {
+        "name": "timestamp",
+        "dtype": "datetime64[ns]",
+        "nullable_ratio": 0.0,
+        "min_value": 1.7466084e+18,
+        "max_value": 1.767258e+18,
+        "sample_values": [
+          "2025-05-07T09:00:00",
+          "2025-05-08T09:00:00",
+          "2025-05-09T09:00:00",
+          "2025-05-10T09:00:00"
+        ]
+      },
+      {
+        "name": "subscriber_segment",
+        "dtype": "object",
+        "nullable_ratio": 0.0,
+        "min_value": null,
+        "max_value": null,
+        "sample_values": [
+          "consumer",
+          "smb",
+          "enterprise",
+          "consumer"
+        ]
+      },
+      {
+        "name": "active_subscribers",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 181912.0,
+        "max_value": 209208.0,
+        "sample_values": [
+          184754,
+          185578,
+          185702,
+          188117
+        ]
+      },
+      {
+        "name": "data_usage_gb",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 79299.1,
+        "max_value": 115259.99,
+        "sample_values": [
+          111504.22,
+          104413.43,
+          102732.86,
+          107907.95
+        ]
+      },
+      {
+        "name": "arpu_usd",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 14.79,
+        "max_value": 18.76,
+        "sample_values": [
+          17.7,
+          17.21,
+          17.28,
+          17.48
+        ]
+      },
+      {
+        "name": "topup_revenue_usd",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 400000.0,
+        "max_value": 400000.0,
+        "sample_values": [
+          400000.0,
+          400000.0,
+          400000.0,
+          400000.0
+        ]
+      },
+      {
+        "name": "support_contact_rate",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.0657,
+        "max_value": 0.1212,
+        "sample_values": [
+          0.0928,
+          0.0871,
+          0.0925,
+          0.0911
+        ]
+      },
+      {
+        "name": "subscriber_churn_rate",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.0103,
+        "max_value": 0.0273,
+        "sample_values": [
+          0.018,
+          0.0199,
+          0.0212,
+          0.0188
+        ]
+      }
+    ]
+  },
+  {
+    "source_name": "tiktok_ads",
+    "domain": "marketing_attribution",
+    "grain": "day",
+    "description": "Paid acquisition efficiency for TikTok campaigns.",
+    "row_count": 240,
+    "join_keys": [
+      "timestamp",
+      "campaign_cluster"
+    ],
+    "schema": [
+      {
+        "name": "timestamp",
+        "dtype": "datetime64[ns]",
+        "nullable_ratio": 0.0,
+        "min_value": 1.7466084e+18,
+        "max_value": 1.767258e+18,
+        "sample_values": [
+          "2025-05-07T09:00:00",
+          "2025-05-08T09:00:00",
+          "2025-05-09T09:00:00",
+          "2025-05-10T09:00:00"
+        ]
+      },
+      {
+        "name": "campaign_cluster",
+        "dtype": "object",
+        "nullable_ratio": 0.0,
+        "min_value": null,
+        "max_value": null,
+        "sample_values": [
+          "prospecting",
+          "brand",
+          "expansion",
+          "prospecting"
+        ]
+      },
+      {
+        "name": "tiktok_spend_usd",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 4624.9,
+        "max_value": 7522.08,
+        "sample_values": [
+          4748.2,
+          4754.68,
+          5249.97,
+          5252.59
+        ]
+      },
+      {
+        "name": "tiktok_impressions",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 400000.0,
+        "max_value": 400000.0,
+        "sample_values": [
+          400000,
+          400000,
+          400000,
+          400000
+        ]
+      },
+      {
+        "name": "tiktok_clicks",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 7911.0,
+        "max_value": 18000.0,
+        "sample_values": [
+          13631,
+          14041,
+          15358,
+          15134
+        ]
+      },
+      {
+        "name": "tiktok_conversions",
+        "dtype": "int64",
+        "nullable_ratio": 0.0,
+        "min_value": 609.0,
+        "max_value": 2003.0,
+        "sample_values": [
+          1122,
+          1203,
+          1217,
+          1361
+        ]
+      },
+      {
+        "name": "tiktok_ctr",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.0145,
+        "max_value": 0.0272,
+        "sample_values": [
+          0.0234,
+          0.0245,
+          0.024,
+          0.0237
+        ]
+      },
+      {
+        "name": "tiktok_cpc_usd",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 0.29,
+        "max_value": 0.62,
+        "sample_values": [
+          0.35,
+          0.34,
+          0.34,
+          0.35
+        ]
+      },
+      {
+        "name": "tiktok_cac_usd",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 6.0,
+        "max_value": 9.61,
+        "sample_values": [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      },
+      {
+        "name": "tiktok_attributed_revenue",
+        "dtype": "float64",
+        "nullable_ratio": 0.0,
+        "min_value": 88369.68,
+        "max_value": 359577.99,
+        "sample_values": [
+          196685.51,
+          209649.18,
+          215933.63,
+          238685.64
+        ]
+      }
+    ]
+  }
+]
