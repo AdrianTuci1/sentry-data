@@ -1,0 +1,492 @@
+[
+  {
+    "cluster_id": "growth_maximizers",
+    "dominant_domains": [
+      "saas_metrics",
+      "marketing_attribution",
+      "sales_pipeline"
+    ],
+    "minimum_users_for_shift": 9,
+    "reward_delta_threshold": 0.08,
+    "field_adjustments": [
+      {
+        "field_name": "mrr",
+        "direction": "increase_priority",
+        "weight_shift": 0.08,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "pipeline_value_usd",
+        "direction": "increase_diagnostic_depth",
+        "weight_shift": 0.11,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "meta_cac_usd",
+        "direction": "increase_priority",
+        "weight_shift": 0.14,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "demo_requests",
+        "direction": "increase_diagnostic_depth",
+        "weight_shift": 0.17,
+        "trigger": "collective_user_deviation"
+      }
+    ],
+    "recommended_widgets": [
+      "north_star_kpi_board",
+      "ltv_cac_radar",
+      "revenue_forecast_vs_capacity"
+    ]
+  },
+  {
+    "cluster_id": "retention_guardians",
+    "dominant_domains": [
+      "product_analytics",
+      "customer_support",
+      "saas_metrics"
+    ],
+    "minimum_users_for_shift": 9,
+    "reward_delta_threshold": 0.08,
+    "field_adjustments": [
+      {
+        "field_name": "feature_adoption_rate",
+        "direction": "increase_priority",
+        "weight_shift": 0.08,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "churn_rate",
+        "direction": "increase_diagnostic_depth",
+        "weight_shift": 0.11,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "csat_score",
+        "direction": "increase_priority",
+        "weight_shift": 0.14,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "seats_active",
+        "direction": "increase_diagnostic_depth",
+        "weight_shift": 0.17,
+        "trigger": "collective_user_deviation"
+      }
+    ],
+    "recommended_widgets": [
+      "cohort_retention_heatmap",
+      "customer_health_command",
+      "churn_risk_bubble_map"
+    ]
+  },
+  {
+    "cluster_id": "ops_reliability_owners",
+    "dominant_domains": [
+      "observability",
+      "finops"
+    ],
+    "minimum_users_for_shift": 9,
+    "reward_delta_threshold": 0.08,
+    "field_adjustments": [
+      {
+        "field_name": "p95_latency_ms",
+        "direction": "increase_priority",
+        "weight_shift": 0.08,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "error_rate",
+        "direction": "increase_diagnostic_depth",
+        "weight_shift": 0.11,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "cloud_cost_usd",
+        "direction": "increase_priority",
+        "weight_shift": 0.14,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "error_budget_burn",
+        "direction": "increase_diagnostic_depth",
+        "weight_shift": 0.17,
+        "trigger": "collective_user_deviation"
+      }
+    ],
+    "recommended_widgets": [
+      "incident_reliability_timeline",
+      "cloud_cost_efficiency",
+      "slo_burn_down"
+    ]
+  },
+  {
+    "cluster_id": "security_hardeners",
+    "dominant_domains": [
+      "cybersecurity",
+      "observability"
+    ],
+    "minimum_users_for_shift": 9,
+    "reward_delta_threshold": 0.08,
+    "field_adjustments": [
+      {
+        "field_name": "failed_logins",
+        "direction": "increase_priority",
+        "weight_shift": 0.08,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "suspicious_ips",
+        "direction": "increase_diagnostic_depth",
+        "weight_shift": 0.11,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "bytes_out",
+        "direction": "increase_priority",
+        "weight_shift": 0.14,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "threat_score",
+        "direction": "increase_diagnostic_depth",
+        "weight_shift": 0.17,
+        "trigger": "collective_user_deviation"
+      }
+    ],
+    "recommended_widgets": [
+      "security_threat_surface",
+      "privileged_access_watchtower",
+      "exfiltration_risk_chord"
+    ]
+  },
+  {
+    "cluster_id": "commerce_optimizers",
+    "dominant_domains": [
+      "commerce",
+      "marketing_attribution",
+      "web_analytics"
+    ],
+    "minimum_users_for_shift": 9,
+    "reward_delta_threshold": 0.08,
+    "field_adjustments": [
+      {
+        "field_name": "revenue",
+        "direction": "increase_priority",
+        "weight_shift": 0.08,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "return_rate",
+        "direction": "increase_diagnostic_depth",
+        "weight_shift": 0.11,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "meta_spend_usd",
+        "direction": "increase_priority",
+        "weight_shift": 0.14,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "sessions",
+        "direction": "increase_diagnostic_depth",
+        "weight_shift": 0.17,
+        "trigger": "collective_user_deviation"
+      }
+    ],
+    "recommended_widgets": [
+      "roas_treemap",
+      "checkout_friction_matrix",
+      "path_to_conversion_funnel"
+    ]
+  },
+  {
+    "cluster_id": "plg_experimenters",
+    "dominant_domains": [
+      "product_analytics",
+      "web_analytics"
+    ],
+    "minimum_users_for_shift": 9,
+    "reward_delta_threshold": 0.08,
+    "field_adjustments": [
+      {
+        "field_name": "activation_rate",
+        "direction": "increase_priority",
+        "weight_shift": 0.08,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "feature_adoption_rate",
+        "direction": "increase_diagnostic_depth",
+        "weight_shift": 0.11,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "engaged_sessions",
+        "direction": "increase_priority",
+        "weight_shift": 0.14,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "workspace_growth_rate",
+        "direction": "increase_diagnostic_depth",
+        "weight_shift": 0.17,
+        "trigger": "collective_user_deviation"
+      }
+    ],
+    "recommended_widgets": [
+      "activation_funnel",
+      "product_feature_adoption_mesh",
+      "workspace_growth_clusters"
+    ]
+  },
+  {
+    "cluster_id": "field_mix_blenders",
+    "dominant_domains": [
+      "rl_control",
+      "observability",
+      "product_analytics",
+      "finops"
+    ],
+    "minimum_users_for_shift": 9,
+    "reward_delta_threshold": 0.08,
+    "field_adjustments": [
+      {
+        "field_name": "rightsizing_score",
+        "direction": "increase_priority",
+        "weight_shift": 0.08,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "p95_latency_ms",
+        "direction": "increase_diagnostic_depth",
+        "weight_shift": 0.11,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "feature_adoption_rate",
+        "direction": "increase_priority",
+        "weight_shift": 0.14,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "cost_per_request_usd",
+        "direction": "increase_diagnostic_depth",
+        "weight_shift": 0.17,
+        "trigger": "collective_user_deviation"
+      }
+    ],
+    "recommended_widgets": [
+      "reinforcement_policy_map",
+      "collective_deviation_compass",
+      "schema_drift_radar"
+    ]
+  },
+  {
+    "cluster_id": "industrial_margin_guardians",
+    "dominant_domains": [
+      "iot_operations",
+      "commerce",
+      "customer_support"
+    ],
+    "minimum_users_for_shift": 9,
+    "reward_delta_threshold": 0.08,
+    "field_adjustments": [
+      {
+        "field_name": "throughput_units",
+        "direction": "increase_priority",
+        "weight_shift": 0.08,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "defect_rate",
+        "direction": "increase_diagnostic_depth",
+        "weight_shift": 0.11,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "energy_kwh",
+        "direction": "increase_priority",
+        "weight_shift": 0.14,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "backlog_size",
+        "direction": "increase_diagnostic_depth",
+        "weight_shift": 0.17,
+        "trigger": "collective_user_deviation"
+      }
+    ],
+    "recommended_widgets": [
+      "inventory_pressure_matrix",
+      "anomaly_investigation_panel",
+      "support_burden_heatmap"
+    ]
+  },
+  {
+    "cluster_id": "banking_risk_navigators",
+    "dominant_domains": [
+      "banking_finance",
+      "cybersecurity",
+      "enterprise_bi"
+    ],
+    "minimum_users_for_shift": 9,
+    "reward_delta_threshold": 0.08,
+    "field_adjustments": [
+      {
+        "field_name": "liquidity_coverage_ratio",
+        "direction": "increase_priority",
+        "weight_shift": 0.08,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "delinquency_rate",
+        "direction": "increase_diagnostic_depth",
+        "weight_shift": 0.11,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "aml_alert_count",
+        "direction": "increase_priority",
+        "weight_shift": 0.14,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "fraud_loss_usd",
+        "direction": "increase_diagnostic_depth",
+        "weight_shift": 0.17,
+        "trigger": "collective_user_deviation"
+      }
+    ],
+    "recommended_widgets": [
+      "revenue_growth_waterfall",
+      "security_threat_surface",
+      "privileged_access_watchtower"
+    ]
+  },
+  {
+    "cluster_id": "enterprise_planning_stewards",
+    "dominant_domains": [
+      "enterprise_bi",
+      "finops",
+      "sales_pipeline"
+    ],
+    "minimum_users_for_shift": 9,
+    "reward_delta_threshold": 0.08,
+    "field_adjustments": [
+      {
+        "field_name": "budget_usd",
+        "direction": "increase_priority",
+        "weight_shift": 0.08,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "actual_spend_usd",
+        "direction": "increase_diagnostic_depth",
+        "weight_shift": 0.11,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "revenue_forecast_usd",
+        "direction": "increase_priority",
+        "weight_shift": 0.14,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "working_capital_days",
+        "direction": "increase_diagnostic_depth",
+        "weight_shift": 0.17,
+        "trigger": "collective_user_deviation"
+      }
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall",
+      "revenue_growth_waterfall",
+      "cloud_cost_efficiency"
+    ]
+  },
+  {
+    "cluster_id": "telecom_experience_owners",
+    "dominant_domains": [
+      "telecom_network",
+      "observability",
+      "customer_support"
+    ],
+    "minimum_users_for_shift": 9,
+    "reward_delta_threshold": 0.08,
+    "field_adjustments": [
+      {
+        "field_name": "dropped_call_rate",
+        "direction": "increase_priority",
+        "weight_shift": 0.08,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "packet_loss_pct",
+        "direction": "increase_diagnostic_depth",
+        "weight_shift": 0.11,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "subscriber_churn_rate",
+        "direction": "increase_priority",
+        "weight_shift": 0.14,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "mean_time_to_repair_hours",
+        "direction": "increase_diagnostic_depth",
+        "weight_shift": 0.17,
+        "trigger": "collective_user_deviation"
+      }
+    ],
+    "recommended_widgets": [
+      "incident_reliability_timeline",
+      "latency_error_correlation",
+      "support_burden_heatmap"
+    ]
+  },
+  {
+    "cluster_id": "care_capacity_balancers",
+    "dominant_domains": [
+      "healthcare_operations",
+      "enterprise_bi",
+      "observability"
+    ],
+    "minimum_users_for_shift": 9,
+    "reward_delta_threshold": 0.08,
+    "field_adjustments": [
+      {
+        "field_name": "patient_wait_minutes",
+        "direction": "increase_priority",
+        "weight_shift": 0.08,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "bed_occupancy_rate",
+        "direction": "increase_diagnostic_depth",
+        "weight_shift": 0.11,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "claim_denial_rate",
+        "direction": "increase_priority",
+        "weight_shift": 0.14,
+        "trigger": "collective_user_deviation"
+      },
+      {
+        "field_name": "care_margin_usd",
+        "direction": "increase_diagnostic_depth",
+        "weight_shift": 0.17,
+        "trigger": "collective_user_deviation"
+      }
+    ],
+    "recommended_widgets": [
+      "customer_health_command",
+      "anomaly_investigation_panel",
+      "executive_mixed_signal_wall"
+    ]
+  }
+]

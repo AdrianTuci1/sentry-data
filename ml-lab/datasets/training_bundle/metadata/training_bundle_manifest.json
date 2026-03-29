@@ -1,0 +1,176 @@
+{
+  "version": "2.1",
+  "generated_at": "2026-03-29T18:47:53.518960Z",
+  "seed": 42,
+  "rows_per_source": 240,
+  "source_exports": [
+    {
+      "source_name": "saas_billing",
+      "csv_path": "ml-lab/datasets/training_bundle/csv/saas_billing.csv",
+      "parquet_path": "ml-lab/datasets/training_bundle/parquet/saas_billing.parquet",
+      "parquet_status": "written",
+      "row_count": 240
+    },
+    {
+      "source_name": "product_usage",
+      "csv_path": "ml-lab/datasets/training_bundle/csv/product_usage.csv",
+      "parquet_path": "ml-lab/datasets/training_bundle/parquet/product_usage.parquet",
+      "parquet_status": "written",
+      "row_count": 240
+    },
+    {
+      "source_name": "ga4_web",
+      "csv_path": "ml-lab/datasets/training_bundle/csv/ga4_web.csv",
+      "parquet_path": "ml-lab/datasets/training_bundle/parquet/ga4_web.parquet",
+      "parquet_status": "written",
+      "row_count": 240
+    },
+    {
+      "source_name": "meta_ads",
+      "csv_path": "ml-lab/datasets/training_bundle/csv/meta_ads.csv",
+      "parquet_path": "ml-lab/datasets/training_bundle/parquet/meta_ads.parquet",
+      "parquet_status": "written",
+      "row_count": 240
+    },
+    {
+      "source_name": "tiktok_ads",
+      "csv_path": "ml-lab/datasets/training_bundle/csv/tiktok_ads.csv",
+      "parquet_path": "ml-lab/datasets/training_bundle/parquet/tiktok_ads.parquet",
+      "parquet_status": "written",
+      "row_count": 240
+    },
+    {
+      "source_name": "ecommerce_orders",
+      "csv_path": "ml-lab/datasets/training_bundle/csv/ecommerce_orders.csv",
+      "parquet_path": "ml-lab/datasets/training_bundle/parquet/ecommerce_orders.parquet",
+      "parquet_status": "written",
+      "row_count": 240
+    },
+    {
+      "source_name": "crm_pipeline",
+      "csv_path": "ml-lab/datasets/training_bundle/csv/crm_pipeline.csv",
+      "parquet_path": "ml-lab/datasets/training_bundle/parquet/crm_pipeline.parquet",
+      "parquet_status": "written",
+      "row_count": 240
+    },
+    {
+      "source_name": "support_operations",
+      "csv_path": "ml-lab/datasets/training_bundle/csv/support_operations.csv",
+      "parquet_path": "ml-lab/datasets/training_bundle/parquet/support_operations.parquet",
+      "parquet_status": "written",
+      "row_count": 240
+    },
+    {
+      "source_name": "infra_observability",
+      "csv_path": "ml-lab/datasets/training_bundle/csv/infra_observability.csv",
+      "parquet_path": "ml-lab/datasets/training_bundle/parquet/infra_observability.parquet",
+      "parquet_status": "written",
+      "row_count": 240
+    },
+    {
+      "source_name": "cloud_finops",
+      "csv_path": "ml-lab/datasets/training_bundle/csv/cloud_finops.csv",
+      "parquet_path": "ml-lab/datasets/training_bundle/parquet/cloud_finops.parquet",
+      "parquet_status": "written",
+      "row_count": 240
+    },
+    {
+      "source_name": "security_events",
+      "csv_path": "ml-lab/datasets/training_bundle/csv/security_events.csv",
+      "parquet_path": "ml-lab/datasets/training_bundle/parquet/security_events.parquet",
+      "parquet_status": "written",
+      "row_count": 240
+    },
+    {
+      "source_name": "iot_telemetry",
+      "csv_path": "ml-lab/datasets/training_bundle/csv/iot_telemetry.csv",
+      "parquet_path": "ml-lab/datasets/training_bundle/parquet/iot_telemetry.parquet",
+      "parquet_status": "written",
+      "row_count": 240
+    },
+    {
+      "source_name": "banking_core_ledger",
+      "csv_path": "ml-lab/datasets/training_bundle/csv/banking_core_ledger.csv",
+      "parquet_path": "ml-lab/datasets/training_bundle/parquet/banking_core_ledger.parquet",
+      "parquet_status": "written",
+      "row_count": 240
+    },
+    {
+      "source_name": "banking_aml_alerts",
+      "csv_path": "ml-lab/datasets/training_bundle/csv/banking_aml_alerts.csv",
+      "parquet_path": "ml-lab/datasets/training_bundle/parquet/banking_aml_alerts.parquet",
+      "parquet_status": "written",
+      "row_count": 240
+    },
+    {
+      "source_name": "enterprise_erp_finance",
+      "csv_path": "ml-lab/datasets/training_bundle/csv/enterprise_erp_finance.csv",
+      "parquet_path": "ml-lab/datasets/training_bundle/parquet/enterprise_erp_finance.parquet",
+      "parquet_status": "written",
+      "row_count": 240
+    },
+    {
+      "source_name": "enterprise_procurement_ops",
+      "csv_path": "ml-lab/datasets/training_bundle/csv/enterprise_procurement_ops.csv",
+      "parquet_path": "ml-lab/datasets/training_bundle/parquet/enterprise_procurement_ops.parquet",
+      "parquet_status": "written",
+      "row_count": 240
+    },
+    {
+      "source_name": "telecom_network_health",
+      "csv_path": "ml-lab/datasets/training_bundle/csv/telecom_network_health.csv",
+      "parquet_path": "ml-lab/datasets/training_bundle/parquet/telecom_network_health.parquet",
+      "parquet_status": "written",
+      "row_count": 240
+    },
+    {
+      "source_name": "telecom_subscriber_usage",
+      "csv_path": "ml-lab/datasets/training_bundle/csv/telecom_subscriber_usage.csv",
+      "parquet_path": "ml-lab/datasets/training_bundle/parquet/telecom_subscriber_usage.parquet",
+      "parquet_status": "written",
+      "row_count": 240
+    },
+    {
+      "source_name": "healthcare_operations",
+      "csv_path": "ml-lab/datasets/training_bundle/csv/healthcare_operations.csv",
+      "parquet_path": "ml-lab/datasets/training_bundle/parquet/healthcare_operations.parquet",
+      "parquet_status": "written",
+      "row_count": 240
+    },
+    {
+      "source_name": "healthcare_capacity_planning",
+      "csv_path": "ml-lab/datasets/training_bundle/csv/healthcare_capacity_planning.csv",
+      "parquet_path": "ml-lab/datasets/training_bundle/parquet/healthcare_capacity_planning.parquet",
+      "parquet_status": "written",
+      "row_count": 240
+    }
+  ],
+  "metadata_exports": {
+    "source_registry": "ml-lab/datasets/training_bundle/metadata/source_registry.json",
+    "field_specs": "ml-lab/datasets/training_bundle/metadata/field_specs.json",
+    "widget_training_catalog": "ml-lab/datasets/training_bundle/metadata/widget_training_catalog.json",
+    "rl_cluster_profiles": "ml-lab/datasets/training_bundle/metadata/rl_cluster_profiles.json",
+    "collective_adaptation_signals": "ml-lab/datasets/training_bundle/metadata/collective_adaptation_signals.json",
+    "domain_detection_scenarios": {
+      "path": "ml-lab/datasets/training_bundle/metadata/domain_detection_scenarios.jsonl",
+      "row_count": 60
+    },
+    "query_generation_scenarios": {
+      "path": "ml-lab/datasets/training_bundle/metadata/query_generation_scenarios.jsonl",
+      "row_count": 60
+    },
+    "rl_feedback_events": {
+      "path": "ml-lab/datasets/training_bundle/metadata/rl_feedback_events.jsonl",
+      "row_count": 288
+    }
+  },
+  "summary": {
+    "source_count": 20,
+    "field_spec_count": 147,
+    "widget_count": 44,
+    "domain_detection_scenarios": 60,
+    "query_generation_scenarios": 60,
+    "rl_cluster_count": 12,
+    "rl_feedback_events": 288
+  }
+}

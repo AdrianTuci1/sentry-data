@@ -1,7 +1,9 @@
-from .generator import (
-    build_training_bundle,
+from .bundle import build_training_bundle, materialize_training_bundle
+from .cli import main
+from .sources import (
     generate_banking_aml_alerts,
     generate_banking_core_data,
+    generate_crm_pipeline_data,
     generate_cyber_logs,
     generate_ecommerce_data,
     generate_enterprise_finance_data,
@@ -16,15 +18,16 @@ from .generator import (
     generate_procurement_ops_data,
     generate_product_usage_data,
     generate_saas_metrics,
+    generate_support_data,
     generate_telecom_network_health,
     generate_telecom_subscriber_usage,
-    materialize_training_bundle,
 )
 
 __all__ = [
     "build_training_bundle",
     "generate_banking_aml_alerts",
     "generate_banking_core_data",
+    "generate_crm_pipeline_data",
     "generate_cyber_logs",
     "generate_ecommerce_data",
     "generate_enterprise_finance_data",
@@ -39,7 +42,9 @@ __all__ = [
     "generate_procurement_ops_data",
     "generate_product_usage_data",
     "generate_saas_metrics",
+    "generate_support_data",
     "generate_telecom_network_health",
     "generate_telecom_subscriber_usage",
+    "main",
     "materialize_training_bundle",
 ]

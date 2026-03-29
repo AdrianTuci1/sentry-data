@@ -22,5 +22,12 @@ Acesta este dicționarul dinamic care funcționează pe două direcții:
 *   `agents/llm_engine.py` - Conectorul către Gemini 3 Flash.
 *   `agents/insight_catalog.py` - Managerul matricial de dependențe (Date -> Insights).
 *   `models/` - Detecție anomalii și vector space de similaritate.
-*   `datasets/` - Scripturi temporare pentru seedings și mock testing.
+*   `datasets/` - Generator pentru bundle-uri de antrenare multi-domain, seedings și mock testing.
 *   `vector_store/` - ChromaDB client pentru a reține istoric embeddings ale schemelor și scorurile de decizie RL.
+
+## Documente operaționale
+
+*   `VISUALIZATION_SOURCE_PLAYBOOK.md` - Matricea surse de date -> vizualizări -> comportament la mixuri.
+*   `MODAL_DEPLOYMENT_AND_ACCURACY.md` - Ghid pentru deploy pe Modal, testare, inference și creșterea preciziei.
+*   `TRAINING_DATASET_BUILD.md` - Cum construim dataset-ul de antrenare și cum extindem generatorul modular.
+*   `ML_LAB_COMMANDS.md` - Dicționarul de comenzi pentru pregătirea datelor și fluxurile ML-LAB.

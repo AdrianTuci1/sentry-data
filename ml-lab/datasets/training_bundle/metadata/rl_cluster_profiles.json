@@ -1,0 +1,456 @@
+[
+  {
+    "cluster_id": "growth_maximizers",
+    "dominant_domains": [
+      "saas_metrics",
+      "marketing_attribution",
+      "sales_pipeline"
+    ],
+    "dominant_objectives": [
+      "growth",
+      "forecasting",
+      "channel efficiency"
+    ],
+    "tracked_fields": [
+      "mrr",
+      "pipeline_value_usd",
+      "meta_cac_usd",
+      "demo_requests"
+    ],
+    "preferred_widgets": [
+      "north_star_kpi_board",
+      "ltv_cac_radar",
+      "revenue_forecast_vs_capacity",
+      "multi_touch_attribution_paths"
+    ],
+    "preference_vector": {
+      "growth": 0.92,
+      "efficiency": 0.71,
+      "reliability": 0.42,
+      "security": 0.18,
+      "forecasting": 0.77,
+      "exploration": 0.69
+    },
+    "adaptation_policy": {
+      "minimum_users_for_shift": 9,
+      "reward_delta_threshold": 0.08,
+      "field_adjustment_mode": "per_field_reweight_and_widget_rerank"
+    }
+  },
+  {
+    "cluster_id": "retention_guardians",
+    "dominant_domains": [
+      "product_analytics",
+      "customer_support",
+      "saas_metrics"
+    ],
+    "dominant_objectives": [
+      "retention",
+      "adoption",
+      "health scoring"
+    ],
+    "tracked_fields": [
+      "feature_adoption_rate",
+      "churn_rate",
+      "csat_score",
+      "seats_active"
+    ],
+    "preferred_widgets": [
+      "cohort_retention_heatmap",
+      "customer_health_command",
+      "churn_risk_bubble_map",
+      "seat_utilization_balance"
+    ],
+    "preference_vector": {
+      "growth": 0.54,
+      "efficiency": 0.63,
+      "reliability": 0.48,
+      "security": 0.22,
+      "forecasting": 0.58,
+      "exploration": 0.74
+    },
+    "adaptation_policy": {
+      "minimum_users_for_shift": 9,
+      "reward_delta_threshold": 0.08,
+      "field_adjustment_mode": "per_field_reweight_and_widget_rerank"
+    }
+  },
+  {
+    "cluster_id": "ops_reliability_owners",
+    "dominant_domains": [
+      "observability",
+      "finops"
+    ],
+    "dominant_objectives": [
+      "reliability",
+      "cost efficiency",
+      "incident prevention"
+    ],
+    "tracked_fields": [
+      "p95_latency_ms",
+      "error_rate",
+      "cloud_cost_usd",
+      "error_budget_burn"
+    ],
+    "preferred_widgets": [
+      "incident_reliability_timeline",
+      "cloud_cost_efficiency",
+      "slo_burn_down",
+      "latency_error_correlation"
+    ],
+    "preference_vector": {
+      "growth": 0.41,
+      "efficiency": 0.79,
+      "reliability": 0.91,
+      "security": 0.38,
+      "forecasting": 0.62,
+      "exploration": 0.44
+    },
+    "adaptation_policy": {
+      "minimum_users_for_shift": 9,
+      "reward_delta_threshold": 0.08,
+      "field_adjustment_mode": "per_field_reweight_and_widget_rerank"
+    }
+  },
+  {
+    "cluster_id": "security_hardeners",
+    "dominant_domains": [
+      "cybersecurity",
+      "observability"
+    ],
+    "dominant_objectives": [
+      "threat detection",
+      "access review",
+      "exfiltration control"
+    ],
+    "tracked_fields": [
+      "failed_logins",
+      "suspicious_ips",
+      "bytes_out",
+      "threat_score"
+    ],
+    "preferred_widgets": [
+      "security_threat_surface",
+      "privileged_access_watchtower",
+      "exfiltration_risk_chord",
+      "anomaly_investigation_panel"
+    ],
+    "preference_vector": {
+      "growth": 0.28,
+      "efficiency": 0.51,
+      "reliability": 0.66,
+      "security": 0.95,
+      "forecasting": 0.37,
+      "exploration": 0.33
+    },
+    "adaptation_policy": {
+      "minimum_users_for_shift": 9,
+      "reward_delta_threshold": 0.08,
+      "field_adjustment_mode": "per_field_reweight_and_widget_rerank"
+    }
+  },
+  {
+    "cluster_id": "commerce_optimizers",
+    "dominant_domains": [
+      "commerce",
+      "marketing_attribution",
+      "web_analytics"
+    ],
+    "dominant_objectives": [
+      "conversion",
+      "margin",
+      "checkout quality"
+    ],
+    "tracked_fields": [
+      "revenue",
+      "return_rate",
+      "meta_spend_usd",
+      "sessions"
+    ],
+    "preferred_widgets": [
+      "roas_treemap",
+      "checkout_friction_matrix",
+      "path_to_conversion_funnel",
+      "demand_forecast_ribbon"
+    ],
+    "preference_vector": {
+      "growth": 0.88,
+      "efficiency": 0.84,
+      "reliability": 0.32,
+      "security": 0.18,
+      "forecasting": 0.69,
+      "exploration": 0.58
+    },
+    "adaptation_policy": {
+      "minimum_users_for_shift": 9,
+      "reward_delta_threshold": 0.08,
+      "field_adjustment_mode": "per_field_reweight_and_widget_rerank"
+    }
+  },
+  {
+    "cluster_id": "plg_experimenters",
+    "dominant_domains": [
+      "product_analytics",
+      "web_analytics"
+    ],
+    "dominant_objectives": [
+      "activation",
+      "stickiness",
+      "feature usage"
+    ],
+    "tracked_fields": [
+      "activation_rate",
+      "feature_adoption_rate",
+      "engaged_sessions",
+      "workspace_growth_rate"
+    ],
+    "preferred_widgets": [
+      "activation_funnel",
+      "product_feature_adoption_mesh",
+      "workspace_growth_clusters",
+      "session_quality_breakdown"
+    ],
+    "preference_vector": {
+      "growth": 0.72,
+      "efficiency": 0.58,
+      "reliability": 0.35,
+      "security": 0.14,
+      "forecasting": 0.46,
+      "exploration": 0.91
+    },
+    "adaptation_policy": {
+      "minimum_users_for_shift": 9,
+      "reward_delta_threshold": 0.08,
+      "field_adjustment_mode": "per_field_reweight_and_widget_rerank"
+    }
+  },
+  {
+    "cluster_id": "field_mix_blenders",
+    "dominant_domains": [
+      "rl_control",
+      "observability",
+      "product_analytics",
+      "finops"
+    ],
+    "dominant_objectives": [
+      "mixed-source decisioning",
+      "policy adaptation",
+      "field re-weighting"
+    ],
+    "tracked_fields": [
+      "rightsizing_score",
+      "p95_latency_ms",
+      "feature_adoption_rate",
+      "cost_per_request_usd"
+    ],
+    "preferred_widgets": [
+      "reinforcement_policy_map",
+      "collective_deviation_compass",
+      "schema_drift_radar",
+      "executive_mixed_signal_wall"
+    ],
+    "preference_vector": {
+      "growth": 0.61,
+      "efficiency": 0.81,
+      "reliability": 0.76,
+      "security": 0.33,
+      "forecasting": 0.66,
+      "exploration": 0.87
+    },
+    "adaptation_policy": {
+      "minimum_users_for_shift": 9,
+      "reward_delta_threshold": 0.08,
+      "field_adjustment_mode": "per_field_reweight_and_widget_rerank"
+    }
+  },
+  {
+    "cluster_id": "industrial_margin_guardians",
+    "dominant_domains": [
+      "iot_operations",
+      "commerce",
+      "customer_support"
+    ],
+    "dominant_objectives": [
+      "quality",
+      "throughput",
+      "service recovery"
+    ],
+    "tracked_fields": [
+      "throughput_units",
+      "defect_rate",
+      "energy_kwh",
+      "backlog_size"
+    ],
+    "preferred_widgets": [
+      "inventory_pressure_matrix",
+      "anomaly_investigation_panel",
+      "support_burden_heatmap",
+      "demand_forecast_ribbon"
+    ],
+    "preference_vector": {
+      "growth": 0.49,
+      "efficiency": 0.68,
+      "reliability": 0.72,
+      "security": 0.24,
+      "forecasting": 0.56,
+      "exploration": 0.64
+    },
+    "adaptation_policy": {
+      "minimum_users_for_shift": 9,
+      "reward_delta_threshold": 0.08,
+      "field_adjustment_mode": "per_field_reweight_and_widget_rerank"
+    }
+  },
+  {
+    "cluster_id": "banking_risk_navigators",
+    "dominant_domains": [
+      "banking_finance",
+      "cybersecurity",
+      "enterprise_bi"
+    ],
+    "dominant_objectives": [
+      "liquidity control",
+      "fraud containment",
+      "executive governance"
+    ],
+    "tracked_fields": [
+      "liquidity_coverage_ratio",
+      "delinquency_rate",
+      "aml_alert_count",
+      "fraud_loss_usd"
+    ],
+    "preferred_widgets": [
+      "revenue_growth_waterfall",
+      "security_threat_surface",
+      "privileged_access_watchtower",
+      "executive_mixed_signal_wall"
+    ],
+    "preference_vector": {
+      "growth": 0.66,
+      "efficiency": 0.74,
+      "reliability": 0.58,
+      "security": 0.82,
+      "forecasting": 0.52,
+      "exploration": 0.43
+    },
+    "adaptation_policy": {
+      "minimum_users_for_shift": 9,
+      "reward_delta_threshold": 0.08,
+      "field_adjustment_mode": "per_field_reweight_and_widget_rerank"
+    }
+  },
+  {
+    "cluster_id": "enterprise_planning_stewards",
+    "dominant_domains": [
+      "enterprise_bi",
+      "finops",
+      "sales_pipeline"
+    ],
+    "dominant_objectives": [
+      "planning accuracy",
+      "budget control",
+      "operating leverage"
+    ],
+    "tracked_fields": [
+      "budget_usd",
+      "actual_spend_usd",
+      "revenue_forecast_usd",
+      "working_capital_days"
+    ],
+    "preferred_widgets": [
+      "executive_mixed_signal_wall",
+      "revenue_growth_waterfall",
+      "cloud_cost_efficiency",
+      "pipeline_velocity_board"
+    ],
+    "preference_vector": {
+      "growth": 0.63,
+      "efficiency": 0.88,
+      "reliability": 0.47,
+      "security": 0.21,
+      "forecasting": 0.72,
+      "exploration": 0.49
+    },
+    "adaptation_policy": {
+      "minimum_users_for_shift": 9,
+      "reward_delta_threshold": 0.08,
+      "field_adjustment_mode": "per_field_reweight_and_widget_rerank"
+    }
+  },
+  {
+    "cluster_id": "telecom_experience_owners",
+    "dominant_domains": [
+      "telecom_network",
+      "observability",
+      "customer_support"
+    ],
+    "dominant_objectives": [
+      "network quality",
+      "subscriber stability",
+      "repair speed"
+    ],
+    "tracked_fields": [
+      "dropped_call_rate",
+      "packet_loss_pct",
+      "subscriber_churn_rate",
+      "mean_time_to_repair_hours"
+    ],
+    "preferred_widgets": [
+      "incident_reliability_timeline",
+      "latency_error_correlation",
+      "support_burden_heatmap",
+      "customer_health_command"
+    ],
+    "preference_vector": {
+      "growth": 0.57,
+      "efficiency": 0.69,
+      "reliability": 0.84,
+      "security": 0.29,
+      "forecasting": 0.55,
+      "exploration": 0.61
+    },
+    "adaptation_policy": {
+      "minimum_users_for_shift": 9,
+      "reward_delta_threshold": 0.08,
+      "field_adjustment_mode": "per_field_reweight_and_widget_rerank"
+    }
+  },
+  {
+    "cluster_id": "care_capacity_balancers",
+    "dominant_domains": [
+      "healthcare_operations",
+      "enterprise_bi",
+      "observability"
+    ],
+    "dominant_objectives": [
+      "patient flow",
+      "safety",
+      "capacity utilization"
+    ],
+    "tracked_fields": [
+      "patient_wait_minutes",
+      "bed_occupancy_rate",
+      "claim_denial_rate",
+      "care_margin_usd"
+    ],
+    "preferred_widgets": [
+      "customer_health_command",
+      "anomaly_investigation_panel",
+      "executive_mixed_signal_wall",
+      "revenue_forecast_vs_capacity"
+    ],
+    "preference_vector": {
+      "growth": 0.44,
+      "efficiency": 0.62,
+      "reliability": 0.73,
+      "security": 0.18,
+      "forecasting": 0.68,
+      "exploration": 0.58
+    },
+    "adaptation_policy": {
+      "minimum_users_for_shift": 9,
+      "reward_delta_threshold": 0.08,
+      "field_adjustment_mode": "per_field_reweight_and_widget_rerank"
+    }
+  }
+]

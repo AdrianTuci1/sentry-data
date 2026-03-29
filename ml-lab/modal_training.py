@@ -1,5 +1,10 @@
-import modal
 import os
+import json
+from pathlib import Path
+
+import modal
+
+BASE_DIR = Path(__file__).resolve().parent
 
 # Define the image with all necessary ML dependencies
 image = modal.Image.debian_slim().pip_install(
@@ -9,9 +14,9 @@ image = modal.Image.debian_slim().pip_install(
     "scikit-learn==1.3.2",
     "sentence-transformers",
     "duckdb"
-).add_local_dir("models", remote_path="/root/models") \
- .add_local_dir("core", remote_path="/root/core") \
- .add_local_dir("datasets", remote_path="/root/datasets")
+).add_local_dir(str(BASE_DIR / "models"), remote_path="/root/models") \
+ .add_local_dir(str(BASE_DIR / "core"), remote_path="/root/core") \
+ .add_local_dir(str(BASE_DIR / "datasets"), remote_path="/root/datasets")
 
 # Persistent volume for model weights
 volume = modal.Volume.from_name("sentinel-ml-checkpoints", create_if_missing=True)

@@ -1,0 +1,7076 @@
+[
+  {
+    "field_name": "activation_rate",
+    "semantic_role": "adoption_metric",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "product_usage"
+    ],
+    "domain_coverage": [
+      "product_analytics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.232,
+    "max_value_observed": 0.391,
+    "sample_values": [
+      0.3211,
+      0.3135,
+      0.308,
+      0.3247
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "retention_curve",
+      "cohort_id",
+      "stickiness_score",
+      "activation_gap"
+    ],
+    "recommended_widgets": [
+      "product_feature_adoption_mesh",
+      "seat_utilization_balance",
+      "customer_health_command"
+    ],
+    "query_aliases": [
+      "activation",
+      "activation_rate"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "active_seats",
+    "semantic_role": "adoption_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "saas_billing"
+    ],
+    "domain_coverage": [
+      "saas_metrics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 9556.0,
+    "max_value_observed": 11891.0,
+    "sample_values": [
+      9862,
+      9988,
+      9820,
+      9886
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "retention_curve",
+      "cohort_id",
+      "stickiness_score",
+      "activation_gap"
+    ],
+    "recommended_widgets": [
+      "product_feature_adoption_mesh",
+      "seat_utilization_balance",
+      "customer_health_command"
+    ],
+    "query_aliases": [
+      "active_seats"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "active_subscribers",
+    "semantic_role": "adoption_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "telecom_subscriber_usage"
+    ],
+    "domain_coverage": [
+      "telecom_network"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 181912.0,
+    "max_value_observed": 209208.0,
+    "sample_values": [
+      184754,
+      185578,
+      185702,
+      188117
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "retention_curve",
+      "cohort_id",
+      "stickiness_score",
+      "activation_gap"
+    ],
+    "recommended_widgets": [
+      "product_feature_adoption_mesh",
+      "seat_utilization_balance",
+      "customer_health_command"
+    ],
+    "query_aliases": [
+      "active_subscribers"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "data_usage_gb",
+    "semantic_role": "adoption_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "telecom_subscriber_usage"
+    ],
+    "domain_coverage": [
+      "telecom_network"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 79299.1,
+    "max_value_observed": 115259.99,
+    "sample_values": [
+      111504.22,
+      104413.43,
+      102732.86,
+      107907.95
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "retention_curve",
+      "cohort_id",
+      "stickiness_score",
+      "activation_gap"
+    ],
+    "recommended_widgets": [
+      "product_feature_adoption_mesh",
+      "seat_utilization_balance",
+      "customer_health_command"
+    ],
+    "query_aliases": [
+      "data_usage_gb"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "feature_adoption_rate",
+    "semantic_role": "adoption_metric",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "product_usage"
+    ],
+    "domain_coverage": [
+      "product_analytics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.2514,
+    "max_value_observed": 0.6011,
+    "sample_values": [
+      0.5217,
+      0.5221,
+      0.5504,
+      0.5948
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "retention_curve",
+      "cohort_id",
+      "stickiness_score",
+      "activation_gap"
+    ],
+    "recommended_widgets": [
+      "product_feature_adoption_mesh",
+      "seat_utilization_balance",
+      "customer_health_command"
+    ],
+    "query_aliases": [
+      "feature_adoption",
+      "feature_adoption_rate"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "seats_active",
+    "semantic_role": "adoption_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "product_usage"
+    ],
+    "domain_coverage": [
+      "product_analytics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 7446.0,
+    "max_value_observed": 9592.0,
+    "sample_values": [
+      8320,
+      8154,
+      8238,
+      8190
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "retention_curve",
+      "cohort_id",
+      "stickiness_score",
+      "activation_gap"
+    ],
+    "recommended_widgets": [
+      "product_feature_adoption_mesh",
+      "seat_utilization_balance",
+      "customer_health_command"
+    ],
+    "query_aliases": [
+      "seats_active"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "seats_provisioned",
+    "semantic_role": "adoption_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "product_usage"
+    ],
+    "domain_coverage": [
+      "product_analytics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 10944.0,
+    "max_value_observed": 12631.0,
+    "sample_values": [
+      11072,
+      10944,
+      11188,
+      11055
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "retention_curve",
+      "cohort_id",
+      "stickiness_score",
+      "activation_gap"
+    ],
+    "recommended_widgets": [
+      "product_feature_adoption_mesh",
+      "seat_utilization_balance",
+      "customer_health_command"
+    ],
+    "query_aliases": [
+      "seats_provisioned"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "meetings_booked",
+    "semantic_role": "conversion_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "crm_pipeline"
+    ],
+    "domain_coverage": [
+      "sales_pipeline"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 27.0,
+    "max_value_observed": 53.0,
+    "sample_values": [
+      39,
+      36
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "conversion_rate",
+      "lag_7",
+      "lag_28",
+      "funnel_dropoff"
+    ],
+    "recommended_widgets": [
+      "activation_funnel",
+      "pipeline_velocity_board",
+      "checkout_friction_matrix"
+    ],
+    "query_aliases": [
+      "meetings_booked"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "meta_conversions",
+    "semantic_role": "conversion_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "meta_ads"
+    ],
+    "domain_coverage": [
+      "marketing_attribution"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 594.0,
+    "max_value_observed": 2052.0,
+    "sample_values": [
+      1316,
+      1379,
+      1375,
+      1371
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "conversion_rate",
+      "lag_7",
+      "lag_28",
+      "funnel_dropoff"
+    ],
+    "recommended_widgets": [
+      "activation_funnel",
+      "pipeline_velocity_board",
+      "checkout_friction_matrix"
+    ],
+    "query_aliases": [
+      "meta_conversions"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "new_signups",
+    "semantic_role": "conversion_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "saas_billing"
+    ],
+    "domain_coverage": [
+      "saas_metrics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 97.0,
+    "max_value_observed": 169.0,
+    "sample_values": [
+      151,
+      141,
+      135,
+      142
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "conversion_rate",
+      "lag_7",
+      "lag_28",
+      "funnel_dropoff"
+    ],
+    "recommended_widgets": [
+      "activation_funnel",
+      "pipeline_velocity_board",
+      "checkout_friction_matrix"
+    ],
+    "query_aliases": [
+      "new_signups"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "opportunities_created",
+    "semantic_role": "conversion_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "crm_pipeline"
+    ],
+    "domain_coverage": [
+      "sales_pipeline"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 19.0,
+    "max_value_observed": 41.0,
+    "sample_values": [
+      29,
+      28,
+      27
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "conversion_rate",
+      "lag_7",
+      "lag_28",
+      "funnel_dropoff"
+    ],
+    "recommended_widgets": [
+      "activation_funnel",
+      "pipeline_velocity_board",
+      "checkout_friction_matrix"
+    ],
+    "query_aliases": [
+      "opportunities_created"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "orders",
+    "semantic_role": "conversion_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "ecommerce_orders"
+    ],
+    "domain_coverage": [
+      "commerce"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 290.0,
+    "max_value_observed": 463.0,
+    "sample_values": [
+      310,
+      315,
+      321,
+      333
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "conversion_rate",
+      "lag_7",
+      "lag_28",
+      "funnel_dropoff"
+    ],
+    "recommended_widgets": [
+      "activation_funnel",
+      "pipeline_velocity_board",
+      "checkout_friction_matrix"
+    ],
+    "query_aliases": [
+      "orders"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "sqls",
+    "semantic_role": "conversion_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "crm_pipeline"
+    ],
+    "domain_coverage": [
+      "sales_pipeline"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 65.0,
+    "max_value_observed": 102.0,
+    "sample_values": [
+      84,
+      86,
+      82,
+      81
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "conversion_rate",
+      "lag_7",
+      "lag_28",
+      "funnel_dropoff"
+    ],
+    "recommended_widgets": [
+      "activation_funnel",
+      "pipeline_velocity_board",
+      "checkout_friction_matrix"
+    ],
+    "query_aliases": [
+      "sqls"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "tickets_opened",
+    "semantic_role": "conversion_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "support_operations"
+    ],
+    "domain_coverage": [
+      "customer_support"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 141.0,
+    "max_value_observed": 231.0,
+    "sample_values": [
+      186,
+      184,
+      196,
+      183
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "conversion_rate",
+      "lag_7",
+      "lag_28",
+      "funnel_dropoff"
+    ],
+    "recommended_widgets": [
+      "activation_funnel",
+      "pipeline_velocity_board",
+      "checkout_friction_matrix"
+    ],
+    "query_aliases": [
+      "tickets_opened"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "tiktok_conversions",
+    "semantic_role": "conversion_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "tiktok_ads"
+    ],
+    "domain_coverage": [
+      "marketing_attribution"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 609.0,
+    "max_value_observed": 2003.0,
+    "sample_values": [
+      1122,
+      1203,
+      1217,
+      1361
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "conversion_rate",
+      "lag_7",
+      "lag_28",
+      "funnel_dropoff"
+    ],
+    "recommended_widgets": [
+      "activation_funnel",
+      "pipeline_velocity_board",
+      "checkout_friction_matrix"
+    ],
+    "query_aliases": [
+      "tiktok_conversions"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "actual_spend_usd",
+    "semantic_role": "cost_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "enterprise_erp_finance"
+    ],
+    "domain_coverage": [
+      "enterprise_bi"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 10947308.51,
+    "max_value_observed": 16484334.01,
+    "sample_values": [
+      14797240.24,
+      13997139.25,
+      13398041.57,
+      13964904.48
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "rolling_cost_baseline",
+      "unit_economics_ratio",
+      "efficiency_ratio",
+      "waste_score"
+    ],
+    "recommended_widgets": [
+      "cloud_cost_efficiency",
+      "finops_waste_treemap",
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "actual_spend",
+      "actual_spend_usd"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "budget_usd",
+    "semantic_role": "cost_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "enterprise_erp_finance"
+    ],
+    "domain_coverage": [
+      "enterprise_bi"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 12001114.43,
+    "max_value_observed": 16219541.82,
+    "sample_values": [
+      14532389.42,
+      14181070.49,
+      13457613.48,
+      14206607.6
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "rolling_cost_baseline",
+      "unit_economics_ratio",
+      "efficiency_ratio",
+      "waste_score"
+    ],
+    "recommended_widgets": [
+      "cloud_cost_efficiency",
+      "finops_waste_treemap",
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "budget",
+      "budget_usd"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "cloud_cost_usd",
+    "semantic_role": "cost_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "cloud_finops"
+    ],
+    "domain_coverage": [
+      "finops"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 38931.35,
+    "max_value_observed": 59021.77,
+    "sample_values": [
+      42286.64,
+      41075.27,
+      42238.62,
+      43387.32
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "rolling_cost_baseline",
+      "unit_economics_ratio",
+      "efficiency_ratio",
+      "waste_score"
+    ],
+    "recommended_widgets": [
+      "cloud_cost_efficiency",
+      "finops_waste_treemap",
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "cloud_cost",
+      "cloud_cost_usd"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "compute_cost_usd",
+    "semantic_role": "cost_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "cloud_finops"
+    ],
+    "domain_coverage": [
+      "finops"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 20437.72,
+    "max_value_observed": 30416.3,
+    "sample_values": [
+      23348.37,
+      23002.18,
+      24505.72,
+      24743.7
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "rolling_cost_baseline",
+      "unit_economics_ratio",
+      "efficiency_ratio",
+      "waste_score"
+    ],
+    "recommended_widgets": [
+      "cloud_cost_efficiency",
+      "finops_waste_treemap",
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "compute_cost",
+      "compute_cost_usd"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "cost_per_request_usd",
+    "semantic_role": "cost_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "cloud_finops"
+    ],
+    "domain_coverage": [
+      "finops"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.071464,
+    "max_value_observed": 0.104546,
+    "sample_values": [
+      0.08132,
+      0.07894,
+      0.081124,
+      0.083276
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "rolling_cost_baseline",
+      "unit_economics_ratio",
+      "efficiency_ratio",
+      "waste_score"
+    ],
+    "recommended_widgets": [
+      "cloud_cost_efficiency",
+      "finops_waste_treemap",
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "cost_per_request",
+      "cost_per_request_usd"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "error_budget_burn",
+    "semantic_role": "cost_metric",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "cloud_finops"
+    ],
+    "domain_coverage": [
+      "finops"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.2242,
+    "max_value_observed": 0.4613,
+    "sample_values": [
+      0.3434,
+      0.3245,
+      0.3613,
+      0.3874
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "rolling_cost_baseline",
+      "unit_economics_ratio",
+      "efficiency_ratio",
+      "waste_score"
+    ],
+    "recommended_widgets": [
+      "cloud_cost_efficiency",
+      "finops_waste_treemap",
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "error_budget_burn"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "storage_cost_usd",
+    "semantic_role": "cost_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "cloud_finops"
+    ],
+    "domain_coverage": [
+      "finops"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 6037.87,
+    "max_value_observed": 12519.66,
+    "sample_values": [
+      8649.58,
+      7729.66,
+      8773.06,
+      8716.22
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "rolling_cost_baseline",
+      "unit_economics_ratio",
+      "efficiency_ratio",
+      "waste_score"
+    ],
+    "recommended_widgets": [
+      "cloud_cost_efficiency",
+      "finops_waste_treemap",
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "storage_cost",
+      "storage_cost_usd"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "auth_region",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "object"
+    ],
+    "source_coverage": [
+      "security_events"
+    ],
+    "domain_coverage": [
+      "cybersecurity"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": null,
+    "max_value_observed": null,
+    "sample_values": [
+      "na",
+      "remote",
+      "eu"
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "auth_region"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "backorder_rate",
+    "semantic_role": "dimension",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "enterprise_procurement_ops"
+    ],
+    "domain_coverage": [
+      "enterprise_bi"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.0252,
+    "max_value_observed": 0.0785,
+    "sample_values": [
+      0.0352,
+      0.0392,
+      0.0377,
+      0.0406
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "backorder",
+      "backorder_rate"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "bed_occupancy_rate",
+    "semantic_role": "dimension",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "healthcare_operations"
+    ],
+    "domain_coverage": [
+      "healthcare_operations"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.7208,
+    "max_value_observed": 0.8846,
+    "sample_values": [
+      0.7893,
+      0.8348,
+      0.8289,
+      0.8236
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "bed_occupancy",
+      "bed_occupancy_rate"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "business_unit",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "object"
+    ],
+    "source_coverage": [
+      "enterprise_erp_finance"
+    ],
+    "domain_coverage": [
+      "enterprise_bi"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": null,
+    "max_value_observed": null,
+    "sample_values": [
+      "retail",
+      "shared_services",
+      "digital"
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "business_unit"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "campaign_cluster",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "object"
+    ],
+    "source_coverage": [
+      "meta_ads",
+      "tiktok_ads"
+    ],
+    "domain_coverage": [
+      "marketing_attribution"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": null,
+    "max_value_observed": null,
+    "sample_values": [
+      "prospecting",
+      "expansion",
+      "brand"
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "campaign_cluster"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "care_unit",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "object"
+    ],
+    "source_coverage": [
+      "healthcare_capacity_planning"
+    ],
+    "domain_coverage": [
+      "healthcare_operations"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": null,
+    "max_value_observed": null,
+    "sample_values": [
+      "surgery",
+      "ambulatory",
+      "er"
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "care_unit"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "carts_started",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "ecommerce_orders"
+    ],
+    "domain_coverage": [
+      "commerce"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 898.0,
+    "max_value_observed": 1634.0,
+    "sample_values": [
+      1031,
+      1049,
+      1017,
+      1073
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "carts_started"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "channel",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "object"
+    ],
+    "source_coverage": [
+      "ga4_web"
+    ],
+    "domain_coverage": [
+      "web_analytics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": null,
+    "max_value_observed": null,
+    "sample_values": [
+      "direct",
+      "organic",
+      "paid"
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "channel"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "cloud_region",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "object"
+    ],
+    "source_coverage": [
+      "cloud_finops"
+    ],
+    "domain_coverage": [
+      "finops"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": null,
+    "max_value_observed": null,
+    "sample_values": [
+      "ap-south",
+      "us-west"
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "cloud_region"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "corridor",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "object"
+    ],
+    "source_coverage": [
+      "banking_aml_alerts"
+    ],
+    "domain_coverage": [
+      "banking_finance"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": null,
+    "max_value_observed": null,
+    "sample_values": [
+      "na",
+      "apac",
+      "emea"
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "corridor"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "daily_txn_volume_usd",
+    "semantic_role": "dimension",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "banking_core_ledger"
+    ],
+    "domain_coverage": [
+      "banking_finance"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 65590881.62,
+    "max_value_observed": 104872895.32,
+    "sample_values": [
+      92817285.36,
+      96961958.88,
+      97703913.12,
+      95122382.25
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "daily_txn_volume",
+      "daily_txn_volume_usd"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "demo_requests",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "ga4_web"
+    ],
+    "domain_coverage": [
+      "web_analytics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 47.0,
+    "max_value_observed": 178.0,
+    "sample_values": [
+      134,
+      92,
+      121,
+      141
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "demo_requests"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "deploy_frequency",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "infra_observability"
+    ],
+    "domain_coverage": [
+      "observability"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 2.27,
+    "max_value_observed": 4.14,
+    "sample_values": [
+      3.64,
+      3.44,
+      3.37
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "deploy_frequency"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "dropped_call_rate",
+    "semantic_role": "dimension",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "telecom_network_health"
+    ],
+    "domain_coverage": [
+      "telecom_network"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.0049,
+    "max_value_observed": 0.03308,
+    "sample_values": [
+      0.01579,
+      0.01221,
+      0.01382,
+      0.01324
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "dropped_call",
+      "dropped_call_rate"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "escalation_rate",
+    "semantic_role": "dimension",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "support_operations"
+    ],
+    "domain_coverage": [
+      "customer_support"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.0477,
+    "max_value_observed": 0.1144,
+    "sample_values": [
+      0.0744,
+      0.0811,
+      0.0788,
+      0.0827
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "escalation",
+      "escalation_rate"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "inventory_turns",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "enterprise_procurement_ops"
+    ],
+    "domain_coverage": [
+      "enterprise_bi"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 5.995,
+    "max_value_observed": 8.418,
+    "sample_values": [
+      7.174,
+      7.372,
+      7.166,
+      7.611
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "inventory_turns"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "investigation_time_hours",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "banking_aml_alerts"
+    ],
+    "domain_coverage": [
+      "banking_finance"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 15.49,
+    "max_value_observed": 27.87,
+    "sample_values": [
+      22.21,
+      20.02,
+      20.3,
+      22.49
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "investigation_time_hours"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "liquidity_coverage_ratio",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "banking_core_ledger"
+    ],
+    "domain_coverage": [
+      "banking_finance"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 1.0563,
+    "max_value_observed": 1.3872,
+    "sample_values": [
+      1.3256,
+      1.3434,
+      1.293,
+      1.2973
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "liquidity_coverage_ratio"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "meta_ctr",
+    "semantic_role": "dimension",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "meta_ads"
+    ],
+    "domain_coverage": [
+      "marketing_attribution"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.0149,
+    "max_value_observed": 0.0267,
+    "sample_values": [
+      0.0235,
+      0.0239,
+      0.0257
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "meta_ctr"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "open_po_count",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "enterprise_procurement_ops"
+    ],
+    "domain_coverage": [
+      "enterprise_bi"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 960.0,
+    "max_value_observed": 1385.0,
+    "sample_values": [
+      1185,
+      1166,
+      1160,
+      1199
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "open_po",
+      "open_po_count"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "operating_room_utilization",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "healthcare_capacity_planning"
+    ],
+    "domain_coverage": [
+      "healthcare_operations"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.5969,
+    "max_value_observed": 0.7996,
+    "sample_values": [
+      0.7034,
+      0.7263,
+      0.6744,
+      0.7195
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "operating_room_utilization"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "owner_segment",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "object"
+    ],
+    "source_coverage": [
+      "crm_pipeline"
+    ],
+    "domain_coverage": [
+      "sales_pipeline"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": null,
+    "max_value_observed": null,
+    "sample_values": [
+      "enterprise",
+      "mid_market",
+      "smb"
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "owner_segment"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "patient_safety_events",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "healthcare_operations"
+    ],
+    "domain_coverage": [
+      "healthcare_operations"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 5.74,
+    "max_value_observed": 12.0,
+    "sample_values": [
+      10.23,
+      9.93,
+      9.1,
+      9.97
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "patient_safety_events"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "plan_name",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "object"
+    ],
+    "source_coverage": [
+      "saas_billing"
+    ],
+    "domain_coverage": [
+      "saas_metrics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": null,
+    "max_value_observed": null,
+    "sample_values": [
+      "starter",
+      "scale",
+      "enterprise",
+      "growth"
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "plan_name"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "purchase_commitment_usd",
+    "semantic_role": "dimension",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "enterprise_procurement_ops"
+    ],
+    "domain_coverage": [
+      "enterprise_bi"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 7054058.84,
+    "max_value_observed": 9041202.96,
+    "sample_values": [
+      8194363.83,
+      8495355.14,
+      8505877.84,
+      8199534.83
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "purchase_commitment",
+      "purchase_commitment_usd"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "region",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "object"
+    ],
+    "source_coverage": [
+      "ecommerce_orders"
+    ],
+    "domain_coverage": [
+      "commerce"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": null,
+    "max_value_observed": null,
+    "sample_values": [
+      "emea",
+      "apac",
+      "na"
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "region"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "rightsizing_score",
+    "semantic_role": "dimension",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "cloud_finops"
+    ],
+    "domain_coverage": [
+      "finops"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.5352,
+    "max_value_observed": 0.8088,
+    "sample_values": [
+      0.7113,
+      0.712,
+      0.7164,
+      0.7411
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "rightsizing_score"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "saturation_pct",
+    "semantic_role": "dimension",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "infra_observability"
+    ],
+    "domain_coverage": [
+      "observability"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.4446,
+    "max_value_observed": 0.6977,
+    "sample_values": [
+      0.5743,
+      0.6069,
+      0.5798,
+      0.582
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "saturation_pct"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "scheduled_visits",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "healthcare_capacity_planning"
+    ],
+    "domain_coverage": [
+      "healthcare_operations"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 1204.0,
+    "max_value_observed": 1723.0,
+    "sample_values": [
+      1556,
+      1569,
+      1528,
+      1565
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "scheduled_visits"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "service_name",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "object"
+    ],
+    "source_coverage": [
+      "infra_observability"
+    ],
+    "domain_coverage": [
+      "observability"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": null,
+    "max_value_observed": null,
+    "sample_values": [
+      "etl",
+      "sync",
+      "api",
+      "dashboard"
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "service_name"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "staff_overtime_hours",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "healthcare_operations"
+    ],
+    "domain_coverage": [
+      "healthcare_operations"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 311.51,
+    "max_value_observed": 503.55,
+    "sample_values": [
+      400.64,
+      398.18,
+      419.98,
+      413.55
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "staff_overtime_hours"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "subscriber_segment",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "object"
+    ],
+    "source_coverage": [
+      "telecom_subscriber_usage"
+    ],
+    "domain_coverage": [
+      "telecom_network"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": null,
+    "max_value_observed": null,
+    "sample_values": [
+      "consumer",
+      "smb",
+      "enterprise"
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "subscriber_segment"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "supplier_tier",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "object"
+    ],
+    "source_coverage": [
+      "enterprise_procurement_ops"
+    ],
+    "domain_coverage": [
+      "enterprise_bi"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": null,
+    "max_value_observed": null,
+    "sample_values": [
+      "preferred",
+      "strategic"
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "supplier_tier"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "support_contact_rate",
+    "semantic_role": "dimension",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "telecom_subscriber_usage"
+    ],
+    "domain_coverage": [
+      "telecom_network"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.0657,
+    "max_value_observed": 0.1212,
+    "sample_values": [
+      0.0928,
+      0.0871,
+      0.0925,
+      0.0911
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "support_contact",
+      "support_contact_rate"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "support_tier",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "object"
+    ],
+    "source_coverage": [
+      "support_operations"
+    ],
+    "domain_coverage": [
+      "customer_support"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": null,
+    "max_value_observed": null,
+    "sample_values": [
+      "self_serve",
+      "premium"
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "support_tier"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "suspicious_txn_usd",
+    "semantic_role": "dimension",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "banking_aml_alerts"
+    ],
+    "domain_coverage": [
+      "banking_finance"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 5171802.09,
+    "max_value_observed": 12575412.3,
+    "sample_values": [
+      7138310.41,
+      7007793.19,
+      7155429.57,
+      6735079.41
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "suspicious_txn",
+      "suspicious_txn_usd"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "tiktok_ctr",
+    "semantic_role": "dimension",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "tiktok_ads"
+    ],
+    "domain_coverage": [
+      "marketing_attribution"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.0145,
+    "max_value_observed": 0.0272,
+    "sample_values": [
+      0.0234,
+      0.0245,
+      0.024,
+      0.0237
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "tiktok_ctr"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "tower_cluster",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "object"
+    ],
+    "source_coverage": [
+      "telecom_network_health"
+    ],
+    "domain_coverage": [
+      "telecom_network"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": null,
+    "max_value_observed": null,
+    "sample_values": [
+      "regional",
+      "metro"
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "tower_cluster"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "trial_to_paid_rate",
+    "semantic_role": "dimension",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "saas_billing"
+    ],
+    "domain_coverage": [
+      "saas_metrics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.149,
+    "max_value_observed": 0.2336,
+    "sample_values": [
+      0.1768,
+      0.1862,
+      0.1963,
+      0.1921
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "trial_to_paid",
+      "trial_to_paid_rate"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "units_sold",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "ecommerce_orders"
+    ],
+    "domain_coverage": [
+      "commerce"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 362.0,
+    "max_value_observed": 675.0,
+    "sample_values": [
+      432,
+      451,
+      460,
+      468
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "units_sold"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "working_capital_days",
+    "semantic_role": "dimension",
+    "unit": "count",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "enterprise_erp_finance"
+    ],
+    "domain_coverage": [
+      "enterprise_bi"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 42.74,
+    "max_value_observed": 61.83,
+    "sample_values": [
+      55.9,
+      52.67,
+      55.19,
+      53.32
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "working_capital_days"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "workspace_growth_rate",
+    "semantic_role": "dimension",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "product_usage"
+    ],
+    "domain_coverage": [
+      "product_analytics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.005,
+    "max_value_observed": 0.031,
+    "sample_values": [
+      0.0192,
+      0.019,
+      0.0232,
+      0.0212
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "one_hot_or_embed",
+      "cross_feature_join",
+      "group_level_aggregate"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "workspace_growth",
+      "workspace_growth_rate"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "branch_id",
+    "semantic_role": "entity_id",
+    "unit": "identifier",
+    "data_types_seen": [
+      "object"
+    ],
+    "source_coverage": [
+      "banking_core_ledger"
+    ],
+    "domain_coverage": [
+      "banking_finance"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": null,
+    "max_value_observed": null,
+    "sample_values": [
+      "branch_01",
+      "branch_02",
+      "branch_03",
+      "branch_04"
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "group_by_key",
+      "dedupe_key",
+      "slowly_changing_dimension_join"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "branch_id"
+    ],
+    "join_hints": [
+      "timestamp"
+    ]
+  },
+  {
+    "field_name": "facility_id",
+    "semantic_role": "entity_id",
+    "unit": "identifier",
+    "data_types_seen": [
+      "object"
+    ],
+    "source_coverage": [
+      "healthcare_operations"
+    ],
+    "domain_coverage": [
+      "healthcare_operations"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": null,
+    "max_value_observed": null,
+    "sample_values": [
+      "facility_01",
+      "facility_02",
+      "facility_03",
+      "facility_04"
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "group_by_key",
+      "dedupe_key",
+      "slowly_changing_dimension_join"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "facility_id"
+    ],
+    "join_hints": [
+      "timestamp"
+    ]
+  },
+  {
+    "field_name": "line_id",
+    "semantic_role": "entity_id",
+    "unit": "identifier",
+    "data_types_seen": [
+      "object"
+    ],
+    "source_coverage": [
+      "iot_telemetry"
+    ],
+    "domain_coverage": [
+      "iot_operations"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": null,
+    "max_value_observed": null,
+    "sample_values": [
+      "line_a",
+      "line_c",
+      "line_b"
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "group_by_key",
+      "dedupe_key",
+      "slowly_changing_dimension_join"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "line_id"
+    ],
+    "join_hints": [
+      "timestamp"
+    ]
+  },
+  {
+    "field_name": "tenant_id",
+    "semantic_role": "entity_id",
+    "unit": "identifier",
+    "data_types_seen": [
+      "object"
+    ],
+    "source_coverage": [
+      "saas_billing"
+    ],
+    "domain_coverage": [
+      "saas_metrics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": null,
+    "max_value_observed": null,
+    "sample_values": [
+      "tenant_growth_lab"
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "group_by_key",
+      "dedupe_key",
+      "slowly_changing_dimension_join"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "tenant_id"
+    ],
+    "join_hints": [
+      "timestamp"
+    ]
+  },
+  {
+    "field_name": "workspace_id",
+    "semantic_role": "entity_id",
+    "unit": "identifier",
+    "data_types_seen": [
+      "object"
+    ],
+    "source_coverage": [
+      "product_usage"
+    ],
+    "domain_coverage": [
+      "product_analytics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": null,
+    "max_value_observed": null,
+    "sample_values": [
+      "ws_1000",
+      "ws_1001",
+      "ws_1002",
+      "ws_1003"
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "group_by_key",
+      "dedupe_key",
+      "slowly_changing_dimension_join"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "workspace_id"
+    ],
+    "join_hints": [
+      "timestamp"
+    ]
+  },
+  {
+    "field_name": "arpu_usd",
+    "semantic_role": "financial_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "telecom_subscriber_usage"
+    ],
+    "domain_coverage": [
+      "telecom_network"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 14.79,
+    "max_value_observed": 18.76,
+    "sample_values": [
+      17.7,
+      17.21,
+      17.28,
+      17.48
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "rolling_sum_30d",
+      "trend_slope",
+      "growth_rate",
+      "seasonality_index"
+    ],
+    "recommended_widgets": [
+      "north_star_kpi_board",
+      "revenue_growth_waterfall",
+      "revenue_forecast_vs_capacity"
+    ],
+    "query_aliases": [
+      "arpu",
+      "arpu_usd"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "arr",
+    "semantic_role": "financial_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "saas_billing"
+    ],
+    "domain_coverage": [
+      "saas_metrics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 836247.25,
+    "max_value_observed": 1092147.58,
+    "sample_values": [
+      869119.25,
+      852062.96,
+      887637.78,
+      896249.17
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "rolling_sum_30d",
+      "trend_slope",
+      "growth_rate",
+      "seasonality_index"
+    ],
+    "recommended_widgets": [
+      "north_star_kpi_board",
+      "revenue_growth_waterfall",
+      "revenue_forecast_vs_capacity"
+    ],
+    "query_aliases": [
+      "arr"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "average_order_value",
+    "semantic_role": "financial_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "ecommerce_orders"
+    ],
+    "domain_coverage": [
+      "commerce"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 97.26,
+    "max_value_observed": 138.59,
+    "sample_values": [
+      120.11,
+      114.26,
+      122.37,
+      120.68
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "rolling_sum_30d",
+      "trend_slope",
+      "growth_rate",
+      "seasonality_index"
+    ],
+    "recommended_widgets": [
+      "north_star_kpi_board",
+      "revenue_growth_waterfall",
+      "revenue_forecast_vs_capacity"
+    ],
+    "query_aliases": [
+      "average_order_value"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "care_margin_usd",
+    "semantic_role": "financial_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "healthcare_capacity_planning"
+    ],
+    "domain_coverage": [
+      "healthcare_operations"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 1089539.94,
+    "max_value_observed": 1686104.01,
+    "sample_values": [
+      1460961.8,
+      1567210.53,
+      1563092.3,
+      1487504.71
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "rolling_sum_30d",
+      "trend_slope",
+      "growth_rate",
+      "seasonality_index"
+    ],
+    "recommended_widgets": [
+      "north_star_kpi_board",
+      "revenue_growth_waterfall",
+      "revenue_forecast_vs_capacity"
+    ],
+    "query_aliases": [
+      "care_margin",
+      "care_margin_usd"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "contraction_mrr",
+    "semantic_role": "financial_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "saas_billing"
+    ],
+    "domain_coverage": [
+      "saas_metrics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 1399.64,
+    "max_value_observed": 2982.3,
+    "sample_values": [
+      2015.03,
+      2131.37,
+      1829.31,
+      1903.14
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "rolling_sum_30d",
+      "trend_slope",
+      "growth_rate",
+      "seasonality_index"
+    ],
+    "recommended_widgets": [
+      "north_star_kpi_board",
+      "revenue_growth_waterfall",
+      "revenue_forecast_vs_capacity"
+    ],
+    "query_aliases": [
+      "contraction_mrr"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "deposit_balance_usd",
+    "semantic_role": "financial_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "banking_core_ledger"
+    ],
+    "domain_coverage": [
+      "banking_finance"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 419180219.22,
+    "max_value_observed": 508837700.27,
+    "sample_values": [
+      419180219.22,
+      429284409.56,
+      419708669.38,
+      424783601.58
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "rolling_sum_30d",
+      "trend_slope",
+      "growth_rate",
+      "seasonality_index"
+    ],
+    "recommended_widgets": [
+      "north_star_kpi_board",
+      "revenue_growth_waterfall",
+      "revenue_forecast_vs_capacity"
+    ],
+    "query_aliases": [
+      "deposit_balance",
+      "deposit_balance_usd"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "expansion_mrr",
+    "semantic_role": "financial_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "saas_billing"
+    ],
+    "domain_coverage": [
+      "saas_metrics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 4782.81,
+    "max_value_observed": 7559.72,
+    "sample_values": [
+      6901.39,
+      7251.32,
+      6958.98,
+      7119.81
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "rolling_sum_30d",
+      "trend_slope",
+      "growth_rate",
+      "seasonality_index"
+    ],
+    "recommended_widgets": [
+      "north_star_kpi_board",
+      "revenue_growth_waterfall",
+      "revenue_forecast_vs_capacity"
+    ],
+    "query_aliases": [
+      "expansion_mrr"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "gross_margin",
+    "semantic_role": "financial_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "ecommerce_orders"
+    ],
+    "domain_coverage": [
+      "commerce"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 12908.5,
+    "max_value_observed": 27987.08,
+    "sample_values": [
+      17924.2,
+      17406.42,
+      18883.06,
+      18995.05
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "rolling_sum_30d",
+      "trend_slope",
+      "growth_rate",
+      "seasonality_index"
+    ],
+    "recommended_widgets": [
+      "north_star_kpi_board",
+      "revenue_growth_waterfall",
+      "revenue_forecast_vs_capacity"
+    ],
+    "query_aliases": [
+      "gross_margin"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "gross_margin_pct",
+    "semantic_role": "financial_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "enterprise_erp_finance"
+    ],
+    "domain_coverage": [
+      "enterprise_bi"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.2849,
+    "max_value_observed": 0.4098,
+    "sample_values": [
+      0.3503,
+      0.3684,
+      0.3797,
+      0.3722
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "rolling_sum_30d",
+      "trend_slope",
+      "growth_rate",
+      "seasonality_index"
+    ],
+    "recommended_widgets": [
+      "north_star_kpi_board",
+      "revenue_growth_waterfall",
+      "revenue_forecast_vs_capacity"
+    ],
+    "query_aliases": [
+      "gross_margin_pct"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "loan_exposure_usd",
+    "semantic_role": "financial_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "banking_core_ledger"
+    ],
+    "domain_coverage": [
+      "banking_finance"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 310940314.02,
+    "max_value_observed": 378527188.54,
+    "sample_values": [
+      316070768.29,
+      316361515.1,
+      314029541.04,
+      316664470.61
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "rolling_sum_30d",
+      "trend_slope",
+      "growth_rate",
+      "seasonality_index"
+    ],
+    "recommended_widgets": [
+      "north_star_kpi_board",
+      "revenue_growth_waterfall",
+      "revenue_forecast_vs_capacity"
+    ],
+    "query_aliases": [
+      "loan_exposure",
+      "loan_exposure_usd"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "meta_attributed_revenue",
+    "semantic_role": "financial_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "meta_ads"
+    ],
+    "domain_coverage": [
+      "marketing_attribution"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 93688.93,
+    "max_value_observed": 366810.04,
+    "sample_values": [
+      233532.35,
+      250592.16,
+      237840.6,
+      242215.27
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "rolling_sum_30d",
+      "trend_slope",
+      "growth_rate",
+      "seasonality_index"
+    ],
+    "recommended_widgets": [
+      "north_star_kpi_board",
+      "revenue_growth_waterfall",
+      "revenue_forecast_vs_capacity"
+    ],
+    "query_aliases": [
+      "income",
+      "meta_attributed_revenue",
+      "sales"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "mrr",
+    "semantic_role": "financial_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "saas_billing"
+    ],
+    "domain_coverage": [
+      "saas_metrics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 69687.27,
+    "max_value_observed": 91012.3,
+    "sample_values": [
+      72426.6,
+      71005.25,
+      73969.81,
+      74687.43
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "rolling_sum_30d",
+      "trend_slope",
+      "growth_rate",
+      "seasonality_index"
+    ],
+    "recommended_widgets": [
+      "north_star_kpi_board",
+      "revenue_growth_waterfall",
+      "revenue_forecast_vs_capacity"
+    ],
+    "query_aliases": [
+      "mrr"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "net_interest_margin",
+    "semantic_role": "financial_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "banking_core_ledger"
+    ],
+    "domain_coverage": [
+      "banking_finance"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.0263,
+    "max_value_observed": 0.03512,
+    "sample_values": [
+      0.03316,
+      0.03305,
+      0.03147,
+      0.03275
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "rolling_sum_30d",
+      "trend_slope",
+      "growth_rate",
+      "seasonality_index"
+    ],
+    "recommended_widgets": [
+      "north_star_kpi_board",
+      "revenue_growth_waterfall",
+      "revenue_forecast_vs_capacity"
+    ],
+    "query_aliases": [
+      "net_interest_margin"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "net_revenue_retention",
+    "semantic_role": "financial_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "saas_billing"
+    ],
+    "domain_coverage": [
+      "saas_metrics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.9901,
+    "max_value_observed": 1.1097,
+    "sample_values": [
+      1.035,
+      1.0424,
+      1.0499,
+      1.0701
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "rolling_sum_30d",
+      "trend_slope",
+      "growth_rate",
+      "seasonality_index"
+    ],
+    "recommended_widgets": [
+      "north_star_kpi_board",
+      "revenue_growth_waterfall",
+      "revenue_forecast_vs_capacity"
+    ],
+    "query_aliases": [
+      "income",
+      "net_revenue_retention",
+      "sales"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "pipeline_value_usd",
+    "semantic_role": "financial_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "crm_pipeline"
+    ],
+    "domain_coverage": [
+      "sales_pipeline"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 146058.81,
+    "max_value_observed": 399189.57,
+    "sample_values": [
+      261551.24,
+      235909.81,
+      241151.93,
+      234277.93
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "rolling_sum_30d",
+      "trend_slope",
+      "growth_rate",
+      "seasonality_index"
+    ],
+    "recommended_widgets": [
+      "north_star_kpi_board",
+      "revenue_growth_waterfall",
+      "revenue_forecast_vs_capacity"
+    ],
+    "query_aliases": [
+      "pipeline_value",
+      "pipeline_value_usd"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "procurement_savings_usd",
+    "semantic_role": "financial_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "enterprise_erp_finance"
+    ],
+    "domain_coverage": [
+      "enterprise_bi"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 519656.98,
+    "max_value_observed": 776586.6,
+    "sample_values": [
+      749670.14,
+      726270.3,
+      708096.68,
+      761780.68
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "rolling_sum_30d",
+      "trend_slope",
+      "growth_rate",
+      "seasonality_index"
+    ],
+    "recommended_widgets": [
+      "north_star_kpi_board",
+      "revenue_growth_waterfall",
+      "revenue_forecast_vs_capacity"
+    ],
+    "query_aliases": [
+      "procurement_savings",
+      "procurement_savings_usd"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "revenue",
+    "semantic_role": "financial_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "ecommerce_orders"
+    ],
+    "domain_coverage": [
+      "commerce"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 32916.96,
+    "max_value_observed": 64205.23,
+    "sample_values": [
+      37224.63,
+      36041.99,
+      39271.15,
+      40142.85
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "rolling_sum_30d",
+      "trend_slope",
+      "growth_rate",
+      "seasonality_index"
+    ],
+    "recommended_widgets": [
+      "north_star_kpi_board",
+      "revenue_growth_waterfall",
+      "revenue_forecast_vs_capacity"
+    ],
+    "query_aliases": [
+      "income",
+      "revenue",
+      "sales"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "revenue_forecast_usd",
+    "semantic_role": "financial_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "enterprise_erp_finance"
+    ],
+    "domain_coverage": [
+      "enterprise_bi"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 25318647.19,
+    "max_value_observed": 32969362.06,
+    "sample_values": [
+      26542878.95,
+      26572859.11,
+      26846271.29,
+      27161284.01
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "rolling_sum_30d",
+      "trend_slope",
+      "growth_rate",
+      "seasonality_index"
+    ],
+    "recommended_widgets": [
+      "north_star_kpi_board",
+      "revenue_growth_waterfall",
+      "revenue_forecast_vs_capacity"
+    ],
+    "query_aliases": [
+      "income",
+      "revenue_forecast",
+      "revenue_forecast_usd",
+      "sales"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "tiktok_attributed_revenue",
+    "semantic_role": "financial_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "tiktok_ads"
+    ],
+    "domain_coverage": [
+      "marketing_attribution"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 88369.68,
+    "max_value_observed": 359577.99,
+    "sample_values": [
+      196685.51,
+      209649.18,
+      215933.63,
+      238685.64
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "rolling_sum_30d",
+      "trend_slope",
+      "growth_rate",
+      "seasonality_index"
+    ],
+    "recommended_widgets": [
+      "north_star_kpi_board",
+      "revenue_growth_waterfall",
+      "revenue_forecast_vs_capacity"
+    ],
+    "query_aliases": [
+      "income",
+      "sales",
+      "tiktok_attributed_revenue"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "topup_revenue_usd",
+    "semantic_role": "financial_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "telecom_subscriber_usage"
+    ],
+    "domain_coverage": [
+      "telecom_network"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 400000.0,
+    "max_value_observed": 400000.0,
+    "sample_values": [
+      400000.0
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "rolling_sum_30d",
+      "trend_slope",
+      "growth_rate",
+      "seasonality_index"
+    ],
+    "recommended_widgets": [
+      "north_star_kpi_board",
+      "revenue_growth_waterfall",
+      "revenue_forecast_vs_capacity"
+    ],
+    "query_aliases": [
+      "income",
+      "sales",
+      "topup_revenue",
+      "topup_revenue_usd"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "meta_cac_usd",
+    "semantic_role": "marketing_spend",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "meta_ads"
+    ],
+    "domain_coverage": [
+      "marketing_attribution"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 6.0,
+    "max_value_observed": 9.74,
+    "sample_values": [
+      6.0
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "log1p",
+      "7d_rolling_mean",
+      "efficiency_ratio",
+      "pct_change_7d"
+    ],
+    "recommended_widgets": [
+      "spend_efficiency_frontier",
+      "roas_treemap",
+      "multi_touch_attribution_paths"
+    ],
+    "query_aliases": [
+      "meta_cac",
+      "meta_cac_usd"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "meta_cpc_usd",
+    "semantic_role": "marketing_spend",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "meta_ads"
+    ],
+    "domain_coverage": [
+      "marketing_attribution"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.29,
+    "max_value_observed": 0.6,
+    "sample_values": [
+      0.35,
+      0.31,
+      0.34
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "log1p",
+      "7d_rolling_mean",
+      "efficiency_ratio",
+      "pct_change_7d"
+    ],
+    "recommended_widgets": [
+      "spend_efficiency_frontier",
+      "roas_treemap",
+      "multi_touch_attribution_paths"
+    ],
+    "query_aliases": [
+      "meta_cpc",
+      "meta_cpc_usd"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "meta_spend_usd",
+    "semantic_role": "marketing_spend",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "meta_ads"
+    ],
+    "domain_coverage": [
+      "marketing_attribution"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 4669.71,
+    "max_value_observed": 7328.39,
+    "sample_values": [
+      5214.85,
+      5159.24,
+      5294.53,
+      5451.1
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "log1p",
+      "7d_rolling_mean",
+      "efficiency_ratio",
+      "pct_change_7d"
+    ],
+    "recommended_widgets": [
+      "spend_efficiency_frontier",
+      "roas_treemap",
+      "multi_touch_attribution_paths"
+    ],
+    "query_aliases": [
+      "meta_spend",
+      "meta_spend_usd"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "tiktok_cac_usd",
+    "semantic_role": "marketing_spend",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "tiktok_ads"
+    ],
+    "domain_coverage": [
+      "marketing_attribution"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 6.0,
+    "max_value_observed": 9.61,
+    "sample_values": [
+      6.0
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "log1p",
+      "7d_rolling_mean",
+      "efficiency_ratio",
+      "pct_change_7d"
+    ],
+    "recommended_widgets": [
+      "spend_efficiency_frontier",
+      "roas_treemap",
+      "multi_touch_attribution_paths"
+    ],
+    "query_aliases": [
+      "tiktok_cac",
+      "tiktok_cac_usd"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "tiktok_cpc_usd",
+    "semantic_role": "marketing_spend",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "tiktok_ads"
+    ],
+    "domain_coverage": [
+      "marketing_attribution"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.29,
+    "max_value_observed": 0.62,
+    "sample_values": [
+      0.35,
+      0.34
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "log1p",
+      "7d_rolling_mean",
+      "efficiency_ratio",
+      "pct_change_7d"
+    ],
+    "recommended_widgets": [
+      "spend_efficiency_frontier",
+      "roas_treemap",
+      "multi_touch_attribution_paths"
+    ],
+    "query_aliases": [
+      "tiktok_cpc",
+      "tiktok_cpc_usd"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "tiktok_spend_usd",
+    "semantic_role": "marketing_spend",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "tiktok_ads"
+    ],
+    "domain_coverage": [
+      "marketing_attribution"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 4624.9,
+    "max_value_observed": 7522.08,
+    "sample_values": [
+      4748.2,
+      4754.68,
+      5249.97,
+      5252.59
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "reject_negative_values_unless_credit_event",
+      "monitor_scale_shifts_over_100x"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "log1p",
+      "7d_rolling_mean",
+      "efficiency_ratio",
+      "pct_change_7d"
+    ],
+    "recommended_widgets": [
+      "spend_efficiency_frontier",
+      "roas_treemap",
+      "multi_touch_attribution_paths"
+    ],
+    "query_aliases": [
+      "tiktok_spend",
+      "tiktok_spend_usd"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "avg_session_duration_sec",
+    "semantic_role": "performance_metric",
+    "unit": "time",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "ga4_web"
+    ],
+    "domain_coverage": [
+      "web_analytics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 72.87,
+    "max_value_observed": 188.32,
+    "sample_values": [
+      168.45,
+      152.5,
+      156.88,
+      153.32
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "track_percentile_breaks_and_capacity_spikes"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "p95_delta",
+      "slo_gap",
+      "latency_bucket",
+      "capacity_pressure"
+    ],
+    "recommended_widgets": [
+      "latency_error_correlation",
+      "incident_reliability_timeline",
+      "cloud_cost_efficiency"
+    ],
+    "query_aliases": [
+      "avg_session_duration_sec"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "discharge_delay_hours",
+    "semantic_role": "performance_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "healthcare_capacity_planning"
+    ],
+    "domain_coverage": [
+      "healthcare_operations"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 7.76,
+    "max_value_observed": 16.63,
+    "sample_values": [
+      10.85,
+      10.73,
+      10.48,
+      11.62
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "track_percentile_breaks_and_capacity_spikes"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "p95_delta",
+      "slo_gap",
+      "latency_bucket",
+      "capacity_pressure"
+    ],
+    "recommended_widgets": [
+      "latency_error_correlation",
+      "incident_reliability_timeline",
+      "cloud_cost_efficiency"
+    ],
+    "query_aliases": [
+      "discharge_delay_hours"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "mean_time_to_repair_hours",
+    "semantic_role": "performance_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "telecom_network_health"
+    ],
+    "domain_coverage": [
+      "telecom_network"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 3.5,
+    "max_value_observed": 6.05,
+    "sample_values": [
+      4.83,
+      5.09,
+      4.78,
+      4.54
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "track_percentile_breaks_and_capacity_spikes"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "p95_delta",
+      "slo_gap",
+      "latency_bucket",
+      "capacity_pressure"
+    ],
+    "recommended_widgets": [
+      "latency_error_correlation",
+      "incident_reliability_timeline",
+      "cloud_cost_efficiency"
+    ],
+    "query_aliases": [
+      "mean_time_to_repair_hours"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "network_latency_ms",
+    "semantic_role": "performance_metric",
+    "unit": "milliseconds",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "telecom_network_health"
+    ],
+    "domain_coverage": [
+      "telecom_network"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 41.14,
+    "max_value_observed": 64.27,
+    "sample_values": [
+      60.9,
+      61.21,
+      58.09,
+      60.24
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "track_percentile_breaks_and_capacity_spikes"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "p95_delta",
+      "slo_gap",
+      "latency_bucket",
+      "capacity_pressure"
+    ],
+    "recommended_widgets": [
+      "latency_error_correlation",
+      "incident_reliability_timeline",
+      "cloud_cost_efficiency"
+    ],
+    "query_aliases": [
+      "network_latency_ms",
+      "request_latency",
+      "response_time"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "p95_latency_ms",
+    "semantic_role": "performance_metric",
+    "unit": "milliseconds",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "infra_observability"
+    ],
+    "domain_coverage": [
+      "observability"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 214.44,
+    "max_value_observed": 394.55,
+    "sample_values": [
+      265.69,
+      275.67,
+      286.66,
+      274.11
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "track_percentile_breaks_and_capacity_spikes"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "p95_delta",
+      "slo_gap",
+      "latency_bucket",
+      "capacity_pressure"
+    ],
+    "recommended_widgets": [
+      "latency_error_correlation",
+      "incident_reliability_timeline",
+      "cloud_cost_efficiency"
+    ],
+    "query_aliases": [
+      "p95_latency_ms",
+      "request_latency",
+      "response_time"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "patient_wait_minutes",
+    "semantic_role": "performance_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "healthcare_operations"
+    ],
+    "domain_coverage": [
+      "healthcare_operations"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 23.94,
+    "max_value_observed": 54.12,
+    "sample_values": [
+      37.34,
+      37.68,
+      39.73
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "track_percentile_breaks_and_capacity_spikes"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "p95_delta",
+      "slo_gap",
+      "latency_bucket",
+      "capacity_pressure"
+    ],
+    "recommended_widgets": [
+      "latency_error_correlation",
+      "incident_reliability_timeline",
+      "cloud_cost_efficiency"
+    ],
+    "query_aliases": [
+      "patient_wait_minutes"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "procedure_throughput",
+    "semantic_role": "performance_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "healthcare_operations"
+    ],
+    "domain_coverage": [
+      "healthcare_operations"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 223.0,
+    "max_value_observed": 304.0,
+    "sample_values": [
+      279,
+      271,
+      281,
+      260
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "track_percentile_breaks_and_capacity_spikes"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "p95_delta",
+      "slo_gap",
+      "latency_bucket",
+      "capacity_pressure"
+    ],
+    "recommended_widgets": [
+      "latency_error_correlation",
+      "incident_reliability_timeline",
+      "cloud_cost_efficiency"
+    ],
+    "query_aliases": [
+      "procedure_throughput"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "resolution_time_hours",
+    "semantic_role": "performance_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "support_operations"
+    ],
+    "domain_coverage": [
+      "customer_support"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 10.36,
+    "max_value_observed": 17.31,
+    "sample_values": [
+      13.18,
+      13.94,
+      13.58,
+      12.74
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "track_percentile_breaks_and_capacity_spikes"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "p95_delta",
+      "slo_gap",
+      "latency_bucket",
+      "capacity_pressure"
+    ],
+    "recommended_widgets": [
+      "latency_error_correlation",
+      "incident_reliability_timeline",
+      "cloud_cost_efficiency"
+    ],
+    "query_aliases": [
+      "resolution_time_hours"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "sales_cycle_days",
+    "semantic_role": "performance_metric",
+    "unit": "time",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "crm_pipeline"
+    ],
+    "domain_coverage": [
+      "sales_pipeline"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 32.42,
+    "max_value_observed": 56.93,
+    "sample_values": [
+      44.84,
+      46.46,
+      47.29,
+      45.51
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "track_percentile_breaks_and_capacity_spikes"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "p95_delta",
+      "slo_gap",
+      "latency_bucket",
+      "capacity_pressure"
+    ],
+    "recommended_widgets": [
+      "latency_error_correlation",
+      "incident_reliability_timeline",
+      "cloud_cost_efficiency"
+    ],
+    "query_aliases": [
+      "sales_cycle_days"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "subscriber_outage_minutes",
+    "semantic_role": "performance_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "telecom_network_health"
+    ],
+    "domain_coverage": [
+      "telecom_network"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 1124.13,
+    "max_value_observed": 1756.37,
+    "sample_values": [
+      1665.29,
+      1657.61,
+      1575.81,
+      1659.29
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "track_percentile_breaks_and_capacity_spikes"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "p95_delta",
+      "slo_gap",
+      "latency_bucket",
+      "capacity_pressure"
+    ],
+    "recommended_widgets": [
+      "latency_error_correlation",
+      "incident_reliability_timeline",
+      "cloud_cost_efficiency"
+    ],
+    "query_aliases": [
+      "subscriber_outage_minutes"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "supplier_lead_time_days",
+    "semantic_role": "performance_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "enterprise_procurement_ops"
+    ],
+    "domain_coverage": [
+      "enterprise_bi"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 14.64,
+    "max_value_observed": 28.03,
+    "sample_values": [
+      20.64,
+      19.48,
+      21.24,
+      19.21
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "track_percentile_breaks_and_capacity_spikes"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "p95_delta",
+      "slo_gap",
+      "latency_bucket",
+      "capacity_pressure"
+    ],
+    "recommended_widgets": [
+      "latency_error_correlation",
+      "incident_reliability_timeline",
+      "cloud_cost_efficiency"
+    ],
+    "query_aliases": [
+      "supplier_lead_time_days"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "throughput_units",
+    "semantic_role": "performance_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "iot_telemetry"
+    ],
+    "domain_coverage": [
+      "iot_operations"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 909.0,
+    "max_value_observed": 1423.0,
+    "sample_values": [
+      1247,
+      1162,
+      1249,
+      1197
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "track_percentile_breaks_and_capacity_spikes"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "p95_delta",
+      "slo_gap",
+      "latency_bucket",
+      "capacity_pressure"
+    ],
+    "recommended_widgets": [
+      "latency_error_correlation",
+      "incident_reliability_timeline",
+      "cloud_cost_efficiency"
+    ],
+    "query_aliases": [
+      "throughput_units"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "bounce_rate",
+    "semantic_role": "quality_metric",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "ga4_web"
+    ],
+    "domain_coverage": [
+      "web_analytics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.3031,
+    "max_value_observed": 0.6333,
+    "sample_values": [
+      0.4542,
+      0.4224,
+      0.4438,
+      0.4443
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "cap_ratio_metrics_inside_expected_band"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "smoothed_rate",
+      "trend_break_flag",
+      "quality_gap",
+      "expected_band_distance"
+    ],
+    "recommended_widgets": [
+      "csat_resolution_tradeoff",
+      "support_burden_heatmap",
+      "churn_risk_bubble_map"
+    ],
+    "query_aliases": [
+      "bounce",
+      "bounce_rate"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "churn_rate",
+    "semantic_role": "quality_metric",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "saas_billing"
+    ],
+    "domain_coverage": [
+      "saas_metrics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.0149,
+    "max_value_observed": 0.0556,
+    "sample_values": [
+      0.0277,
+      0.0306,
+      0.0265,
+      0.0339
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "cap_ratio_metrics_inside_expected_band"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "smoothed_rate",
+      "trend_break_flag",
+      "quality_gap",
+      "expected_band_distance"
+    ],
+    "recommended_widgets": [
+      "csat_resolution_tradeoff",
+      "support_burden_heatmap",
+      "churn_risk_bubble_map"
+    ],
+    "query_aliases": [
+      "churn",
+      "churn_rate"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "claim_denial_rate",
+    "semantic_role": "quality_metric",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "healthcare_capacity_planning"
+    ],
+    "domain_coverage": [
+      "healthcare_operations"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.0448,
+    "max_value_observed": 0.0859,
+    "sample_values": [
+      0.0607,
+      0.065,
+      0.0638
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "cap_ratio_metrics_inside_expected_band"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "smoothed_rate",
+      "trend_break_flag",
+      "quality_gap",
+      "expected_band_distance"
+    ],
+    "recommended_widgets": [
+      "csat_resolution_tradeoff",
+      "support_burden_heatmap",
+      "churn_risk_bubble_map"
+    ],
+    "query_aliases": [
+      "claim_denial",
+      "claim_denial_rate"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "csat_score",
+    "semantic_role": "quality_metric",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "support_operations"
+    ],
+    "domain_coverage": [
+      "customer_support"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 3.838,
+    "max_value_observed": 4.551,
+    "sample_values": [
+      4.442,
+      4.451,
+      4.441,
+      4.46
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "cap_ratio_metrics_inside_expected_band"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "smoothed_rate",
+      "trend_break_flag",
+      "quality_gap",
+      "expected_band_distance"
+    ],
+    "recommended_widgets": [
+      "csat_resolution_tradeoff",
+      "support_burden_heatmap",
+      "churn_risk_bubble_map"
+    ],
+    "query_aliases": [
+      "csat_score"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "defect_rate",
+    "semantic_role": "quality_metric",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "iot_telemetry"
+    ],
+    "domain_coverage": [
+      "iot_operations"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.0104,
+    "max_value_observed": 0.0441,
+    "sample_values": [
+      0.02,
+      0.0185,
+      0.0198,
+      0.021
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "cap_ratio_metrics_inside_expected_band"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "smoothed_rate",
+      "trend_break_flag",
+      "quality_gap",
+      "expected_band_distance"
+    ],
+    "recommended_widgets": [
+      "csat_resolution_tradeoff",
+      "support_burden_heatmap",
+      "churn_risk_bubble_map"
+    ],
+    "query_aliases": [
+      "defect",
+      "defect_rate"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "delinquency_rate",
+    "semantic_role": "quality_metric",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "banking_core_ledger"
+    ],
+    "domain_coverage": [
+      "banking_finance"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.0177,
+    "max_value_observed": 0.0373,
+    "sample_values": [
+      0.0253,
+      0.0243,
+      0.0233,
+      0.0255
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "cap_ratio_metrics_inside_expected_band"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "smoothed_rate",
+      "trend_break_flag",
+      "quality_gap",
+      "expected_band_distance"
+    ],
+    "recommended_widgets": [
+      "csat_resolution_tradeoff",
+      "support_burden_heatmap",
+      "churn_risk_bubble_map"
+    ],
+    "query_aliases": [
+      "delinquency",
+      "delinquency_rate"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "no_show_rate",
+    "semantic_role": "quality_metric",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "healthcare_capacity_planning"
+    ],
+    "domain_coverage": [
+      "healthcare_operations"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.0639,
+    "max_value_observed": 0.1211,
+    "sample_values": [
+      0.0942,
+      0.0957,
+      0.0887,
+      0.093
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "cap_ratio_metrics_inside_expected_band"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "smoothed_rate",
+      "trend_break_flag",
+      "quality_gap",
+      "expected_band_distance"
+    ],
+    "recommended_widgets": [
+      "csat_resolution_tradeoff",
+      "support_burden_heatmap",
+      "churn_risk_bubble_map"
+    ],
+    "query_aliases": [
+      "no_show",
+      "no_show_rate"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "on_time_delivery_rate",
+    "semantic_role": "quality_metric",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "enterprise_procurement_ops"
+    ],
+    "domain_coverage": [
+      "enterprise_bi"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.829,
+    "max_value_observed": 0.9769,
+    "sample_values": [
+      0.9323,
+      0.9374,
+      0.9353,
+      0.9286
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "cap_ratio_metrics_inside_expected_band"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "smoothed_rate",
+      "trend_break_flag",
+      "quality_gap",
+      "expected_band_distance"
+    ],
+    "recommended_widgets": [
+      "csat_resolution_tradeoff",
+      "support_burden_heatmap",
+      "churn_risk_bubble_map"
+    ],
+    "query_aliases": [
+      "on_time_delivery",
+      "on_time_delivery_rate"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "readmission_rate",
+    "semantic_role": "quality_metric",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "healthcare_operations"
+    ],
+    "domain_coverage": [
+      "healthcare_operations"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.075,
+    "max_value_observed": 0.126,
+    "sample_values": [
+      0.0946,
+      0.0948,
+      0.091,
+      0.0893
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "cap_ratio_metrics_inside_expected_band"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "smoothed_rate",
+      "trend_break_flag",
+      "quality_gap",
+      "expected_band_distance"
+    ],
+    "recommended_widgets": [
+      "csat_resolution_tradeoff",
+      "support_burden_heatmap",
+      "churn_risk_bubble_map"
+    ],
+    "query_aliases": [
+      "readmission",
+      "readmission_rate"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "return_rate",
+    "semantic_role": "quality_metric",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "ecommerce_orders"
+    ],
+    "domain_coverage": [
+      "commerce"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.0337,
+    "max_value_observed": 0.1203,
+    "sample_values": [
+      0.0522,
+      0.0575,
+      0.0548,
+      0.0574
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "cap_ratio_metrics_inside_expected_band"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "smoothed_rate",
+      "trend_break_flag",
+      "quality_gap",
+      "expected_band_distance"
+    ],
+    "recommended_widgets": [
+      "csat_resolution_tradeoff",
+      "support_burden_heatmap",
+      "churn_risk_bubble_map"
+    ],
+    "query_aliases": [
+      "return",
+      "return_rate"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "subscriber_churn_rate",
+    "semantic_role": "quality_metric",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "telecom_subscriber_usage"
+    ],
+    "domain_coverage": [
+      "telecom_network"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.0103,
+    "max_value_observed": 0.0273,
+    "sample_values": [
+      0.018,
+      0.0199,
+      0.0212,
+      0.0188
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "cap_ratio_metrics_inside_expected_band"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "smoothed_rate",
+      "trend_break_flag",
+      "quality_gap",
+      "expected_band_distance"
+    ],
+    "recommended_widgets": [
+      "csat_resolution_tradeoff",
+      "support_burden_heatmap",
+      "churn_risk_bubble_map"
+    ],
+    "query_aliases": [
+      "subscriber_churn",
+      "subscriber_churn_rate"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "win_rate",
+    "semantic_role": "quality_metric",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "crm_pipeline"
+    ],
+    "domain_coverage": [
+      "sales_pipeline"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.1315,
+    "max_value_observed": 0.2962,
+    "sample_values": [
+      0.2302,
+      0.2062,
+      0.2567,
+      0.2427
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "cap_ratio_metrics_inside_expected_band"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "smoothed_rate",
+      "trend_break_flag",
+      "quality_gap",
+      "expected_band_distance"
+    ],
+    "recommended_widgets": [
+      "csat_resolution_tradeoff",
+      "support_burden_heatmap",
+      "churn_risk_bubble_map"
+    ],
+    "query_aliases": [
+      "win",
+      "win_rate"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "backlog_size",
+    "semantic_role": "reliability_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "support_operations"
+    ],
+    "domain_coverage": [
+      "customer_support"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 335.0,
+    "max_value_observed": 570.0,
+    "sample_values": [
+      436,
+      446,
+      432,
+      462
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "cap_ratio_metrics_inside_expected_band"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "burn_rate_rolling",
+      "incident_density",
+      "error_budget_gap",
+      "severity_weighted_score"
+    ],
+    "recommended_widgets": [
+      "slo_burn_down",
+      "schema_drift_radar",
+      "source_quality_lineage"
+    ],
+    "query_aliases": [
+      "backlog_size"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "case_backlog",
+    "semantic_role": "reliability_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "banking_aml_alerts"
+    ],
+    "domain_coverage": [
+      "banking_finance"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 142.0,
+    "max_value_observed": 259.0,
+    "sample_values": [
+      198,
+      203,
+      216,
+      213
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "cap_ratio_metrics_inside_expected_band"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "burn_rate_rolling",
+      "incident_density",
+      "error_budget_gap",
+      "severity_weighted_score"
+    ],
+    "recommended_widgets": [
+      "slo_burn_down",
+      "schema_drift_radar",
+      "source_quality_lineage"
+    ],
+    "query_aliases": [
+      "case_backlog"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "error_rate",
+    "semantic_role": "reliability_metric",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "infra_observability"
+    ],
+    "domain_coverage": [
+      "observability"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.00896,
+    "max_value_observed": 0.0305,
+    "sample_values": [
+      0.01432,
+      0.01351,
+      0.0132,
+      0.01483
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "cap_ratio_metrics_inside_expected_band"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "burn_rate_rolling",
+      "incident_density",
+      "error_budget_gap",
+      "severity_weighted_score"
+    ],
+    "recommended_widgets": [
+      "slo_burn_down",
+      "schema_drift_radar",
+      "source_quality_lineage"
+    ],
+    "query_aliases": [
+      "error",
+      "error_rate"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "incident_count",
+    "semantic_role": "reliability_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "infra_observability"
+    ],
+    "domain_coverage": [
+      "observability"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 3.07,
+    "max_value_observed": 11.19,
+    "sample_values": [
+      4.51,
+      4.44,
+      4.3,
+      4.96
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "cap_ratio_metrics_inside_expected_band"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "burn_rate_rolling",
+      "incident_density",
+      "error_budget_gap",
+      "severity_weighted_score"
+    ],
+    "recommended_widgets": [
+      "slo_burn_down",
+      "schema_drift_radar",
+      "source_quality_lineage"
+    ],
+    "query_aliases": [
+      "incident",
+      "incident_count"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "packet_loss_pct",
+    "semantic_role": "reliability_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "telecom_network_health"
+    ],
+    "domain_coverage": [
+      "telecom_network"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.1883,
+    "max_value_observed": 1.0523,
+    "sample_values": [
+      0.5655,
+      0.5035,
+      0.4843,
+      0.6656
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "cap_ratio_metrics_inside_expected_band"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "burn_rate_rolling",
+      "incident_density",
+      "error_budget_gap",
+      "severity_weighted_score"
+    ],
+    "recommended_widgets": [
+      "slo_burn_down",
+      "schema_drift_radar",
+      "source_quality_lineage"
+    ],
+    "query_aliases": [
+      "packet_loss_pct"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "tower_availability_pct",
+    "semantic_role": "reliability_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "telecom_network_health"
+    ],
+    "domain_coverage": [
+      "telecom_network"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.96901,
+    "max_value_observed": 0.99832,
+    "sample_values": [
+      0.99291,
+      0.99555,
+      0.99368,
+      0.99424
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "cap_ratio_metrics_inside_expected_band"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "burn_rate_rolling",
+      "incident_density",
+      "error_budget_gap",
+      "severity_weighted_score"
+    ],
+    "recommended_widgets": [
+      "slo_burn_down",
+      "schema_drift_radar",
+      "source_quality_lineage"
+    ],
+    "query_aliases": [
+      "tower_availability_pct"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "aml_alert_count",
+    "semantic_role": "security_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "banking_aml_alerts"
+    ],
+    "domain_coverage": [
+      "banking_finance"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 266.0,
+    "max_value_observed": 625.0,
+    "sample_values": [
+      354,
+      380,
+      345,
+      340
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "alert_on_entropy_shift",
+      "flag_unusual_region_spread"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "outlier_score",
+      "entropy_shift",
+      "region_change_flag",
+      "threat_velocity"
+    ],
+    "recommended_widgets": [
+      "security_threat_surface",
+      "privileged_access_watchtower",
+      "exfiltration_risk_chord"
+    ],
+    "query_aliases": [
+      "aml_alert",
+      "aml_alert_count"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "bytes_out",
+    "semantic_role": "security_metric",
+    "unit": "bytes",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "security_events"
+    ],
+    "domain_coverage": [
+      "cybersecurity"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 4096544650.72,
+    "max_value_observed": 5929999731.88,
+    "sample_values": [
+      4675037636.24,
+      4661993291.34,
+      4965214655.89,
+      4767753204.89
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "alert_on_entropy_shift",
+      "flag_unusual_region_spread"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "outlier_score",
+      "entropy_shift",
+      "region_change_flag",
+      "threat_velocity"
+    ],
+    "recommended_widgets": [
+      "security_threat_surface",
+      "privileged_access_watchtower",
+      "exfiltration_risk_chord"
+    ],
+    "query_aliases": [
+      "bytes_out"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "failed_logins",
+    "semantic_role": "security_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "security_events"
+    ],
+    "domain_coverage": [
+      "cybersecurity"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 152.0,
+    "max_value_observed": 770.0,
+    "sample_values": [
+      233,
+      229,
+      217,
+      227
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "alert_on_entropy_shift",
+      "flag_unusual_region_spread"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "outlier_score",
+      "entropy_shift",
+      "region_change_flag",
+      "threat_velocity"
+    ],
+    "recommended_widgets": [
+      "security_threat_surface",
+      "privileged_access_watchtower",
+      "exfiltration_risk_chord"
+    ],
+    "query_aliases": [
+      "failed_logins"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "fraud_loss_usd",
+    "semantic_role": "security_metric",
+    "unit": "usd",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "banking_aml_alerts"
+    ],
+    "domain_coverage": [
+      "banking_finance"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 162295.75,
+    "max_value_observed": 281346.66,
+    "sample_values": [
+      221555.8,
+      214205.25,
+      217962.66,
+      225738.19
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "alert_on_entropy_shift",
+      "flag_unusual_region_spread"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "outlier_score",
+      "entropy_shift",
+      "region_change_flag",
+      "threat_velocity"
+    ],
+    "recommended_widgets": [
+      "security_threat_surface",
+      "privileged_access_watchtower",
+      "exfiltration_risk_chord"
+    ],
+    "query_aliases": [
+      "fraud_loss",
+      "fraud_loss_usd"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "fraud_score",
+    "semantic_role": "security_metric",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "banking_core_ledger"
+    ],
+    "domain_coverage": [
+      "banking_finance"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.0948,
+    "max_value_observed": 0.3455,
+    "sample_values": [
+      0.1955,
+      0.1911,
+      0.1947,
+      0.1953
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "alert_on_entropy_shift",
+      "flag_unusual_region_spread"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "outlier_score",
+      "entropy_shift",
+      "region_change_flag",
+      "threat_velocity"
+    ],
+    "recommended_widgets": [
+      "security_threat_surface",
+      "privileged_access_watchtower",
+      "exfiltration_risk_chord"
+    ],
+    "query_aliases": [
+      "fraud_score"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "privileged_actions",
+    "semantic_role": "security_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "security_events"
+    ],
+    "domain_coverage": [
+      "cybersecurity"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 32.0,
+    "max_value_observed": 51.0,
+    "sample_values": [
+      47,
+      46,
+      48
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "alert_on_entropy_shift",
+      "flag_unusual_region_spread"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "outlier_score",
+      "entropy_shift",
+      "region_change_flag",
+      "threat_velocity"
+    ],
+    "recommended_widgets": [
+      "security_threat_surface",
+      "privileged_access_watchtower",
+      "exfiltration_risk_chord"
+    ],
+    "query_aliases": [
+      "privileged_actions"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "sanction_hits",
+    "semantic_role": "security_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "banking_aml_alerts"
+    ],
+    "domain_coverage": [
+      "banking_finance"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 4.0,
+    "max_value_observed": 18.0,
+    "sample_values": [
+      9,
+      8
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "alert_on_entropy_shift",
+      "flag_unusual_region_spread"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "outlier_score",
+      "entropy_shift",
+      "region_change_flag",
+      "threat_velocity"
+    ],
+    "recommended_widgets": [
+      "security_threat_surface",
+      "privileged_access_watchtower",
+      "exfiltration_risk_chord"
+    ],
+    "query_aliases": [
+      "sanction_hits"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "suspicious_ips",
+    "semantic_role": "security_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "security_events"
+    ],
+    "domain_coverage": [
+      "cybersecurity"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 13.0,
+    "max_value_observed": 57.0,
+    "sample_values": [
+      18,
+      19,
+      20
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "alert_on_entropy_shift",
+      "flag_unusual_region_spread"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "outlier_score",
+      "entropy_shift",
+      "region_change_flag",
+      "threat_velocity"
+    ],
+    "recommended_widgets": [
+      "security_threat_surface",
+      "privileged_access_watchtower",
+      "exfiltration_risk_chord"
+    ],
+    "query_aliases": [
+      "suspicious_ips"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "threat_score",
+    "semantic_role": "security_metric",
+    "unit": "ratio",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "security_events"
+    ],
+    "domain_coverage": [
+      "cybersecurity"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 0.2134,
+    "max_value_observed": 0.6898,
+    "sample_values": [
+      0.3395,
+      0.3791,
+      0.3781,
+      0.3664
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "alert_on_entropy_shift",
+      "flag_unusual_region_spread"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "outlier_score",
+      "entropy_shift",
+      "region_change_flag",
+      "threat_velocity"
+    ],
+    "recommended_widgets": [
+      "security_threat_surface",
+      "privileged_access_watchtower",
+      "exfiltration_risk_chord"
+    ],
+    "query_aliases": [
+      "threat_score"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "energy_kwh",
+    "semantic_role": "sensor_metric",
+    "unit": "kwh",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "iot_telemetry"
+    ],
+    "domain_coverage": [
+      "iot_operations"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 805.98,
+    "max_value_observed": 1129.04,
+    "sample_values": [
+      1088.48,
+      1117.41,
+      1057.89,
+      1099.47
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "validate_against_drift_and_maintenance_thresholds"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "rolling_std",
+      "fft_energy_proxy",
+      "maintenance_risk",
+      "drift_direction"
+    ],
+    "recommended_widgets": [
+      "inventory_pressure_matrix",
+      "anomaly_investigation_panel",
+      "workspace_growth_clusters"
+    ],
+    "query_aliases": [
+      "energy_kwh"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "temperature_c",
+    "semantic_role": "sensor_metric",
+    "unit": "celsius",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "iot_telemetry"
+    ],
+    "domain_coverage": [
+      "iot_operations"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 60.67,
+    "max_value_observed": 74.07,
+    "sample_values": [
+      66.67,
+      67.89,
+      69.68,
+      67.48
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "validate_against_drift_and_maintenance_thresholds"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "rolling_std",
+      "fft_energy_proxy",
+      "maintenance_risk",
+      "drift_direction"
+    ],
+    "recommended_widgets": [
+      "inventory_pressure_matrix",
+      "anomaly_investigation_panel",
+      "workspace_growth_clusters"
+    ],
+    "query_aliases": [
+      "temperature_c"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "vibration_mm_s",
+    "semantic_role": "sensor_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "float64"
+    ],
+    "source_coverage": [
+      "iot_telemetry"
+    ],
+    "domain_coverage": [
+      "iot_operations"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 2.428,
+    "max_value_observed": 7.614,
+    "sample_values": [
+      3.895,
+      3.958,
+      3.665,
+      3.731
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition",
+      "validate_against_drift_and_maintenance_thresholds"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "rolling_std",
+      "fft_energy_proxy",
+      "maintenance_risk",
+      "drift_direction"
+    ],
+    "recommended_widgets": [
+      "inventory_pressure_matrix",
+      "anomaly_investigation_panel",
+      "workspace_growth_clusters"
+    ],
+    "query_aliases": [
+      "vibration_mm_s"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "timestamp",
+    "semantic_role": "temporal",
+    "unit": "timestamp",
+    "data_types_seen": [
+      "datetime64[ns]"
+    ],
+    "source_coverage": [
+      "banking_aml_alerts",
+      "banking_core_ledger",
+      "cloud_finops",
+      "crm_pipeline",
+      "ecommerce_orders",
+      "enterprise_erp_finance",
+      "enterprise_procurement_ops",
+      "ga4_web",
+      "healthcare_capacity_planning",
+      "healthcare_operations",
+      "infra_observability",
+      "iot_telemetry",
+      "meta_ads",
+      "product_usage",
+      "saas_billing",
+      "security_events",
+      "support_operations",
+      "telecom_network_health",
+      "telecom_subscriber_usage",
+      "tiktok_ads"
+    ],
+    "domain_coverage": [
+      "banking_finance",
+      "commerce",
+      "customer_support",
+      "cybersecurity",
+      "enterprise_bi",
+      "finops",
+      "healthcare_operations",
+      "iot_operations",
+      "marketing_attribution",
+      "observability",
+      "product_analytics",
+      "saas_metrics",
+      "sales_pipeline",
+      "telecom_network",
+      "web_analytics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 1.7466084e+18,
+    "max_value_observed": 1.767258e+18,
+    "sample_values": [
+      "2025-05-07T09:00:00",
+      "2025-05-08T09:00:00",
+      "2025-05-09T09:00:00",
+      "2025-05-10T09:00:00",
+      "2025-12-22T10:00:00",
+      "2025-12-22T11:00:00"
+    ],
+    "validation_rules": [
+      "enforce_monotonic_time_if_temporal"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "calendar_features",
+      "time_bucket",
+      "recency_weight"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "timestamp"
+    ],
+    "join_hints": [
+      "timestamp"
+    ]
+  },
+  {
+    "field_name": "weekly_active_teams",
+    "semantic_role": "temporal",
+    "unit": "timestamp",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "product_usage"
+    ],
+    "domain_coverage": [
+      "product_analytics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 1575.0,
+    "max_value_observed": 2132.0,
+    "sample_values": [
+      1583,
+      1576,
+      1647,
+      1589
+    ],
+    "validation_rules": [
+      "enforce_monotonic_time_if_temporal"
+    ],
+    "normalization_strategy": {
+      "primary": "identity",
+      "secondary": "none"
+    },
+    "feature_hints": [
+      "calendar_features",
+      "time_bucket",
+      "recency_weight"
+    ],
+    "recommended_widgets": [
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "weekly_active_teams"
+    ],
+    "join_hints": [
+      "timestamp"
+    ]
+  },
+  {
+    "field_name": "engaged_sessions",
+    "semantic_role": "traffic_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "ga4_web"
+    ],
+    "domain_coverage": [
+      "web_analytics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 4100.0,
+    "max_value_observed": 6887.0,
+    "sample_values": [
+      5524,
+      5452,
+      5106,
+      5553
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "ctr",
+      "rolling_peak_ratio",
+      "source_mix_share",
+      "traffic_quality_blend"
+    ],
+    "recommended_widgets": [
+      "session_quality_breakdown",
+      "landing_page_dropoff_sankey",
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "engaged_sessions",
+      "traffic_sessions",
+      "visits"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "meta_clicks",
+    "semantic_role": "traffic_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "meta_ads"
+    ],
+    "domain_coverage": [
+      "marketing_attribution"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 7985.0,
+    "max_value_observed": 18000.0,
+    "sample_values": [
+      14960,
+      14921,
+      17017,
+      16016
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "ctr",
+      "rolling_peak_ratio",
+      "source_mix_share",
+      "traffic_quality_blend"
+    ],
+    "recommended_widgets": [
+      "session_quality_breakdown",
+      "landing_page_dropoff_sankey",
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "meta_clicks"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "meta_impressions",
+    "semantic_role": "traffic_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "meta_ads"
+    ],
+    "domain_coverage": [
+      "marketing_attribution"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 400000.0,
+    "max_value_observed": 400000.0,
+    "sample_values": [
+      400000
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "ctr",
+      "rolling_peak_ratio",
+      "source_mix_share",
+      "traffic_quality_blend"
+    ],
+    "recommended_widgets": [
+      "session_quality_breakdown",
+      "landing_page_dropoff_sankey",
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "meta_impressions"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "page_views",
+    "semantic_role": "traffic_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "ga4_web"
+    ],
+    "domain_coverage": [
+      "web_analytics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 20407.0,
+    "max_value_observed": 30856.0,
+    "sample_values": [
+      22958,
+      22668,
+      24200,
+      23992
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "ctr",
+      "rolling_peak_ratio",
+      "source_mix_share",
+      "traffic_quality_blend"
+    ],
+    "recommended_widgets": [
+      "session_quality_breakdown",
+      "landing_page_dropoff_sankey",
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "page_views"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "request_count",
+    "semantic_role": "traffic_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "infra_observability"
+    ],
+    "domain_coverage": [
+      "observability"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 449250.0,
+    "max_value_observed": 634508.0,
+    "sample_values": [
+      472709,
+      492539,
+      488244,
+      501922
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "ctr",
+      "rolling_peak_ratio",
+      "source_mix_share",
+      "traffic_quality_blend"
+    ],
+    "recommended_widgets": [
+      "session_quality_breakdown",
+      "landing_page_dropoff_sankey",
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "request",
+      "request_count"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "sessions",
+    "semantic_role": "traffic_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "ga4_web"
+    ],
+    "domain_coverage": [
+      "web_analytics"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 7793.0,
+    "max_value_observed": 10378.0,
+    "sample_values": [
+      8574,
+      8396,
+      8435,
+      8392
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "ctr",
+      "rolling_peak_ratio",
+      "source_mix_share",
+      "traffic_quality_blend"
+    ],
+    "recommended_widgets": [
+      "session_quality_breakdown",
+      "landing_page_dropoff_sankey",
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "sessions",
+      "traffic_sessions",
+      "visits"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "tiktok_clicks",
+    "semantic_role": "traffic_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "tiktok_ads"
+    ],
+    "domain_coverage": [
+      "marketing_attribution"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 7911.0,
+    "max_value_observed": 18000.0,
+    "sample_values": [
+      13631,
+      14041,
+      15358,
+      15134
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "ctr",
+      "rolling_peak_ratio",
+      "source_mix_share",
+      "traffic_quality_blend"
+    ],
+    "recommended_widgets": [
+      "session_quality_breakdown",
+      "landing_page_dropoff_sankey",
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "tiktok_clicks"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  },
+  {
+    "field_name": "tiktok_impressions",
+    "semantic_role": "traffic_metric",
+    "unit": "count",
+    "data_types_seen": [
+      "int64"
+    ],
+    "source_coverage": [
+      "tiktok_ads"
+    ],
+    "domain_coverage": [
+      "marketing_attribution"
+    ],
+    "nullable_ratio_max": 0.0,
+    "min_value_observed": 400000.0,
+    "max_value_observed": 400000.0,
+    "sample_values": [
+      400000
+    ],
+    "validation_rules": [
+      "track_null_ratio_by_partition"
+    ],
+    "normalization_strategy": {
+      "primary": "zscore_by_source",
+      "secondary": "winsorize_p99"
+    },
+    "feature_hints": [
+      "ctr",
+      "rolling_peak_ratio",
+      "source_mix_share",
+      "traffic_quality_blend"
+    ],
+    "recommended_widgets": [
+      "session_quality_breakdown",
+      "landing_page_dropoff_sankey",
+      "executive_mixed_signal_wall"
+    ],
+    "query_aliases": [
+      "tiktok_impressions"
+    ],
+    "join_hints": [
+      "timestamp",
+      "domain_dimension_key"
+    ]
+  }
+]
