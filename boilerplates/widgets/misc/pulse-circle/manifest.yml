@@ -1,8 +1,0 @@
-title: "Pulse Circle"
-description: "A pulsating circle indicating a status or an important metric."
-data_structure_template:
-  value: "100%"
-grid_span: "default"
-sdui:
-  mapping_mode: "single"
-  root_key: "pulse"

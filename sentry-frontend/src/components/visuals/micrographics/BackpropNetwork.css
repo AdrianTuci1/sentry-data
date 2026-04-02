@@ -1,0 +1,93 @@
+.backprop-container {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.backprop-svg {
+    width: 100%;
+    height: calc(100% - 30px);
+    cursor: grab;
+}
+
+.backprop-svg:active {
+    cursor: grabbing;
+}
+
+.network-node {
+    transition: filter 0.2s;
+}
+
+.network-node:hover {
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
+}
+
+.node-label {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+}
+
+/* Pulsing effect for nodes in focus */
+.node-pulse {
+    animation: nodePulse 2s infinite alternate;
+}
+
+@keyframes nodePulse {
+    0% {
+        r: 12;
+        filter: drop-shadow(0 0 2px currentColor);
+    }
+
+    100% {
+        r: 15;
+        filter: drop-shadow(0 0 12px currentColor);
+    }
+}
+
+/* Backpropagation flowing line animation */
+.link-animated {
+    animation: flowLine 1s linear infinite;
+}
+
+@keyframes flowLine {
+    to {
+        stroke-dashoffset: -8;
+    }
+}
+
+.backprop-legend {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    padding: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    color: #9CA3AF;
+}
+
+.legend-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.legend-dot.input {
+    background: #60A5FA;
+}
+
+.legend-dot.hidden {
+    background: #A78BFA;
+}
+
+.legend-dot.output {
+    background: #4ADE80;
+}

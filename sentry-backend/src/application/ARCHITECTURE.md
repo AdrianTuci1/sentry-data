@@ -1,73 +1,39 @@
-# Application Layer Architecture
+# Application Architecture
 
-This document describes the core architecture of the `sentry-backend` application layer, specifically focusing on the unified data pipeline orchestration.
+`sentry-backend` is now a Parrot OS control plane, not a DAG orchestrator.
 
-```mermaid
-flowchart TD
-    %% Define Styles
-    classDef service fill:#f9f,stroke:#333,stroke-width:2px;
-    classDef runner fill:#bfb,stroke:#333,stroke-width:2px;
-    classDef executor fill:#fbb,stroke:#333,stroke-width:2px;
-    classDef config fill:#ddd,stroke:#333,stroke-width:1px,stroke-dasharray: 5 5;
+## Runtime Flow
 
-    %% Entry Points
-    API["REST / GraphQL Webhooks"] --> OS
-    Cron["Scheduled Jobs / Cron"] --> OS
+1. `sentry-meltano` lands Bronze data.
+2. `OrchestrationService` starts a Parrot runtime request.
+3. `ParrotNeuralEngineService` builds the execution score.
+4. `SentinelClient` aligns and validates the score.
+5. `BronzeDiscoveryService` infers source metadata directly from Bronze.
+6. `WorkloadPlannerService` chooses `modal` or `ray_daft`.
+7. `ExecutionPlaneService` submits the plan to the execution control plane.
+8. `MindMapManifestService` generates the source-to-insight mindmap manifest and YAML.
+9. `ReverseEtlHeadService` stages governed Reverse ETL outputs and receipts.
 
-    %% Orchestration & Config
-    PC(["PipelineConfig"]):::config -.-> OS
-    PC -.-> PR
-    
-    subgraph ApplicationLayer ["src/application/"]
-        OS["OrchestrationService"]:::service
-        
-        %% Runners
-        subgraph Pipeline ["pipeline/"]
-            PR["PipelineRunner"]:::runner
-            MR["MLPathRunner"]:::runner
-            
-            AE["AgentExecutor"]:::executor
-            TT["TokenTracker"]
-            CV["CoreVitalsCollector"]
-            SF["SchemaFingerprint"]
-        end
-    end
+## Core Services
 
-    %% Flow
-    OS -->|"execute(context)"| PR
-    OS -->|"execute(context)"| MR
-    SF -.->|"Compute Delta"| PR
-    
-    PR -->|"Per-Source Blocks"| AE
-    MR -->|"Architecture/Trainer/Inference"| AE
+- `OrchestrationService`: top-level runtime coordinator.
+- `ParrotRuntimeService`: request lifecycle, progress, artifacts, and project runtime state.
+- `ParrotNeuralEngineService`: translator/compiler for Bronze-first execution logic.
+- `SentinelClient`: alignment and safety validation.
+- `BronzeDiscoveryService`: schema, semantic typing, and source metadata discovery.
+- `WorkloadPlannerService`: execution sizing and provider selection.
+- `ExecutionPlaneService`: submission to Modal or Ray/Daft control planes.
+- `MindMapManifestService`: frontend-facing mindmap structure, YAML, and editable logic.
+- `ReverseEtlHeadService`: DNS-gated Reverse ETL policy and receipts.
 
-    %% Telemetry
-    AE -->|"Record Usage"| TT
-    OS -->|"Generate Report"| CV
+## Persistence
 
-    %% External Dependencies
-    subgraph External ["Infrastructure / MicroVMs"]
-        Modal["Modal Sandboxes"]
-        Dynamo[("DynamoDB ProjectEntity")]
-        R2[("Cloudflare R2 Storage")]
-    end
+- Client/project runtime artifacts are stored in object storage under `metadata/...`.
+- DynamoDB keeps higher-level project state, runtime pointers, and commercial metadata.
+- Reverse ETL stays guarded by DNS TXT ownership checks, VM limits, and stop conditions.
 
-    AE -->|"Deploy & Run agent_manager.py"| Modal
-    OS -->|"Save Vitals & Discovery"| Dynamo
-    AE -.->|"Read/Write Scripts"| R2
-```
+## Execution Plane
 
-## Component Overview
-
-### Core Orchestration
-- **`OrchestrationService`**: The primary coordinator. It triggers the `PipelineRunner` for the ETL phase and optionally the `MLPathRunner` for predictions. It manages high-level discovery aggregation and telemetry persistence.
-- **`PipelineConfig`**: Centralized configuration for feature toggles (e.g., enabling/disabling the ML path).
-
-### Smart Execution
-- **`PipelineRunner`**: The "brain" of the ETL phase. It uses **`SchemaFingerprint`** to detect schema drift or new sources and executes parallel ETL blocks (Normalization -> Feature Engineering) for each source. It identifies cache hits vs misses per-source, ensuring minimal token usage for existing data.
-- **`MLPathRunner`**: Specialized runner for executing advanced modeling. It designs strategy (Architect), trains models (Trainer), and generates predictions (Inference) in a unified, multi-source aware manner.
-
-### Agent Execution & Auditing
-- **`AgentExecutor`**: The bridge to isolated microVMs (Modal). It handles script deployment, environment injection, and maps agent outputs (`AGENT_DISCOVERY`, `AGENT_RESULT`) back to the application context.
-- **`TokenTracker`**: Audits and estimates token consumption from LLM-driven tasks.
-- **`CoreVitalsCollector`**: Collects performance metrics and execution details for each pipeline run.
+- `Node.js` stays in the control plane.
+- Heavy execution belongs to `Modal` or `Kubernetes + Ray + Daft`.
+- The Python analytics worker now exposes a minimal execution control plane for plan submission and status tracking until the full K8s/Ray control plane is in place.

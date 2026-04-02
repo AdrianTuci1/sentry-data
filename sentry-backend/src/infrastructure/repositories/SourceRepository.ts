@@ -13,7 +13,7 @@ export interface SourceEntity extends Entity {
     uri: string;            // S3/R2 URI pointing to the raw data
     type: string;           // e.g. 'csv', 'parquet', 'shopify', 'meta', 'postgres'
     cronSchedule?: string;  // Optional cron expression for automatic refresh
-    lastRunAt?: string;     // ISO timestamp of the last successful pipeline run
+    lastRunAt?: string;     // ISO timestamp of the last successful runtime execution
     schemaFingerprint?: string; // Hash of column names — used for cache invalidation
     createdAt: string;
 }
@@ -86,7 +86,7 @@ export class SourceRepository extends BaseRepository<SourceEntity> {
     }
 
     /**
-     * Update lastRunAt timestamp after a pipeline run completes.
+     * Update lastRunAt timestamp after a runtime execution completes.
      */
     public async updateLastRunAt(tenantId: string, projectId: string, sourceId: string): Promise<void> {
         const source = await this.findById(tenantId, projectId, sourceId);

@@ -1,7 +1,0 @@
-/* Cohorts specific styles */
-.cohort-container {
-    overflow-y: auto;
-}
-.cohort-container::-webkit-scrollbar {
-    display: none;
-}

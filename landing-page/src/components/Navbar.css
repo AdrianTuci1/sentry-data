@@ -1,0 +1,93 @@
+.navbar-shell {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(5, 5, 5, 0.94);
+  backdrop-filter: blur(10px);
+}
+
+.navbar {
+  min-height: 3.5rem;
+  padding: 0 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.navbar-brand {
+  color: var(--text-primary);
+  font-size: 1.9rem;
+  font-weight: 300;
+  letter-spacing: -0.06em;
+}
+
+.navbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.navbar-nav a,
+.navbar-menu {
+  color: var(--text-muted);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition: color 180ms ease;
+}
+
+.navbar-nav a:hover,
+.navbar-menu:hover {
+  color: var(--text-primary);
+}
+
+.navbar-menu {
+  width: 1.75rem;
+  height: 1.75rem;
+  display: inline-grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.navbar-menu-lines {
+  position: relative;
+  width: 0.95rem;
+  height: 0.65rem;
+}
+
+.navbar-menu-lines::before,
+.navbar-menu-lines::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+}
+
+.navbar-menu-lines::before {
+  top: 0;
+}
+
+.navbar-menu-lines::after {
+  bottom: 0;
+}
+
+@media (max-width: 720px) {
+  .navbar {
+    padding: 0 0.9rem;
+  }
+
+  .navbar-nav {
+    gap: 0.9rem;
+  }
+
+  .navbar-nav a:nth-child(3) {
+    display: none;
+  }
+}

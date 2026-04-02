@@ -45,7 +45,7 @@ export class ProjectController implements IController {
         this.router.delete('/:projectId/sources/:sourceId', auth, this.deleteSource);
 
         this.router.get('/:projectId', auth, this.getProjectById);
-        this.router.post('/:projectId/pipeline/run', auth, this.runPipeline);
+        this.router.post('/:projectId/runtime/run', auth, this.runRuntime);
 
         // Endpoints for Frontend data extraction
         this.router.get('/:projectId/lineage', auth, this.getLineage);
@@ -112,9 +112,11 @@ export class ProjectController implements IController {
         try {
             const tenantId = req.tenantId!;
             const { projectId } = req.params;
-            const { name, uri, type, cronSchedule } = req.body;
+            const { name, sourceName, uri, sourceUri, type, cronSchedule } = req.body;
+            const resolvedName = name || sourceName;
+            const resolvedUri = uri || sourceUri;
 
-            if (!name || !uri) {
+            if (!resolvedName || !resolvedUri) {
                 res.status(400).json({ error: 'name and uri are required' });
                 return;
             }
@@ -124,8 +126,8 @@ export class ProjectController implements IController {
                 tenantId,
                 projectId,
                 sourceId,
-                name,
-                uri,
+                name: resolvedName,
+                uri: resolvedUri,
                 type: type || 'csv',
                 cronSchedule,
                 createdAt: new Date().toISOString(),
@@ -134,7 +136,7 @@ export class ProjectController implements IController {
             res.status(201).json({
                 status: 'success',
                 message: 'Source connected to project',
-                data: { sourceId, name, uri, type: type || 'csv', cronSchedule }
+                data: { sourceId, name: resolvedName, uri: resolvedUri, type: type || 'csv', cronSchedule }
             });
         } catch (error) {
             next(error);
@@ -173,9 +175,9 @@ export class ProjectController implements IController {
         }
     };
 
-    // ─── Pipeline ─────────────────────────────────────────────────
+    // ─── Runtime ─────────────────────────────────────────────────
 
-    private runPipeline = async (req: Request, res: Response, next: NextFunction) => {
+    private runRuntime = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const tenantId = req.tenantId!;
             const { projectId } = req.params;
@@ -193,16 +195,15 @@ export class ProjectController implements IController {
             const rawSourceUris = sources.map(s => s.uri);
             const sourceNames = sources.map(s => s.name);
 
-            // Fire and forget (Runs asynchronously in background)
-            // It will communicate its progress via SSE using SSEManager inside OrchestrationService
-            this.orchestrationService.runFullPipeline(tenantId, projectId, rawSourceUris, sourceNames)
+            // Fire and forget. Progress is streamed over SSE by the Parrot runtime.
+            this.orchestrationService.runRuntime(tenantId, projectId, rawSourceUris, sourceNames)
                 .catch(err => {
-                    console.error(`[ProjectController] Background pipeline failed for ${projectId}:`, err);
+                    console.error(`[ProjectController] Background Parrot runtime failed for ${projectId}:`, err);
                 });
 
             res.status(202).json({
                 status: 'accepted',
-                message: 'End-to-end pipeline started in the background. Connect to the SSE stream to track progress.',
+                message: 'Parrot runtime started in the background. Connect to the SSE stream to track discovery, alignment, and mindmap generation.',
                 sourcesUsed: sources.length
             });
         } catch (error) {
@@ -217,7 +218,7 @@ export class ProjectController implements IController {
             const project = await this.projectRepo.findById(tenantId, projectId);
 
             if (!project || !project.discoveryMetadata) {
-                res.status(404).json({ error: 'Lineage data not found' });
+                res.status(404).json({ error: 'Mindmap data not found' });
                 return;
             }
 

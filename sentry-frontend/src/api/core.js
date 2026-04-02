@@ -61,10 +61,10 @@ export const ProjectService = {
     },
 
     /**
-     * Triggers the full 6-agent Orchestration Pipeline.
+     * Triggers the Parrot runtime for a project.
      */
-    async runPipeline(projectId, rawSourceUris) {
-        const res = await fetch(`${API_BASE_URL}/projects/${projectId}/pipeline/run`, {
+    async runRuntime(projectId, rawSourceUris) {
+        const res = await fetch(`${API_BASE_URL}/projects/${projectId}/runtime/run`, {
             method: 'POST',
             headers: getHeaders(),
             body: JSON.stringify({ rawSourceUris })
@@ -85,7 +85,7 @@ export const ProjectService = {
     },
 
     /**
-     * Fetches the generated insights/ML predictions mapped to Dashboard Widgets.
+     * Fetches dashboard metadata plus optional widget data payloads.
      */
     async getAnalytics(projectId) {
         const res = await fetch(`${API_BASE_URL}/dashboard/${projectId}`, {
@@ -107,20 +107,9 @@ export const ProjectService = {
     },
 
     /**
-     * Fetches hydrated data for a specific widget.
+     * Subscribes to Server-Sent Events (SSE) to receive real-time updates of runtime progress.
      */
-    async getWidgetData(projectId, widgetId) {
-        const res = await fetch(`${API_BASE_URL}/dashboard/${projectId}/widget/${widgetId}`, {
-            headers: getHeaders()
-        });
-        if (!res.ok) throw new Error(`API Error: ${res.status}`);
-        return res.json();
-    },
-
-    /**
-     * Subscribes to Server-Sent Events (SSE) to receive real-time updates of agent progress.
-     */
-    connectToPipelineStream(onMessage, onError) {
+    connectToRuntimeStream(onMessage, onError) {
         let eventSource = null;
         let reconnectTimeout = null;
         let retryCount = 0;

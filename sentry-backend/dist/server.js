@@ -30,7 +30,9 @@ class Server {
         this.server = this.app.expressApp.listen(config_1.config.port, () => {
             console.log(`🚀 Central Server running on port ${config_1.config.port}`);
             console.log(`🌍 Environment: ${config_1.config.env}`);
-            console.log(`🔧 Sandbox Provider Configured: ${config_1.config.providers.sandbox.toUpperCase()}`);
+            console.log(`🧠 PNE Service: ${config_1.config.parrot.pneApiUrl ? 'remote' : 'local_fallback'}`);
+            console.log(`🛡️ Sentinel Service: ${config_1.config.parrot.sentinelApiUrl ? 'remote' : 'local_fallback'}`);
+            console.log(`🧪 ML Executor: ${config_1.config.parrot.mlExecutorApiUrl ? 'remote' : 'not_configured'}`);
         });
         this.setupProcessHandlers();
     }

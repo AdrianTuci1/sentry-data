@@ -35,6 +35,26 @@ export const useMindMapLayout = ({
     const layout = useMemo(() => {
         const nodes = [];
         const edges = [];
+        const seenNodeIds = new Set();
+        const seenEdgeIds = new Set();
+
+        const pushNode = (node) => {
+            if (!node?.id || seenNodeIds.has(node.id)) {
+                return;
+            }
+
+            seenNodeIds.add(node.id);
+            nodes.push(node);
+        };
+
+        const pushEdge = (edge) => {
+            if (!edge?.id || seenEdgeIds.has(edge.id)) {
+                return;
+            }
+
+            seenEdgeIds.add(edge.id);
+            edges.push(edge);
+        };
 
         // X-Coordinates for Layers
         const X_CONNECTOR  = -800;
@@ -70,7 +90,7 @@ export const useMindMapLayout = ({
                     y: startY,
                     parentId: `adj-${adj.id}`
                 };
-                nodes.push(colNode);
+                pushNode(colNode);
                 startY += ITEM_HEIGHT;
             });
 
@@ -86,11 +106,11 @@ export const useMindMapLayout = ({
                 parentId: `org-${adj.origin_id || 'root'}`,
                 data: { childIds: columns.map(c => c.id), ...adj }
             };
-            nodes.push(adjNode);
+            pushNode(adjNode);
 
             columns.forEach(col => {
                 const uniqueColId = `${adj.id}-${col.id}`;
-                edges.push({
+                pushEdge({
                     id: `edge-adj-${adj.id}-${col.id}`,
                     sourceId: `adj-${adj.id}`,
                     targetId: uniqueColId,
@@ -121,10 +141,10 @@ export const useMindMapLayout = ({
                         y: adjNode.y,
                         data: act
                     };
-                    nodes.push(actNode);
+                    pushNode(actNode);
                 }
 
-                edges.push({
+                pushEdge({
                     id: `edge-act-${act.id}-adj-${adj.id}`,
                     sourceId: `act-${act.id}`,
                     targetId: `adj-${adj.id}`,
@@ -143,13 +163,13 @@ export const useMindMapLayout = ({
                             label: conn.name,
                             iconType: conn.type,
                             x: X_CONNECTOR,
-                            y: actNode.y,
-                            data: conn
-                        };
-                        nodes.push(connNode);
+                        y: actNode.y,
+                        data: conn
+                    };
+                        pushNode(connNode);
                     }
 
-                    edges.push({
+                    pushEdge({
                         id: `edge-conn-${conn.id}-act-${act.id}`,
                         sourceId: `conn-${conn.id}`,
                         targetId: `act-${act.id}`,
@@ -177,7 +197,7 @@ export const useMindMapLayout = ({
                 y: grpY,
                 data: grp
             };
-            nodes.push(grpNode);
+            pushNode(grpNode);
 
             /* 
             // Connect group to its source adjustedData nodes
@@ -206,9 +226,9 @@ export const useMindMapLayout = ({
                     y: groupStartY + (ITEM_HEIGHT / 2),
                     parentId: `grp-${grp.id}`
                 };
-                nodes.push(insNode);
+                pushNode(insNode);
 
-                edges.push({
+                pushEdge({
                     id: `edge-grp-${grp.id}-ins-${ins.id}`,
                     sourceId: `grp-${grp.id}`,
                     targetId: ins.id,
@@ -220,7 +240,7 @@ export const useMindMapLayout = ({
                 (ins.adjusted_data_columns || []).forEach(adjColName => {
                     const colNode = nodes.find(n => n.data?.name === adjColName && n.type === 'idea' && (ins.lineage?.source_keys || []).some(srcId => n.parentId === `adj-${srcId}`));
                     if (colNode) {
-                        edges.push({
+                        pushEdge({
                             id: `edge-lin-${colNode.id}-grp-${grp.id}`,
                             sourceId: colNode.id,
                             targetId: `grp-${grp.id}`,

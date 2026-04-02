@@ -1,8 +1,0 @@
-title: "Optimal Time Heatmap"
-description: "A heatmap grid representing time/day hot spots for engagement."
-data_structure_template:
-  data: [[0, 0, 25], [1, 0, 45]]
-grid_span: "col-span-2 row-span-2"
-sdui:
-  mapping_mode: "list"
-  root_key: "heatmap"

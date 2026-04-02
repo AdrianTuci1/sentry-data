@@ -9,7 +9,7 @@
     "dev": "nodemon src/server.ts",
     "seed": "ts-node scripts/seed_test_data.ts",
     "clean": "ts-node scripts/full_cleanup.ts",
-    "pipeline": "ts-node scripts/test_pipeline.ts",
+    "runtime": "ts-node scripts/test_runtime.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {

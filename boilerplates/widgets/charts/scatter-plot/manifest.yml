@@ -1,8 +1,0 @@
-title: "Scatter Plot"
-description: "A scatter plot showing distribution and trend line."
-data_structure_template:
-  data: [[40, 426], [45, 450], [50, 568]]
-grid_span: "col-span-2 row-span-2"
-sdui:
-  mapping_mode: "list"
-  root_key: "scatter"

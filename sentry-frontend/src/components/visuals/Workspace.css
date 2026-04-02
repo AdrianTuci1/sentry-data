@@ -127,6 +127,8 @@
     align-items: center;
     justify-content: center;
     padding: 2rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }
 
 .editor-modal {
@@ -136,6 +138,7 @@
     width: 100%;
     max-width: 56rem;
     height: 80vh;
+    max-height: calc(100dvh - 4rem);
     display: flex;
     flex-direction: column;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
@@ -248,6 +251,8 @@
 .editor-body {
     flex: 1;
     position: relative;
+    min-height: 0;
+    overflow: hidden;
 }
 
 /* Mindmap Controls */

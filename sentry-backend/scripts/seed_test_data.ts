@@ -211,7 +211,7 @@ async function seed() {
         console.log(`Sources:   ${sourceUris.length}`);
         console.log(`\nAUTH TOKEN:\n  Bearer ${token}\n`);
         console.log('Pipeline run (no body needed):');
-        console.log(`  POST /api/projects/${projectId}/pipeline/run\n`);
+        console.log(`  POST /api/projects/${projectId}/runtime/run\n`);
 
     } catch (error) {
         console.error('Seed failed:', error);

@@ -1,0 +1,16 @@
+.app-shell {
+  min-height: 100vh;
+  background: var(--page-bg);
+  color: var(--text-primary);
+}
+
+.app-main {
+  position: relative;
+  display: grid;
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.05), transparent 26%),
+    radial-gradient(circle at 14% 32%, rgba(255, 127, 87, 0.05), transparent 22%),
+    radial-gradient(circle at 72% 58%, rgba(123, 92, 255, 0.06), transparent 24%),
+    var(--page-bg);
+  overflow: hidden;
+}

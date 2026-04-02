@@ -1,8 +1,0 @@
-title: "Budget Sensitivity"
-description: "Analysis of how changes in budget allocation affect KPIs."
-data_structure_template:
-  data: [[0, 0.66], [2, 0.81], [4, 1.2]]
-grid_span: "col-span-2"
-sdui:
-  mapping_mode: "list"
-  root_key: "curvePoints"

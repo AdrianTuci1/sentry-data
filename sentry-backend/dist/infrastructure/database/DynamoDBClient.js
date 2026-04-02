@@ -3,11 +3,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.dynamoDbDocumentClient = void 0;
 const client_dynamodb_1 = require("@aws-sdk/client-dynamodb");
 const lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
+const index_1 = require("../../config/index");
 // Basic configuration for the DynamoDB Client.
-// In production, roles/credentials will be picked up from the AWS Environment.
+// We use explicit credentials from the config object.
 const ddbClient = new client_dynamodb_1.DynamoDBClient({
-    region: process.env.AWS_REGION || 'eu-central-1',
-    // ... Any explicit credentials or endpoint configurations (e.g. for local-dynamodb) goes here
+    region: index_1.config.aws.region,
+    credentials: {
+        accessKeyId: index_1.config.aws.accessKeyId,
+        secretAccessKey: index_1.config.aws.secretAccessKey
+    }
 });
 // The DocumentClient abstracts away explicit type mappings (e.g., {"S": "String"})
 const marshallOptions = {

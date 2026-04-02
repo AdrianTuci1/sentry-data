@@ -1,0 +1,279 @@
+.flowchart-section {
+  position: relative;
+}
+
+.flowchart-bleed {
+  width: 100%;
+}
+
+.flowchart-panel {
+  width: 100%;
+  background: var(--panel-bg);
+  padding: clamp(1.2rem, 2.8vw, 2.25rem);
+}
+
+.flowchart-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--text-dim);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.flowchart-stage {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) 250px minmax(280px, 1fr);
+  grid-template-rows: auto minmax(28rem, auto) auto;
+  column-gap: 1.75rem;
+  row-gap: 1.5rem;
+  margin-top: 1.5rem;
+  align-items: center;
+}
+
+.flowchart-title-slot,
+.flowchart-footer-slot {
+  grid-column: 3;
+}
+
+.flowchart-copy {
+  max-width: 21rem;
+}
+
+.flowchart-copy-top h2 {
+  margin: 0;
+  font-size: clamp(2.2rem, 4.4vw, 4.1rem);
+  font-weight: 300;
+  letter-spacing: -0.06em;
+  line-height: 0.95;
+}
+
+.flowchart-copy-bottom strong {
+  display: block;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.flowchart-copy-bottom p {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.8;
+}
+
+.flowchart-graph {
+  position: relative;
+  grid-column: 1 / 4;
+}
+
+.flowchart-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.flowchart-grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) 250px minmax(280px, 1fr);
+  min-height: 28rem;
+  gap: 1.75rem;
+  align-items: center;
+}
+
+.flowchart-column {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.flowchart-column-left {
+  justify-items: end;
+}
+
+.flowchart-column-right {
+  justify-items: start;
+}
+
+.flow-pill-row {
+  width: 100%;
+  display: flex;
+}
+
+.flow-pill-row-left {
+  justify-content: flex-end;
+}
+
+.flow-pill-row-right {
+  justify-content: flex-start;
+}
+
+.flow-pill {
+  min-height: 2.1rem;
+  padding: 0.48rem 0.78rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  border-radius: 999px;
+  background: rgba(20, 20, 20, 0.98);
+  color: var(--text-soft);
+  font-size: 0.78rem;
+  line-height: 1.35;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+}
+
+.flow-pill-left {
+  border: 1px solid rgba(217, 85, 85, 0.3);
+}
+
+.flow-pill-right {
+  border: 1px solid rgba(138, 95, 255, 0.34);
+}
+
+.flow-pill-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  flex: 0 0 auto;
+  border-radius: 999px;
+}
+
+.flow-pill-dot-left {
+  background: #e35353;
+  box-shadow: 0 0 10px rgba(227, 83, 83, 0.5);
+}
+
+.flow-pill-dot-right {
+  background: #8a5fff;
+  box-shadow: 0 0 10px rgba(138, 95, 255, 0.5);
+}
+
+.flowchart-center {
+  display: grid;
+  place-items: center;
+}
+
+.flowchart-core {
+  width: 12.25rem;
+  height: 12.25rem;
+  padding: 1rem;
+  display: grid;
+  place-items: center;
+  clip-path: polygon(25% 6%, 75% 6%, 100% 50%, 75% 94%, 25% 94%, 0 50%);
+  background: rgba(61, 34, 112, 0.96);
+  border: 1px solid rgba(132, 91, 255, 0.28);
+  box-shadow: 0 26px 70px rgba(64, 30, 130, 0.2);
+}
+
+.flowchart-core-inner {
+  position: relative;
+  width: 7.8rem;
+  height: 7.8rem;
+}
+
+.core-cube {
+  position: absolute;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.38rem;
+  background: #c5c3d1;
+  box-shadow:
+    inset -8px -8px 12px rgba(92, 90, 113, 0.28),
+    0 12px 20px rgba(0, 0, 0, 0.16);
+}
+
+.cube-a {
+  top: 0.2rem;
+  left: 2.8rem;
+}
+
+.cube-b {
+  top: 1.4rem;
+  left: 1.4rem;
+}
+
+.cube-c {
+  top: 1.4rem;
+  right: 1.4rem;
+}
+
+.cube-d {
+  top: 2.7rem;
+  left: 0.3rem;
+}
+
+.cube-e {
+  top: 2.7rem;
+  left: 2.8rem;
+}
+
+.cube-f {
+  top: 2.7rem;
+  right: 0.3rem;
+}
+
+.cube-g {
+  bottom: 1.3rem;
+  left: 1.35rem;
+}
+
+.cube-h {
+  bottom: 1.3rem;
+  right: 1.35rem;
+}
+
+.cube-i {
+  bottom: 0.05rem;
+  left: 2.8rem;
+}
+
+@media (max-width: 1100px) {
+  .flowchart-stage,
+  .flowchart-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .flowchart-title-slot,
+  .flowchart-footer-slot,
+  .flowchart-graph {
+    grid-column: auto;
+  }
+
+  .flowchart-copy {
+    max-width: none;
+  }
+
+  .flowchart-canvas {
+    display: none;
+  }
+
+  .flowchart-column-left,
+  .flowchart-column-right {
+    justify-items: stretch;
+  }
+
+  .flow-pill-row-left,
+  .flow-pill-row-right {
+    justify-content: flex-start;
+  }
+
+  .flowchart-center {
+    order: -1;
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .flowchart-panel {
+    padding: 1rem;
+  }
+
+  .flowchart-core {
+    width: 10rem;
+    height: 10rem;
+  }
+}

@@ -14,14 +14,21 @@ import { SSEController } from '../api/controllers/SSEController';
 import { config } from '../config';
 
 // External Providers & Services
-import { ISandboxProvider } from '../infrastructure/providers/ISandboxProvider';
-import { E2BSandboxProvider } from '../infrastructure/providers/E2BSandboxProvider';
-import { ModalSandboxProvider } from '../infrastructure/providers/ModalSandboxProvider';
-import { ModalInferenceProvider } from '../infrastructure/providers/ModalInferenceProvider';
 import { R2StorageService } from '../infrastructure/storage/R2StorageService';
-import { PipelineOrchestratorService } from '../application/services/PipelineOrchestratorService';
 import { OrchestrationService } from '../application/services/OrchestrationService';
 import { WebhookController } from '../api/controllers/WebhookController';
+import { ParrotNeuralEngineService } from '../application/services/ParrotNeuralEngineService';
+import { ParrotProgressService } from '../application/services/ParrotProgressService';
+import { ReverseEtlHeadService } from '../application/services/ReverseEtlHeadService';
+import { ParrotRuntimeService } from '../application/services/ParrotRuntimeService';
+import { SentinelClient } from '../application/services/SentinelClient';
+import { BronzeDiscoveryService } from '../application/services/BronzeDiscoveryService';
+import { MindMapManifestService } from '../application/services/MindMapManifestService';
+import { WorkloadPlannerService } from '../application/services/WorkloadPlannerService';
+import { ExecutionPlaneService } from '../application/services/ExecutionPlaneService';
+import { ModalExecutionProvider } from '../application/execution/ModalExecutionProvider';
+import { RayDaftExecutionProvider } from '../application/execution/RayDaftExecutionProvider';
+import { RuntimeOrchestratorService } from '../application/services/RuntimeOrchestratorService';
 
 export function initContainer() {
     console.log('[DI Container] Bootstrapping Application dependencies...');
@@ -36,47 +43,53 @@ export function initContainer() {
 
     // 2. Initialize Infrastructure Providers
     const r2StorageService = new R2StorageService();
-    const modalInferenceProvider = new ModalInferenceProvider();
-
-    // Choose the active sandbox provider via strategy pattern
-    let sandboxProvider: ISandboxProvider;
-    if (config.providers.sandbox === 'modal') {
-        sandboxProvider = new ModalSandboxProvider();
-    } else {
-        sandboxProvider = new E2BSandboxProvider();
-    }
 
     // 3. Initialize Domain Services 
     const authService = new AuthService(tenantRepo);
     const widgetService = new WidgetService(r2StorageService);
     const widgetRenderer = new WidgetRenderer(r2StorageService);
     const analyticsService = new AnalyticsService(projectRepo, widgetService, widgetRenderer);
-    
-    // Pipeline Architectural Components
-    const { AgentExecutor } = require('../application/pipeline/AgentExecutor');
-    const { PipelineRunner } = require('../application/pipeline/PipelineRunner');
-    const { MLPathRunner } = require('../application/pipeline/MLPathRunner');
-    
-    const agentExecutor = new AgentExecutor(sandboxProvider, r2StorageService);
-    const pipelineRunner = new PipelineRunner(agentExecutor, r2StorageService, sseManager, projectRepo, widgetService);
-    const mlPathRunner = new MLPathRunner(agentExecutor, r2StorageService, sseManager, widgetService, projectRepo);
-    
-    const orchestrationService = new OrchestrationService(
-        pipelineRunner,
-        mlPathRunner,
+    const sentinelClient = new SentinelClient();
+    const parrotNeuralEngineService = new ParrotNeuralEngineService();
+    const parrotProgressService = new ParrotProgressService(r2StorageService);
+    const reverseEtlHeadService = new ReverseEtlHeadService();
+    const bronzeDiscoveryService = new BronzeDiscoveryService(r2StorageService);
+    const mindMapManifestService = new MindMapManifestService();
+    const workloadPlannerService = new WorkloadPlannerService();
+    const modalExecutionProvider = new ModalExecutionProvider();
+    const rayDaftExecutionProvider = new RayDaftExecutionProvider();
+    const executionPlaneService = new ExecutionPlaneService([
+        modalExecutionProvider,
+        rayDaftExecutionProvider
+    ]);
+    const parrotRuntimeService = new ParrotRuntimeService(
+        parrotNeuralEngineService,
+        parrotProgressService,
+        reverseEtlHeadService,
+        sentinelClient,
         projectRepo,
-        sseManager,
-        widgetService
+        sseManager
     );
     
-    const pipelineOrchestratorService = new PipelineOrchestratorService(orchestrationService, sourceRepo);
+    const orchestrationService = new OrchestrationService(
+        projectRepo,
+        sseManager,
+        parrotRuntimeService,
+        bronzeDiscoveryService,
+        mindMapManifestService,
+        parrotProgressService,
+        workloadPlannerService,
+        executionPlaneService
+    );
+    
+    const runtimeOrchestratorService = new RuntimeOrchestratorService(orchestrationService, sourceRepo);
 
     // 4. Initialize Controllers
     // Controllers are standalone objects that will be passed into the App class
     const healthController = new HealthController();
     const dashboardController = new DashboardController(analyticsService, authService);
     const sseController = new SSEController(sseManager, authService);
-    const webhookController = new WebhookController(pipelineOrchestratorService);
+    const webhookController = new WebhookController(runtimeOrchestratorService);
     const projectController = new ProjectController(orchestrationService, analyticsService, authService, projectRepo, sourceRepo);
 
     const controllers = [
@@ -100,15 +113,18 @@ export function initContainer() {
             projectController,
             analyticsService,
             authService,
-            pipelineOrchestratorService,
+            runtimeOrchestratorService,
             orchestrationService,
             projectRepo,
             tenantRepo,
             sourceRepo,
             sseManager,
             r2StorageService,
-            modalInferenceProvider,
-            sandboxProvider
+            parrotRuntimeService,
+            bronzeDiscoveryService,
+            mindMapManifestService,
+            workloadPlannerService,
+            executionPlaneService
         }
     };
 }

@@ -1,0 +1,117 @@
+.architecture-section {
+  --architecture-scene-offset-x: -50px;
+  --architecture-scene-offset-y: -200px;
+  --architecture-scene-safe-top: -150px;
+  --architecture-scene-safe-bottom: 160px;
+  position: relative;
+  padding: clamp(2rem, 4vw, 3.5rem) clamp(1rem, 3vw, 2.5rem) clamp(2.5rem, 4vw, 4rem);
+  background:
+    radial-gradient(circle at 16% 32%, rgba(209, 255, 94, 0.08), transparent 22%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0)),
+    var(--page-bg);
+  overflow: visible;
+}
+
+.architecture-stage {
+  display: grid;
+  grid-template-columns: minmax(22rem, 0.92fr) minmax(0, 1.08fr);
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  align-items: center;
+  max-width: 1260px;
+  margin: 0 auto;
+  overflow: visible;
+}
+
+.architecture-visual {
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  overflow: visible;
+
+}
+
+.architecture-scene {
+  position: relative;
+  width: min(100%, 40rem);
+  height: calc(min(42rem, 68vw) + var(--architecture-scene-safe-top) + var(--architecture-scene-safe-bottom));
+  min-height: calc(31rem + var(--architecture-scene-safe-top) + var(--architecture-scene-safe-bottom));
+}
+
+.architecture-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+
+}
+
+.architecture-copy {
+  width: min(100%, 28rem);
+  justify-self: center;
+}
+
+.architecture-copy h2 {
+  margin: 0;
+  max-width: 10ch;
+  font-size: clamp(2rem, 4.6vw, 3.35rem);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+}
+
+.architecture-steps {
+  margin-top: 1.6rem;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.architecture-steps p {
+  margin: 0;
+  position: relative;
+  padding-left: 1.1rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.92rem;
+  letter-spacing: 0.08em;
+  line-height: 1.55;
+  text-transform: uppercase;
+}
+
+.architecture-steps p::before {
+  content: "";
+  position: absolute;
+  top: 0.5rem;
+  left: 0;
+  width: 0.32rem;
+  height: 0.32rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+  transform: rotate(-45deg);
+}
+
+@media (max-width: 1040px) {
+  .architecture-stage {
+    grid-template-columns: 1fr;
+  }
+
+  .architecture-copy {
+    max-width: none;
+  }
+
+  .architecture-copy h2 {
+    max-width: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .architecture-section {
+    padding: 1.4rem 1rem 2.4rem;
+  }
+
+  .architecture-scene {
+    height: calc(28rem + var(--architecture-scene-safe-top) + var(--architecture-scene-safe-bottom));
+    min-height: calc(24rem + var(--architecture-scene-safe-top) + var(--architecture-scene-safe-bottom));
+  }
+
+  .architecture-steps p {
+    font-size: 0.84rem;
+  }
+}

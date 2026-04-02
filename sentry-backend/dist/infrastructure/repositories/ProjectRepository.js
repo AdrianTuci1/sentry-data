@@ -18,7 +18,7 @@ class ProjectRepository extends BaseRepository_1.BaseRepository {
         return `PROJECT#${projectId}`;
     }
     // Fetch a single project by its ID for a specific Tenant
-    async findOne(tenantId, projectId) {
+    async findById(tenantId, projectId) {
         return this.get(tenantId, projectId);
     }
     // Fetch ALL projects for a specific Tenant using the SK prefix `PROJECT#`
@@ -33,7 +33,13 @@ class ProjectRepository extends BaseRepository_1.BaseRepository {
             sourceType: project.sourceType,
             status: project.status,
             createdAt: project.createdAt,
+            runtimeMode: project.runtimeMode,
             queryConfigs: project.queryConfigs,
+            discoveryMetadata: project.discoveryMetadata,
+            schemaFingerprint: project.schemaFingerprint,
+            sourceClassifications: project.sourceClassifications,
+            runtimeVitals: project.runtimeVitals,
+            parrotRuntime: project.parrotRuntime,
             PK: this.getPartitionKey(project.tenantId),
             SK: this.getSortKey(project.projectId),
         };

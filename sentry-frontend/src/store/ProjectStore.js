@@ -1,7 +1,7 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import { Project } from "./models";
 import { ProjectService } from "../api/core";
-import projectData from "../data/projectData.json"; // Using this as our initial "DB"
+import { createParrotRuntimeMock } from "../mocks/parrotRuntimeMock";
 
 export class ProjectStore {
     rootStore = null;
@@ -35,7 +35,7 @@ export class ProjectStore {
         }
 
         if (this.currentProjectId) {
-            this.sseCloser = ProjectService.connectToPipelineStream(
+            this.sseCloser = ProjectService.connectToRuntimeStream(
                 (message) => this.handleSSEMessage(message),
                 (error) => console.error("[ProjectStore] SSE Error:", error)
             );
@@ -49,9 +49,16 @@ export class ProjectStore {
                 runInAction(() => {
                     this.rootStore.workspaceStore.data.setData(res.data);
                 });
+            } else {
+                runInAction(() => {
+                    this.rootStore.workspaceStore.data.setData(createParrotRuntimeMock(projectId));
+                });
             }
         } catch (error) {
             console.error("[ProjectStore] Failed to fetch latest discovery:", error);
+            runInAction(() => {
+                this.rootStore.workspaceStore.data.setData(createParrotRuntimeMock(projectId));
+            });
         }
     }
 
@@ -66,8 +73,8 @@ export class ProjectStore {
             }
         }
 
-        if (type === 'pipeline_progress') {
-            console.log("[ProjectStore] Pipeline Progress:", data.step, `${data.progress}%`);
+        if (type === 'runtime_progress') {
+            console.log("[ProjectStore] Runtime Progress:", data.step, `${data.progress}%`);
         }
     }
 
@@ -103,9 +110,9 @@ export class ProjectStore {
 
     _loadMockProjects() {
         const mockDbProjects = [
-            { id: 'marketing_campaign_2024', name: projectData.projectNames['marketing_campaign_2024'], status: 'active', lastActive: '2 min ago', connectors: 3, models: 1 },
-            { id: 'customer_churn_v1', name: projectData.projectNames['customer_churn_v1'], status: 'active', lastActive: '2h ago', connectors: 1, models: 2 },
-            { id: 'sales_forecast_q3', name: projectData.projectNames['sales_forecast_q3'], status: 'archived', lastActive: '5d ago', connectors: 2, models: 0 }
+            { id: 'parrot-commerce-demo', name: 'Parrot Commerce Demo', status: 'active', lastActive: '2 min ago', connectors: 2, models: 1 },
+            { id: 'parrot-growth-studio', name: 'Parrot Growth Studio', status: 'active', lastActive: '2h ago', connectors: 3, models: 2 },
+            { id: 'parrot-risk-lab', name: 'Parrot Risk Lab', status: 'archived', lastActive: '5d ago', connectors: 2, models: 1 }
         ];
 
         runInAction(() => {

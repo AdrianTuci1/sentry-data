@@ -1,9 +1,0 @@
-title: "Scanning Orbit"
-description: "A radar scanning animation showing live activity."
-data_structure_template:
-  value: "14,500"
-  unit: "ops/sec"
-grid_span: "default"
-sdui:
-  mapping_mode: "single"
-  root_key: "orbitData"

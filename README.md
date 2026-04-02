@@ -1,187 +1,221 @@
-# 🦜 Stats Parrot: Autonomous Data Engineering & Analytics
+# Stats Parrot
 
-Stats Parrot replaces rigid ETL pipelines with an **Agentic DAG**. It is a **universal data engine** designed to autonomously manage the entire data lifecycle across diverse modern domains—from **Cybersecurity (XDR/SIEM)** and **Cloud Observability** to **Enterprise BI** and **Predictive Analytics**.
+Stats Parrot is a fully agnostic DataOS.
 
-Built for extreme dynamism, it effortlessly orchestrates execution graphs (DAG) capable of scaling seamlessly from thousands to **billions of rows**—without requiring the user to write a single line of SQL or Python.
+It aligns user data to user interests without violating privacy, using metadata instead of exposing raw business data to the reasoning layer. The same system can be used for ecommerce, marketing, BI, banking, cybersecurity, LLM training, logistics, and other big data workloads.
 
-## 🚀 The Client Journey
-1. **Create Project**: Isolate the analytics environment.
-2. **Connect Sources**: Link raw data via Meltano (Stripe, PostgreSQL, etc.).
-3. **Autonomous Modeling**: The AI infers schemas, cleans anomalies, and engineers features.
-4. **Instant Analytics**: Receive an interactive node graph and auto-generated dashboards.
+## What It Does
 
-## 🎯 Use Cases
+- ingests raw data into Bronze,
+- discovers structure and meaning from metadata,
+- compiles virtual transformations directly from Bronze,
+- generates groups, insights, widget queries, and recommended actions,
+- can push outputs through Reverse ETL with strict safety controls.
 
-*   **🛡️ Cybersecurity (XDR/SIEM):** Automates log normalization from thousands of sources (Windows, Linux, Cloud). Detects threat patterns and provides instant visualization for SOC analysts.
-*   **☁️ Cloud Observability:** Monitors infrastructure telemetery, identifies performance anomalies, and manages alerting pipelines without manual script updates.
-*   **📊 Enterprise BI & Analytics:** Replaces legacy ETL with an agentic flow that adapts to new data structures, delivering sub-second dashboards for sales, finance, and operations.
-*   **📈 Advanced ML & Statistical Discovery:** Executes complex analytical tasks and machine learning workflows using robust **Python scaffolds**. The system autonomously monitors data patterns, triggering challenger-model retraining in isolated micro-VMs when concept drift is detected.
-*   **🛰️ IoT & Industrial Data:** Processes massive sensor streams via the Hot Path, providing real-time monitoring of billion-row datasets with zero token overhead.
+The goal is simple: one control plane for discovery, analytics, recommendations, and operational outputs.
 
-### Autonomous DAG & Auto-Generated Insights
-![Node View](docs/node-view.png)
-![Insights](docs/insights.png)
+## Core Innovation
 
----
+### Parrot Neural Engine
 
-## 🧠 Architecture: The Autonomous Engine
+`Parrot Neural Engine` is the translator of the system.
 
-Stats Parrot replaces static scripts with AI Agents acting as Data Engineers.
+Instead of forcing a rigid Bronze -> Silver -> Gold persistence chain, it reads Bronze directly and compiles:
 
-### 1. The Autonomous DAG (Cold Path)
-An Orchestrator spins up ephemeral **Modal Sandboxes** executing Python agents. This path is triggered on first run or when schema drift is detected.
-*   **Data Normalization (Bronze → Silver):** Uses DuckDB to infer schemas, flatten nested JSONs, and drop corrupt records.
-*   **Feature Engineering (Silver → Gold):** Profiles Silver data (nulls, min/max). Generates optimized DuckDB `COPY` statements to output aggregated business metrics.
-*   **Query Generation:** Maps Gold layer columns to UI widgets (`weather`, `predictive`), generating SQL templates.
+- virtual transformations,
+- virtual gold views,
+- query logic,
+- feature logic,
+- output recommendations.
 
-### 2. Boilerplates as Scaffolds (Schele)
-Running LLMs on raw code generation is expensive and error-prone. Stats Parrot uses **Boilerplates** as robust Python scaffolds that handle all infrastructure heavy-lifting.
+This is the main architectural shift: the system stores less intermediate data and stores more metadata, intent, and execution state.
 
-*   **Infrastructure Isolation:** The boilerplate (e.g., [query_generator.py]) manages R2 connections, DuckDB lifecycle, schema discovery, and configuration fetching.
-*   **LLM as Logic Engine:** The LLM only writes the core transformation logic (~150 tokens) injected into a specific "Phase" of the scaffold. This cuts costs by 90% and ensures 100% reliable execution code.
+### Sentinel
 
-```python
-# Example Boilerplate Scaffold Pattern
-  for i, gold_uri in enumerate(gold_uris):
-        if not gold_uri: continue
-        alias = f"gold_{i}"
-        print(f"\n  ➤ Table {i} [{alias}]: {gold_uri}")
-        
-        try:
-            schema_rows = con.execute(f"DESCRIBE SELECT * FROM read_parquet('{gold_uri}')").fetchall()
-            print("    Columns:")
-            for col in schema_rows:
-                print(f"      - {col[0]} ({col[1]})")
-        except Exception as e:
-            if "404" in str(e) or "NoSuchKey" in str(e):
-                print(f"    AGENT_ERROR: Gold Layer not found. Did Feature Engineering fail or skip this?")
-            else:
-                print(f"    AGENT_ERROR: {str(e)}")
-            continue
+`Sentinel` is the decision and validation layer.
+
+It checks whether the engine is still aligned with reality:
+
+- schema drift,
+- semantic drift,
+- quality anomalies,
+- invalid user edits,
+- unsafe Reverse ETL actions.
+
+If a change is wrong, unsafe, or inconsistent, Sentinel rejects it or asks for a re-plan.
+
+## Privacy Model
+
+Stats Parrot is designed to reason primarily over metadata:
+
+- inferred schema,
+- semantic tags,
+- column roles,
+- source freshness,
+- quality signals,
+- feature definitions,
+- query definitions,
+- intent and edit history.
+
+The point is to align data to the user's goals without turning the reasoning layer into a raw-data leak.
+
+## Architecture
+
+The runtime has five roles:
+
+- `sentry-meltano`: ingestion head
+- `sentry-backend`: control body
+- `parrot-neural-engine`: translator
+- `sentinel`: validation and decision layer
+- `reverse-etl head`: secure outbound layer
+
+### Current State
+
+Today, `Parrot Neural Engine` still uses Modal as the execution substrate.
+
+That means the architecture is already split at the control layer, but the final execution runtime is not fully moved yet to dedicated user-owned VM orchestration.
+
+### Target State
+
+The intended execution stack is:
+
+- `Kubernetes` for orchestration,
+- `Ray` for distributed scheduling,
+- `Daft` for fast data execution,
+- isolated VM-style execution for outbound and heavy jobs.
+
+So the innovation is already in the translation and decision model, while the full compute substrate is still being completed.
+
+## Why It Is Different
+
+Classic systems break when schemas drift, duplicate data into too many layers, and hide compute power behind hard engineering work.
+
+Stats Parrot does the opposite:
+
+- it adapts to change,
+- it keeps transformations virtual as much as possible,
+- it lets the user shape the system through intent,
+- it can expose the actual logic instead of pretending to be magic.
+
+## Mindmap Model
+
+The platform can expose the project as a layered mindmap:
+
+```yaml
+sources:
+transformations:
+gold:
+groups:
+insights:
 ```
 
-### 3. Data Engineering Hot Path (Zero-Token Execution)
-To avoid running expensive LLMs on every ingestion tick, the system utilizes a high-performance **Hot Path**.
-*   **Verified Script Caching:** Once an LLM agent successfully generates a transformation script, it is persisted to Cloudflare R2 as a "Verified Script".
-*   **Zero Token Usage:** If the Bronze schema fingerprint matches the cached state in DynamoDB, the `Analytics Engine` (triggered by the Orchestrator) skips the LLM reasoning phase entirely and executes the verified Python script directly.
-*   **Self-Healing:** If a schema drifts (e.g., new column), the system automatically falls back to the Cold Path to "self-heal" the logic and update the cached script.
+Recommended structure:
 
-```json
-{
-  "tenantId": "org_123",
-  "projectId": "proj_abc",
-  "dagState": {
-    "normalization": {
-       "Olist_Orders": { "hash": "a1b2c3d4", "lastRunAt": "2026-03-13T12:00:00Z" }
-    },
-    "feature_engineering": {
-       "dependencies": ["Olist_Orders"], 
-       "outputSchemaHash": "f8e7d6c5"
-    }
-  }
-}
-```
+- `sources`, `transformations`, and `gold` are tracked per source
+- `groups` and `insights` are global, because they can combine multiple sources
 
-*   **Cache Hit:** If the Bronze parquet schema fingerprint matches the DynamoDB state, LLM execution is skipped. Data flows directly into Silver/Gold.
-*   **Cache Miss:** If a schema drifts (e.g., new column), only the affected downstream LLM agents spin up to "self-heal" the pipeline logic.
+This gives the user one editable model of the whole system.
 
-### 4. Admin-Driven Metrics Strategy
-Admins steer the generated insights via a centralized `business-metrics-strategy.yml` without writing code. 
-*   **Combinatorial Rules:** E.g., If only `Orders` data exists, generate LTV. If `Customers` also exists, generate Churn Risk. This ensures token efficiency and business relevance.
+## Intent and Code
 
-### 5. Concept Drift & ML Sandboxing
-Stats Parrot continuously monitors ML models (e.g., Churn prediction) against incoming Silver data.
-*   **Automated Retraining:** If prediction error exceeds the threshold (Concept Drift), the Orchestrator spins up a new Modal Sandbox to train a Challenger model on the latest partitioned data, replacing the Champion model seamlessly.
+The user can manipulate every layer of the mindmap in two ways:
 
-### 6. Sub-Second Analytics (Hot Path)
-While the pipeline handles data flow, the UI uses its own **Analytics Hot Path** for live data exploration.
-Dashboards don't cache stale data; they store SQL templates in DynamoDB.
+- by changing **intent**
+- by changing **code**
 
-```json
-{
-  "tenantId": "org_123",
-  "projectId": "proj_abc",
-  "dashboards": [
-    {
-      "id": "ins_total_sales",
-      "title": "Total LTV (All Time)",
-      "type": "weather",
-      "query": "SELECT ROUND(SUM(total_ltv), 2) as value FROM read_parquet('s3://.../gold/*/*.parquet')"
-    }
-  ]
-}
-```
+### Intent Editing
 
-*   **Execution Engine:** When a user opens a dashboard, the centralized `Analytics Engine` (Python + DuckDB) reads the SQL template and executes it directly against the time-partitioned Gold Parquet files (`gold/*/*.parquet`) via Cloudflare R2.
-*   **Result:** Live, sub-second analytics without a dedicated data warehouse.
+Intent means changing what the system should do, not how every line is written.
 
-### 7. Multi-Tenant Security & Code Portability
-*   **Data Isolation:** All R2 objects are namespaced (`tenants/{tenantId}/projects/{projectId}/...`).
-*   **Metadata Isolation:** DynamoDB strict Partition Keys per Tenant.
-*   **Execution Isolation:** Ephemeral Modal microVMs destroy state after each run.
-*   **Zero Vendor Lock-in:** The entire agent execution layer (Python + DuckDB) is container-agnostic. It can seamlessly migrate from Modal to a self-hosted Kubernetes cluster (e.g., Firecracker microVMs) without backend alterations.
+Examples:
 
+- "normalize dates from this source"
+- "create a gold view for customer lifetime"
+- "recommend an ML model but do not launch it"
+- "prepare Reverse ETL for Salesforce only"
 
+The engine recompiles the logic from that intent.
 
-## 🏗 System Architecture Diagram
+### Code Editing
 
-```mermaid
-graph TD
-    subgraph command_center [Command Center]
-        A[User / UI]
-        B{Central Backend<br/>Node.js}
-    end
-    
-    subgraph left_panel [Ingestion & System State]
-        Meltano[Ingestion Server<br/>Meltano + Cron]
-        Dynamo[(DynamoDB)]
-        R2_System[(Cloudflare R2<br/>SYSTEM)]
-    end
-    
-    subgraph query_engine [Query Engine]
-        subgraph ai_engine [AI Data Engineering - Cold Path]
-            E2B[Modal Sandbox<br/>AI Agents]
-        end
-        subgraph direct_analytics ["Analytics & Execution Engine - Hot & Cold Path<br/><i>(PySpark, DuckDB, Duck Swarm, etc.)</i>"]
-            Analytics[Analytics Server<br/>Python + DuckDB]
-        end
-    end
+The user can also inspect and edit the calculation logic directly:
 
-    subgraph warehouse [Data Warehouse]
-        D[(Cloudflare R2<br/>BRONZE)]
-        R2_Silver[(Cloudflare R2<br/>SILVER)]
-        R2_Gold[(Cloudflare R2<br/>GOLD)]
-    end
+- transformation logic,
+- feature logic,
+- query logic,
+- Reverse ETL logic.
 
-    %% Layout Enforcement (Invisible Links)
-    B ~~~ E2B
-    B ~~~ Analytics
-    Analytics ~~~ R2_Silver
-    Analytics ~~~ R2_Gold
+That matters because the product should not feel like a toy. The user must be able to see the real logic, challenge it, and edit it.
 
-    %% Command Center Flow
-    A -->|1. Request Dashboard| B
-    B -->|5. Responds with analyticsData.json| A
-    
-    %% Ingestion & Metadata
-    Meltano -->|Extracts & Uploads| D
-    B <-->|Auth, Projects, Query Configs| Dynamo
-    B <-->|Manages Verified Scripts| R2_System
-    E2B <-->|Reads/Writes Cached Scripts| R2_System
+### Sentinel Guardrails
 
-    %% AI Sandbox (Cold Path Logic Generation)
-    B <-->|Webhook Trigger & SSE Streaming| E2B
-    E2B <-->|Reads/Saves DAG State & SQL| Dynamo
-    E2B -->|Submits Transformation Queries| Analytics
+If the user changes intent or code:
 
-    %% Analytics Engine Data Access (Hot & Cold Paths Execution)
-    Analytics -.->|Reads Raw Parquet| D
-    Analytics <-->|Reads & Writes Clean Parquet| R2_Silver
-    
-    %% Hot Path (Dashboard Flow & Query Output)
-    B -->|2. Sends Queries + Tenant ID| Analytics
-    Analytics <-->|3. Reads/Writes Aggregated Parquet| R2_Gold
-    Analytics -->|4. Returns Calculated JSON| B
-```
+- `Sentinel` validates the structure,
+- rejects broken or unsafe logic,
+- accepts valid updates,
+- or forces a re-plan.
 
----
+So the system is editable, but not uncontrolled.
+
+## ML Model Strategy
+
+ML models do not need to launch automatically.
+
+The preferred approach is:
+
+- detect candidate ML opportunities,
+- surface them as a blue group such as `ML Recommended`,
+- let the user inspect the reason, proposed features, and expected output,
+- launch only after manual confirmation.
+
+The same pattern applies to `Reverse ETL Recommended`.
+
+This keeps the system powerful without making hidden decisions for the user.
+
+## Reverse ETL Security
+
+Reverse ETL is dangerous if uncontrolled because it can launch outbound execution and affect third-party systems.
+
+Stats Parrot uses multiple protections:
+
+- DNS TXT verification to prove domain ownership
+- VM launch tied to verified user ownership
+- rate limiting
+- stop conditions for errors like `not allowed` and `too many requests`
+- hard limits before expanded outbound execution is allowed
+
+Current rule of thumb:
+
+- no outbound VM launch without DNS verification
+- stop after repeated permission or rate-limit failures
+- cap unverified outbound execution aggressively
+
+The point is to prevent malicious or careless actors from turning Reverse ETL into an abuse vector.
+
+## Supported Needs
+
+Stats Parrot is built for any metadata-driven big data workload, including:
+
+- ecommerce
+- marketing
+- BI
+- banking
+- cybersecurity
+- LLM training
+- logistics
+- and other high-volume analytical systems
+
+## Summary
+
+Stats Parrot is a metadata-driven DataOS.
+
+`Parrot Neural Engine` compiles the logic.
+
+`Sentinel` protects the truth.
+
+The user controls the system through intent or direct code.
+
+Reverse ETL is powerful but constrained by verification and safety rules.
+
+The decision layer is already here. The full execution layer is moving from Modal toward `K8s + Ray + Daft + isolated VM execution`.
