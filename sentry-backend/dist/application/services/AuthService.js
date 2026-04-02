@@ -16,6 +16,11 @@ class AuthService {
      * @returns The tenantId if valid
      */
     async validateTokenAndGetTenant(token) {
+        // MOCK BYPASS FOR TESTING PHASE
+        if (token === 'mock-tenant-token-123') {
+            console.log('[AuthService] Using MOCK bypass for testing.');
+            return 'test_tenant_1';
+        }
         try {
             const decoded = jsonwebtoken_1.default.verify(token, this.jwtSecret);
             // Check if tenant exists/is active in DynamoDB

@@ -1,9 +1,0 @@
-title: "Covariance Matrix"
-description: "A matrix showing how different variables change together."
-data_structure_template:
-  fields: ['Spend', 'Impr', 'Clicks', 'Conv']
-  matrix: [[0, 0, 1], [0, 1, 0.8]]
-grid_span: "col-span-2 row-span-2"
-sdui:
-  mapping_mode: "list"
-  root_key: "matrix"

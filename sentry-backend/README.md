@@ -1,6 +1,6 @@
 # Sentry Backend (Node.js)
 
-This is the backend server for the Sentry Data platform, built with Node.js, Express, and TypeScript. It serves as the API and Orchestrator, managing data flow between the Frontend, AWS services (DynamoDB, S3, EventBridge, Step Functions), and external compute layers (E2B, Modal).
+This is the backend control plane for StatsParrot, built with Node.js, Express, and TypeScript. It exposes APIs, persists project/runtime state, coordinates Parrot OS, and submits workloads to external execution layers such as Modal and Ray/Daft control planes.
 
 ## 🚀 Getting Started
 
@@ -40,10 +40,7 @@ The project follows a Clean Architecture / Monorepo-style structure:
 - **`src/dal`**: Data Access Layer.
   - `dynamo.ts`: AWS DynamoDB Single-Table Design helpers.
   - `s3.ts`: AWS S3 helpers for Bronze/Silver/Gold layers.
-- **`src/services`**: Business Logic & Orchestration.
-  - `orchestrator`: AWS EventBridge & Step Functions integration.
-  - `sse`: Server-Sent Events (SSE) Manager for real-time frontend updates.
-  - `ai`: Placeholder for E2B (Code Interpreter) & LLM logic discovery.
+- **`src/services`**: Runtime orchestration and SSE delivery.
 - **`src/utils`**: shared utilities (e.g., `cost-calc`).
 
 ## 🔌 API Endpoints
@@ -55,10 +52,9 @@ The project follows a Clean Architecture / Monorepo-style structure:
 - `GET /api/layers/health/connectors`: Check status of Airbyte/S3 (Layer 1).
 - `GET /api/layers/scripts?key={s3_key}`: Get Signed URL for script content (Layer 2).
 
-### Orchestration & Webhooks
-- `POST /api/orchestration/trigger-sync`: Trigger a data sync job.
-- `POST /api/orchestration/run-flow`: Start a Step Function workflow.
-- `POST /api/webhooks/sandbox-callback`: Callback for E2B/Modal jobs (updates state).
+### Runtime & Webhooks
+- `POST /api/projects/:projectId/runtime/run`: Start the Parrot runtime for a project.
+- `POST /api/webhooks/meltano`: Trigger a runtime refresh after ingestion.
 
 ### Real-time Events
 - `GET /events`: SSE Endpoint. Connect to receive live updates.
@@ -67,13 +63,12 @@ The project follows a Clean Architecture / Monorepo-style structure:
 
 - **Environment Variables**:
   - `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`: For S3/DynamoDB access.
-  - `MODAL_WEBHOOK_BASE_URL`: Base URL for Modal.com function triggers.
-  - `E2B_API_KEY`: For Sandbox instantiation.
   - `MODAL_TOKEN_ID`: Authentication for Modal.
   - `MODAL_TOKEN_SECRET`: Secret key for Modal.
-  - `API_BASE_URL`: Public URL of this backend (for callback webhooks).
+  - `PNE_API_URL`: Optional URL for the dedicated Parrot Neural Engine service.
+  - `SENTINEL_API_URL`: Optional URL for the dedicated Sentinel service.
+  - `API_BASE_URL`: Public URL of this backend.
 
 - **Express**: Web server framework.
 - **AWS SDK v3**: Modular SDK for DynamoDB, S3, EventBridge, StepFunctions.
-- **E2B**: SDK for running secure code sandboxes (AI Logic).
 - **SSE**: Custom implementation for real-time push.

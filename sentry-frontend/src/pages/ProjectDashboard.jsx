@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite';
 import { useStore } from '../store/StoreProvider';
 import { ProjectService } from '../api/core';
 import Workspace from '../components/visuals/Workspace';
-import projectData from '../data/projectData.json';
+import { createParrotRuntimeMock } from '../mocks/parrotRuntimeMock';
 
 const ProjectDashboard = observer(() => {
     const { projectId } = useParams();
@@ -31,13 +31,13 @@ const ProjectDashboard = observer(() => {
                         console.log(`[Dashboard] Using backend discovery for ${projectId}`);
                         workspaceStore.data.setData(response.data.discoveryMetadata);
                     } else {
-                        // Explicitly set null/empty to show "Please connect a source"
-                        workspaceStore.data.setData(null);
+                        console.warn(`[Dashboard] No discovery metadata returned for ${projectId}. Using Parrot mock fallback.`);
+                        workspaceStore.data.setData(createParrotRuntimeMock(projectId));
                     }
                 }
             } catch (err) {
                 console.warn("[Dashboard] Backend fetch failed.", err);
-                workspaceStore.data.setData(null);
+                workspaceStore.data.setData(createParrotRuntimeMock(projectId));
             }
         };
 

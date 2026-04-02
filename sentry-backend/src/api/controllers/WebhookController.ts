@@ -1,17 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
 import { IController } from './IController';
 import { Router } from 'express';
-import { PipelineOrchestratorService } from '../../application/services/PipelineOrchestratorService';
+import { RuntimeOrchestratorService } from '../../application/services/RuntimeOrchestratorService';
 import crypto from 'crypto';
 import { config } from '../../config';
 
 export class WebhookController implements IController {
     public path = '/webhooks';
     public router = Router();
-    private orchestrator: PipelineOrchestratorService;
+    private orchestrator: RuntimeOrchestratorService;
 
     // Dependency Injection via Constructor
-    constructor(orchestrator: PipelineOrchestratorService) {
+    constructor(orchestrator: RuntimeOrchestratorService) {
         this.orchestrator = orchestrator;
         this.initRoutes();
     }

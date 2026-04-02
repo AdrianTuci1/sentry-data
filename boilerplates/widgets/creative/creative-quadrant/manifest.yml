@@ -1,8 +1,0 @@
-title: "Creative Performance Quadrant"
-description: "A 2x2 matrix plotting ad creatives based on Engagement vs Cost Efficiency."
-data_structure_template:
-  data: [[4.2, 5.8, "Video: Summer Lifestyle", "Video"]]
-grid_span: "col-span-2 row-span-2"
-sdui:
-  mapping_mode: "list"
-  root_key: "creatives"

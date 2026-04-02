@@ -6,6 +6,7 @@ import { useStore } from '../../store/StoreProvider';
 import { BrainCircuit, Play, X } from 'lucide-react';
 import FeatureMindMap from './FeatureMindMap';
 import Insights from './Insights';
+import MindMapInspectorPanel from './MindMapInspectorPanel';
 import './Workspace.css';
 
 const Workspace = observer(({ viewState = 'engineering' }) => {
@@ -25,6 +26,18 @@ const Workspace = observer(({ viewState = 'engineering' }) => {
         metrics,
         features
     } = data;
+
+    const openCodeDocument = ({ title, code, type = 'python', recurrence = 'manual', payload = null }) => {
+        editor.openCode({
+            isOpen: true,
+            nodeId: title,
+            title,
+            code,
+            type,
+            recurrence,
+            payload
+        });
+    };
 
     // Sync tab from URL
     useEffect(() => {
@@ -84,27 +97,28 @@ const Workspace = observer(({ viewState = 'engineering' }) => {
 
     const handleNodeClick = (node) => {
         if (node.type === 'action') {
-            const isPython = node.label.includes('Model') || node.label.includes('Spark') || node.label.includes('Processing');
-            const code = isPython
-                ? `def ${node.label.toLowerCase().replace(/ /g, '_')}(data):\n    # Process data for ${node.label}\n    return data.transform()\n\n# Schedule: ${editor.recurrence}`
-                : `-- dbt model for ${node.label}\nSELECT *\nFROM raw_data\nWHERE date >= current_date - 1`;
+            const code = [
+                `# PNE transform draft for ${node.label}`,
+                '',
+                'def compile_virtual_transform(bronze_frame):',
+                '    harmonized = harmonize_schema(bronze_frame)',
+                '    aligned = normalize_timestamps(harmonized)',
+                '    checked = apply_quality_guards(aligned)',
+                '    return checked'
+            ].join('\n');
 
-            editor.setState({
-                isOpen: true,
-                nodeId: node.id,
+            openCodeDocument({
                 title: node.label,
                 code,
-                type: isPython ? 'python' : 'sql',
+                type: 'python',
                 recurrence: 'daily'
             });
-        } else if (node.type === 'card' && node.data?.sqlString) {
-            editor.setState({
-                isOpen: true,
-                nodeId: node.id,
-                title: `SQL: ${node.label}`,
-                code: node.data.sqlString,
-                type: 'sql',
-                recurrence: 'realtime'
+        } else if (node.type === 'card' && (node.data?.logic?.compiled_code || node.data?.logic?.code || node.data?.sqlString || node.data?.sql)) {
+            openCodeDocument({
+                title: `Logic: ${node.label}`,
+                code: node.data?.logic?.compiled_code || node.data?.logic?.code || node.data?.sqlString || node.data?.sql,
+                type: (node.data?.logic?.compiled_code || node.data?.logic?.code || '').trim().startsWith('{') ? 'json' : 'sql',
+                recurrence: node.data?.activationMode === 'manual' ? 'manual' : 'realtime'
             });
         }
     };
@@ -112,58 +126,92 @@ const Workspace = observer(({ viewState = 'engineering' }) => {
     const renderEditorModal = () => {
         if (!editor.isOpen) return null;
 
+        const isInspector = editor.view === 'inspector';
+
         return (
-            <div className="editor-overlay">
-                <div className="editor-modal">
+            <div
+                className="editor-overlay"
+                onMouseDown={(event) => event.stopPropagation()}
+                onClick={(event) => event.stopPropagation()}
+                onWheelCapture={(event) => event.stopPropagation()}
+            >
+                <div
+                    className="editor-modal"
+                    onMouseDown={(event) => event.stopPropagation()}
+                    onClick={(event) => event.stopPropagation()}
+                    onWheelCapture={(event) => event.stopPropagation()}
+                >
                     {/* Header */}
                     <div className="editor-header">
                         <div className="editor-title-group">
                             <BrainCircuit size={18} color="#A8C7FA" />
                             <span className="editor-title">{editor.title}</span>
-                            <span className="editor-lang-badge">{editor.type}</span>
+                            <span className="editor-lang-badge">{isInspector ? 'agent' : editor.type}</span>
                         </div>
-                        <button onClick={() => editor.setOpen(false)} className="editor-close-btn">
+                        <button onClick={() => editor.close()} className="editor-close-btn">
                             <X size={18} />
                         </button>
                     </div>
 
                     {/* Toolbar */}
-                    <div className="editor-toolbar">
-                        <div className="editor-setting-group">
-                            <span className="editor-setting-label">Recurrence:</span>
-                            <select
-                                value={editor.recurrence}
-                                onChange={(e) => editor.setRecurrence(e.target.value)}
-                                className="editor-select"
-                            >
-                                <option value="hourly">Hourly</option>
-                                <option value="daily">Daily</option>
-                                <option value="weekly">Weekly</option>
-                                <option value="realtime">Real-time Stream</option>
-                            </select>
+                    {!isInspector && (
+                        <div className="editor-toolbar">
+                            <div className="editor-setting-group">
+                                <span className="editor-setting-label">Recurrence:</span>
+                                <select
+                                    value={editor.recurrence}
+                                    onChange={(e) => editor.setRecurrence(e.target.value)}
+                                    className="editor-select"
+                                >
+                                    <option value="hourly">Hourly</option>
+                                    <option value="daily">Daily</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="realtime">Real-time Stream</option>
+                                    <option value="manual">Manual</option>
+                                </select>
+                            </div>
+                            <div style={{ flex: 1 }} />
+                            <button className="editor-btn-run">
+                                <Play size={14} /> Run Now
+                            </button>
                         </div>
-                        <div style={{ flex: 1 }} />
-                        <button className="editor-btn-run">
-                            <Play size={14} /> Run Now
-                        </button>
-                    </div>
+                    )}
 
                     {/* Editor */}
-                    <div className="editor-body">
-                        <Editor
-                            height="100%"
-                            defaultLanguage={editor.type}
-                            value={editor.code}
-                            theme="vs-dark"
-                            options={{
-                                minimap: { enabled: false },
-                                fontSize: 14,
-                                fontFamily: 'JetBrains Mono, monospace',
-                                scrollBeyondLastLine: false,
-                                padding: { top: 16, bottom: 16 }
-                            }}
-                            onChange={(val) => editor.setCode(val)}
-                        />
+                    <div
+                        className="editor-body"
+                        onMouseDown={(event) => event.stopPropagation()}
+                        onClick={(event) => event.stopPropagation()}
+                        onWheelCapture={(event) => event.stopPropagation()}
+                    >
+                        {isInspector ? (
+                            <MindMapInspectorPanel
+                                editor={editor}
+                                ui={ui}
+                                onOpenCode={(artifact) => openCodeDocument({
+                                    title: artifact.title,
+                                    code: artifact.code,
+                                    type: artifact.language,
+                                    recurrence: 'manual',
+                                    payload: editor.payload
+                                })}
+                            />
+                        ) : (
+                            <Editor
+                                height="100%"
+                                defaultLanguage={editor.type}
+                                value={editor.code}
+                                theme="vs-dark"
+                                options={{
+                                    minimap: { enabled: false },
+                                    fontSize: 14,
+                                    fontFamily: 'JetBrains Mono, monospace',
+                                    scrollBeyondLastLine: false,
+                                    padding: { top: 16, bottom: 16 }
+                                }}
+                                onChange={(val) => editor.setCode(val)}
+                            />
+                        )}
                     </div>
                 </div>
             </div>

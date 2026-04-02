@@ -88,13 +88,6 @@ export class R2StorageService {
     }
 
     /**
-     * Fetch a system prompt from the generic boilerplates area.
-     */
-    public async getPrompt(promptFileName: string): Promise<string> {
-        return this.getFileContent(`system/boilerplates/prompts/${promptFileName}`);
-    }
-
-    /**
      * Generic method to fetch file content from R2.
      */
     public async getFileContent(key: string): Promise<string> {
@@ -182,6 +175,36 @@ export class R2StorageService {
             Body: JSON.stringify(discovery, null, 2),
             ContentType: 'application/json'
         }));
+    }
+
+    public async saveJson(tenantId: string, projectId: string, layer: string, data: unknown, ...parts: string[]): Promise<{ key: string; uri: string }> {
+        const key = this.getS3Key(tenantId, projectId, layer, ...parts);
+        await this.client.send(new PutObjectCommand({
+            Bucket: this.dataBucket,
+            Key: key,
+            Body: JSON.stringify(data, null, 2),
+            ContentType: 'application/json'
+        }));
+
+        return {
+            key,
+            uri: `s3://${this.dataBucket}/${key}`
+        };
+    }
+
+    public async saveText(tenantId: string, projectId: string, layer: string, content: string, contentType: string, ...parts: string[]): Promise<{ key: string; uri: string }> {
+        const key = this.getS3Key(tenantId, projectId, layer, ...parts);
+        await this.client.send(new PutObjectCommand({
+            Bucket: this.dataBucket,
+            Key: key,
+            Body: content,
+            ContentType: contentType
+        }));
+
+        return {
+            key,
+            uri: `s3://${this.dataBucket}/${key}`
+        };
     }
 
     private getDatePartition(): string {

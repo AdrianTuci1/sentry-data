@@ -9,6 +9,7 @@ export class UIStore {
     isDragging = false;
     lastMousePos = { x: 0, y: 0 };
     selectedItems = new Set();
+    acceptedRecommendations = new Set();
 
     constructor(rootStore) {
         this.rootStore = rootStore;
@@ -56,8 +57,25 @@ export class UIStore {
         }
     }
 
+    isRecommendationAccepted(id) {
+        return this.acceptedRecommendations.has(id);
+    }
+
+    toggleRecommendation(id) {
+        if (this.acceptedRecommendations.has(id)) {
+            this.acceptedRecommendations.delete(id);
+        } else {
+            this.acceptedRecommendations.add(id);
+        }
+    }
+
+    resetRecommendations() {
+        this.acceptedRecommendations = new Set();
+    }
+
     initializeSelection(data) {
         if (!data) return;
+        this.resetRecommendations();
         const initialSelection = new Set();
         const { connector, actionType, adjustedData, insight } = data;
 

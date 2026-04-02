@@ -1,8 +1,0 @@
-title: "Anomaly Pulse"
-description: "A real-time or historical feed of detected anomalies."
-data_structure_template:
-  data: [[900, 150000, "Meta Ads (Spike)"], [100, 160000, "Google Ads (Alert)"]]
-grid_span: "col-span-2"
-sdui:
-  mapping_mode: "list"
-  root_key: "anomalies"

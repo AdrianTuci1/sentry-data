@@ -1,8 +1,0 @@
-title: "Intensity Heat"
-description: "Shows density or activity distribution across a line (Ad Fatigue)"
-data_structure_template:
-  value: "29"
-grid_span: "default"
-sdui:
-  mapping_mode: "single"
-  root_key: "heat"

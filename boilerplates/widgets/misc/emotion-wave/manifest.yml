@@ -1,8 +1,0 @@
-title: "Emotion Wave"
-description: "Backend-driven widget for Emotion Wave."
-data_structure_template:
-  sentimentScore: 78
-grid_span: "default"
-sdui:
-  mapping_mode: "single"
-  root_key: "sentiment"

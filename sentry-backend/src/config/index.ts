@@ -25,21 +25,26 @@ export const config = {
         region: process.env.R2_REGION || 'auto',
         bucketData: process.env.R2_BUCKET_DATA || 'statsparrot-data',
     },
-    providers: {
-        sandbox: (process.env.SANDBOX_PROVIDER || 'e2b') as 'e2b' | 'modal',
-        e2bApiKey: process.env.E2B_API_KEY || '',
+    modal: {
         modalTokenId: process.env.MODAL_TOKEN_ID || '',
         modalTokenSecret: process.env.MODAL_TOKEN_SECRET || '',
     },
-    // Cheile pentru inteligența artificială, pe care le vom pasa în Interiorul Sandbox-ului
-    llm: {
-        openaiApiKey: process.env.OPENAI_API_KEY || '',
-        anthropicApiKey: process.env.ANTHROPIC_API_KEY || '',
-        agentModel: process.env.AGENT_MODEL || 'gpt-4-turbo',
+    parrot: {
+        pneApiUrl: process.env.PNE_API_URL || '',
+        sentinelApiUrl: process.env.SENTINEL_API_URL || '',
+        mlExecutorApiUrl: process.env.ML_EXECUTOR_API_URL || '',
     },
     worker: {
         url: process.env.ANALYTICS_WORKER_URL || 'http://localhost:4000/execute',
         secret: process.env.INTERNAL_API_SECRET || 'secret'
+    },
+    execution: {
+        defaultEngine: (process.env.PARROT_EXECUTION_DEFAULT_ENGINE || 'auto') as 'auto' | 'modal' | 'ray_daft',
+        modalControlUrl: process.env.MODAL_EXECUTION_CONTROL_URL || '',
+        rayControlUrl: process.env.RAY_EXECUTION_CONTROL_URL || '',
+        k8sNamespace: process.env.RAY_K8S_NAMESPACE || 'statsparrot',
+        k8sCluster: process.env.RAY_K8S_CLUSTER || 'default',
+        rayQueue: process.env.RAY_JOB_QUEUE || 'parrot-default'
     },
     mapboxToken: process.env.VITE_MAPBOX_TOKEN || process.env.MAPBOX_TOKEN || ''
 };

@@ -1,9 +1,0 @@
-title: "Lead Clustering"
-description: "Clusters leads based on engagement and conversion probability."
-data_structure_template:
-  data:
-    - [85, 0.92, "TechFlow Corp"]
-grid_span: "col-span-2 row-span-2"
-sdui:
-  mapping_mode: "list"
-  root_key: "clusteringData"

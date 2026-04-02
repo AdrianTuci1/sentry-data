@@ -1,8 +1,0 @@
-title: "Incremental Lift"
-description: "Measures the 'true' lift provided by a campaign by comparing test vs control groups."
-data_structure_template:
-  data: [4200, 2800, 1200]
-grid_span: "default"
-sdui:
-  mapping_mode: "list"
-  root_key: "liftData"

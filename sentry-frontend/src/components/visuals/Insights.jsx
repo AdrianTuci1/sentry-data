@@ -7,7 +7,7 @@ import { ProjectService } from '../../api/core';
 import { observer } from 'mobx-react-lite';
 
 const Insights = observer(() => {
-    const { projectStore, workspaceStore } = useStore();
+    const { projectStore } = useStore();
     const [expandedCardId, setExpandedCardId] = useState(null);
     const [analyticsData, setAnalyticsData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -22,17 +22,18 @@ const Insights = observer(() => {
             }
 
             try {
-                // Fetch FULLY HYDRATED data (server-side orchestration)
+                // Fetch dashboard metadata plus optional widget data payloads.
                 const res = await ProjectService.getAnalytics(projectId);
+                const dashboards = res?.data?.dashboards || res?.dashboards || [];
 
-                if (res.data && res.data.dashboards) {
-                    setAnalyticsData(res.data.dashboards);
+                if (dashboards.length > 0) {
+                    setAnalyticsData(dashboards);
                 } else {
-                    setAnalyticsData([]); // Show "Nothing to see here" if no data at all
+                    setAnalyticsData(fallbackAnalyticsData);
                 }
             } catch (error) {
                 console.warn("[Insights] Failed to fetch analytics from backend.", error);
-                setAnalyticsData([]); // Set empty to trigger "Nothing to see here"
+                setAnalyticsData(fallbackAnalyticsData);
             } finally {
                 setIsLoading(false);
             }

@@ -1,8 +1,0 @@
-title: "Chrono Dial"
-description: "A radial visualization for time-based data. Best for showing cyclical patterns."
-data_structure_template:
-  sliderValue: 50
-grid_span: "default"
-sdui:
-  mapping_mode: "single"
-  root_key: "chrono"

@@ -23,6 +23,11 @@ export class DataStore {
     get adjustedData() { return this.data?.adjustedData || []; }
     get group() { return this.data?.group || []; }
     get insight() { return this.data?.insight || []; }
+    get mindmapManifest() { return this.data?.mindmapManifest || null; }
+    get mindmapYaml() { return this.data?.mindmapYaml || ''; }
+    get sourceMetadata() { return this.data?.sourceMetadata || []; }
+    get features() { return this.data?.features || []; }
+    get meta() { return this.data?.meta || null; }
 
     get metrics() { return this.data?.metrics || { precision: 0, recall: 0, roi: 0 }; }
 }

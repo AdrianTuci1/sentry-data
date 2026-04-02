@@ -1,9 +1,0 @@
-title: "Liquid Gauge"
-description: "A fluid representation of a percentage value."
-data_structure_template:
-  sliderValue: 50
-  unit: "%"
-grid_span: "default"
-sdui:
-  mapping_mode: "single"
-  root_key: "gauge"

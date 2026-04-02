@@ -1,7 +1,6 @@
 import { ProjectRepository } from '../../infrastructure/repositories/ProjectRepository';
 import { WidgetDataMapper } from '../utils/WidgetDataMapper';
 import { WidgetService } from './WidgetService';
-import { SDUIHydrator } from '../utils/SDUIHydrator';
 import { WidgetRenderer } from '../utils/WidgetRenderer';
 
 // Debugging Tasks:
@@ -16,21 +15,47 @@ import { WidgetRenderer } from '../utils/WidgetRenderer';
 export class AnalyticsService {
     private projectRepository: ProjectRepository;
     private widgetService: WidgetService;
-    private widgetRenderer: WidgetRenderer;
     private analyticsWorkerUrl: string;
     private workerSecret: string;
 
     constructor(
         projectRepository: ProjectRepository,
         widgetService: WidgetService,
-        widgetRenderer: WidgetRenderer
+        _widgetRenderer: WidgetRenderer
     ) {
         this.projectRepository = projectRepository;
         this.widgetService = widgetService;
-        this.widgetRenderer = widgetRenderer;
         // Internal worker connection details
         this.analyticsWorkerUrl = process.env.ANALYTICS_WORKER_URL || 'http://localhost:4000/execute';
         this.workerSecret = process.env.INTERNAL_API_SECRET || 'secret';
+    }
+
+    private async buildCatalogDashboards(): Promise<any[]> {
+        const catalog = await this.widgetService.getCatalog();
+
+        return catalog.map((widget: any) => ({
+            id: widget.id,
+            type: widget.id,
+            title: widget.title || widget.id,
+            description: widget.description,
+            category: widget.category,
+            gridSpan: widget.grid_span || widget.gridSpan || 'col-span-1',
+            colorTheme: widget.color_theme || widget.colorTheme || 'theme-productivity',
+            isMock: true,
+            data: widget.data_structure_template || {}
+        }));
+    }
+
+    private buildWidgetShell(widget: any, definition?: any): any {
+        const widgetType = widget?.type || widget?.widget_type || definition?.id || widget?.id;
+
+        return {
+            ...widget,
+            type: widgetType,
+            title: widget?.title || definition?.title || widgetType,
+            gridSpan: widget?.grid_span || widget?.gridSpan || definition?.grid_span || 'col-span-1',
+            colorTheme: widget?.color_theme || widget?.colorTheme || definition?.color_theme || 'theme-productivity'
+        };
     }
 
     /**
@@ -42,18 +67,7 @@ export class AnalyticsService {
 
         if (!project.queryConfigs || project.queryConfigs.length === 0) {
             // If project is fresh (just seeded), return the catalog as 'discovery' widgets
-            const catalog = await this.widgetService.getCatalog();
-            const enrichedDashboards = await Promise.all(catalog.map(async (widget: any) => {
-                const componentCode = await this.widgetRenderer.getCompiledCode(widget.id, widget.category);
-                return {
-                    ...widget,
-                    gridSpan: widget.grid_span || widget.gridSpan || 'col-span-1',
-                    colorTheme: widget.color_theme || widget.colorTheme || 'theme-productivity',
-                    isMock: true,
-                    data: widget.data_structure_template || {},
-                    componentCode
-                };
-            }));
+            const enrichedDashboards = await this.buildCatalogDashboards();
             return { tenantId, projectId, status: 'discovery', dashboards: enrichedDashboards };
         }
 
@@ -77,6 +91,12 @@ export class AnalyticsService {
                 console.log(`[AnalyticsService] Found ${metadataDashboards.length} insight widgets. Types: ${metadataDashboards.map((w: any) => w?.type || w?.widget_type || 'NO_TYPE').join(', ')}`);
             }
 
+            if (!Array.isArray(metadataDashboards) || metadataDashboards.length === 0) {
+                console.warn('[AnalyticsService] No dashboard metadata found. Falling back to widget catalog.');
+                const dashboards = await this.buildCatalogDashboards();
+                return { tenantId, projectId, status: 'discovery', dashboards };
+            }
+
             const enrichedDashboards = await Promise.all(metadataDashboards.map(async (widget: any) => {
                 if (!widget) return { id: 'err', title: 'Error', isMock: true };
                 const result = workerResult?.results?.find((r: any) => r?.widgetId === widget.id);
@@ -87,24 +107,11 @@ export class AnalyticsService {
                 // Get definition to find category, gridSpan, and title
                 const definition = await this.widgetService.findWidget(widgetType);
 
-                let componentCode = "";
-                if (definition) {
-                    componentCode = await this.widgetRenderer.getCompiledCode(widgetType, definition.category);
-                    if (!componentCode) {
-                        console.warn(`[AnalyticsService] Component code EMPTY for ${widgetType} (category: ${definition.category})`);
-                    }
-                } else {
+                if (!definition) {
                     console.warn(`[AnalyticsService] No widget definition found for type: "${widgetType}" (widget id: ${widget.id})`);
                 }
 
-                const baseWidget = {
-                    ...widget,
-                    type: widgetType,
-                    gridSpan: widget.grid_span || widget.gridSpan || definition?.grid_span || 'col-span-1',
-                    colorTheme: widget.color_theme || widget.colorTheme || definition?.color_theme || 'theme-productivity',
-                    title: widget.title || definition?.title || widgetType,
-                    componentCode
-                };
+                const baseWidget = this.buildWidgetShell(widget, definition);
 
                 if (!result || result.error || !result.data || result.data.length === 0) {
                     // If no result, error, or empty data, return base widget with isMock: true 
@@ -120,8 +127,7 @@ export class AnalyticsService {
 
                 return {
                     ...baseWidget,
-                    ...mappedData,
-                    results: result.data,
+                    data: mappedData,
                     isMock: false,
                     latency: result.latency_ms
                 };
@@ -148,7 +154,7 @@ export class AnalyticsService {
             dashboardGroups: Array.isArray(groups) ? groups : [],
             dashboards: (Array.isArray(insights) ? insights : []).map((d: any) => ({
                 id: d?.id,
-                type: d?.type,
+                type: d?.type || d?.widget_type,
                 title: d?.title,
                 gridSpan: d?.gridSpan || d?.grid_span,
                 colorTheme: d?.colorTheme || d?.color_theme
@@ -188,11 +194,9 @@ export class AnalyticsService {
             }
 
             console.log(`[AnalyticsService] Falling back to type preview for ${widgetId}`);
-            const componentCode = await this.widgetRenderer.getCompiledCode(definition.id, definition.category);
             return {
                 id: widgetId,
                 type: definition.id,
-                componentCode,
                 title: definition.title,
                 gridSpan: definition.grid_span || 'col-span-1',
                 colorTheme: definition.color_theme || 'theme-productivity',
@@ -224,15 +228,13 @@ export class AnalyticsService {
             const mappedData = WidgetDataMapper.map(widgetType, result?.data || []);
             const meta = (widgetMetadata || {}) as any;
             return {
-                ...meta,
-                gridSpan: meta.grid_span || meta.gridSpan || 'col-span-1',
-                colorTheme: meta.color_theme || meta.colorTheme || 'theme-productivity',
-                ...mappedData
+                ...this.buildWidgetShell(meta),
+                data: mappedData,
+                isMock: Array.isArray(result?.data) && result.data.length === 0
             };
         }
 
         const mappedData = WidgetDataMapper.map(widgetType, result.data);
-        const componentCode = await this.widgetRenderer.getCompiledCode(definition.id, definition.category);
 
         return {
             id: widgetMetadata.id,
@@ -240,10 +242,8 @@ export class AnalyticsService {
             title: widgetMetadata.title || definition.title || widgetType,
             gridSpan: widgetMetadata.grid_span || widgetMetadata.gridSpan || definition.grid_span || 'col-span-1',
             colorTheme: widgetMetadata.color_theme || widgetMetadata.colorTheme || definition.color_theme || 'theme-productivity',
-            ...mappedData,
-            results: result.data,
-            isMock: (Array.isArray(result.data) && result.data.length === 0),
-            componentCode
+            data: mappedData,
+            isMock: (Array.isArray(result.data) && result.data.length === 0)
         };
     }
 }
