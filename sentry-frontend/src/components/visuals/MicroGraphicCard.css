@@ -19,6 +19,10 @@
     grid-column: span 2;
 }
 
+.col-span-3 {
+    grid-column: span 3;
+}
+
 .row-span-2 {
     grid-row: span 2;
     height: 624px;
@@ -31,6 +35,12 @@
     height: 624px;
 }
 
+.col-span-3.row-span-2 {
+    grid-column: span 3;
+    grid-row: span 2;
+    height: 624px;
+}
+
 @media (max-width: 1024px) {
     .micro-card {
         height: 250px;
@@ -38,12 +48,17 @@
     }
 
     .row-span-2,
-    .col-span-2.row-span-2 {
+    .col-span-2.row-span-2,
+    .col-span-3.row-span-2 {
         height: 524px;
         /* (250 * 2) + 24gap */
     }
 
     .col-span-2 {
+        grid-column: span 2;
+    }
+
+    .col-span-3 {
         grid-column: span 2;
     }
 }
@@ -54,9 +69,14 @@
     }
 
     .row-span-2,
-    .col-span-2.row-span-2 {
+    .col-span-2.row-span-2,
+    .col-span-3.row-span-2 {
         height: 460px;
         /* (220 * 2) + 20gap */
+    }
+
+    .col-span-3 {
+        grid-column: span 2;
     }
 }
 
@@ -167,6 +187,12 @@
     padding-bottom: 1.1rem;
 }
 
+.micro-card.funnel-hero-card {
+    padding: 0;
+    background: linear-gradient(180deg, #020202 0%, #060707 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
 .micro-card.map-bleed-card .micro-card-header {
     position: absolute;
     inset: 0 0 auto 0;
@@ -192,6 +218,12 @@
     justify-content: stretch;
 }
 
+.micro-card.funnel-hero-card .micro-card-body {
+    min-height: 0;
+    align-items: stretch;
+    justify-content: stretch;
+}
+
 .micro-card.editorial-card::before {
     content: '';
     position: absolute;
@@ -201,10 +233,16 @@
         radial-gradient(circle at bottom left, rgba(63, 216, 255, 0.08), transparent 28%);
     opacity: 0.68;
     pointer-events: none;
-    transition: opacity 0.28s ease;
+    transition: none;
 }
 
 .micro-card.map-bleed-card .micro-card-body > * {
+    width: 100%;
+    height: 100%;
+    flex: 1 1 auto;
+}
+
+.micro-card.funnel-hero-card .micro-card-body > * {
     width: 100%;
     height: 100%;
     flex: 1 1 auto;
@@ -229,37 +267,9 @@
     z-index: 6;
 }
 
-@media (hover: hover) and (pointer: fine) {
-    .micro-card.editorial-card {
-        transition:
-            transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
-            box-shadow 0.32s cubic-bezier(0.22, 1, 0.36, 1),
-            border-color 0.32s ease;
-    }
-
-    .micro-card.editorial-card:hover {
-        transform: translateY(-4px);
-        border-color: rgba(255, 255, 255, 0.12);
-        box-shadow: 0 20px 44px rgba(0, 0, 0, 0.42);
-    }
-
-    .micro-card.editorial-card:hover::before {
-        opacity: 1;
-    }
-
-    .micro-card.editorial-card .predictive-metric-grid,
-    .micro-card.editorial-card .live-pulse-metrics,
-    .micro-card.editorial-card .retention-header {
-        transition:
-            transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-            opacity 0.28s ease;
-    }
-
-    .micro-card.editorial-card:hover .predictive-metric-grid,
-    .micro-card.editorial-card:hover .live-pulse-metrics,
-    .micro-card.editorial-card:hover .retention-header {
-        transform: translateY(-2px);
-    }
+.micro-card.funnel-hero-card .expand-indicator,
+.micro-card.funnel-hero-card .close-indicator {
+    z-index: 6;
 }
 
 @media (max-width: 1024px) {

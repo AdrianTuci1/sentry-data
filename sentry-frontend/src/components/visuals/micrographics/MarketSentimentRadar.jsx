@@ -118,7 +118,7 @@ const MarketSentimentRadar = ({ data }) => {
     };
 
     return (
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '12px', alignItems: 'stretch', width: '100%', height: '100%', minHeight: 0 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '12px', alignItems: 'start', width: '100%', height: '100%', minHeight: 0 }}>
             <div style={{ minWidth: 0, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', width: '100%' }}>
                 <ReactECharts
                     option={option}
@@ -128,8 +128,8 @@ const MarketSentimentRadar = ({ data }) => {
                 />
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minWidth: 0, minHeight: 0, height: '100%', padding: '2px 0 2px 4px' }}>
-                <div style={{ paddingBottom: '8px', marginBottom: '8px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', gap: '12px', minWidth: 0, minHeight: 0, height: '100%', padding: '2px 0 2px 4px' }}>
+                <div style={{ paddingBottom: '10px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
                     <div style={{ color: 'rgba(255,255,255,0.42)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '6px' }}>
                         Composite
                     </div>

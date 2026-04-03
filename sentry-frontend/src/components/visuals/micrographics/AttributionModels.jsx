@@ -1,152 +1,159 @@
 import React from 'react';
 import ReactECharts from 'echarts-for-react';
 
-const compactCurrency = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    notation: 'compact',
-    maximumFractionDigits: 1,
-});
+const formatMetricValue = (value, options = {}) => {
+    if (value === null || value === undefined || value === '') {
+        return '';
+    }
 
-const fullCurrency = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-});
+    if (typeof value === 'string') {
+        return value;
+    }
+
+    const {
+        format = 'currency',
+        currency = 'USD',
+        compact = format === 'currency' || format === 'compact-number',
+        maximumFractionDigits,
+        minimumFractionDigits,
+        prefix = '',
+        suffix = '',
+    } = options;
+
+    let formatterOptions;
+
+    switch (format) {
+    case 'number':
+        formatterOptions = {
+            style: 'decimal',
+            notation: compact ? 'compact' : 'standard',
+            maximumFractionDigits: maximumFractionDigits ?? (compact ? 1 : 0),
+            minimumFractionDigits,
+        };
+        break;
+    case 'compact-number':
+        formatterOptions = {
+            style: 'decimal',
+            notation: 'compact',
+            maximumFractionDigits: maximumFractionDigits ?? 1,
+            minimumFractionDigits,
+        };
+        break;
+    case 'percent':
+        formatterOptions = {
+            style: 'percent',
+            maximumFractionDigits: maximumFractionDigits ?? 1,
+            minimumFractionDigits,
+        };
+        break;
+    case 'currency':
+    default:
+        formatterOptions = {
+            style: 'currency',
+            currency,
+            notation: compact ? 'compact' : 'standard',
+            maximumFractionDigits: maximumFractionDigits ?? (compact ? 1 : 0),
+            minimumFractionDigits,
+        };
+        break;
+    }
+
+    return `${prefix}${new Intl.NumberFormat('en-US', formatterOptions).format(value)}${suffix}`;
+};
 
 const AttributionModels = ({ data }) => {
     const allocations = Array.isArray(data?.models) ? data.models : [];
-    const monthlySeries = allocations.map((row) => ({
-        name: row.channel,
-        value: row.monthly ?? 0,
-        itemStyle: { color: row.monthlyColor || '#FFC533' },
-    }));
-    const yearlySeries = allocations.map((row) => ({
+    const primaryMetricLabel = data?.primaryMetricLabel || 'yearly';
+    const secondaryMetricLabel = data?.secondaryMetricLabel || 'monthly';
+    const valueFormat = {
+        format: data?.valueFormat || 'currency',
+        currency: data?.valueCurrency || 'USD',
+        compact: data?.valueCompact ?? true,
+        maximumFractionDigits: data?.valueMaximumFractionDigits,
+        minimumFractionDigits: data?.valueMinimumFractionDigits,
+        prefix: data?.valuePrefix || '',
+        suffix: data?.valueSuffix || '',
+    };
+    const tooltipValueFormat = {
+        ...valueFormat,
+        compact: false,
+    };
+    const secondaryValueFormat = {
+        format: data?.secondaryValueFormat || valueFormat.format,
+        currency: data?.secondaryValueCurrency || valueFormat.currency,
+        compact: data?.secondaryValueCompact ?? valueFormat.compact,
+        maximumFractionDigits: data?.secondaryValueMaximumFractionDigits ?? valueFormat.maximumFractionDigits,
+        minimumFractionDigits: data?.secondaryValueMinimumFractionDigits ?? valueFormat.minimumFractionDigits,
+        prefix: data?.secondaryValuePrefix || valueFormat.prefix,
+        suffix: data?.secondaryValueSuffix || valueFormat.suffix,
+    };
+    const seriesData = allocations.map((row) => ({
         name: row.channel,
         value: row.yearly ?? row.budget ?? 0,
-        itemStyle: { color: row.yearlyColor || '#35C9FF' },
-    }));
-    const frameSegments = new Array(10).fill(null).map((_, index) => ({
-        name: `frame-${index}`,
-        value: 1,
-        itemStyle: {
-            color: index % 2 === 0 ? 'rgba(157, 152, 164, 0.84)' : 'rgba(120, 117, 128, 0.78)',
-        },
-        label: { show: false },
-        tooltip: { show: false },
+        monthly: row.monthly ?? 0,
+        itemStyle: { color: row.yearlyColor || row.monthlyColor || '#35C9FF' },
     }));
     const periodMetrics = data?.periodMetrics || [];
-    const totalMonthly = monthlySeries.reduce((sum, row) => sum + row.value, 0);
-    const totalYearly = yearlySeries.reduce((sum, row) => sum + row.value, 0);
-    const summaryValue = data?.summaryValue || compactCurrency.format(totalMonthly);
+    const totalMonthly = allocations.reduce((sum, row) => sum + (row.monthly ?? 0), 0);
+    const totalYearly = allocations.reduce((sum, row) => sum + (row.yearly ?? row.budget ?? 0), 0);
+    const summaryValue = data?.summaryValue || formatMetricValue(totalMonthly, secondaryValueFormat);
     const summaryLabel = data?.summaryLabel || 'Monthly Budget';
-    const footerMetrics = data?.footerMetrics || [];
     const listRows = allocations.map((row) => ({
         label: row.channel,
         value: row.yearly ?? row.budget ?? 0,
+        monthly: row.monthly ?? 0,
+        color: row.yearlyColor || row.monthlyColor || '#35C9FF',
     }));
 
     const option = {
         animation: true,
-        animationDuration: 900,
-        animationEasing: 'cubicOut',
+        animationDuration: 700,
         tooltip: {
             trigger: 'item',
             backgroundColor: 'rgba(17, 24, 39, 0.92)',
             borderColor: 'rgba(255, 255, 255, 0.08)',
             textStyle: { color: '#fff' },
-            formatter: ({ seriesName, name, value, percent }) => `${seriesName}<br/>${name}: ${fullCurrency.format(value)} · ${percent}%`,
+            formatter: ({ name, value, percent }) => `${name}<br/>${formatMetricValue(value, tooltipValueFormat)} ${primaryMetricLabel} · ${percent}%`,
+        },
+        title: {
+            text: summaryValue,
+            subtext: summaryLabel.toUpperCase(),
+            left: 'center',
+            top: '37%',
+            textStyle: {
+                color: '#fff',
+                fontSize: 26,
+                fontWeight: 700,
+            },
+            subtextStyle: {
+                color: 'rgba(255,255,255,0.42)',
+                fontSize: 10,
+                fontWeight: 600,
+                letterSpacing: 2,
+            },
+            itemGap: 8,
         },
         series: [
             {
-                name: 'Frame',
+                name: data?.seriesName || 'Channel Mix',
                 type: 'pie',
-                radius: ['74%', '86%'],
-                center: ['42%', '45%'],
-                startAngle: 110,
-                clockwise: false,
-                avoidLabelOverlap: true,
-                padAngle: 2,
+                radius: ['56%', '77%'],
+                center: ['50%', '48%'],
+                startAngle: 90,
                 itemStyle: {
-                    borderColor: '#0a0a0a',
-                    borderWidth: 4,
-                    borderRadius: 8,
+                    borderColor: '#09090a',
+                    borderWidth: 5,
+                    borderRadius: 16,
                 },
                 label: { show: false },
                 labelLine: { show: false },
-                silent: true,
-                data: frameSegments,
-            },
-            {
-                name: 'Yearly',
-                type: 'pie',
-                radius: ['52%', '70%'],
-                center: ['42%', '45%'],
-                startAngle: 110,
-                clockwise: false,
-                avoidLabelOverlap: true,
-                padAngle: 2,
-                itemStyle: {
-                    borderColor: '#0a0a0a',
-                    borderWidth: 4,
-                    borderRadius: 8,
-                },
-                label: { show: false },
-                labelLine: { show: false },
-                data: yearlySeries,
-            },
-            {
-                name: 'Monthly',
-                type: 'pie',
-                radius: ['31%', '48%'],
-                center: ['42%', '45%'],
-                startAngle: 110,
-                clockwise: false,
-                avoidLabelOverlap: true,
-                padAngle: 2,
-                itemStyle: {
-                    borderColor: '#0a0a0a',
-                    borderWidth: 4,
-                    borderRadius: 8,
-                },
-                label: { show: false },
-                labelLine: { show: false },
-                data: monthlySeries,
-            },
-        ],
-        graphic: [
-            {
-                type: 'text',
-                left: '42%',
-                top: '38%',
-                style: {
-                    text: summaryValue,
-                    fill: '#fff',
-                    fontSize: 22,
-                    fontWeight: 700,
-                    textAlign: 'center',
-                    textVerticalAlign: 'middle',
-                },
-            },
-            {
-                type: 'text',
-                left: '42%',
-                top: '45%',
-                style: {
-                    text: summaryLabel.toUpperCase(),
-                    fill: 'rgba(255,255,255,0.38)',
-                    fontSize: 10,
-                    fontWeight: 600,
-                    textAlign: 'center',
-                    textVerticalAlign: 'middle',
-                    letterSpacing: 2,
-                },
+                data: seriesData,
             },
         ],
     };
 
     return (
-        <div style={{ height: '100%', width: '100%', display: 'grid', gridTemplateColumns: 'minmax(320px, 1.05fr) minmax(240px, 0.95fr)', gridTemplateRows: 'auto 1fr auto', gap: '16px', alignItems: 'stretch' }}>
+        <div style={{ height: '100%', width: '100%', display: 'grid', gridTemplateColumns: 'minmax(320px, 1.02fr) minmax(240px, 0.98fr)', gridTemplateRows: 'auto 1fr', gap: '16px', alignItems: 'stretch' }}>
             <div style={{ gridColumn: '1 / 2', gridRow: '1 / 3', minHeight: '360px' }}>
                 <ReactECharts
                     option={option}
@@ -157,8 +164,8 @@ const AttributionModels = ({ data }) => {
 
             <div style={{ gridColumn: '2 / 3', gridRow: '1 / 2', display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '18px' }}>
                 {(periodMetrics.length ? periodMetrics : [
-                    { label: 'Monthly', value: compactCurrency.format(totalMonthly), delta: '+19.6%', note: `${compactCurrency.format(totalMonthly * 0.82)} baseline`, tone: '#7CFF5B' },
-                    { label: 'Yearly', value: compactCurrency.format(totalYearly), delta: '+2.5%', note: `${compactCurrency.format(totalYearly * 0.96)} baseline`, tone: '#FFC533' },
+                    { label: secondaryMetricLabel, value: formatMetricValue(totalMonthly, secondaryValueFormat), delta: '+19.6%', note: `${formatMetricValue(totalMonthly * 0.82, secondaryValueFormat)} baseline`, tone: '#7CFF5B' },
+                    { label: primaryMetricLabel, value: formatMetricValue(totalYearly, valueFormat), delta: '+2.5%', note: `${formatMetricValue(totalYearly * 0.96, valueFormat)} baseline`, tone: '#FFC533' },
                 ]).map((metric) => (
                     <div key={metric.label}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
@@ -187,27 +194,21 @@ const AttributionModels = ({ data }) => {
                             borderBottom: index === listRows.length - 1 ? 'none' : '1px solid rgba(255,255,255,0.1)',
                         }}
                     >
-                        <span style={{ fontSize: '16px', color: 'rgba(255,255,255,0.82)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                            {row.label}
-                        </span>
-                        <span style={{ fontSize: '15px', fontWeight: 700, color: '#fff' }}>{fullCurrency.format(row.value)}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                            <span style={{ width: '10px', height: '10px', borderRadius: '999px', background: row.color, boxShadow: `0 0 14px ${row.color}55`, flexShrink: 0 }} />
+                            <div style={{ minWidth: 0 }}>
+                                <div style={{ fontSize: '16px', color: 'rgba(255,255,255,0.82)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                    {row.label}
+                                </div>
+                                <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.32)', marginTop: '3px' }}>
+                                    {`${formatMetricValue(row.monthly, secondaryValueFormat)} ${secondaryMetricLabel}`.trim()}
+                                </div>
+                            </div>
+                        </div>
+                        <span style={{ fontSize: '15px', fontWeight: 700, color: '#fff' }}>{formatMetricValue(row.value, tooltipValueFormat)}</span>
                     </div>
                 ))}
             </div>
-
-            {footerMetrics.length > 0 && (
-                <div style={{ gridColumn: '1 / 3', gridRow: '3 / 4', display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '18px', paddingTop: '8px' }}>
-                    {footerMetrics.map((metric) => (
-                        <div key={metric.label} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <div style={{ width: '52px', height: '52px', borderRadius: '18px', background: metric.iconBg || 'linear-gradient(180deg, #5b47e8 0%, #4338ca 100%)', boxShadow: '0 12px 28px rgba(0,0,0,0.28)' }} />
-                            <div>
-                                <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: '11px', marginBottom: '2px' }}>{metric.label}</div>
-                                <div style={{ color: '#fff', fontSize: '18px', fontWeight: 700 }}>{metric.value}</div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )}
         </div>
     );
 };

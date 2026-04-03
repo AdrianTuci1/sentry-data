@@ -1,0 +1,231 @@
+.funnel-hero-widget {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    align-items: stretch;
+    padding: 1rem 1.15rem 0.95rem;
+    background:
+        radial-gradient(circle at 46% 58%, rgba(26, 83, 188, 0.5), transparent 42%),
+        radial-gradient(circle at 78% 52%, rgba(37, 189, 159, 0.18), transparent 28%),
+        linear-gradient(180deg, #020202 0%, #050506 100%);
+    color: #f6f7fb;
+}
+
+.funnel-hero-toolbar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.funnel-hero-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 0.28rem;
+}
+
+.funnel-hero-kicker {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.92);
+}
+
+.funnel-hero-value-line {
+    display: flex;
+    align-items: baseline;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+}
+
+.funnel-hero-value-line strong {
+    font-size: clamp(1.85rem, 2.8vw, 2.25rem);
+    line-height: 0.9;
+    letter-spacing: -0.08em;
+    font-weight: 700;
+}
+
+.funnel-hero-delta {
+    color: #24f29d;
+    font-size: 0.88rem;
+    font-weight: 700;
+}
+
+.funnel-hero-compare {
+    color: rgba(214, 216, 225, 0.76);
+    font-size: 0.82rem;
+}
+
+.funnel-hero-stage {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+    margin-top: 0.4rem;
+    margin-left: -1.15rem;
+    margin-right: -1.15rem;
+    padding: 2rem 0 1.9rem;
+    overflow: hidden;
+}
+
+.funnel-hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.funnel-hero-icon-button,
+.funnel-hero-export-button {
+    border: 0;
+    background: rgba(31, 31, 32, 0.96);
+    color: rgba(243, 243, 247, 0.88);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.funnel-hero-icon-button {
+    width: 2.45rem;
+    height: 2.45rem;
+    border-radius: 0.6rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.funnel-hero-export-button {
+    min-width: 6.5rem;
+    height: 2.45rem;
+    padding: 0 0.95rem;
+    border-radius: 0.6rem;
+    font-size: 0.86rem;
+    font-weight: 500;
+}
+
+.funnel-hero-visual {
+    position: absolute;
+    inset: 2rem 0 1.9rem 0;
+    min-height: 0;
+    z-index: 1;
+}
+
+.funnel-hero-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.funnel-marker {
+    position: absolute;
+    inset: 0 auto 0 auto;
+    width: 0;
+    transform: translateX(-50%);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.funnel-marker-line {
+    position: absolute;
+    top: 2rem;
+    bottom: 1.9rem;
+    left: 50%;
+    width: 4px;
+    transform: translateX(-50%);
+    background: #09090a;
+}
+
+.funnel-pill {
+    position: absolute;
+    left: 50%;
+    min-width: 6.7rem;
+    height: 2rem;
+    padding: 0 0.9rem;
+    border-radius: 999px;
+    transform: translateX(-50%);
+    background: #030303;
+    color: #f7f7fb;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font: 700 0.74rem "JetBrains Mono", "SFMono-Regular", monospace;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+}
+
+.funnel-pill-top {
+    top: 0.15rem;
+}
+
+.funnel-pill-bottom {
+    bottom: 0.1rem;
+}
+
+@media (max-width: 1024px) {
+    .funnel-hero-widget {
+        padding: 0.9rem;
+    }
+
+    .funnel-hero-value-line strong {
+        font-size: 1.65rem;
+    }
+
+    .funnel-hero-compare {
+        font-size: 0.74rem;
+    }
+
+    .funnel-hero-export-button {
+        min-width: 5.8rem;
+        font-size: 0.8rem;
+    }
+
+    .funnel-hero-stage {
+        margin-left: -0.9rem;
+        margin-right: -0.9rem;
+        padding: 1.8rem 0 1.75rem;
+    }
+
+    .funnel-hero-visual {
+        inset: 1.8rem 0 1.75rem 0;
+    }
+
+    .funnel-marker-line {
+        top: 1.8rem;
+        bottom: 1.75rem;
+    }
+
+    .funnel-pill {
+        min-width: 6rem;
+        height: 1.8rem;
+        font-size: 0.68rem;
+    }
+}
+
+@media (max-width: 720px) {
+    .funnel-hero-actions {
+        display: none;
+    }
+
+    .funnel-hero-kicker {
+        font-size: 0.72rem;
+    }
+
+    .funnel-hero-stage {
+        padding: 1.65rem 0 1.6rem;
+    }
+
+    .funnel-hero-visual {
+        inset: 1.65rem 0 1.6rem 0;
+    }
+
+    .funnel-marker-line {
+        top: 1.65rem;
+        bottom: 1.6rem;
+    }
+
+    .funnel-pill {
+        min-width: 5.4rem;
+        height: 1.65rem;
+        padding: 0 0.75rem;
+        font-size: 0.62rem;
+    }
+}

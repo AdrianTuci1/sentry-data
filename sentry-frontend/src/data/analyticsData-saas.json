@@ -1,0 +1,2001 @@
+[
+    {
+        "id": "marketing-roas",
+        "type": "weather",
+        "title": "MRR Velocity",
+        "subtitle": "Recurring Revenue Expansion Rate",
+        "footerText": "Net new + expansion MRR",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "default",
+        "data": {
+            "value": "8.4",
+            "unit": "%",
+            "trendValue": "+1.1 pts",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "vs yesterday"
+        }
+    },
+    {
+        "id": "marketing-cpa",
+        "type": "natural",
+        "title": "Blended CAC",
+        "subtitle": "Acquisition efficiency vs target",
+        "footerText": "Target $300, ceiling $380",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "default",
+        "data": {
+            "value": "$312",
+            "unit": "avg",
+            "sparklineColor": "#49d793",
+            "dataPoints": [
+                386,
+                372,
+                358,
+                344,
+                336,
+                328,
+                320,
+                312
+            ]
+        }
+    },
+    {
+        "id": "marketing-conv-rate",
+        "type": "light-dial",
+        "title": "Trial Conversion",
+        "subtitle": "Signup to paid workspace %",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "default",
+        "data": {
+            "value": "6.2",
+            "unit": "%",
+            "signalOrientation": "horizontal",
+            "signalScore": 78,
+            "signalLabel": "Healthy funnel",
+            "trendValue": "+0.7 pts",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "vs prior cohort"
+        }
+    },
+    {
+        "id": "marketing-pclv",
+        "type": "predictive",
+        "title": "Predictive LTV",
+        "subtitle": "Future value of active SaaS accounts",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "value": "$8,420",
+            "unit": "est",
+            "metricCards": [
+                {
+                    "label": "Current LTV",
+                    "value": "$7,960",
+                    "delta": "+6.3%",
+                    "comparison": "Compared to $7,486 last month"
+                },
+                {
+                    "label": "Projected 30D",
+                    "value": "$8,420",
+                    "delta": "+8.1%",
+                    "comparison": "Forecast from active product cohorts"
+                },
+                {
+                    "label": "Confidence",
+                    "value": "83%",
+                    "delta": "+4 pts",
+                    "comparison": "Model stability vs previous run"
+                }
+            ],
+            "chartLabels": [
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+                "Sun"
+            ],
+            "chartSeries": [
+                4120,
+                4380,
+                4910,
+                5620,
+                5970,
+                6480,
+                7020
+            ],
+            "highlightRange": [
+                1,
+                5
+            ],
+            "markerLabels": [
+                {
+                    "index": 1,
+                    "value": "4,380"
+                },
+                {
+                    "index": 5,
+                    "value": "6,480"
+                }
+            ],
+            "chartMin": 0,
+            "chartMax": 8200,
+            "historical": [
+                7020,
+                7180,
+                7350,
+                7480,
+                7640,
+                7810,
+                7960
+            ],
+            "forecast": [
+                8060,
+                8160,
+                8250,
+                8330,
+                8420
+            ],
+            "confidenceRange": [
+                40,
+                60,
+                80
+            ]
+        }
+    },
+    {
+        "id": "data-saturation",
+        "type": "liquid-gauge",
+        "title": "Product Telemetry",
+        "subtitle": "Event coverage across key journeys",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "default",
+        "data": {
+            "value": "92",
+            "unit": "%",
+            "signalOrientation": "vertical",
+            "signalScore": 92,
+            "signalLabel": "Strong instrumentation",
+            "signalNote": "Billing, activation and reliability events are consistently flowing into the analytics layer.",
+            "trendValue": "+6 pts",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "tracked coverage"
+        }
+    },
+    {
+        "id": "ai-coverage",
+        "type": "neural-nexus",
+        "title": "Automation Coverage",
+        "subtitle": "Autonomous support and ops assist",
+        "footerText": "Tier-1 flows automated",
+        "colorTheme": "theme-light",
+        "gridSpan": "default",
+        "data": {
+            "value": "76",
+            "unit": "%",
+            "sliderValue": 76,
+            "gaugeUnit": "%",
+            "gaugeColor": "#6ae3a7"
+        }
+    },
+    {
+        "id": "llm-train-loss",
+        "type": "mpl-training-loss",
+        "title": "Forecast Training Curves",
+        "subtitle": "Churn and expansion model convergence",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "steps": [
+                "W1",
+                "W2",
+                "W3",
+                "W4",
+                "W5",
+                "W6",
+                "W7",
+                "W8"
+            ],
+            "trainLoss": [
+                2.46,
+                2.18,
+                1.93,
+                1.74,
+                1.61,
+                1.51,
+                1.42,
+                1.37
+            ],
+            "valLoss": [
+                2.58,
+                2.29,
+                2.04,
+                1.89,
+                1.79,
+                1.73,
+                1.75,
+                1.78
+            ],
+            "perplexity": [
+                16.8,
+                14.6,
+                12.1,
+                10,
+                8.9,
+                8.1,
+                8.3,
+                8.6
+            ],
+            "stats": [
+                {
+                    "label": "Best val loss",
+                    "value": "1.73",
+                    "accent": "#7cff5b",
+                    "meta": "week 6"
+                },
+                {
+                    "label": "Feature drift",
+                    "value": "0.14",
+                    "accent": "#7bd3ff",
+                    "meta": "stable inputs"
+                },
+                {
+                    "label": "Rows / sec",
+                    "value": "3.4M",
+                    "accent": "#ffc857",
+                    "meta": "warehouse sync"
+                }
+            ]
+        }
+    },
+    {
+        "id": "llm-eval-guards",
+        "type": "mpl-benchmark-bars",
+        "title": "KPI Guardrails",
+        "subtitle": "Benchmarks before experiment rollout",
+        "colorTheme": "theme-audience",
+        "gridSpan": "row-span-2",
+        "data": {
+            "benchmarks": [
+                {
+                    "label": "NRR",
+                    "score": 112.4,
+                    "target": 110,
+                    "delta": "+2.4"
+                },
+                {
+                    "label": "Trial CVR",
+                    "score": 6.2,
+                    "target": 5.8,
+                    "delta": "+0.4"
+                },
+                {
+                    "label": "Churn",
+                    "score": 3.1,
+                    "target": 3.5,
+                    "delta": "+0.4"
+                },
+                {
+                    "label": "Uptime",
+                    "score": 99.96,
+                    "target": 99.9,
+                    "delta": "+0.06"
+                }
+            ]
+        }
+    },
+    {
+        "id": "llm-attention-drift",
+        "type": "mpl-attention-heatmap",
+        "title": "Journey Heatmap",
+        "subtitle": "Activation focus across product stages",
+        "colorTheme": "theme-natural",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "xLabels": [
+                "S1",
+                "S2",
+                "S3",
+                "S4",
+                "S5",
+                "S6"
+            ],
+            "yLabels": [
+                "Signup",
+                "Onboard",
+                "Invite",
+                "Adopt",
+                "Expand",
+                "Renew"
+            ],
+            "matrix": [
+                [
+                    0.24,
+                    0.28,
+                    0.31,
+                    0.35,
+                    0.38,
+                    0.4
+                ],
+                [
+                    0.27,
+                    0.31,
+                    0.36,
+                    0.41,
+                    0.45,
+                    0.5
+                ],
+                [
+                    0.25,
+                    0.3,
+                    0.37,
+                    0.44,
+                    0.49,
+                    0.54
+                ],
+                [
+                    0.21,
+                    0.28,
+                    0.34,
+                    0.47,
+                    0.56,
+                    0.61
+                ],
+                [
+                    0.18,
+                    0.24,
+                    0.32,
+                    0.42,
+                    0.53,
+                    0.66
+                ],
+                [
+                    0.15,
+                    0.19,
+                    0.26,
+                    0.35,
+                    0.46,
+                    0.59
+                ]
+            ],
+            "sideNotes": [
+                {
+                    "label": "peak focus",
+                    "value": "Renew / S6"
+                },
+                {
+                    "label": "expansion headroom",
+                    "value": "19%"
+                },
+                {
+                    "label": "active cohorts",
+                    "value": "124"
+                }
+            ]
+        }
+    },
+    {
+        "id": "ad-fatigue",
+        "type": "intensity-heat",
+        "title": "Incident Pressure",
+        "subtitle": "Ops load saturation index",
+        "footerText": "Pager load under control",
+        "colorTheme": "theme-red",
+        "gridSpan": "default",
+        "data": {
+            "value": "22",
+            "unit": "deg",
+            "signalOrientation": "horizontal",
+            "signalScore": 22,
+            "signalLabel": "Low pressure",
+            "goodAtHigh": false
+        }
+    },
+    {
+        "id": "refresh-cycle",
+        "type": "chrono-dial",
+        "title": "Release Health",
+        "subtitle": "Deployment freshness score",
+        "footerText": "Next release on Tuesday",
+        "colorTheme": "theme-color",
+        "gridSpan": "default",
+        "data": {
+            "value": "88",
+            "unit": "pts",
+            "trendValue": "+4 pts",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "since last deploy"
+        }
+    },
+    {
+        "id": "budget-burn",
+        "type": "natural",
+        "title": "Infra Budget Pacing",
+        "subtitle": "Monthly cloud spend momentum",
+        "footerText": "12 days left at current pace",
+        "colorTheme": "theme-red",
+        "gridSpan": "default",
+        "data": {
+            "value": "64",
+            "unit": "%",
+            "sparklineColor": "#ff7676",
+            "dataPoints": [
+                48,
+                51,
+                54,
+                56,
+                59,
+                61,
+                63,
+                64
+            ],
+            "trendTone": "negative"
+        }
+    },
+    {
+        "id": "viral-k-factor",
+        "type": "light-dial",
+        "title": "Referral Multiplier",
+        "subtitle": "Invited teams per activated workspace",
+        "colorTheme": "theme-color",
+        "gridSpan": "default",
+        "data": {
+            "value": "1.7",
+            "unit": "x",
+            "sliderValue": 56,
+            "trendValue": "+0.2x",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "network effect"
+        }
+    },
+    {
+        "id": "incremental-lift",
+        "type": "incremental-lift",
+        "title": "Expansion Lift",
+        "subtitle": "Product-led upsell vs baseline",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "default",
+        "data": {
+            "value": "+19%",
+            "unit": "lift"
+        }
+    },
+    {
+        "id": "optimal-time",
+        "type": "optimal-time",
+        "title": "Peak Usage Window",
+        "subtitle": "Best support staffing hour",
+        "colorTheme": "theme-natural",
+        "gridSpan": "row-span-2",
+        "data": {
+            "value": "14:00",
+            "unit": "UTC+2",
+            "calendarMonth": "April 2026",
+            "calendarOffset": 2,
+            "daysInMonth": 30,
+            "totalCalendarCells": 56,
+            "calendarValues": [
+                28,
+                31,
+                33,
+                35,
+                44,
+                48,
+                55,
+                56,
+                32,
+                31,
+                34,
+                35,
+                26,
+                28,
+                22,
+                35,
+                36,
+                35,
+                35,
+                35,
+                35,
+                21,
+                36,
+                36,
+                27,
+                29,
+                32,
+                22,
+                34,
+                23
+            ],
+            "engagementMatrix": [
+                [
+                    28,
+                    31,
+                    33,
+                    35,
+                    44,
+                    48,
+                    55,
+                    56
+                ],
+                [
+                    32,
+                    31,
+                    34,
+                    35,
+                    26,
+                    28,
+                    22,
+                    35
+                ],
+                [
+                    36,
+                    35,
+                    35,
+                    35,
+                    35,
+                    21,
+                    36,
+                    36
+                ],
+                [
+                    27,
+                    29,
+                    32,
+                    22,
+                    34,
+                    23,
+                    29,
+                    35
+                ],
+                [
+                    14,
+                    16,
+                    18,
+                    11,
+                    13,
+                    12,
+                    16,
+                    11
+                ],
+                [
+                    32,
+                    32,
+                    32,
+                    1,
+                    31,
+                    31,
+                    11,
+                    32
+                ],
+                [
+                    3,
+                    6,
+                    8,
+                    11,
+                    31,
+                    11,
+                    12,
+                    14
+                ],
+                [
+                    3,
+                    2,
+                    7,
+                    30,
+                    31,
+                    11,
+                    19,
+                    33
+                ]
+            ],
+            "summaryCards": [
+                {
+                    "id": "weekly-peak",
+                    "icon": "sparkles",
+                    "label": "Weekly Peak",
+                    "value": "18,240",
+                    "delta": "+12.6%",
+                    "note": "active sessions",
+                    "tone": "positive"
+                },
+                {
+                    "id": "quarter-reach",
+                    "icon": "orbit",
+                    "label": "Quarter Accounts",
+                    "value": "6,840",
+                    "delta": "+3.8%",
+                    "note": "6,589 prior baseline",
+                    "tone": "positive"
+                }
+            ],
+            "marketBreakdown": [
+                {
+                    "label": "EU",
+                    "value": "2,840"
+                },
+                {
+                    "label": "US",
+                    "value": "2,320"
+                },
+                {
+                    "label": "APAC",
+                    "value": "1,680"
+                }
+            ]
+        }
+    },
+    {
+        "id": "live-traffic",
+        "type": "animated-line",
+        "title": "Live Active Users",
+        "subtitle": "Real-time concurrent workspaces",
+        "footerText": "Last 5 Minutes Activity",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2",
+        "description": "Concurrent product usage across dashboards, alerts, settings and billing surfaces.",
+        "data": {
+            "value": "2,184",
+            "unit": "usr",
+            "metricCards": [
+                {
+                    "icon": "sparkles",
+                    "label": "Active now",
+                    "value": "918",
+                    "delta": "+6.2%",
+                    "note": "users online"
+                },
+                {
+                    "icon": "medal",
+                    "label": "Peak today",
+                    "value": "1,042",
+                    "delta": "+9.8%",
+                    "note": "highest concurrent users"
+                }
+            ],
+            "chartLabels": [
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+                "Sun"
+            ],
+            "chartSeries": [
+                520,
+                604,
+                711,
+                842,
+                918,
+                null,
+                null
+            ],
+            "chartMin": 180,
+            "chartMax": 1200,
+            "annotation": {
+                "index": 4,
+                "label": "ACTIVE USERS",
+                "value": "918"
+            },
+            "dataPoints": [
+                520,
+                604,
+                711,
+                842,
+                918
+            ]
+        }
+    },
+    {
+        "id": "revenue-forecast",
+        "type": "predictive",
+        "title": "ARR Forecast",
+        "subtitle": "Predictive recurring revenue outlook",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "col-span-2",
+        "data": {
+            "value": "$4.8M",
+            "unit": "est",
+            "historical": [
+                3.5,
+                3.7,
+                3.65,
+                3.9,
+                4.1,
+                4.3
+            ],
+            "forecast": [
+                4.42,
+                4.53,
+                4.62,
+                4.71,
+                4.8
+            ],
+            "confidenceRange": [
+                25,
+                40,
+                58
+            ]
+        }
+    },
+    {
+        "id": "retention-cohorts",
+        "type": "cohorts",
+        "title": "Retention",
+        "subtitle": "Workspace stickiness by cohort",
+        "colorTheme": "theme-audience",
+        "gridSpan": "default",
+        "data": {
+            "summaryValue": "84.6%",
+            "summaryDelta": "+2.1 pts",
+            "summaryCompare": "Average last-step retention across active account cohorts",
+            "retentionBars": [
+                {
+                    "label": "500",
+                    "segments": [
+                        39,
+                        11,
+                        10,
+                        10
+                    ],
+                    "marker": 97
+                },
+                {
+                    "label": "400",
+                    "segments": [
+                        39,
+                        15,
+                        14,
+                        15
+                    ],
+                    "marker": 87
+                },
+                {
+                    "label": "300",
+                    "segments": [
+                        16,
+                        9,
+                        8,
+                        8
+                    ],
+                    "marker": 49
+                },
+                {
+                    "label": "200",
+                    "segments": [
+                        16,
+                        13,
+                        13,
+                        13
+                    ],
+                    "marker": 63
+                },
+                {
+                    "label": "100",
+                    "segments": [
+                        39,
+                        15,
+                        14,
+                        15
+                    ],
+                    "marker": 97
+                }
+            ],
+            "cohorts": [
+                {
+                    "week": "Feb 01",
+                    "size": 420,
+                    "data": [
+                        100,
+                        94,
+                        88,
+                        82
+                    ]
+                },
+                {
+                    "week": "Feb 08",
+                    "size": 396,
+                    "data": [
+                        100,
+                        92,
+                        86
+                    ]
+                },
+                {
+                    "week": "Feb 15",
+                    "size": 442,
+                    "data": [
+                        100,
+                        95
+                    ]
+                },
+                {
+                    "week": "Feb 22",
+                    "size": 458,
+                    "data": [
+                        100
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "id": "technical-health",
+        "type": "vitals",
+        "title": "System Status",
+        "subtitle": "Core services uptime and reliability",
+        "colorTheme": "theme-weather",
+        "gridSpan": "default",
+        "data": {
+            "value": "99.96",
+            "unit": "%",
+            "uptimeBars": [
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "warn",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "warn",
+                "good",
+                "good",
+                "good",
+                "good",
+                "down",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good"
+            ],
+            "metrics": [
+                {
+                    "name": "API",
+                    "value": "99.97%",
+                    "status": "good"
+                },
+                {
+                    "name": "DB",
+                    "value": "99.99%",
+                    "status": "good"
+                },
+                {
+                    "name": "Queue",
+                    "value": "99.94%",
+                    "status": "good"
+                },
+                {
+                    "name": "Incidents",
+                    "value": "2 open",
+                    "status": "warn"
+                }
+            ]
+        }
+    },
+    {
+        "id": "stat-leads",
+        "type": "leads-list",
+        "title": "Open Tickets",
+        "subtitle": "Active customer-facing issues",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "row-span-2",
+        "data": {
+            "leads": [
+                {
+                    "name": "SSO login delays",
+                    "value": "Enterprise",
+                    "status": "vip",
+                    "time": "3m ago"
+                },
+                {
+                    "name": "Webhook retries",
+                    "value": "Growth",
+                    "status": "warm",
+                    "time": "12m ago"
+                },
+                {
+                    "name": "Usage export lag",
+                    "value": "Pro",
+                    "status": "warm",
+                    "time": "26m ago"
+                },
+                {
+                    "name": "Billing receipt mismatch",
+                    "value": "Starter",
+                    "status": "cold",
+                    "time": "41m ago"
+                },
+                {
+                    "name": "Invite email bounce",
+                    "value": "Pro",
+                    "status": "cold",
+                    "time": "57m ago"
+                },
+                {
+                    "name": "Dashboard timeout",
+                    "value": "Enterprise",
+                    "status": "vip",
+                    "time": "1h ago"
+                },
+                {
+                    "name": "Seat sync drift",
+                    "value": "Growth",
+                    "status": "warm",
+                    "time": "2h ago"
+                },
+                {
+                    "name": "Audit log delay",
+                    "value": "Enterprise",
+                    "status": "cold",
+                    "time": "3h ago"
+                }
+            ]
+        }
+    },
+    {
+        "id": "top-routes",
+        "type": "leads-list",
+        "title": "Degraded Systems",
+        "subtitle": "Most impacted platform surfaces",
+        "colorTheme": "theme-natural",
+        "gridSpan": "default",
+        "data": {
+            "leads": [
+                {
+                    "name": "/api/v1/search",
+                    "value": "p95 842ms",
+                    "time": "+14%"
+                },
+                {
+                    "name": "/jobs/exports",
+                    "value": "queue 4.2m",
+                    "time": "+9%"
+                },
+                {
+                    "name": "/billing/webhooks",
+                    "value": "retry 1.8%",
+                    "time": "+6%"
+                },
+                {
+                    "name": "/auth/sso/callback",
+                    "value": "error 0.4%",
+                    "time": "-2%"
+                }
+            ]
+        }
+    },
+    {
+        "id": "financial-waterfall",
+        "type": "waterfall",
+        "title": "MRR Bridge",
+        "subtitle": "Gross to net recurring revenue",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "col-span-2",
+        "data": {
+            "value": "$382K",
+            "unit": "net",
+            "steps": [
+                {
+                    "name": "Gross MRR",
+                    "value": 624000
+                },
+                {
+                    "name": "Discounts",
+                    "value": -94000
+                },
+                {
+                    "name": "Churn",
+                    "value": -88000
+                },
+                {
+                    "name": "Service Credits",
+                    "value": -60000
+                },
+                {
+                    "name": "Net MRR",
+                    "isTotal": true
+                }
+            ]
+        }
+    },
+    {
+        "id": "market-sentiment",
+        "type": "market-radar",
+        "title": "Product Health Radar",
+        "subtitle": "Aggregated system and experience health",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2",
+        "data": {
+            "indicator": [
+                {
+                    "name": "Uptime",
+                    "max": 100
+                },
+                {
+                    "name": "Latency",
+                    "max": 100
+                },
+                {
+                    "name": "Support",
+                    "max": 100
+                },
+                {
+                    "name": "Adoption",
+                    "max": 100
+                },
+                {
+                    "name": "Billing",
+                    "max": 100
+                }
+            ],
+            "radarData": [
+                {
+                    "value": [
+                        96,
+                        82,
+                        79,
+                        88,
+                        84
+                    ],
+                    "name": "Current Metric",
+                    "symbol": "none",
+                    "itemStyle": {
+                        "color": "#ec4899"
+                    },
+                    "areaStyle": {
+                        "color": {
+                            "type": "radial",
+                            "x": 0.5,
+                            "y": 0.5,
+                            "r": 1,
+                            "colorStops": [
+                                {
+                                    "offset": 0,
+                                    "color": "rgba(236, 72, 153, 0.1)"
+                                },
+                                {
+                                    "offset": 1,
+                                    "color": "rgba(236, 72, 153, 0.4)"
+                                }
+                            ]
+                        }
+                    },
+                    "lineStyle": {
+                        "width": 2,
+                        "type": "solid"
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "id": "attribution-models",
+        "type": "attribution",
+        "title": "Revenue Attribution",
+        "subtitle": "Monthly and yearly source allocation",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "summaryValue": "$412K",
+            "summaryLabel": "Monthly MRR",
+            "periodMetrics": [
+                {
+                    "label": "Monthly",
+                    "value": "$412K",
+                    "delta": "+11.4%",
+                    "note": "$370K baseline",
+                    "tone": "#7CFF5B"
+                },
+                {
+                    "label": "Yearly",
+                    "value": "$4.8M",
+                    "delta": "+7.1%",
+                    "note": "$4.48M baseline",
+                    "tone": "#FFC533"
+                }
+            ],
+            "models": [
+                {
+                    "channel": "Self-serve",
+                    "monthly": 148000,
+                    "yearly": 1760000,
+                    "yearlyColor": "#2EF0B2",
+                    "monthlyColor": "#FFBF1F"
+                },
+                {
+                    "channel": "Sales-led",
+                    "monthly": 126000,
+                    "yearly": 1540000,
+                    "yearlyColor": "#31E9C9",
+                    "monthlyColor": "#FF9F1F"
+                },
+                {
+                    "channel": "Expansion",
+                    "monthly": 94000,
+                    "yearly": 1160000,
+                    "yearlyColor": "#8B5CF6",
+                    "monthlyColor": "#FF5A36"
+                },
+                {
+                    "channel": "Partner",
+                    "monthly": 44000,
+                    "yearly": 340000,
+                    "yearlyColor": "#7B6D87",
+                    "monthlyColor": "#F33B1D"
+                }
+            ]
+        }
+    },
+    {
+        "id": "anomaly-detection",
+        "type": "anomaly-stream",
+        "title": "Incident Anomalies",
+        "subtitle": "ML-driven reliability variance detection",
+        "colorTheme": "theme-weather",
+        "gridSpan": "col-span-2",
+        "data": {
+            "value": "3 Spikes",
+            "unit": "warn"
+        }
+    },
+    {
+        "id": "romania-3d",
+        "type": "3d-map",
+        "title": "Regional System Load",
+        "subtitle": "Active SaaS infrastructure footprint",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {}
+    },
+    {
+        "id": "data-scatter",
+        "type": "scatter",
+        "title": "ARR vs Churn Risk",
+        "subtitle": "Account value over retention pressure",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "periodLabels": [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct"
+            ],
+            "scatterData": [
+                [
+                    32,
+                    180
+                ],
+                [
+                    46,
+                    240
+                ],
+                [
+                    58,
+                    310
+                ],
+                [
+                    71,
+                    420
+                ],
+                [
+                    85,
+                    516
+                ],
+                [
+                    102,
+                    660
+                ],
+                [
+                    118,
+                    744
+                ],
+                [
+                    136,
+                    892
+                ],
+                [
+                    152,
+                    1040
+                ],
+                [
+                    169,
+                    1186
+                ]
+            ]
+        }
+    },
+    {
+        "id": "sales-funnel",
+        "type": "funnel",
+        "title": "SaaS Funnel",
+        "subtitle": "Signup to expansion flow",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2",
+        "data": {
+            "summaryLabel": "Revenue",
+            "summaryValue": "$58,320",
+            "summaryDelta": "↑5.6%",
+            "summaryCompare": "Compared to $55,240 last month",
+            "funnel": [
+                {
+                    "value": 100,
+                    "name": "Visits"
+                },
+                {
+                    "value": 42,
+                    "name": "Signup"
+                },
+                {
+                    "value": 24,
+                    "name": "Activated"
+                },
+                {
+                    "value": 11,
+                    "name": "Paid"
+                },
+                {
+                    "value": 6,
+                    "name": "Expanded"
+                }
+            ]
+        }
+    },
+    {
+        "id": "market-evolution",
+        "type": "market-evolution",
+        "title": "System Dependency Dynamics",
+        "subtitle": "Cross-service influence and resilience",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "channels": [
+                {
+                    "name": "API",
+                    "color": "#3B82F6",
+                    "value": 92,
+                    "synergy": "Critical"
+                },
+                {
+                    "name": "Database",
+                    "color": "#10B981",
+                    "value": 95,
+                    "synergy": "Critical"
+                },
+                {
+                    "name": "Queue",
+                    "color": "#F59E0B",
+                    "value": 81,
+                    "synergy": "High"
+                },
+                {
+                    "name": "Billing",
+                    "color": "#EF4444",
+                    "value": 64,
+                    "synergy": "Mid"
+                },
+                {
+                    "name": "Auth",
+                    "color": "#8B5CF6",
+                    "value": 88,
+                    "synergy": "High"
+                },
+                {
+                    "name": "Email",
+                    "color": "#EC4899",
+                    "value": 58,
+                    "synergy": "Mid"
+                },
+                {
+                    "name": "Search",
+                    "color": "#06B6D4",
+                    "value": 76,
+                    "synergy": "High"
+                }
+            ],
+            "links": [
+                {
+                    "source": "API",
+                    "target": "Database",
+                    "value": 9
+                },
+                {
+                    "source": "API",
+                    "target": "Queue",
+                    "value": 7
+                },
+                {
+                    "source": "Billing",
+                    "target": "Email",
+                    "value": 5
+                },
+                {
+                    "source": "Auth",
+                    "target": "API",
+                    "value": 8
+                },
+                {
+                    "source": "Search",
+                    "target": "Database",
+                    "value": 6
+                },
+                {
+                    "source": "Queue",
+                    "target": "Email",
+                    "value": 4
+                },
+                {
+                    "source": "Auth",
+                    "target": "Billing",
+                    "value": 5
+                }
+            ]
+        }
+    },
+    {
+        "id": "creative-quadrant",
+        "type": "creative-quadrant",
+        "title": "Feature Impact Quadrant",
+        "subtitle": "Adoption vs revenue influence",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "row-span-2",
+        "data": {
+            "creatives": [
+                [
+                    7.8,
+                    8.4,
+                    "SSO Setup",
+                    "Enterprise"
+                ],
+                [
+                    6.4,
+                    7.9,
+                    "Usage Alerts",
+                    "Core"
+                ],
+                [
+                    3.8,
+                    9.1,
+                    "Audit Export",
+                    "Compliance"
+                ],
+                [
+                    8.7,
+                    3.2,
+                    "Quick Invite",
+                    "Growth"
+                ],
+                [
+                    5.3,
+                    6.1,
+                    "Team Templates",
+                    "Collab"
+                ],
+                [
+                    1.9,
+                    2.4,
+                    "Legacy Theme",
+                    "Low use"
+                ],
+                [
+                    7.1,
+                    4.6,
+                    "API Tokens",
+                    "Developer"
+                ]
+            ]
+        }
+    },
+    {
+        "id": "budget-sensitivity",
+        "type": "budget-sensitivity",
+        "title": "Capacity Sensitivity",
+        "subtitle": "Infrastructure elasticity and diminishing returns",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "col-span-2",
+        "data": {
+            "curvePoints": [
+                [
+                    0,
+                    0.6692850924284856
+                ],
+                [
+                    2,
+                    0.816257115315989
+                ],
+                [
+                    4,
+                    0.9951801866904316
+                ],
+                [
+                    6,
+                    1.2128434984274237
+                ],
+                [
+                    8,
+                    1.4774031693273055
+                ],
+                [
+                    10,
+                    1.798620996209156
+                ],
+                [
+                    12,
+                    2.188127093613047
+                ],
+                [
+                    14,
+                    2.6596993576865855
+                ],
+                [
+                    16,
+                    3.2295464698450496
+                ],
+                [
+                    18,
+                    3.9165722796764353
+                ],
+                [
+                    20,
+                    4.742587317756678
+                ],
+                [
+                    22,
+                    5.7324175898868726
+                ],
+                [
+                    24,
+                    6.913842034334682
+                ],
+                [
+                    26,
+                    8.317269649392236
+                ],
+                [
+                    28,
+                    9.975048911968514
+                ],
+                [
+                    30,
+                    11.920292202211755
+                ],
+                [
+                    32,
+                    14.185106490048778
+                ],
+                [
+                    34,
+                    16.79816148660755
+                ],
+                [
+                    36,
+                    19.781611144141824
+                ],
+                [
+                    38,
+                    23.14752165009823
+                ],
+                [
+                    40,
+                    26.894142136999513
+                ],
+                [
+                    42,
+                    31.002551887238752
+                ],
+                [
+                    44,
+                    35.43436937742045
+                ],
+                [
+                    46,
+                    40.1312339887548
+                ],
+                [
+                    48,
+                    45.016600268752214
+                ],
+                [
+                    50,
+                    50
+                ],
+                [
+                    52,
+                    54.98339973124779
+                ],
+                [
+                    54,
+                    59.8687660112452
+                ],
+                [
+                    56,
+                    64.56563062257955
+                ],
+                [
+                    58,
+                    68.99744811276125
+                ],
+                [
+                    60,
+                    73.10585786300048
+                ],
+                [
+                    62,
+                    76.85247834990177
+                ],
+                [
+                    64,
+                    80.21838885585818
+                ],
+                [
+                    66,
+                    83.20183851339245
+                ],
+                [
+                    68,
+                    85.81489350995123
+                ],
+                [
+                    70,
+                    88.07970779778823
+                ],
+                [
+                    72,
+                    90.02495108803149
+                ],
+                [
+                    74,
+                    91.68273035060777
+                ],
+                [
+                    76,
+                    93.08615796566532
+                ],
+                [
+                    78,
+                    94.26758241011314
+                ],
+                [
+                    80,
+                    95.25741268224333
+                ],
+                [
+                    82,
+                    96.08342772032357
+                ],
+                [
+                    84,
+                    96.77045353015495
+                ],
+                [
+                    86,
+                    97.34030064231341
+                ],
+                [
+                    88,
+                    97.81187290638695
+                ],
+                [
+                    90,
+                    98.20137900379083
+                ],
+                [
+                    92,
+                    98.5225968306727
+                ],
+                [
+                    94,
+                    98.78715650157258
+                ],
+                [
+                    96,
+                    99.00481981330957
+                ],
+                [
+                    98,
+                    99.18374288468401
+                ],
+                [
+                    100,
+                    99.33071490757152
+                ]
+            ]
+        }
+    },
+    {
+        "id": "intent-sunburst",
+        "type": "intent-sunburst",
+        "title": "Workspace Intent",
+        "subtitle": "Real-time account classification",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "sunburstData": [
+                {
+                    "name": "Expansion Ready",
+                    "itemStyle": {
+                        "color": "#10B981"
+                    },
+                    "children": [
+                        {
+                            "name": "Multi-team",
+                            "value": 22
+                        },
+                        {
+                            "name": "Usage Spike",
+                            "value": 18
+                        }
+                    ]
+                },
+                {
+                    "name": "Support Needed",
+                    "itemStyle": {
+                        "color": "#3B82F6"
+                    },
+                    "children": [
+                        {
+                            "name": "Activation Blocker",
+                            "value": 15
+                        },
+                        {
+                            "name": "Billing Question",
+                            "value": 13
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "id": "shapley-attribution",
+        "type": "shapley-attribution",
+        "title": "Revenue Shapley",
+        "subtitle": "Channel contribution by period",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "rawData": [
+                [
+                    "Lifecycle",
+                    19.683019058189853,
+                    2021
+                ],
+                [
+                    "Lifecycle",
+                    24.6833903211189,
+                    2021
+                ],
+                [
+                    "Lifecycle",
+                    23.64701871671297,
+                    2021
+                ],
+                [
+                    "Lifecycle",
+                    33.91222823701676,
+                    2022
+                ],
+                [
+                    "Lifecycle",
+                    32.716793702194735,
+                    2022
+                ],
+                [
+                    "Lifecycle",
+                    37.026395307833425,
+                    2022
+                ],
+                [
+                    "Lifecycle",
+                    20.921580606324838,
+                    2023
+                ],
+                [
+                    "Lifecycle",
+                    27.621240347441923,
+                    2023
+                ],
+                [
+                    "Lifecycle",
+                    19.77874834249792,
+                    2023
+                ],
+                [
+                    "Self-serve",
+                    16.66624500617535,
+                    2021
+                ],
+                [
+                    "Self-serve",
+                    7.089858637785376,
+                    2021
+                ],
+                [
+                    "Self-serve",
+                    10.535892257841073,
+                    2021
+                ],
+                [
+                    "Self-serve",
+                    19.556827999698566,
+                    2022
+                ],
+                [
+                    "Self-serve",
+                    17.457968856172435,
+                    2022
+                ],
+                [
+                    "Self-serve",
+                    10.967951684922037,
+                    2022
+                ],
+                [
+                    "Self-serve",
+                    18.344452921626278,
+                    2023
+                ],
+                [
+                    "Self-serve",
+                    22.747748377664635,
+                    2023
+                ],
+                [
+                    "Self-serve",
+                    6.689114437669323,
+                    2023
+                ],
+                [
+                    "Paid",
+                    38.137365454748775,
+                    2021
+                ],
+                [
+                    "Paid",
+                    30.979587885344078,
+                    2021
+                ],
+                [
+                    "Paid",
+                    27.28416755121987,
+                    2021
+                ],
+                [
+                    "Paid",
+                    43.31883899911986,
+                    2022
+                ],
+                [
+                    "Paid",
+                    30.906468457236777,
+                    2022
+                ],
+                [
+                    "Paid",
+                    26.0294944225872,
+                    2022
+                ],
+                [
+                    "Paid",
+                    26.10890509165352,
+                    2023
+                ],
+                [
+                    "Paid",
+                    41.124464881933434,
+                    2023
+                ],
+                [
+                    "Paid",
+                    36.24909818232206,
+                    2023
+                ],
+                [
+                    "Product-led",
+                    38.80848393210776,
+                    2021
+                ],
+                [
+                    "Product-led",
+                    34.93841002732542,
+                    2021
+                ],
+                [
+                    "Product-led",
+                    43.67616347781882,
+                    2021
+                ],
+                [
+                    "Product-led",
+                    31.784535742398475,
+                    2022
+                ],
+                [
+                    "Product-led",
+                    35.25466082369594,
+                    2022
+                ],
+                [
+                    "Product-led",
+                    40.8019414832913,
+                    2022
+                ],
+                [
+                    "Product-led",
+                    36.584243245516326,
+                    2023
+                ],
+                [
+                    "Product-led",
+                    41.44798620444695,
+                    2023
+                ],
+                [
+                    "Product-led",
+                    35.760891103366646,
+                    2023
+                ],
+                [
+                    "Partner",
+                    22.05364275956095,
+                    2021
+                ],
+                [
+                    "Partner",
+                    25.695120599478642,
+                    2021
+                ],
+                [
+                    "Partner",
+                    26.92491435848985,
+                    2021
+                ],
+                [
+                    "Partner",
+                    22.732994624920256,
+                    2022
+                ],
+                [
+                    "Partner",
+                    25.79297281366831,
+                    2022
+                ],
+                [
+                    "Partner",
+                    23.15718367464229,
+                    2022
+                ],
+                [
+                    "Partner",
+                    26.696627148649547,
+                    2023
+                ],
+                [
+                    "Partner",
+                    33.85084397173571,
+                    2023
+                ],
+                [
+                    "Partner",
+                    28.43379866584939,
+                    2023
+                ]
+            ]
+        }
+    },
+    {
+        "id": "trend-spotter",
+        "type": "trend-spotter",
+        "title": "Emerging Product Signals",
+        "subtitle": "Leading indicators across growth and reliability",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "keywords": [
+                {
+                    "text": "seat expansion",
+                    "weight": 92,
+                    "trend": "up"
+                },
+                {
+                    "text": "sso adoption",
+                    "weight": 86,
+                    "trend": "up"
+                },
+                {
+                    "text": "usage alerts",
+                    "weight": 81,
+                    "trend": "up"
+                },
+                {
+                    "text": "cost controls",
+                    "weight": 69,
+                    "trend": "stable"
+                },
+                {
+                    "text": "support backlog",
+                    "weight": 44,
+                    "trend": "down"
+                },
+                {
+                    "text": "export latency",
+                    "weight": 73,
+                    "trend": "up"
+                },
+                {
+                    "text": "renewal risk",
+                    "weight": 66,
+                    "trend": "stable"
+                },
+                {
+                    "text": "trial activation",
+                    "weight": 88,
+                    "trend": "up"
+                },
+                {
+                    "text": "db failover",
+                    "weight": 79,
+                    "trend": "up"
+                },
+                {
+                    "text": "service credits",
+                    "weight": 58,
+                    "trend": "down"
+                },
+                {
+                    "text": "api reliability",
+                    "weight": 84,
+                    "trend": "up"
+                },
+                {
+                    "text": "billing retry",
+                    "weight": 62,
+                    "trend": "stable"
+                }
+            ]
+        }
+    }
+]

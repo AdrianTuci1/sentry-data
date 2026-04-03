@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactECharts from 'echarts-for-react';
 
-const QUADRANT_THRESHOLD = 5;
+const DEFAULT_QUADRANT_THRESHOLD = 5;
 
-const QUADRANT_STYLES = {
+const DEFAULT_QUADRANT_STYLES = {
     heroes: {
         label: 'Hero',
         detail: 'Scale',
@@ -26,16 +26,16 @@ const QUADRANT_STYLES = {
     },
 };
 
-const getQuadrantKey = (ctr, conv) => {
-    if (ctr >= QUADRANT_THRESHOLD && conv >= QUADRANT_THRESHOLD) {
+const getQuadrantKey = (xValue, yValue, thresholdX, thresholdY) => {
+    if (xValue >= thresholdX && yValue >= thresholdY) {
         return 'heroes';
     }
 
-    if (ctr >= QUADRANT_THRESHOLD && conv < QUADRANT_THRESHOLD) {
+    if (xValue >= thresholdX && yValue < thresholdY) {
         return 'seekers';
     }
 
-    if (ctr < QUADRANT_THRESHOLD && conv >= QUADRANT_THRESHOLD) {
+    if (xValue < thresholdX && yValue >= thresholdY) {
         return 'intent';
     }
 
@@ -44,9 +44,44 @@ const getQuadrantKey = (ctr, conv) => {
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
-const formatPercent = (value) => `${Number(value).toFixed(1)}%`;
+const formatAxisValue = (value, format = 'percent') => {
+    const numericValue = Number(value);
+
+    if (!Number.isFinite(numericValue)) {
+        return String(value);
+    }
+
+    if (format === 'number') {
+        return numericValue.toFixed(1);
+    }
+
+    return `${numericValue.toFixed(1)}%`;
+};
 
 const CreativeQuadrant = ({ data: componentData }) => {
+    const thresholdX = Number(componentData?.quadrantThresholdX ?? DEFAULT_QUADRANT_THRESHOLD);
+    const thresholdY = Number(componentData?.quadrantThresholdY ?? DEFAULT_QUADRANT_THRESHOLD);
+    const quadrantStyles = {
+        heroes: { ...DEFAULT_QUADRANT_STYLES.heroes, ...(componentData?.quadrantLabels?.heroes || {}) },
+        seekers: { ...DEFAULT_QUADRANT_STYLES.seekers, ...(componentData?.quadrantLabels?.seekers || {}) },
+        intent: { ...DEFAULT_QUADRANT_STYLES.intent, ...(componentData?.quadrantLabels?.intent || {}) },
+        burners: { ...DEFAULT_QUADRANT_STYLES.burners, ...(componentData?.quadrantLabels?.burners || {}) },
+    };
+    const axisMetricLabels = {
+        x: componentData?.axisMetricLabels?.x || 'CTR',
+        y: componentData?.axisMetricLabels?.y || 'CVR',
+    };
+    const axisLabels = {
+        xLow: componentData?.axisLabels?.xLow || 'Low CTR',
+        xHigh: componentData?.axisLabels?.xHigh || 'High CTR',
+        yLow: componentData?.axisLabels?.yLow || 'Low CVR',
+        yHigh: componentData?.axisLabels?.yHigh || 'High CVR',
+    };
+    const axisFormats = {
+        x: componentData?.axisMetricFormats?.x || 'percent',
+        y: componentData?.axisMetricFormats?.y || 'percent',
+    };
+    const itemLabel = componentData?.listItemLabel || 'Creative';
     const creatives = componentData?.creatives || [
         [4.5, 6.2, 'Video: Spring Launch', 'Video'],
         [3.9, 6.5, 'Static: Product Close-up', 'Static'],
@@ -58,15 +93,15 @@ const CreativeQuadrant = ({ data: componentData }) => {
     ];
 
     const scoredCreatives = creatives
-        .map(([ctr, conv, name, type], index) => {
-            const quadrantKey = getQuadrantKey(ctr, conv);
-            const quadrant = QUADRANT_STYLES[quadrantKey];
-            const score = Math.round(clamp((ctr * 4.6) + (conv * 5.4), 0, 100));
+        .map(([xValue, yValue, name, type], index) => {
+            const quadrantKey = getQuadrantKey(xValue, yValue, thresholdX, thresholdY);
+            const quadrant = quadrantStyles[quadrantKey];
+            const score = Math.round(clamp((xValue * 4.6) + (yValue * 5.4), 0, 100));
 
             return {
                 id: `${name}-${index}`,
-                ctr,
-                conv,
+                xValue,
+                yValue,
                 name,
                 type,
                 score,
@@ -95,15 +130,15 @@ const CreativeQuadrant = ({ data: componentData }) => {
                     return '';
                 }
 
-                const [ctr, conv, name, type] = params.data;
-                const quadrant = QUADRANT_STYLES[getQuadrantKey(ctr, conv)];
-                const score = Math.round(clamp((ctr * 4.6) + (conv * 5.4), 0, 100));
+                const [xValue, yValue, name, type] = params.data;
+                const quadrant = quadrantStyles[getQuadrantKey(xValue, yValue, thresholdX, thresholdY)];
+                const score = Math.round(clamp((xValue * 4.6) + (yValue * 5.4), 0, 100));
 
                 return `
                     <div style="padding:2px 4px;">
                         <div style="font-weight:700; margin-bottom:4px;">${name}</div>
                         <div style="font-size:11px; color:rgba(255,255,255,0.72); margin-bottom:2px;">${type} · ${quadrant.label}</div>
-                        <div style="font-size:11px;">CTR ${formatPercent(ctr)} · CVR ${formatPercent(conv)} · Score ${score}</div>
+                        <div style="font-size:11px;">${axisMetricLabels.x} ${formatAxisValue(xValue, axisFormats.x)} · ${axisMetricLabels.y} ${formatAxisValue(yValue, axisFormats.y)} · Score ${score}</div>
                     </div>
                 `;
             },
@@ -132,7 +167,7 @@ const CreativeQuadrant = ({ data: componentData }) => {
                 data: creatives,
                 symbolSize: (value) => Math.max(10, Math.min(16, 8 + (value[1] * 0.7))),
                 itemStyle: {
-                    color: (params) => QUADRANT_STYLES[getQuadrantKey(params.data[0], params.data[1])].color,
+                    color: (params) => quadrantStyles[getQuadrantKey(params.data[0], params.data[1], thresholdX, thresholdY)].color,
                     borderColor: '#050505',
                     borderWidth: 2,
                     shadowBlur: 16,
@@ -148,8 +183,8 @@ const CreativeQuadrant = ({ data: componentData }) => {
                     },
                     label: { show: false },
                     data: [
-                        { xAxis: QUADRANT_THRESHOLD },
-                        { yAxis: QUADRANT_THRESHOLD },
+                        { xAxis: thresholdX },
+                        { yAxis: thresholdY },
                     ],
                 },
             },
@@ -160,7 +195,7 @@ const CreativeQuadrant = ({ data: componentData }) => {
                 left: '7%',
                 top: '6%',
                 style: {
-                    text: 'Low CTR',
+                    text: axisLabels.xLow,
                     fill: 'rgba(255,255,255,0.28)',
                     fontSize: 10,
                     fontWeight: 600,
@@ -171,7 +206,7 @@ const CreativeQuadrant = ({ data: componentData }) => {
                 right: '7%',
                 top: '6%',
                 style: {
-                    text: 'High CTR',
+                    text: axisLabels.xHigh,
                     fill: 'rgba(255,255,255,0.28)',
                     fontSize: 10,
                     fontWeight: 600,
@@ -183,7 +218,7 @@ const CreativeQuadrant = ({ data: componentData }) => {
                 left: '7%',
                 bottom: '6%',
                 style: {
-                    text: 'Low CVR',
+                    text: axisLabels.yLow,
                     fill: 'rgba(255,255,255,0.28)',
                     fontSize: 10,
                     fontWeight: 600,
@@ -194,7 +229,7 @@ const CreativeQuadrant = ({ data: componentData }) => {
                 right: '7%',
                 bottom: '6%',
                 style: {
-                    text: 'High CVR',
+                    text: axisLabels.yHigh,
                     fill: 'rgba(255,255,255,0.28)',
                     fontSize: 10,
                     fontWeight: 600,
@@ -205,7 +240,7 @@ const CreativeQuadrant = ({ data: componentData }) => {
     };
 
     return (
-        <div style={{ display: 'grid', gridTemplateRows: '220px minmax(0, 1fr)', gap: '14px', height: '100%', minHeight: '420px' }}>
+        <div style={{ display: 'grid', gridTemplateRows: '220px minmax(0, 1fr)', gap: '14px', height: '100%', minHeight: '420px', overflow: 'hidden' }}>
             <div style={{ width: '100%', minHeight: 0 }}>
                 <ReactECharts
                     option={option}
@@ -215,14 +250,15 @@ const CreativeQuadrant = ({ data: componentData }) => {
                 />
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', minHeight: 0 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', minHeight: 0, overflow: 'hidden' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto auto', gap: '12px', padding: '0 0 6px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                    <span style={{ color: 'rgba(255,255,255,0.42)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Creative</span>
+                    <span style={{ color: 'rgba(255,255,255,0.42)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{itemLabel}</span>
                     <span style={{ color: 'rgba(255,255,255,0.42)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Zone</span>
                     <span style={{ color: 'rgba(255,255,255,0.42)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', textAlign: 'right' }}>Score</span>
                 </div>
 
-                {scoredCreatives.map((creative) => (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', minHeight: 0, overflowY: 'auto', paddingRight: '4px' }}>
+                    {scoredCreatives.map((creative) => (
                     <div
                         key={creative.id}
                         style={{
@@ -239,7 +275,7 @@ const CreativeQuadrant = ({ data: componentData }) => {
                                 {creative.name}
                             </div>
                             <div style={{ color: 'rgba(255,255,255,0.34)', fontSize: '10px', marginTop: '3px' }}>
-                                {creative.type} · CTR {formatPercent(creative.ctr)} · CVR {formatPercent(creative.conv)}
+                                {creative.type} · {axisMetricLabels.x} {formatAxisValue(creative.xValue, axisFormats.x)} · {axisMetricLabels.y} {formatAxisValue(creative.yValue, axisFormats.y)}
                             </div>
                         </div>
 
@@ -264,7 +300,8 @@ const CreativeQuadrant = ({ data: componentData }) => {
                             <div style={{ color: 'rgba(255,255,255,0.28)', fontSize: '10px', marginTop: '4px' }}>{creative.quadrant.detail}</div>
                         </div>
                     </div>
-                ))}
+                    ))}
+                </div>
             </div>
         </div>
     );

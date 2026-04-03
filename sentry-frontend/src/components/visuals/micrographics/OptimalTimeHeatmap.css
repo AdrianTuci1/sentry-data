@@ -36,19 +36,45 @@
 
 .optimal-time-grid {
     display: grid;
-    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: 0;
 }
 
+.optimal-time-calendar-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: -0.2rem;
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.optimal-time-calendar-note {
+    color: rgba(255, 255, 255, 0.38);
+}
+
 .optimal-time-cell {
-    min-height: 34px;
-    border-radius: 11px;
+    min-height: 36px;
+    border-radius: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 0.25rem;
     font-size: 0.82rem;
     letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;
+}
+
+.optimal-time-cell strong {
+    font-size: 0.92rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.optimal-time-cell.is-outside {
+    background: rgba(255, 255, 255, 0.04);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
 .optimal-time-summary {
@@ -149,9 +175,9 @@
     }
 
     .optimal-time-cell {
-        min-height: 29px;
+        min-height: 32px;
         font-size: 0.72rem;
-        border-radius: 9px;
+        border-radius: 4px;
     }
 
     .optimal-time-summary {
@@ -178,9 +204,10 @@
     }
 
     .optimal-time-cell {
-        min-height: 24px;
+        min-height: 28px;
         font-size: 0.64rem;
-        border-radius: 8px;
+        border-radius: 4px;
+        padding: 0.2rem;
     }
 
     .optimal-time-market-row {

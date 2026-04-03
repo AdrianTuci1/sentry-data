@@ -42,8 +42,6 @@ const defaultMarketBreakdown = [
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
-const formatCellValue = (value) => String(value).padStart(2, '0');
-
 const getCellStyle = (value) => {
     const normalized = clamp((value - 1) / 55, 0, 1);
     const hue = 252 - normalized * 200;
@@ -59,6 +57,10 @@ const getCellStyle = (value) => {
 };
 
 const renderSummaryIcon = (icon) => {
+    if (icon === 'sparkles') {
+        return <Sparkles size={14} strokeWidth={2.1} />;
+    }
+
     if (icon === 'orbit') {
         return <Orbit size={14} strokeWidth={2.1} />;
     }
@@ -68,6 +70,26 @@ const OptimalTimeHeatmap = ({ data = {} }) => {
     const engagementMatrix = data.engagementMatrix || defaultGrid;
     const summaryCards = data.summaryCards || defaultSummaryCards;
     const marketBreakdown = data.marketBreakdown || defaultMarketBreakdown;
+    const monthLabel = data.calendarMonth || 'April 2026';
+    const calendarOffset = Number.isFinite(data.calendarOffset) ? data.calendarOffset : 2;
+    const flatValues = engagementMatrix.flat();
+    const calendarValues = Array.isArray(data.calendarValues) ? data.calendarValues : flatValues.slice(0, data.daysInMonth || 30);
+    const daysInMonth = Number.isFinite(data.daysInMonth) ? data.daysInMonth : calendarValues.length;
+    const totalCells = Number.isFinite(data.totalCalendarCells) ? data.totalCalendarCells : flatValues.length || 64;
+    const leadingDays = Array.from({ length: calendarOffset }, (_, index) => ({
+        id: `leading-${index}`,
+        outside: true,
+    }));
+    const days = Array.from({ length: daysInMonth }, (_, index) => ({
+        id: `day-${index + 1}`,
+        dayNumber: index + 1,
+        intensity: calendarValues[index] ?? flatValues[index % Math.max(1, flatValues.length)] ?? 0,
+    }));
+    const trailingDays = Array.from({ length: Math.max(0, totalCells - leadingDays.length - days.length) }, (_, index) => ({
+        id: `trailing-${index}`,
+        outside: true,
+    }));
+    const calendarCells = [...leadingDays, ...days, ...trailingDays];
 
     return (
         <div className="optimal-time-widget">
@@ -79,17 +101,22 @@ const OptimalTimeHeatmap = ({ data = {} }) => {
                 </div>
             </div>
 
-            <div className="optimal-time-grid" aria-label="Peak engagement matrix">
-                {engagementMatrix.flatMap((row, rowIndex) => (
-                    row.map((value, columnIndex) => (
-                        <div
-                            key={`${rowIndex}-${columnIndex}`}
-                            className="optimal-time-cell"
-                            style={getCellStyle(value)}
-                        >
-                            {formatCellValue(value)}
-                        </div>
-                    ))
+            <div className="optimal-time-calendar-head">
+                <span>{monthLabel}</span>
+                <span className="optimal-time-calendar-note">Hotter cells mark stronger response windows</span>
+            </div>
+
+            <div className="optimal-time-grid" aria-label="Peak engagement calendar">
+                {calendarCells.map((cell) => (
+                    <div
+                        key={cell.id}
+                        className={`optimal-time-cell ${cell.outside ? 'is-outside' : ''}`}
+                        style={cell.outside ? undefined : getCellStyle(cell.intensity)}
+                    >
+                        {!cell.outside && (
+                            <strong>{cell.dayNumber}</strong>
+                        )}
+                    </div>
                 ))}
             </div>
 

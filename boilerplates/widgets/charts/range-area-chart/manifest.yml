@@ -1,0 +1,107 @@
+title: "Range Area Chart"
+description: "Average series with min/max envelope."
+component: "RangeAreaChart"
+runtime_type: "range-area-chart"
+aliases: []
+category: "charts"
+selection_hints:
+  - "min max avg"
+  - "confidence band"
+  - "range over time"
+component_id_overrides: []
+data_requirements:
+  - "dates: Ordered x-axis labels."
+  - "minData: Ordered minimum values."
+  - "avgData: Ordered average values."
+  - "maxData: Ordered maximum values."
+sql_aliases:
+  - alias: "dates"
+    path: "data.dates"
+    required: true
+    sql_type: "string[]"
+    expression_hint: "list(period_label ORDER BY period_index)"
+    description: "Ordered x-axis labels."
+  - alias: "minData"
+    path: "data.minData"
+    required: true
+    sql_type: "number[]"
+    expression_hint: "list(min_value ORDER BY period_index)"
+    description: "Ordered minimum values."
+  - alias: "avgData"
+    path: "data.avgData"
+    required: true
+    sql_type: "number[]"
+    expression_hint: "list(avg_value ORDER BY period_index)"
+    description: "Ordered average values."
+  - alias: "maxData"
+    path: "data.maxData"
+    required: true
+    sql_type: "number[]"
+    expression_hint: "list(max_value ORDER BY period_index)"
+    description: "Ordered maximum values."
+data_structure_template:
+  data:
+    dates:
+      - "08:00"
+      - "10:00"
+      - "12:00"
+    minData:
+      - 40
+      - 70
+      - 100
+    avgData:
+      - 80
+      - 110
+      - 150
+    maxData:
+      - 120
+      - 150
+      - 200
+grid_span: "col-span-2"
+color_theme: "theme-productivity"
+sdui:
+  root_key: "data"
+  mapping_mode: "array"
+query_guidance:
+  sql_shape: "single_row"
+  data_root: "data"
+  return_shape: "array"
+  rules:
+    - "Return SQL-derived fields under the `data` object."
+    - "Use aliases exactly as listed in `sql_aliases`."
+    - "Prefer one final row per widget payload; use DuckDB list/struct aggregations for nested arrays or objects."
+  duckdb_patterns:
+    - "Use `list(value ORDER BY sort_key)` for arrays."
+    - "Use `struct_pack(key := value, ...)` for nested objects."
+    - "Use `list(struct_pack(... ) ORDER BY sort_key)` for arrays of objects."
+  alias_projection_examples:
+    dates: "list(period_label ORDER BY period_index)"
+    minData: "list(min_value ORDER BY period_index)"
+    avgData: "list(avg_value ORDER BY period_index)"
+    maxData: "list(max_value ORDER BY period_index)"
+  recommended_grain: "single row"
+  implementation_notes:
+    - "Aggregate to the widget grain before packaging the payload."
+    - "Return metadata like title, type, gridSpan and colorTheme outside the `data` object; place SQL-derived fields inside `data`."
+    - "Format strings in SQL only when the component explicitly expects formatted labels; otherwise return numerics and let the UI format them."
+insight_payload_contract:
+  type: "range-area-chart"
+  gridSpan: "col-span-2"
+  colorTheme: "theme-productivity"
+  data:
+    dates:
+      - "08:00"
+      - "10:00"
+      - "12:00"
+    minData:
+      - 40
+      - 70
+      - 100
+    avgData:
+      - 80
+      - 110
+      - 150
+    maxData:
+      - 120
+      - 150
+      - 200

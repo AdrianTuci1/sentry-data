@@ -1,0 +1,2117 @@
+[
+    {
+        "id": "marketing-roas",
+        "type": "weather",
+        "title": "Detection Coverage",
+        "subtitle": "Validated Alerts Across All Control Planes",
+        "footerText": "Endpoint, identity and cloud",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "default",
+        "data": {
+            "value": "91",
+            "unit": "%",
+            "trendValue": "+4 pts",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "vs yesterday"
+        }
+    },
+    {
+        "id": "marketing-cpa",
+        "type": "natural",
+        "title": "Mean Triage Time",
+        "subtitle": "MTTT vs 30 min target",
+        "footerText": "Sev1 path under 12 min",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "default",
+        "data": {
+            "value": "18",
+            "unit": "min",
+            "sparklineColor": "#49d793",
+            "dataPoints": [
+                26,
+                24,
+                22,
+                21,
+                20,
+                19,
+                18,
+                18
+            ]
+        }
+    },
+    {
+        "id": "marketing-conv-rate",
+        "type": "light-dial",
+        "title": "Containment Rate",
+        "subtitle": "Validated alerts auto-contained",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "default",
+        "data": {
+            "value": "68",
+            "unit": "%",
+            "signalOrientation": "horizontal",
+            "signalScore": 68,
+            "signalLabel": "Healthy automation",
+            "trendValue": "+6 pts",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "vs prior shift"
+        }
+    },
+    {
+        "id": "marketing-pclv",
+        "type": "predictive",
+        "title": "Predictive Exposure",
+        "subtitle": "7-day prioritized attack surface score",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "value": "7.2",
+            "unit": "risk",
+            "metricCards": [
+                {
+                    "label": "Open exposure",
+                    "value": "6.8",
+                    "delta": "-0.5",
+                    "comparison": "Critical assets still at risk"
+                },
+                {
+                    "label": "Projected 7D",
+                    "value": "7.2",
+                    "delta": "+0.4",
+                    "comparison": "Likely attacker pressure window"
+                },
+                {
+                    "label": "Confidence",
+                    "value": "79%",
+                    "delta": "+3 pts",
+                    "comparison": "Model stability vs previous run"
+                }
+            ],
+            "chartLabels": [
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+                "Sun"
+            ],
+            "chartSeries": [
+                51,
+                49,
+                58,
+                64,
+                62,
+                71,
+                68
+            ],
+            "highlightRange": [
+                1,
+                5
+            ],
+            "markerLabels": [
+                {
+                    "index": 1,
+                    "value": "49"
+                },
+                {
+                    "index": 5,
+                    "value": "71"
+                }
+            ],
+            "chartMin": 0,
+            "chartMax": 90,
+            "historical": [
+                6.1,
+                6,
+                5.8,
+                5.9,
+                6.2,
+                6.4,
+                6.8
+            ],
+            "forecast": [
+                6.9,
+                7,
+                7.1,
+                7.1,
+                7.2
+            ],
+            "confidenceRange": [
+                40,
+                60,
+                80
+            ]
+        }
+    },
+    {
+        "id": "data-saturation",
+        "type": "liquid-gauge",
+        "title": "Telemetry Coverage",
+        "subtitle": "Endpoint, identity and network ingestion",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "default",
+        "data": {
+            "value": "87",
+            "unit": "%",
+            "signalOrientation": "vertical",
+            "signalScore": 87,
+            "signalLabel": "Broad coverage",
+            "signalNote": "Core sensors are streaming consistently and preserving hunt-ready context.",
+            "trendValue": "+9 pts",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "sensor coverage"
+        }
+    },
+    {
+        "id": "ai-coverage",
+        "type": "neural-nexus",
+        "title": "Autonomous Response",
+        "subtitle": "Playbook execution coverage",
+        "footerText": "Tier-1 playbooks live",
+        "colorTheme": "theme-light",
+        "gridSpan": "default",
+        "data": {
+            "value": "74",
+            "unit": "%",
+            "sliderValue": 74,
+            "gaugeUnit": "%",
+            "gaugeColor": "#6ae3a7"
+        }
+    },
+    {
+        "id": "llm-train-loss",
+        "type": "mpl-training-loss",
+        "title": "Threat Model Loss Curves",
+        "subtitle": "Detection retrain convergence",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "steps": [
+                "E1",
+                "E2",
+                "E3",
+                "E4",
+                "E5",
+                "E6",
+                "E7",
+                "E8"
+            ],
+            "trainLoss": [
+                2.31,
+                2.01,
+                1.72,
+                1.58,
+                1.44,
+                1.31,
+                1.24,
+                1.18
+            ],
+            "valLoss": [
+                2.42,
+                2.14,
+                1.89,
+                1.72,
+                1.61,
+                1.54,
+                1.58,
+                1.62
+            ],
+            "perplexity": [
+                15.1,
+                12.9,
+                10.4,
+                8.9,
+                7.8,
+                7.1,
+                7.4,
+                7.8
+            ],
+            "stats": [
+                {
+                    "label": "Best val loss",
+                    "value": "1.54",
+                    "accent": "#7cff5b",
+                    "meta": "epoch E6"
+                },
+                {
+                    "label": "F1 drift",
+                    "value": "+0.8%",
+                    "accent": "#7bd3ff",
+                    "meta": "stable window"
+                },
+                {
+                    "label": "Events / sec",
+                    "value": "94k",
+                    "accent": "#ffc857",
+                    "meta": "GPU inference retrain"
+                }
+            ]
+        }
+    },
+    {
+        "id": "llm-eval-guards",
+        "type": "mpl-benchmark-bars",
+        "title": "Detection Guardrails",
+        "subtitle": "Benchmarks before model promotion",
+        "colorTheme": "theme-audience",
+        "gridSpan": "row-span-2",
+        "data": {
+            "benchmarks": [
+                {
+                    "label": "MITRE",
+                    "score": 78.4,
+                    "target": 76,
+                    "delta": "+2.4"
+                },
+                {
+                    "label": "LOLBAS",
+                    "score": 64.2,
+                    "target": 62,
+                    "delta": "+2.2"
+                },
+                {
+                    "label": "Phishing",
+                    "score": 71.1,
+                    "target": 70,
+                    "delta": "+1.1"
+                },
+                {
+                    "label": "Malware",
+                    "score": 82.6,
+                    "target": 80,
+                    "delta": "+2.6"
+                }
+            ]
+        }
+    },
+    {
+        "id": "llm-attention-drift",
+        "type": "mpl-attention-heatmap",
+        "title": "Lateral Movement Heatmap",
+        "subtitle": "Cross-host correlation during attack chains",
+        "colorTheme": "theme-natural",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "xLabels": [
+                "H1",
+                "H2",
+                "H3",
+                "H4",
+                "H5",
+                "H6"
+            ],
+            "yLabels": [
+                "Recon",
+                "Initial",
+                "Persist",
+                "Lateral",
+                "PrivEsc",
+                "Exfil"
+            ],
+            "matrix": [
+                [
+                    0.14,
+                    0.22,
+                    0.27,
+                    0.33,
+                    0.36,
+                    0.41
+                ],
+                [
+                    0.18,
+                    0.24,
+                    0.29,
+                    0.37,
+                    0.42,
+                    0.48
+                ],
+                [
+                    0.2,
+                    0.27,
+                    0.31,
+                    0.4,
+                    0.46,
+                    0.55
+                ],
+                [
+                    0.17,
+                    0.25,
+                    0.34,
+                    0.47,
+                    0.58,
+                    0.66
+                ],
+                [
+                    0.15,
+                    0.21,
+                    0.3,
+                    0.43,
+                    0.57,
+                    0.69
+                ],
+                [
+                    0.11,
+                    0.17,
+                    0.24,
+                    0.35,
+                    0.49,
+                    0.61
+                ]
+            ],
+            "sideNotes": [
+                {
+                    "label": "hot path",
+                    "value": "PrivEsc / H6"
+                },
+                {
+                    "label": "east-west spread",
+                    "value": "18%"
+                },
+                {
+                    "label": "active hosts",
+                    "value": "1,284"
+                }
+            ]
+        }
+    },
+    {
+        "id": "ad-fatigue",
+        "type": "intensity-heat",
+        "title": "Alert Fatigue",
+        "subtitle": "Analyst saturation index",
+        "footerText": "Shift rebalance recommended",
+        "colorTheme": "theme-red",
+        "gridSpan": "default",
+        "data": {
+            "value": "63",
+            "unit": "deg",
+            "signalOrientation": "horizontal",
+            "signalScore": 63,
+            "signalLabel": "Escalating",
+            "goodAtHigh": false
+        }
+    },
+    {
+        "id": "refresh-cycle",
+        "type": "chrono-dial",
+        "title": "Playbook Freshness",
+        "subtitle": "Automated response confidence",
+        "footerText": "Scheduled for Sunday",
+        "colorTheme": "theme-color",
+        "gridSpan": "default",
+        "data": {
+            "value": "82",
+            "unit": "pts",
+            "trendValue": "+7 pts",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "since last tuning"
+        }
+    },
+    {
+        "id": "budget-burn",
+        "type": "natural",
+        "title": "SOC Budget Pacing",
+        "subtitle": "Monthly investigation spend",
+        "footerText": "11 days left at current burn",
+        "colorTheme": "theme-red",
+        "gridSpan": "default",
+        "data": {
+            "value": "61",
+            "unit": "%",
+            "sparklineColor": "#ff7676",
+            "dataPoints": [
+                49,
+                52,
+                54,
+                57,
+                58,
+                59,
+                60,
+                61
+            ],
+            "trendTone": "negative"
+        }
+    },
+    {
+        "id": "viral-k-factor",
+        "type": "light-dial",
+        "title": "Threat Propagation",
+        "subtitle": "Lateral spread per compromised host",
+        "colorTheme": "theme-color",
+        "gridSpan": "default",
+        "data": {
+            "value": "1.8",
+            "unit": "x",
+            "sliderValue": 58,
+            "trendValue": "+0.3x",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "vs prior cluster"
+        }
+    },
+    {
+        "id": "incremental-lift",
+        "type": "incremental-lift",
+        "title": "Automated Containment Lift",
+        "subtitle": "Auto-response vs manual baseline",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "default",
+        "data": {
+            "value": "+31%",
+            "unit": "lift"
+        }
+    },
+    {
+        "id": "optimal-time",
+        "type": "optimal-time",
+        "title": "Peak Attack Window",
+        "subtitle": "Best defender staffing hour",
+        "colorTheme": "theme-natural",
+        "gridSpan": "row-span-2",
+        "data": {
+            "value": "02:00",
+            "unit": "UTC+2",
+            "calendarMonth": "April 2026",
+            "calendarOffset": 2,
+            "daysInMonth": 30,
+            "totalCalendarCells": 56,
+            "calendarValues": [
+                28,
+                31,
+                33,
+                35,
+                44,
+                48,
+                55,
+                56,
+                32,
+                31,
+                34,
+                35,
+                26,
+                28,
+                22,
+                35,
+                36,
+                35,
+                35,
+                35,
+                35,
+                21,
+                36,
+                36,
+                27,
+                29,
+                32,
+                22,
+                34,
+                23
+            ],
+            "engagementMatrix": [
+                [
+                    28,
+                    31,
+                    33,
+                    35,
+                    44,
+                    48,
+                    55,
+                    56
+                ],
+                [
+                    32,
+                    31,
+                    34,
+                    35,
+                    26,
+                    28,
+                    22,
+                    35
+                ],
+                [
+                    36,
+                    35,
+                    35,
+                    35,
+                    35,
+                    21,
+                    36,
+                    36
+                ],
+                [
+                    27,
+                    29,
+                    32,
+                    22,
+                    34,
+                    23,
+                    29,
+                    35
+                ],
+                [
+                    14,
+                    16,
+                    18,
+                    11,
+                    13,
+                    12,
+                    16,
+                    11
+                ],
+                [
+                    32,
+                    32,
+                    32,
+                    1,
+                    31,
+                    31,
+                    11,
+                    32
+                ],
+                [
+                    3,
+                    6,
+                    8,
+                    11,
+                    31,
+                    11,
+                    12,
+                    14
+                ],
+                [
+                    3,
+                    2,
+                    7,
+                    30,
+                    31,
+                    11,
+                    19,
+                    33
+                ]
+            ],
+            "summaryCards": [
+                {
+                    "id": "weekly-peak",
+                    "icon": "sparkles",
+                    "label": "Weekly Peak",
+                    "value": "4,182",
+                    "delta": "+14.2%",
+                    "note": "critical alerts",
+                    "tone": "negative"
+                },
+                {
+                    "id": "quarter-reach",
+                    "icon": "orbit",
+                    "label": "Quarter Exposure",
+                    "value": "28,640",
+                    "delta": "-3.4%",
+                    "note": "prior quarter 29,651",
+                    "tone": "positive"
+                }
+            ],
+            "marketBreakdown": [
+                {
+                    "label": "Bucharest",
+                    "value": "8,142"
+                },
+                {
+                    "label": "Cluj",
+                    "value": "5,861"
+                },
+                {
+                    "label": "Iasi",
+                    "value": "4,204"
+                }
+            ]
+        }
+    },
+    {
+        "id": "live-traffic",
+        "type": "animated-line",
+        "title": "Live Event Stream",
+        "subtitle": "Real-time correlated detections",
+        "footerText": "Last 5 Minutes Activity",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2",
+        "description": "Correlated security events across endpoint, identity and cloud telemetry.",
+        "data": {
+            "value": "18,240",
+            "unit": "evt/s",
+            "metricCards": [
+                {
+                    "icon": "sparkles",
+                    "label": "High severity",
+                    "value": "148",
+                    "delta": "+9.6%",
+                    "note": "open right now"
+                },
+                {
+                    "icon": "medal",
+                    "label": "Peak today",
+                    "value": "192",
+                    "delta": "+11.8%",
+                    "note": "highest concurrent alerts"
+                }
+            ],
+            "chartLabels": [
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+                "Sun"
+            ],
+            "chartSeries": [
+                12100,
+                13420,
+                14980,
+                15620,
+                18240,
+                null,
+                null
+            ],
+            "chartMin": 8000,
+            "chartMax": 22000,
+            "annotation": {
+                "index": 4,
+                "label": "ACTIVE EVENTS",
+                "value": "18,240"
+            },
+            "dataPoints": [
+                12100,
+                13420,
+                14980,
+                15620,
+                18240
+            ]
+        }
+    },
+    {
+        "id": "revenue-forecast",
+        "type": "predictive",
+        "title": "Incident Cost Forecast",
+        "subtitle": "Projected breach-adjusted exposure",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "col-span-2",
+        "data": {
+            "value": "$612K",
+            "unit": "est",
+            "historical": [
+                410,
+                428,
+                395,
+                442,
+                465,
+                498
+            ],
+            "forecast": [
+                520,
+                548,
+                571,
+                590,
+                612
+            ],
+            "confidenceRange": [
+                30,
+                45,
+                60
+            ]
+        }
+    },
+    {
+        "id": "retention-cohorts",
+        "type": "cohorts",
+        "title": "Agent Retention",
+        "subtitle": "Endpoint coverage by cohort",
+        "colorTheme": "theme-audience",
+        "gridSpan": "default",
+        "data": {
+            "summaryValue": "96.8%",
+            "summaryDelta": "+1.4 pts",
+            "summaryCompare": "Managed endpoints with healthy telemetry heartbeats",
+            "retentionBars": [
+                {
+                    "label": "500",
+                    "segments": [
+                        39,
+                        11,
+                        10,
+                        10
+                    ],
+                    "marker": 97
+                },
+                {
+                    "label": "400",
+                    "segments": [
+                        39,
+                        15,
+                        14,
+                        15
+                    ],
+                    "marker": 87
+                },
+                {
+                    "label": "300",
+                    "segments": [
+                        16,
+                        9,
+                        8,
+                        8
+                    ],
+                    "marker": 49
+                },
+                {
+                    "label": "200",
+                    "segments": [
+                        16,
+                        13,
+                        13,
+                        13
+                    ],
+                    "marker": 63
+                },
+                {
+                    "label": "100",
+                    "segments": [
+                        39,
+                        15,
+                        14,
+                        15
+                    ],
+                    "marker": 97
+                }
+            ],
+            "cohorts": [
+                {
+                    "week": "Feb 01",
+                    "size": 8200,
+                    "data": [
+                        100,
+                        98,
+                        97,
+                        97
+                    ]
+                },
+                {
+                    "week": "Feb 08",
+                    "size": 7900,
+                    "data": [
+                        100,
+                        98,
+                        97
+                    ]
+                },
+                {
+                    "week": "Feb 15",
+                    "size": 8400,
+                    "data": [
+                        100,
+                        99
+                    ]
+                },
+                {
+                    "week": "Feb 22",
+                    "size": 8600,
+                    "data": [
+                        100
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "id": "technical-health",
+        "type": "vitals",
+        "title": "Sensor Health",
+        "subtitle": "Collection and pipeline uptime",
+        "colorTheme": "theme-weather",
+        "gridSpan": "default",
+        "data": {
+            "value": "99.82",
+            "unit": "%",
+            "uptimeBars": [
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "warn",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "warn",
+                "good",
+                "good",
+                "good",
+                "good",
+                "down",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good"
+            ],
+            "metrics": [
+                {
+                    "name": "EDR",
+                    "value": "99.9%",
+                    "status": "good"
+                },
+                {
+                    "name": "NDR",
+                    "value": "99.7%",
+                    "status": "good"
+                },
+                {
+                    "name": "IDP",
+                    "value": "99.8%",
+                    "status": "good"
+                },
+                {
+                    "name": "Loss",
+                    "value": "0.3%",
+                    "status": "warn"
+                }
+            ]
+        }
+    },
+    {
+        "id": "stat-leads",
+        "type": "leads-list",
+        "title": "Open Incidents",
+        "subtitle": "Priority investigations",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "row-span-2",
+        "data": {
+            "leads": [
+                {
+                    "name": "Credential Theft",
+                    "value": "Identity",
+                    "status": "vip",
+                    "time": "2m ago"
+                },
+                {
+                    "name": "Suspicious PowerShell",
+                    "value": "Endpoint",
+                    "status": "warm",
+                    "time": "9m ago"
+                },
+                {
+                    "name": "M365 Impossible Travel",
+                    "value": "Cloud",
+                    "status": "vip",
+                    "time": "14m ago"
+                },
+                {
+                    "name": "Lateral SMB Burst",
+                    "value": "Network",
+                    "status": "warm",
+                    "time": "27m ago"
+                },
+                {
+                    "name": "Ransomware Beacon",
+                    "value": "Endpoint",
+                    "status": "vip",
+                    "time": "41m ago"
+                },
+                {
+                    "name": "OAuth Token Abuse",
+                    "value": "Identity",
+                    "status": "cold",
+                    "time": "55m ago"
+                },
+                {
+                    "name": "Privilege Escalation",
+                    "value": "Server",
+                    "status": "warm",
+                    "time": "1h ago"
+                },
+                {
+                    "name": "Cloud Drift Spike",
+                    "value": "AWS",
+                    "status": "cold",
+                    "time": "2h ago"
+                }
+            ]
+        }
+    },
+    {
+        "id": "top-routes",
+        "type": "leads-list",
+        "title": "Top Attack Paths",
+        "subtitle": "Most traversed kill-chain routes",
+        "colorTheme": "theme-natural",
+        "gridSpan": "default",
+        "data": {
+            "leads": [
+                {
+                    "name": "VPN -> IdP -> Admin",
+                    "value": "184 cases",
+                    "time": "+18%"
+                },
+                {
+                    "name": "Phish -> M365 -> OAuth",
+                    "value": "146 cases",
+                    "time": "+11%"
+                },
+                {
+                    "name": "EDR -> SMB -> DC",
+                    "value": "132 cases",
+                    "time": "+7%"
+                },
+                {
+                    "name": "Cloud Key -> S3 -> Exfil",
+                    "value": "88 cases",
+                    "time": "-3%"
+                }
+            ]
+        }
+    },
+    {
+        "id": "financial-waterfall",
+        "type": "waterfall",
+        "title": "Breach Cost Bridge",
+        "subtitle": "Gross impact to mitigated loss",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "col-span-2",
+        "data": {
+            "value": "$184K",
+            "unit": "net",
+            "steps": [
+                {
+                    "name": "Gross Exposure",
+                    "value": 680000
+                },
+                {
+                    "name": "Early Detection",
+                    "value": -210000
+                },
+                {
+                    "name": "Auto Containment",
+                    "value": -156000
+                },
+                {
+                    "name": "Insurance Offset",
+                    "value": -130000
+                },
+                {
+                    "name": "Net Cost",
+                    "isTotal": true
+                }
+            ]
+        }
+    },
+    {
+        "id": "market-sentiment",
+        "type": "market-radar",
+        "title": "Threat Surface Radar",
+        "subtitle": "Aggregated control posture",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2",
+        "data": {
+            "indicator": [
+                {
+                    "name": "Endpoint",
+                    "max": 100
+                },
+                {
+                    "name": "Identity",
+                    "max": 100
+                },
+                {
+                    "name": "Cloud",
+                    "max": 100
+                },
+                {
+                    "name": "Email",
+                    "max": 100
+                },
+                {
+                    "name": "Network",
+                    "max": 100
+                }
+            ],
+            "radarData": [
+                {
+                    "value": [
+                        88,
+                        74,
+                        69,
+                        82,
+                        77
+                    ],
+                    "name": "Current Posture",
+                    "symbol": "none",
+                    "itemStyle": {
+                        "color": "#ec4899"
+                    },
+                    "areaStyle": {
+                        "color": {
+                            "type": "radial",
+                            "x": 0.5,
+                            "y": 0.5,
+                            "r": 1,
+                            "colorStops": [
+                                {
+                                    "offset": 0,
+                                    "color": "rgba(236, 72, 153, 0.1)"
+                                },
+                                {
+                                    "offset": 1,
+                                    "color": "rgba(236, 72, 153, 0.4)"
+                                }
+                            ]
+                        }
+                    },
+                    "lineStyle": {
+                        "width": 2,
+                        "type": "solid"
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "id": "attribution-models",
+        "type": "attribution",
+        "title": "Detection Source Attribution",
+        "subtitle": "Daily and weekly signal contribution",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "summaryValue": "38.7M",
+            "summaryLabel": "Signals / day",
+            "periodMetrics": [
+                {
+                    "label": "Daily",
+                    "value": "38.7M",
+                    "delta": "+12.2%",
+                    "note": "34.5M baseline",
+                    "tone": "#7CFF5B"
+                },
+                {
+                    "label": "Weekly",
+                    "value": "267M",
+                    "delta": "+4.7%",
+                    "note": "255M baseline",
+                    "tone": "#FFC533"
+                }
+            ],
+            "models": [
+                {
+                    "channel": "Endpoint",
+                    "monthly": 13800000,
+                    "yearly": 98000000,
+                    "yearlyColor": "#2EF0B2",
+                    "monthlyColor": "#FFBF1F"
+                },
+                {
+                    "channel": "Identity",
+                    "monthly": 10400000,
+                    "yearly": 76000000,
+                    "yearlyColor": "#31E9C9",
+                    "monthlyColor": "#FF9F1F"
+                },
+                {
+                    "channel": "Cloud",
+                    "monthly": 8200000,
+                    "yearly": 54000000,
+                    "yearlyColor": "#8B5CF6",
+                    "monthlyColor": "#FF5A36"
+                },
+                {
+                    "channel": "Email",
+                    "monthly": 6300000,
+                    "yearly": 39000000,
+                    "yearlyColor": "#7B6D87",
+                    "monthlyColor": "#F33B1D"
+                }
+            ],
+            "seriesName": "Signal Mix",
+            "valueFormat": "compact-number",
+            "valueCompact": true,
+            "valueMaximumFractionDigits": 1,
+            "secondaryValueFormat": "compact-number",
+            "secondaryValueCompact": true,
+            "secondaryValueMaximumFractionDigits": 1,
+            "primaryMetricLabel": "weekly",
+            "secondaryMetricLabel": "daily"
+        }
+    },
+    {
+        "id": "anomaly-detection",
+        "type": "anomaly-stream",
+        "title": "Behavior Anomalies",
+        "subtitle": "ML-driven user and host variance",
+        "colorTheme": "theme-weather",
+        "gridSpan": "col-span-2",
+        "data": {
+            "value": "6 Spikes",
+            "unit": "warn"
+        }
+    },
+    {
+        "id": "romania-3d",
+        "type": "3d-map",
+        "title": "Global Threat Map",
+        "subtitle": "Live XDR hotspots and relay infrastructure",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-3 row-span-2",
+        "data": {
+            "mapProjection": "globe",
+            "mapAutoRotate": true,
+            "mapFitBounds": false,
+            "mapZoom": 1.18,
+            "mapPitch": 0,
+            "mapBearing": 0,
+            "mapCenter": [
+                12,
+                20
+            ],
+            "mapRotationSpeed": 2.4,
+            "locations": [
+                {
+                    "name": "Seattle C2",
+                    "address": "Seattle",
+                    "longitude": -122.3321,
+                    "latitude": 47.6062
+                },
+                {
+                    "name": "Sao Paulo Botnet",
+                    "address": "Sao Paulo",
+                    "longitude": -46.6333,
+                    "latitude": -23.5505
+                },
+                {
+                    "name": "Bucharest Sinkhole",
+                    "address": "Bucharest",
+                    "longitude": 26.1025,
+                    "latitude": 44.4268
+                },
+                {
+                    "name": "Frankfurt Relay",
+                    "address": "Frankfurt",
+                    "longitude": 8.6821,
+                    "latitude": 50.1109
+                },
+                {
+                    "name": "Lagos Cluster",
+                    "address": "Lagos",
+                    "longitude": 3.3792,
+                    "latitude": 6.5244
+                },
+                {
+                    "name": "Dubai Pivot",
+                    "address": "Dubai",
+                    "longitude": 55.2708,
+                    "latitude": 25.2048
+                },
+                {
+                    "name": "Mumbai Infra",
+                    "address": "Mumbai",
+                    "longitude": 72.8777,
+                    "latitude": 19.076
+                },
+                {
+                    "name": "Singapore Node",
+                    "address": "Singapore",
+                    "longitude": 103.8198,
+                    "latitude": 1.3521
+                },
+                {
+                    "name": "Seoul Beacon",
+                    "address": "Seoul",
+                    "longitude": 126.978,
+                    "latitude": 37.5665
+                },
+                {
+                    "name": "Sydney Relay",
+                    "address": "Sydney",
+                    "longitude": 151.2093,
+                    "latitude": -33.8688
+                }
+            ]
+        }
+    },
+    {
+        "id": "data-scatter",
+        "type": "scatter",
+        "title": "Risk vs Blast Radius",
+        "subtitle": "Incident severity over asset criticality",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "periodLabels": [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct"
+            ],
+            "scatterData": [
+                [
+                    42,
+                    180
+                ],
+                [
+                    55,
+                    260
+                ],
+                [
+                    63,
+                    220
+                ],
+                [
+                    78,
+                    410
+                ],
+                [
+                    91,
+                    520
+                ],
+                [
+                    108,
+                    690
+                ],
+                [
+                    126,
+                    610
+                ],
+                [
+                    141,
+                    790
+                ],
+                [
+                    158,
+                    980
+                ],
+                [
+                    176,
+                    1140
+                ]
+            ]
+        }
+    },
+    {
+        "id": "sales-funnel",
+        "type": "funnel",
+        "title": "Incident Funnel",
+        "subtitle": "Event to containment flow",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2",
+        "data": {
+            "summaryLabel": "Cases",
+            "summaryValue": "1,284",
+            "summaryDelta": "↑6.1%",
+            "summaryCompare": "Compared to 1,210 last week",
+            "funnel": [
+                {
+                    "value": 100,
+                    "name": "Events"
+                },
+                {
+                    "value": 62,
+                    "name": "Correlated"
+                },
+                {
+                    "value": 21,
+                    "name": "Investigated"
+                },
+                {
+                    "value": 9,
+                    "name": "Confirmed"
+                },
+                {
+                    "value": 6,
+                    "name": "Contained"
+                }
+            ]
+        }
+    },
+    {
+        "id": "market-evolution",
+        "type": "market-evolution",
+        "title": "Threat Chain Dynamics",
+        "subtitle": "Cross-signal influence across attack stages",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "channels": [
+                {
+                    "name": "Initial Access",
+                    "color": "#3B82F6",
+                    "value": 84,
+                    "synergy": "High"
+                },
+                {
+                    "name": "Identity Abuse",
+                    "color": "#10B981",
+                    "value": 78,
+                    "synergy": "High"
+                },
+                {
+                    "name": "Lateral Move",
+                    "color": "#F59E0B",
+                    "value": 92,
+                    "synergy": "Critical"
+                },
+                {
+                    "name": "Persistence",
+                    "color": "#EF4444",
+                    "value": 61,
+                    "synergy": "Mid"
+                },
+                {
+                    "name": "Cloud Drift",
+                    "color": "#8B5CF6",
+                    "value": 74,
+                    "synergy": "High"
+                },
+                {
+                    "name": "Exfiltration",
+                    "color": "#EC4899",
+                    "value": 48,
+                    "synergy": "Mid"
+                },
+                {
+                    "name": "C2",
+                    "color": "#06B6D4",
+                    "value": 69,
+                    "synergy": "High"
+                }
+            ],
+            "links": [
+                {
+                    "source": "Initial Access",
+                    "target": "Identity Abuse",
+                    "value": 7
+                },
+                {
+                    "source": "Identity Abuse",
+                    "target": "Lateral Move",
+                    "value": 9
+                },
+                {
+                    "source": "Persistence",
+                    "target": "Lateral Move",
+                    "value": 5
+                },
+                {
+                    "source": "Cloud Drift",
+                    "target": "Exfiltration",
+                    "value": 4
+                },
+                {
+                    "source": "C2",
+                    "target": "Lateral Move",
+                    "value": 8
+                },
+                {
+                    "source": "Initial Access",
+                    "target": "Persistence",
+                    "value": 6
+                },
+                {
+                    "source": "Cloud Drift",
+                    "target": "Identity Abuse",
+                    "value": 5
+                }
+            ]
+        }
+    },
+    {
+        "id": "creative-quadrant",
+        "type": "creative-quadrant",
+        "title": "Detection Precision Quadrant",
+        "subtitle": "Precision vs severity weighting",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "row-span-2",
+        "data": {
+            "creatives": [
+                [
+                    8.2,
+                    8.8,
+                    "Credential Abuse Rule",
+                    "Identity"
+                ],
+                [
+                    7.6,
+                    7.9,
+                    "Lateral SMB Burst",
+                    "Network"
+                ],
+                [
+                    4.8,
+                    9.2,
+                    "Rare Admin Login",
+                    "Behavior"
+                ],
+                [
+                    9.1,
+                    4.2,
+                    "Bulk IOC Match",
+                    "Static"
+                ],
+                [
+                    6.2,
+                    6.8,
+                    "Cloud Priv Esc",
+                    "Cloud"
+                ],
+                [
+                    2.4,
+                    2.9,
+                    "Legacy Noise Rule",
+                    "Static"
+                ],
+                [
+                    7.8,
+                    5.1,
+                    "Phishing Token Replay",
+                    "Email"
+                ]
+            ],
+            "listItemLabel": "Detection",
+            "axisMetricLabels": {
+                "x": "Precision",
+                "y": "Severity"
+            },
+            "axisMetricFormats": {
+                "x": "number",
+                "y": "number"
+            },
+            "axisLabels": {
+                "xLow": "Low precision",
+                "xHigh": "High precision",
+                "yLow": "Low severity",
+                "yHigh": "High severity"
+            },
+            "quadrantLabels": {
+                "heroes": {
+                    "label": "Priority",
+                    "detail": "Escalate"
+                },
+                "seekers": {
+                    "label": "Broad",
+                    "detail": "Tighten"
+                },
+                "intent": {
+                    "label": "Critical",
+                    "detail": "Harden"
+                },
+                "burners": {
+                    "label": "Noise",
+                    "detail": "Tune down"
+                }
+            }
+        }
+    },
+    {
+        "id": "budget-sensitivity",
+        "type": "budget-sensitivity",
+        "title": "Response Elasticity",
+        "subtitle": "Staffing and automation vs coverage",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "col-span-2",
+        "data": {
+            "curvePoints": [
+                [
+                    0,
+                    0.6692850924284856
+                ],
+                [
+                    2,
+                    0.816257115315989
+                ],
+                [
+                    4,
+                    0.9951801866904316
+                ],
+                [
+                    6,
+                    1.2128434984274237
+                ],
+                [
+                    8,
+                    1.4774031693273055
+                ],
+                [
+                    10,
+                    1.798620996209156
+                ],
+                [
+                    12,
+                    2.188127093613047
+                ],
+                [
+                    14,
+                    2.6596993576865855
+                ],
+                [
+                    16,
+                    3.2295464698450496
+                ],
+                [
+                    18,
+                    3.9165722796764353
+                ],
+                [
+                    20,
+                    4.742587317756678
+                ],
+                [
+                    22,
+                    5.7324175898868726
+                ],
+                [
+                    24,
+                    6.913842034334682
+                ],
+                [
+                    26,
+                    8.317269649392236
+                ],
+                [
+                    28,
+                    9.975048911968514
+                ],
+                [
+                    30,
+                    11.920292202211755
+                ],
+                [
+                    32,
+                    14.185106490048778
+                ],
+                [
+                    34,
+                    16.79816148660755
+                ],
+                [
+                    36,
+                    19.781611144141824
+                ],
+                [
+                    38,
+                    23.14752165009823
+                ],
+                [
+                    40,
+                    26.894142136999513
+                ],
+                [
+                    42,
+                    31.002551887238752
+                ],
+                [
+                    44,
+                    35.43436937742045
+                ],
+                [
+                    46,
+                    40.1312339887548
+                ],
+                [
+                    48,
+                    45.016600268752214
+                ],
+                [
+                    50,
+                    50
+                ],
+                [
+                    52,
+                    54.98339973124779
+                ],
+                [
+                    54,
+                    59.8687660112452
+                ],
+                [
+                    56,
+                    64.56563062257955
+                ],
+                [
+                    58,
+                    68.99744811276125
+                ],
+                [
+                    60,
+                    73.10585786300048
+                ],
+                [
+                    62,
+                    76.85247834990177
+                ],
+                [
+                    64,
+                    80.21838885585818
+                ],
+                [
+                    66,
+                    83.20183851339245
+                ],
+                [
+                    68,
+                    85.81489350995123
+                ],
+                [
+                    70,
+                    88.07970779778823
+                ],
+                [
+                    72,
+                    90.02495108803149
+                ],
+                [
+                    74,
+                    91.68273035060777
+                ],
+                [
+                    76,
+                    93.08615796566532
+                ],
+                [
+                    78,
+                    94.26758241011314
+                ],
+                [
+                    80,
+                    95.25741268224333
+                ],
+                [
+                    82,
+                    96.08342772032357
+                ],
+                [
+                    84,
+                    96.77045353015495
+                ],
+                [
+                    86,
+                    97.34030064231341
+                ],
+                [
+                    88,
+                    97.81187290638695
+                ],
+                [
+                    90,
+                    98.20137900379083
+                ],
+                [
+                    92,
+                    98.5225968306727
+                ],
+                [
+                    94,
+                    98.78715650157258
+                ],
+                [
+                    96,
+                    99.00481981330957
+                ],
+                [
+                    98,
+                    99.18374288468401
+                ],
+                [
+                    100,
+                    99.33071490757152
+                ]
+            ]
+        }
+    },
+    {
+        "id": "intent-sunburst",
+        "type": "intent-sunburst",
+        "title": "Alert Intent Tree",
+        "subtitle": "Real-time security classification",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "sunburstData": [
+                {
+                    "name": "Credential Abuse",
+                    "itemStyle": {
+                        "color": "#10B981"
+                    },
+                    "children": [
+                        {
+                            "name": "Impossible Travel",
+                            "value": 24
+                        },
+                        {
+                            "name": "MFA Fatigue",
+                            "value": 18
+                        }
+                    ]
+                },
+                {
+                    "name": "Endpoint Threats",
+                    "itemStyle": {
+                        "color": "#3B82F6"
+                    },
+                    "children": [
+                        {
+                            "name": "Ransomware",
+                            "value": 16
+                        },
+                        {
+                            "name": "PowerShell",
+                            "value": 14
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "id": "shapley-attribution",
+        "type": "shapley-attribution",
+        "title": "Signal Shapley",
+        "subtitle": "Detection contribution by source",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "rawData": [
+                [
+                    "Email",
+                    19.683019058189853,
+                    2021
+                ],
+                [
+                    "Email",
+                    24.6833903211189,
+                    2021
+                ],
+                [
+                    "Email",
+                    23.64701871671297,
+                    2021
+                ],
+                [
+                    "Email",
+                    33.91222823701676,
+                    2022
+                ],
+                [
+                    "Email",
+                    32.716793702194735,
+                    2022
+                ],
+                [
+                    "Email",
+                    37.026395307833425,
+                    2022
+                ],
+                [
+                    "Email",
+                    20.921580606324838,
+                    2023
+                ],
+                [
+                    "Email",
+                    27.621240347441923,
+                    2023
+                ],
+                [
+                    "Email",
+                    19.77874834249792,
+                    2023
+                ],
+                [
+                    "Identity",
+                    16.66624500617535,
+                    2021
+                ],
+                [
+                    "Identity",
+                    7.089858637785376,
+                    2021
+                ],
+                [
+                    "Identity",
+                    10.535892257841073,
+                    2021
+                ],
+                [
+                    "Identity",
+                    19.556827999698566,
+                    2022
+                ],
+                [
+                    "Identity",
+                    17.457968856172435,
+                    2022
+                ],
+                [
+                    "Identity",
+                    10.967951684922037,
+                    2022
+                ],
+                [
+                    "Identity",
+                    18.344452921626278,
+                    2023
+                ],
+                [
+                    "Identity",
+                    22.747748377664635,
+                    2023
+                ],
+                [
+                    "Identity",
+                    6.689114437669323,
+                    2023
+                ],
+                [
+                    "Endpoint",
+                    38.137365454748775,
+                    2021
+                ],
+                [
+                    "Endpoint",
+                    30.979587885344078,
+                    2021
+                ],
+                [
+                    "Endpoint",
+                    27.28416755121987,
+                    2021
+                ],
+                [
+                    "Endpoint",
+                    43.31883899911986,
+                    2022
+                ],
+                [
+                    "Endpoint",
+                    30.906468457236777,
+                    2022
+                ],
+                [
+                    "Endpoint",
+                    26.0294944225872,
+                    2022
+                ],
+                [
+                    "Endpoint",
+                    26.10890509165352,
+                    2023
+                ],
+                [
+                    "Endpoint",
+                    41.124464881933434,
+                    2023
+                ],
+                [
+                    "Endpoint",
+                    36.24909818232206,
+                    2023
+                ],
+                [
+                    "Network",
+                    38.80848393210776,
+                    2021
+                ],
+                [
+                    "Network",
+                    34.93841002732542,
+                    2021
+                ],
+                [
+                    "Network",
+                    43.67616347781882,
+                    2021
+                ],
+                [
+                    "Network",
+                    31.784535742398475,
+                    2022
+                ],
+                [
+                    "Network",
+                    35.25466082369594,
+                    2022
+                ],
+                [
+                    "Network",
+                    40.8019414832913,
+                    2022
+                ],
+                [
+                    "Network",
+                    36.584243245516326,
+                    2023
+                ],
+                [
+                    "Network",
+                    41.44798620444695,
+                    2023
+                ],
+                [
+                    "Network",
+                    35.760891103366646,
+                    2023
+                ],
+                [
+                    "Cloud",
+                    22.05364275956095,
+                    2021
+                ],
+                [
+                    "Cloud",
+                    25.695120599478642,
+                    2021
+                ],
+                [
+                    "Cloud",
+                    26.92491435848985,
+                    2021
+                ],
+                [
+                    "Cloud",
+                    22.732994624920256,
+                    2022
+                ],
+                [
+                    "Cloud",
+                    25.79297281366831,
+                    2022
+                ],
+                [
+                    "Cloud",
+                    23.15718367464229,
+                    2022
+                ],
+                [
+                    "Cloud",
+                    26.696627148649547,
+                    2023
+                ],
+                [
+                    "Cloud",
+                    33.85084397173571,
+                    2023
+                ],
+                [
+                    "Cloud",
+                    28.43379866584939,
+                    2023
+                ]
+            ]
+        }
+    },
+    {
+        "id": "trend-spotter",
+        "type": "trend-spotter",
+        "title": "Emerging TTPs",
+        "subtitle": "Early-warning adversary signals",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "keywords": [
+                {
+                    "text": "MFA fatigue",
+                    "weight": 94,
+                    "trend": "up"
+                },
+                {
+                    "text": "OAuth abuse",
+                    "weight": 88,
+                    "trend": "up"
+                },
+                {
+                    "text": "LOLBins",
+                    "weight": 83,
+                    "trend": "up"
+                },
+                {
+                    "text": "Token replay",
+                    "weight": 79,
+                    "trend": "up"
+                },
+                {
+                    "text": "SMB burst",
+                    "weight": 68,
+                    "trend": "stable"
+                },
+                {
+                    "text": "Cloud drift",
+                    "weight": 73,
+                    "trend": "up"
+                },
+                {
+                    "text": "Shadow SaaS",
+                    "weight": 61,
+                    "trend": "stable"
+                },
+                {
+                    "text": "USB malware",
+                    "weight": 41,
+                    "trend": "down"
+                },
+                {
+                    "text": "AI phishing",
+                    "weight": 90,
+                    "trend": "up"
+                },
+                {
+                    "text": "Rogue OAuth app",
+                    "weight": 76,
+                    "trend": "up"
+                },
+                {
+                    "text": "Priv esc chain",
+                    "weight": 72,
+                    "trend": "stable"
+                },
+                {
+                    "text": "Geo spoofing",
+                    "weight": 58,
+                    "trend": "up"
+                }
+            ]
+        }
+    }
+]

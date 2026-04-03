@@ -335,7 +335,7 @@ export const UptimeStripMicro = ({ data }) => {
                     <span
                         key={`${status}-${index}`}
                         className={`uptime-strip-bar ${status}`}
-                        style={{ height: `${20 + (index % 5) * 4}px` }}
+                        style={{ height: '28px' }}
                     />
                 ))}
             </div>

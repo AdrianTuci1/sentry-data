@@ -2,6 +2,15 @@ import React from 'react';
 import ReactECharts from 'echarts-for-react';
 
 const IncrementalLift = ({ data }) => {
+    const bars = Array.isArray(data?.bars) && data.bars.length
+        ? data.bars
+        : [
+            { label: 'Organic', value: 4200, color: '#3B82F6' },
+            { label: 'Paid', value: 2800, color: '#8B5CF6' },
+            { label: 'Incremental', value: 1200, color: '#10B981', deltaLabel: '+22%' },
+        ];
+    const categories = bars.map((item) => item.label);
+
     const option = {
         tooltip: {
             trigger: 'axis',
@@ -19,7 +28,7 @@ const IncrementalLift = ({ data }) => {
         },
         xAxis: {
             type: 'category',
-            data: ['Organic', 'Paid', 'Incremental'],
+            data: categories,
             axisLabel: { color: '#9CA3AF', fontSize: 10 },
             axisLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.1)' } }
         },
@@ -30,25 +39,21 @@ const IncrementalLift = ({ data }) => {
         },
         series: [
             {
-                data: [
-                    { value: 4200, itemStyle: { color: '#3B82F6' } },
-                    { value: 2800, itemStyle: { color: '#8B5CF6' } },
-                    {
-                        value: 1200,
-                        itemStyle: {
-                            color: '#10B981',
-                            borderRadius: [4, 4, 0, 0]
-                        },
-                        label: {
-                            show: true,
-                            position: 'top',
-                            formatter: '+22%',
-                            color: '#10B981',
-                            fontSize: 10,
-                            fontWeight: 'bold'
-                        }
-                    }
-                ],
+                data: bars.map((item, index) => ({
+                    value: item.value,
+                    itemStyle: {
+                        color: item.color || (index === bars.length - 1 ? '#10B981' : index === 0 ? '#3B82F6' : '#8B5CF6'),
+                        borderRadius: [4, 4, 0, 0],
+                    },
+                    label: item.deltaLabel ? {
+                        show: true,
+                        position: 'top',
+                        formatter: item.deltaLabel,
+                        color: item.color || '#10B981',
+                        fontSize: 10,
+                        fontWeight: 'bold'
+                    } : undefined,
+                })),
                 type: 'bar',
                 barWidth: '40%',
                 showBackground: true,

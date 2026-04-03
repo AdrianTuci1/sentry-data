@@ -1,0 +1,69 @@
+title: "Leads List"
+description: "Compact live-feed of rows such as leads, incidents or routes."
+component: "LeadsList"
+runtime_type: "leads-list"
+aliases: []
+category: "lists"
+selection_hints:
+  - "top entities"
+  - "recent items"
+  - "operational feed"
+component_id_overrides: []
+data_requirements:
+  - "leads: List of rows containing name, value, status and time."
+sql_aliases:
+  - alias: "leads"
+    path: "data.leads"
+    required: true
+    sql_type: "object[]"
+    expression_hint: "list(struct_pack(name := name_col, value := value_col, status := status_col, time := time_label) ORDER BY sort_index)"
+    description: "List of rows containing name, value, status and time."
+data_structure_template:
+  data:
+    leads:
+      - name: "Northline Energy"
+        value: "Google Ads"
+        status: "vip"
+        time: "3m ago"
+      - name: "Aurora Dental"
+        value: "Meta"
+        status: "warm"
+        time: "11m ago"
+grid_span: "row-span-2"
+color_theme: "theme-productivity"
+sdui:
+  root_key: "data"
+  mapping_mode: "list"
+query_guidance:
+  sql_shape: "single_row"
+  data_root: "data"
+  return_shape: "list"
+  rules:
+    - "Return SQL-derived fields under the `data` object."
+    - "Use aliases exactly as listed in `sql_aliases`."
+    - "Prefer one final row per widget payload; use DuckDB list/struct aggregations for nested arrays or objects."
+  duckdb_patterns:
+    - "Use `list(value ORDER BY sort_key)` for arrays."
+    - "Use `struct_pack(key := value, ...)` for nested objects."
+    - "Use `list(struct_pack(... ) ORDER BY sort_key)` for arrays of objects."
+  alias_projection_examples:
+    leads: "list(struct_pack(name := name_col, value := value_col, status := status_col, time := time_label) ORDER BY sort_index)"
+  recommended_grain: "single row"
+  implementation_notes:
+    - "Aggregate to the widget grain before packaging the payload."
+    - "Return metadata like title, type, gridSpan and colorTheme outside the `data` object; place SQL-derived fields inside `data`."
+    - "Format strings in SQL only when the component explicitly expects formatted labels; otherwise return numerics and let the UI format them."
+insight_payload_contract:
+  type: "leads-list"
+  gridSpan: "row-span-2"
+  colorTheme: "theme-productivity"
+  data:
+    leads:
+      - name: "Northline Energy"
+        value: "Google Ads"
+        status: "vip"
+        time: "3m ago"
+      - name: "Aurora Dental"
+        value: "Meta"
+        status: "warm"
+        time: "11m ago"

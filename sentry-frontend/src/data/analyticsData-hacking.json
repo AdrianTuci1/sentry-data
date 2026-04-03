@@ -1,0 +1,1345 @@
+[
+    {
+        "id": "marketing-roas",
+        "type": "weather",
+        "title": "Access Win Rate",
+        "subtitle": "Validated footholds per active campaign",
+        "footerText": "High-confidence ingress only",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "default",
+        "data": {
+            "value": "62",
+            "unit": "%",
+            "trendValue": "+5 pts",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "vs last wave"
+        }
+    },
+    {
+        "id": "marketing-cpa",
+        "type": "natural",
+        "title": "Exploit Window",
+        "subtitle": "Mean time before target hardens",
+        "footerText": "Zero-day shelf life is compressing",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "default",
+        "data": {
+            "value": "19",
+            "unit": "hrs",
+            "sparklineColor": "#49d793",
+            "dataPoints": [
+                34,
+                31,
+                28,
+                26,
+                24,
+                22,
+                20,
+                19
+            ]
+        }
+    },
+    {
+        "id": "marketing-conv-rate",
+        "type": "light-dial",
+        "title": "Intrusion Success",
+        "subtitle": "Initial access to persistence %",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "default",
+        "data": {
+            "value": "44",
+            "unit": "%",
+            "signalOrientation": "horizontal",
+            "signalScore": 44,
+            "signalLabel": "Selective execution",
+            "trendValue": "+3 pts",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "vs previous wave"
+        }
+    },
+    {
+        "id": "marketing-pclv",
+        "type": "predictive",
+        "title": "Target Priority Score",
+        "subtitle": "Projected value of active target clusters",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "value": "8.1",
+            "unit": "risk",
+            "metricCards": [
+                {
+                    "label": "Open targets",
+                    "value": "6.7",
+                    "delta": "+0.6",
+                    "comparison": "Fresh exposure in active watchlist"
+                },
+                {
+                    "label": "Projected 7D",
+                    "value": "8.1",
+                    "delta": "+1.1",
+                    "comparison": "Likely peak pressure window"
+                },
+                {
+                    "label": "Confidence",
+                    "value": "77%",
+                    "delta": "+2 pts",
+                    "comparison": "Model stability vs prior sweep"
+                }
+            ],
+            "chartLabels": [
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+                "Sun"
+            ],
+            "chartSeries": [
+                42,
+                48,
+                55,
+                61,
+                64,
+                72,
+                76
+            ],
+            "highlightRange": [
+                1,
+                5
+            ],
+            "markerLabels": [
+                {
+                    "index": 1,
+                    "value": "48"
+                },
+                {
+                    "index": 5,
+                    "value": "72"
+                }
+            ],
+            "chartMin": 0,
+            "chartMax": 90,
+            "historical": [
+                5.2,
+                5.5,
+                5.8,
+                6,
+                6.2,
+                6.4,
+                6.7
+            ],
+            "forecast": [
+                7,
+                7.3,
+                7.6,
+                7.9,
+                8.1
+            ],
+            "confidenceRange": [
+                40,
+                60,
+                80
+            ]
+        }
+    },
+    {
+        "id": "data-saturation",
+        "type": "liquid-gauge",
+        "title": "Intel Feed Density",
+        "subtitle": "Fresh signals from open and closed channels",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "default",
+        "data": {
+            "value": "86",
+            "unit": "%",
+            "signalOrientation": "vertical",
+            "signalScore": 86,
+            "signalLabel": "Dense feed",
+            "signalNote": "Fresh telemetry and chatter are providing enough context for triage and clustering.",
+            "trendValue": "+8 pts",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "feed coverage"
+        }
+    },
+    {
+        "id": "ai-coverage",
+        "type": "neural-nexus",
+        "title": "Infrastructure Mesh",
+        "subtitle": "Relay and staging coverage",
+        "footerText": "Edge nodes currently available",
+        "colorTheme": "theme-light",
+        "gridSpan": "default",
+        "data": {
+            "value": "71",
+            "unit": "%",
+            "sliderValue": 71,
+            "gaugeUnit": "%",
+            "gaugeColor": "#6ae3a7"
+        }
+    },
+    {
+        "id": "llm-eval-guards",
+        "type": "mpl-benchmark-bars",
+        "title": "OpSec Guardrails",
+        "subtitle": "Benchmarks before campaign escalation",
+        "colorTheme": "theme-audience",
+        "gridSpan": "row-span-2",
+        "data": {
+            "benchmarks": [
+                {
+                    "label": "Noise",
+                    "score": 18.4,
+                    "target": 20,
+                    "delta": "+1.6"
+                },
+                {
+                    "label": "Dwell",
+                    "score": 62.1,
+                    "target": 60,
+                    "delta": "+2.1"
+                },
+                {
+                    "label": "Exposure",
+                    "score": 24.8,
+                    "target": 28,
+                    "delta": "+3.2"
+                },
+                {
+                    "label": "Resilience",
+                    "score": 71.2,
+                    "target": 70,
+                    "delta": "+1.2"
+                }
+            ]
+        }
+    },
+    {
+        "id": "llm-attention-drift",
+        "type": "mpl-attention-heatmap",
+        "title": "Campaign Heatmap",
+        "subtitle": "Movement across attack stages and regions",
+        "colorTheme": "theme-natural",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "xLabels": [
+                "NA",
+                "LATAM",
+                "EU",
+                "MEA",
+                "APAC",
+                "ANZ"
+            ],
+            "yLabels": [
+                "Recon",
+                "Phish",
+                "Exploit",
+                "Persist",
+                "Pivot",
+                "Exit"
+            ],
+            "matrix": [
+                [
+                    0.16,
+                    0.2,
+                    0.24,
+                    0.28,
+                    0.31,
+                    0.35
+                ],
+                [
+                    0.18,
+                    0.23,
+                    0.29,
+                    0.33,
+                    0.39,
+                    0.44
+                ],
+                [
+                    0.2,
+                    0.26,
+                    0.32,
+                    0.39,
+                    0.46,
+                    0.52
+                ],
+                [
+                    0.17,
+                    0.24,
+                    0.31,
+                    0.43,
+                    0.51,
+                    0.6
+                ],
+                [
+                    0.15,
+                    0.21,
+                    0.28,
+                    0.39,
+                    0.5,
+                    0.63
+                ],
+                [
+                    0.12,
+                    0.17,
+                    0.23,
+                    0.34,
+                    0.44,
+                    0.57
+                ]
+            ],
+            "sideNotes": [
+                {
+                    "label": "peak route",
+                    "value": "Pivot / ANZ"
+                },
+                {
+                    "label": "signal bleed",
+                    "value": "13%"
+                },
+                {
+                    "label": "active cells",
+                    "value": "96"
+                }
+            ]
+        }
+    },
+    {
+        "id": "ad-fatigue",
+        "type": "intensity-heat",
+        "title": "Defender Pressure",
+        "subtitle": "Observed SOC saturation index",
+        "footerText": "Blue team workload is rising",
+        "colorTheme": "theme-red",
+        "gridSpan": "default",
+        "data": {
+            "value": "58",
+            "unit": "deg",
+            "signalOrientation": "horizontal",
+            "signalScore": 58,
+            "signalLabel": "Growing pressure",
+            "goodAtHigh": false
+        }
+    },
+    {
+        "id": "refresh-cycle",
+        "type": "chrono-dial",
+        "title": "Infrastructure Freshness",
+        "subtitle": "Relay and payload rotation score",
+        "footerText": "Next churn in 18 hours",
+        "colorTheme": "theme-color",
+        "gridSpan": "default",
+        "data": {
+            "value": "84",
+            "unit": "pts",
+            "trendValue": "+5 pts",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "since last rotate"
+        }
+    },
+    {
+        "id": "budget-burn",
+        "type": "natural",
+        "title": "Burn Pacing",
+        "subtitle": "Campaign resource consumption",
+        "footerText": "Current tempo sustainable for 9 days",
+        "colorTheme": "theme-red",
+        "gridSpan": "default",
+        "data": {
+            "value": "66",
+            "unit": "%",
+            "sparklineColor": "#ff7676",
+            "dataPoints": [
+                47,
+                51,
+                55,
+                58,
+                61,
+                63,
+                65,
+                66
+            ],
+            "trendTone": "negative"
+        }
+    },
+    {
+        "id": "viral-k-factor",
+        "type": "light-dial",
+        "title": "Propagation Factor",
+        "subtitle": "Lateral spread per foothold",
+        "colorTheme": "theme-color",
+        "gridSpan": "default",
+        "data": {
+            "value": "1.9",
+            "unit": "x",
+            "sliderValue": 61,
+            "trendValue": "+0.4x",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "vs prior cluster"
+        }
+    },
+    {
+        "id": "optimal-time",
+        "type": "optimal-time",
+        "title": "Peak Activity Window",
+        "subtitle": "Highest overlap across active regions",
+        "colorTheme": "theme-natural",
+        "gridSpan": "row-span-2",
+        "data": {
+            "value": "01:30",
+            "unit": "UTC",
+            "calendarMonth": "April 2026",
+            "calendarOffset": 2,
+            "daysInMonth": 30,
+            "totalCalendarCells": 56,
+            "calendarValues": [
+                28,
+                31,
+                33,
+                35,
+                44,
+                48,
+                55,
+                56,
+                32,
+                31,
+                34,
+                35,
+                26,
+                28,
+                22,
+                35,
+                36,
+                35,
+                35,
+                35,
+                35,
+                21,
+                36,
+                36,
+                27,
+                29,
+                32,
+                22,
+                34,
+                23
+            ],
+            "engagementMatrix": [
+                [
+                    28,
+                    31,
+                    33,
+                    35,
+                    44,
+                    48,
+                    55,
+                    56
+                ],
+                [
+                    32,
+                    31,
+                    34,
+                    35,
+                    26,
+                    28,
+                    22,
+                    35
+                ],
+                [
+                    36,
+                    35,
+                    35,
+                    35,
+                    35,
+                    21,
+                    36,
+                    36
+                ],
+                [
+                    27,
+                    29,
+                    32,
+                    22,
+                    34,
+                    23,
+                    29,
+                    35
+                ],
+                [
+                    14,
+                    16,
+                    18,
+                    11,
+                    13,
+                    12,
+                    16,
+                    11
+                ],
+                [
+                    32,
+                    32,
+                    32,
+                    1,
+                    31,
+                    31,
+                    11,
+                    32
+                ],
+                [
+                    3,
+                    6,
+                    8,
+                    11,
+                    31,
+                    11,
+                    12,
+                    14
+                ],
+                [
+                    3,
+                    2,
+                    7,
+                    30,
+                    31,
+                    11,
+                    19,
+                    33
+                ]
+            ],
+            "summaryCards": [
+                {
+                    "id": "weekly-peak",
+                    "icon": "sparkles",
+                    "label": "Weekly Peak",
+                    "value": "6,214",
+                    "delta": "+18.1%",
+                    "note": "active sessions",
+                    "tone": "positive"
+                },
+                {
+                    "id": "quarter-reach",
+                    "icon": "orbit",
+                    "label": "Quarter Reach",
+                    "value": "54,880",
+                    "delta": "+5.6%",
+                    "note": "52,004 prior baseline",
+                    "tone": "positive"
+                }
+            ],
+            "marketBreakdown": [
+                {
+                    "label": "EMEA",
+                    "value": "18,420"
+                },
+                {
+                    "label": "Americas",
+                    "value": "17,110"
+                },
+                {
+                    "label": "APAC",
+                    "value": "19,350"
+                }
+            ]
+        }
+    },
+    {
+        "id": "live-traffic",
+        "type": "animated-line",
+        "title": "Live Sessions",
+        "subtitle": "Concurrent operator and relay activity",
+        "footerText": "Last 5 Minutes Activity",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2",
+        "description": "Live stream of active sessions and relay chatter across the current campaign set.",
+        "data": {
+            "value": "3,420",
+            "unit": "sess",
+            "metricCards": [
+                {
+                    "icon": "sparkles",
+                    "label": "Active now",
+                    "value": "612",
+                    "delta": "+8.2%",
+                    "note": "operator sessions"
+                },
+                {
+                    "icon": "medal",
+                    "label": "Peak today",
+                    "value": "744",
+                    "delta": "+12.6%",
+                    "note": "highest concurrent sessions"
+                }
+            ],
+            "chartLabels": [
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+                "Sun"
+            ],
+            "chartSeries": [
+                380,
+                446,
+                505,
+                566,
+                612,
+                null,
+                null
+            ],
+            "chartMin": 120,
+            "chartMax": 820,
+            "annotation": {
+                "index": 4,
+                "label": "ACTIVE SESSIONS",
+                "value": "612"
+            },
+            "dataPoints": [
+                380,
+                446,
+                505,
+                566,
+                612
+            ]
+        }
+    },
+    {
+        "id": "technical-health",
+        "type": "vitals",
+        "title": "Infrastructure Status",
+        "subtitle": "Core nodes, relays and queue health",
+        "colorTheme": "theme-weather",
+        "gridSpan": "default",
+        "data": {
+            "value": "98.72",
+            "unit": "%",
+            "uptimeBars": [
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "warn",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "warn",
+                "good",
+                "good",
+                "good",
+                "good",
+                "down",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good"
+            ],
+            "metrics": [
+                {
+                    "name": "Gateways",
+                    "value": "98.9%",
+                    "status": "good"
+                },
+                {
+                    "name": "Relays",
+                    "value": "98.4%",
+                    "status": "warn"
+                },
+                {
+                    "name": "Queues",
+                    "value": "99.1%",
+                    "status": "good"
+                },
+                {
+                    "name": "Burned",
+                    "value": "3 nodes",
+                    "status": "warn"
+                }
+            ]
+        }
+    },
+    {
+        "id": "stat-leads",
+        "type": "leads-list",
+        "title": "Active Campaigns",
+        "subtitle": "Priority operations and queues",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "row-span-2",
+        "data": {
+            "leads": [
+                {
+                    "name": "Credential Wave",
+                    "value": "Identity",
+                    "status": "vip",
+                    "time": "4m ago"
+                },
+                {
+                    "name": "Edge Exploit",
+                    "value": "Appliance",
+                    "status": "warm",
+                    "time": "11m ago"
+                },
+                {
+                    "name": "Cloud Drift",
+                    "value": "S3",
+                    "status": "cold",
+                    "time": "23m ago"
+                },
+                {
+                    "name": "Stealer Refresh",
+                    "value": "Endpoint",
+                    "status": "warm",
+                    "time": "38m ago"
+                },
+                {
+                    "name": "Proxy Rotation",
+                    "value": "Relay",
+                    "status": "cold",
+                    "time": "54m ago"
+                },
+                {
+                    "name": "Phishing Clone",
+                    "value": "Mail",
+                    "status": "vip",
+                    "time": "1h ago"
+                },
+                {
+                    "name": "Admin Pivot",
+                    "value": "Server",
+                    "status": "warm",
+                    "time": "2h ago"
+                },
+                {
+                    "name": "Access Broker",
+                    "value": "Forum",
+                    "status": "cold",
+                    "time": "3h ago"
+                }
+            ]
+        }
+    },
+    {
+        "id": "top-routes",
+        "type": "leads-list",
+        "title": "Hot Paths",
+        "subtitle": "Most active campaign chains",
+        "colorTheme": "theme-natural",
+        "gridSpan": "default",
+        "data": {
+            "leads": [
+                {
+                    "name": "Phish -> SSO -> VPN",
+                    "value": "188 paths",
+                    "time": "+16%"
+                },
+                {
+                    "name": "Exploit -> Shell -> Relay",
+                    "value": "152 paths",
+                    "time": "+10%"
+                },
+                {
+                    "name": "Stealer -> Broker -> Reuse",
+                    "value": "129 paths",
+                    "time": "+7%"
+                },
+                {
+                    "name": "Cloud Key -> Archive -> Exit",
+                    "value": "84 paths",
+                    "time": "-2%"
+                }
+            ]
+        }
+    },
+    {
+        "id": "attribution-models",
+        "type": "attribution",
+        "title": "Infrastructure Source Attribution",
+        "subtitle": "Daily and weekly signal contribution",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "summaryValue": "11.2M",
+            "summaryLabel": "Signals / day",
+            "periodMetrics": [
+                {
+                    "label": "Daily",
+                    "value": "11.2M",
+                    "delta": "+9.1%",
+                    "note": "10.3M baseline",
+                    "tone": "#7CFF5B"
+                },
+                {
+                    "label": "Weekly",
+                    "value": "77.6M",
+                    "delta": "+4.8%",
+                    "note": "74.0M baseline",
+                    "tone": "#FFC533"
+                }
+            ],
+            "models": [
+                {
+                    "channel": "Phish",
+                    "monthly": 4100000,
+                    "yearly": 28600000,
+                    "yearlyColor": "#2EF0B2",
+                    "monthlyColor": "#FFBF1F"
+                },
+                {
+                    "channel": "Exploit",
+                    "monthly": 2800000,
+                    "yearly": 19400000,
+                    "yearlyColor": "#31E9C9",
+                    "monthlyColor": "#FF9F1F"
+                },
+                {
+                    "channel": "Broker",
+                    "monthly": 2400000,
+                    "yearly": 16800000,
+                    "yearlyColor": "#8B5CF6",
+                    "monthlyColor": "#FF5A36"
+                },
+                {
+                    "channel": "Cloud",
+                    "monthly": 1900000,
+                    "yearly": 12800000,
+                    "yearlyColor": "#7B6D87",
+                    "monthlyColor": "#F33B1D"
+                }
+            ],
+            "seriesName": "Source Mix",
+            "valueFormat": "compact-number",
+            "valueCompact": true,
+            "valueMaximumFractionDigits": 1,
+            "secondaryValueFormat": "compact-number",
+            "secondaryValueCompact": true,
+            "secondaryValueMaximumFractionDigits": 1,
+            "primaryMetricLabel": "weekly",
+            "secondaryMetricLabel": "daily"
+        }
+    },
+    {
+        "id": "anomaly-detection",
+        "type": "anomaly-stream",
+        "title": "Campaign Anomalies",
+        "subtitle": "Variance in noise, dwell and relay health",
+        "colorTheme": "theme-weather",
+        "gridSpan": "col-span-2",
+        "data": {
+            "value": "5 Spikes",
+            "unit": "warn"
+        }
+    },
+    {
+        "id": "romania-3d",
+        "type": "3d-map",
+        "title": "Global Foothold Map",
+        "subtitle": "Rotating globe of active clusters",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-3 row-span-2",
+        "data": {
+            "mapProjection": "globe",
+            "mapAutoRotate": true,
+            "mapFitBounds": false,
+            "mapZoom": 1.12,
+            "mapPitch": 0,
+            "mapBearing": 0,
+            "mapCenter": [
+                8,
+                18
+            ],
+            "mapRotationSpeed": 3.1,
+            "locations": [
+                {
+                    "name": "Toronto Cluster",
+                    "address": "Toronto",
+                    "longitude": -79.3832,
+                    "latitude": 43.6532
+                },
+                {
+                    "name": "Mexico City Relay",
+                    "address": "Mexico City",
+                    "longitude": -99.1332,
+                    "latitude": 19.4326
+                },
+                {
+                    "name": "Reykjavik Proxy",
+                    "address": "Reykjavik",
+                    "longitude": -21.8174,
+                    "latitude": 64.1265
+                },
+                {
+                    "name": "Amsterdam Node",
+                    "address": "Amsterdam",
+                    "longitude": 4.9041,
+                    "latitude": 52.3676
+                },
+                {
+                    "name": "Bucharest Broker",
+                    "address": "Bucharest",
+                    "longitude": 26.1025,
+                    "latitude": 44.4268
+                },
+                {
+                    "name": "Johannesburg Relay",
+                    "address": "Johannesburg",
+                    "longitude": 28.0473,
+                    "latitude": -26.2041
+                },
+                {
+                    "name": "Istanbul Pivot",
+                    "address": "Istanbul",
+                    "longitude": 28.9784,
+                    "latitude": 41.0082
+                },
+                {
+                    "name": "Bangkok Cluster",
+                    "address": "Bangkok",
+                    "longitude": 100.5018,
+                    "latitude": 13.7563
+                },
+                {
+                    "name": "Tokyo Beacon",
+                    "address": "Tokyo",
+                    "longitude": 139.6917,
+                    "latitude": 35.6895
+                },
+                {
+                    "name": "Auckland Relay",
+                    "address": "Auckland",
+                    "longitude": 174.7633,
+                    "latitude": -36.8485
+                }
+            ]
+        }
+    },
+    {
+        "id": "data-scatter",
+        "type": "scatter",
+        "title": "Yield vs Exposure",
+        "subtitle": "Operational value over visibility risk",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "periodLabels": [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct"
+            ],
+            "scatterData": [
+                [
+                    24,
+                    150
+                ],
+                [
+                    38,
+                    240
+                ],
+                [
+                    49,
+                    310
+                ],
+                [
+                    61,
+                    404
+                ],
+                [
+                    75,
+                    512
+                ],
+                [
+                    93,
+                    648
+                ],
+                [
+                    110,
+                    735
+                ],
+                [
+                    126,
+                    862
+                ],
+                [
+                    143,
+                    982
+                ],
+                [
+                    159,
+                    1108
+                ]
+            ]
+        }
+    },
+    {
+        "id": "sales-funnel",
+        "type": "funnel",
+        "title": "Compromise Funnel",
+        "subtitle": "Lead chain from recon to persistence",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2",
+        "data": {
+            "summaryLabel": "Sessions",
+            "summaryValue": "2,184",
+            "summaryDelta": "↑5.9%",
+            "summaryCompare": "Compared to 2,062 last week",
+            "funnel": [
+                {
+                    "value": 100,
+                    "name": "Recon"
+                },
+                {
+                    "value": 58,
+                    "name": "Access"
+                },
+                {
+                    "value": 26,
+                    "name": "Execution"
+                },
+                {
+                    "value": 13,
+                    "name": "Persistence"
+                },
+                {
+                    "value": 7,
+                    "name": "Pivot"
+                }
+            ]
+        }
+    },
+    {
+        "id": "market-evolution",
+        "type": "market-evolution",
+        "title": "Attack Chain Dynamics",
+        "subtitle": "Influence across ingress, pivot and exit stages",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "channels": [
+                {
+                    "name": "Phishing",
+                    "color": "#3B82F6",
+                    "value": 79,
+                    "synergy": "High"
+                },
+                {
+                    "name": "Exploits",
+                    "color": "#10B981",
+                    "value": 85,
+                    "synergy": "Critical"
+                },
+                {
+                    "name": "Brokers",
+                    "color": "#F59E0B",
+                    "value": 67,
+                    "synergy": "High"
+                },
+                {
+                    "name": "Payloads",
+                    "color": "#EF4444",
+                    "value": 73,
+                    "synergy": "High"
+                },
+                {
+                    "name": "Relays",
+                    "color": "#8B5CF6",
+                    "value": 88,
+                    "synergy": "Critical"
+                },
+                {
+                    "name": "Cloud",
+                    "color": "#EC4899",
+                    "value": 54,
+                    "synergy": "Mid"
+                },
+                {
+                    "name": "Exit",
+                    "color": "#06B6D4",
+                    "value": 61,
+                    "synergy": "Mid"
+                }
+            ],
+            "links": [
+                {
+                    "source": "Phishing",
+                    "target": "Brokers",
+                    "value": 6
+                },
+                {
+                    "source": "Exploits",
+                    "target": "Payloads",
+                    "value": 8
+                },
+                {
+                    "source": "Payloads",
+                    "target": "Relays",
+                    "value": 9
+                },
+                {
+                    "source": "Relays",
+                    "target": "Cloud",
+                    "value": 4
+                },
+                {
+                    "source": "Cloud",
+                    "target": "Exit",
+                    "value": 3
+                },
+                {
+                    "source": "Brokers",
+                    "target": "Relays",
+                    "value": 7
+                },
+                {
+                    "source": "Phishing",
+                    "target": "Exploits",
+                    "value": 5
+                }
+            ]
+        }
+    },
+    {
+        "id": "creative-quadrant",
+        "type": "creative-quadrant",
+        "title": "Exploit Quadrant",
+        "subtitle": "Reliability vs exposure pressure",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "row-span-2",
+        "data": {
+            "creatives": [
+                [
+                    8.6,
+                    7.8,
+                    "Edge Auth Chain",
+                    "Exploit"
+                ],
+                [
+                    7.4,
+                    4.1,
+                    "Mail Redirect",
+                    "Phish"
+                ],
+                [
+                    4.6,
+                    8.7,
+                    "Cloud Token Replay",
+                    "Cloud"
+                ],
+                [
+                    8.9,
+                    2.8,
+                    "Silent Loader",
+                    "Payload"
+                ],
+                [
+                    6.1,
+                    6.4,
+                    "VPN Credential Spray",
+                    "Identity"
+                ],
+                [
+                    2.3,
+                    2.9,
+                    "Legacy Macro",
+                    "Office"
+                ],
+                [
+                    7.2,
+                    5.5,
+                    "SSO Session Lift",
+                    "Access"
+                ]
+            ],
+            "listItemLabel": "Exploit",
+            "axisMetricLabels": {
+                "x": "Reliability",
+                "y": "Exposure"
+            },
+            "axisMetricFormats": {
+                "x": "number",
+                "y": "number"
+            },
+            "axisLabels": {
+                "xLow": "Low reliability",
+                "xHigh": "High reliability",
+                "yLow": "Low exposure",
+                "yHigh": "High exposure"
+            },
+            "quadrantLabels": {
+                "heroes": {
+                    "label": "Prime",
+                    "detail": "Scale"
+                },
+                "seekers": {
+                    "label": "Stealth",
+                    "detail": "Expand"
+                },
+                "intent": {
+                    "label": "Volatile",
+                    "detail": "Contain"
+                },
+                "burners": {
+                    "label": "Discard",
+                    "detail": "Retire"
+                }
+            }
+        }
+    },
+    {
+        "id": "intent-sunburst",
+        "type": "intent-sunburst",
+        "title": "Access Intent Tree",
+        "subtitle": "Live classification of active routes",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "sunburstData": [
+                {
+                    "name": "Persistence",
+                    "itemStyle": {
+                        "color": "#10B981"
+                    },
+                    "children": [
+                        {
+                            "name": "Token reuse",
+                            "value": 21
+                        },
+                        {
+                            "name": "Scheduled task",
+                            "value": 16
+                        }
+                    ]
+                },
+                {
+                    "name": "Collection",
+                    "itemStyle": {
+                        "color": "#3B82F6"
+                    },
+                    "children": [
+                        {
+                            "name": "Archive pull",
+                            "value": 14
+                        },
+                        {
+                            "name": "Secret scrape",
+                            "value": 11
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "id": "trend-spotter",
+        "type": "trend-spotter",
+        "title": "Emerging Tactics",
+        "subtitle": "Signals from chatter, noise and campaign drift",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "keywords": [
+                {
+                    "text": "edge auth bypass",
+                    "weight": 91,
+                    "trend": "up"
+                },
+                {
+                    "text": "session replay",
+                    "weight": 86,
+                    "trend": "up"
+                },
+                {
+                    "text": "cloud archive pull",
+                    "weight": 79,
+                    "trend": "up"
+                },
+                {
+                    "text": "inline loaders",
+                    "weight": 68,
+                    "trend": "stable"
+                },
+                {
+                    "text": "macro kits",
+                    "weight": 34,
+                    "trend": "down"
+                },
+                {
+                    "text": "relay churn",
+                    "weight": 74,
+                    "trend": "up"
+                },
+                {
+                    "text": "identity spray",
+                    "weight": 82,
+                    "trend": "up"
+                },
+                {
+                    "text": "token brokers",
+                    "weight": 64,
+                    "trend": "stable"
+                },
+                {
+                    "text": "stealer refresh",
+                    "weight": 77,
+                    "trend": "up"
+                },
+                {
+                    "text": "sinkhole drift",
+                    "weight": 58,
+                    "trend": "stable"
+                },
+                {
+                    "text": "cloud pivots",
+                    "weight": 72,
+                    "trend": "up"
+                },
+                {
+                    "text": "burned relays",
+                    "weight": 46,
+                    "trend": "down"
+                }
+            ]
+        }
+    }
+]

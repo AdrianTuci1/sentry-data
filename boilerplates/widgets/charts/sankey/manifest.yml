@@ -1,0 +1,74 @@
+title: "Sankey Flow"
+description: "Node-link flow diagram using nodes and links."
+component: "SankeyChart"
+runtime_type: "sankey"
+aliases:
+  - "sankey-chart"
+category: "charts"
+selection_hints:
+  - "flow diagram"
+  - "source to target"
+  - "funnel movement"
+component_id_overrides: []
+data_requirements:
+  - "nodes: List of unique nodes."
+  - "links: List of source-target links."
+sql_aliases:
+  - alias: "nodes"
+    path: "data.nodes"
+    required: true
+    sql_type: "object[]"
+    expression_hint: "list(struct_pack(name := node_name) ORDER BY node_order)"
+    description: "List of unique nodes."
+  - alias: "links"
+    path: "data.links"
+    required: true
+    sql_type: "object[]"
+    expression_hint: "list(struct_pack(source := source_name, target := target_name, value := flow_value) ORDER BY link_order)"
+    description: "List of source-target links."
+data_structure_template:
+  data:
+    nodes:
+      - name: "Visits"
+      - name: "Lead"
+    links:
+      - source: "Visits"
+        target: "Lead"
+        value: 1200
+grid_span: "col-span-2"
+color_theme: "theme-productivity"
+sdui:
+  root_key: "data"
+  mapping_mode: "list"
+query_guidance:
+  sql_shape: "single_row"
+  data_root: "data"
+  return_shape: "list"
+  rules:
+    - "Return SQL-derived fields under the `data` object."
+    - "Use aliases exactly as listed in `sql_aliases`."
+    - "Prefer one final row per widget payload; use DuckDB list/struct aggregations for nested arrays or objects."
+  duckdb_patterns:
+    - "Use `list(value ORDER BY sort_key)` for arrays."
+    - "Use `struct_pack(key := value, ...)` for nested objects."
+    - "Use `list(struct_pack(... ) ORDER BY sort_key)` for arrays of objects."
+  alias_projection_examples:
+    nodes: "list(struct_pack(name := node_name) ORDER BY node_order)"
+    links: "list(struct_pack(source := source_name, target := target_name, value := flow_value) ORDER BY link_order)"
+  recommended_grain: "single row"
+  implementation_notes:
+    - "Aggregate to the widget grain before packaging the payload."
+    - "Return metadata like title, type, gridSpan and colorTheme outside the `data` object; place SQL-derived fields inside `data`."
+    - "Format strings in SQL only when the component explicitly expects formatted labels; otherwise return numerics and let the UI format them."
+insight_payload_contract:
+  type: "sankey"
+  gridSpan: "col-span-2"
+  colorTheme: "theme-productivity"
+  data:
+    nodes:
+      - name: "Visits"
+      - name: "Lead"
+    links:
+      - source: "Visits"
+        target: "Lead"
+        value: 1200

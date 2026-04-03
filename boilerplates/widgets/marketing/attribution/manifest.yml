@@ -1,0 +1,137 @@
+title: "Attribution"
+description: "Donut plus supporting panels for source or channel allocation."
+component: "AttributionModels"
+runtime_type: "attribution"
+aliases: []
+category: "marketing"
+selection_hints:
+  - "allocation by source"
+  - "channel mix"
+  - "contribution share"
+component_id_overrides: []
+data_requirements:
+  - "models: Ordered allocation rows."
+sql_aliases:
+  - alias: "summaryValue"
+    path: "data.summaryValue"
+    required: false
+    sql_type: "string"
+    expression_hint: "summaryValue"
+    description: "Center summary value."
+  - alias: "summaryLabel"
+    path: "data.summaryLabel"
+    required: false
+    sql_type: "string"
+    expression_hint: "summaryLabel"
+    description: "Center summary label."
+  - alias: "models"
+    path: "data.models"
+    required: true
+    sql_type: "object[]"
+    expression_hint: "list(struct_pack(channel := channel_name, monthly := secondary_value, yearly := primary_value, yearlyColor := primary_color, monthlyColor := secondary_color) ORDER BY primary_value DESC)"
+    description: "Ordered allocation rows."
+  - alias: "periodMetrics"
+    path: "data.periodMetrics"
+    required: false
+    sql_type: "object[]"
+    expression_hint: "list(struct_pack(label := metric_label, value := metric_value, delta := delta_text, note := note_text, tone := tone_color) ORDER BY metric_index)"
+    description: "Optional headline metrics."
+  - alias: "valueFormat"
+    path: "data.valueFormat"
+    required: false
+    sql_type: "string"
+    expression_hint: "valueFormat"
+    description: "currency, number or compact-number."
+  - alias: "primaryMetricLabel"
+    path: "data.primaryMetricLabel"
+    required: false
+    sql_type: "string"
+    expression_hint: "primaryMetricLabel"
+    description: "Primary metric label, e.g. yearly or weekly."
+  - alias: "secondaryMetricLabel"
+    path: "data.secondaryMetricLabel"
+    required: false
+    sql_type: "string"
+    expression_hint: "secondaryMetricLabel"
+    description: "Secondary metric label, e.g. monthly or daily."
+data_structure_template:
+  data:
+    summaryValue: "$24.8K"
+    summaryLabel: "Monthly Budget"
+    valueFormat: "currency"
+    primaryMetricLabel: "yearly"
+    secondaryMetricLabel: "monthly"
+    models:
+      - channel: "Google"
+        monthly: 9200
+        yearly: 152000
+        yearlyColor: "#2EF0B2"
+        monthlyColor: "#FFBF1F"
+      - channel: "Meta"
+        monthly: 7100
+        yearly: 126000
+        yearlyColor: "#31E9C9"
+        monthlyColor: "#FF9F1F"
+    periodMetrics:
+      - label: "Monthly"
+        value: "$24.8K"
+        delta: "+14.2%"
+        note: "$21.7K baseline"
+        tone: "#7CFF5B"
+grid_span: "col-span-2 row-span-2"
+color_theme: "theme-productivity"
+sdui:
+  root_key: "data"
+  mapping_mode: "single"
+query_guidance:
+  sql_shape: "single_row"
+  data_root: "data"
+  return_shape: "single"
+  rules:
+    - "Return SQL-derived fields under the `data` object."
+    - "Use aliases exactly as listed in `sql_aliases`."
+    - "Prefer one final row per widget payload; use DuckDB list/struct aggregations for nested arrays or objects."
+  duckdb_patterns:
+    - "Use `list(value ORDER BY sort_key)` for arrays."
+    - "Use `struct_pack(key := value, ...)` for nested objects."
+    - "Use `list(struct_pack(... ) ORDER BY sort_key)` for arrays of objects."
+  alias_projection_examples:
+    summaryValue: "summaryValue"
+    summaryLabel: "summaryLabel"
+    models: "list(struct_pack(channel := channel_name, monthly := secondary_value, yearly := primary_value, yearlyColor := primary_color, monthlyColor := secondary_color) ORDER BY primary_value DESC)"
+    periodMetrics: "list(struct_pack(label := metric_label, value := metric_value, delta := delta_text, note := note_text, tone := tone_color) ORDER BY metric_index)"
+    valueFormat: "valueFormat"
+    primaryMetricLabel: "primaryMetricLabel"
+    secondaryMetricLabel: "secondaryMetricLabel"
+  recommended_grain: "single row"
+  implementation_notes:
+    - "Aggregate to the widget grain before packaging the payload."
+    - "Return metadata like title, type, gridSpan and colorTheme outside the `data` object; place SQL-derived fields inside `data`."
+    - "Format strings in SQL only when the component explicitly expects formatted labels; otherwise return numerics and let the UI format them."
+insight_payload_contract:
+  type: "attribution"
+  gridSpan: "col-span-2 row-span-2"
+  colorTheme: "theme-productivity"
+  data:
+    summaryValue: "$24.8K"
+    summaryLabel: "Monthly Budget"
+    valueFormat: "currency"
+    primaryMetricLabel: "yearly"
+    secondaryMetricLabel: "monthly"
+    models:
+      - channel: "Google"
+        monthly: 9200
+        yearly: 152000
+        yearlyColor: "#2EF0B2"
+        monthlyColor: "#FFBF1F"
+      - channel: "Meta"
+        monthly: 7100
+        yearly: 126000
+        yearlyColor: "#31E9C9"
+        monthlyColor: "#FF9F1F"
+    periodMetrics:
+      - label: "Monthly"
+        value: "$24.8K"
+        delta: "+14.2%"
+        note: "$21.7K baseline"
+        tone: "#7CFF5B"

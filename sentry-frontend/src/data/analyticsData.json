@@ -4,259 +4,483 @@
         "type": "weather",
         "title": "ROAS Pulse",
         "subtitle": "Real-time Efficiency Multiplier",
-        "value": "4.8",
-        "unit": "x",
-        "trendValue": "+0.7x",
-        "trendDirection": "up",
-        "trendTone": "positive",
-        "trendLabel": "vs yesterday",
         "footerText": "Consolidated Channels",
         "colorTheme": "theme-productivity",
-        "gridSpan": "default"
+        "gridSpan": "default",
+        "data": {
+            "value": "4.8",
+            "unit": "x",
+            "trendValue": "+0.7x",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "vs yesterday"
+        }
     },
     {
         "id": "marketing-cpa",
         "type": "natural",
         "title": "Acquisition Cost",
         "subtitle": "CPA Efficiency vs Target",
-        "value": "$24",
-        "unit": "avg",
-        "sparklineColor": "#49d793",
-        "dataPoints": [
-            29,
-            28,
-            27,
-            27,
-            26,
-            25,
-            25,
-            24
-        ],
         "footerText": "Target $20, ceiling $35",
         "colorTheme": "theme-productivity",
-        "gridSpan": "default"
+        "gridSpan": "default",
+        "data": {
+            "value": "$24",
+            "unit": "avg",
+            "sparklineColor": "#49d793",
+            "dataPoints": [
+                29,
+                28,
+                27,
+                27,
+                26,
+                25,
+                25,
+                24
+            ]
+        }
     },
     {
         "id": "marketing-conv-rate",
         "type": "light-dial",
         "title": "Conversion Flow",
         "subtitle": "Visitor to Qualified Lead %",
-        "value": "3.8",
-        "unit": "%",
-        "signalOrientation": "horizontal",
-        "signalScore": 72,
-        "signalLabel": "Healthy throughput",
-        "trendValue": "+0.6 pts",
-        "trendDirection": "up",
-        "trendTone": "positive",
-        "trendLabel": "vs last cohort",
         "colorTheme": "theme-productivity",
-        "gridSpan": "default"
+        "gridSpan": "default",
+        "data": {
+            "value": "3.8",
+            "unit": "%",
+            "signalOrientation": "horizontal",
+            "signalScore": 72,
+            "signalLabel": "Healthy throughput",
+            "trendValue": "+0.6 pts",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "vs last cohort"
+        }
     },
     {
         "id": "marketing-pclv",
         "type": "predictive",
         "title": "Predictive LTV",
         "subtitle": "Future Value of Active Customers",
-        "value": "$1,450",
-        "unit": "est",
         "colorTheme": "theme-revenue",
         "gridSpan": "col-span-2 row-span-2",
-        "metricCards": [
-            {
-                "label": "Current LTV",
-                "value": "$1,297",
-                "delta": "+8.6%",
-                "comparison": "Compared to $1,194 last month"
-            },
-            {
-                "label": "Projected 30D",
-                "value": "$1,450",
-                "delta": "+11.8%",
-                "comparison": "Forecast from active cohorts"
-            },
-            {
-                "label": "Confidence",
-                "value": "82%",
-                "delta": "+4 pts",
-                "comparison": "Model stability vs previous run"
-            }
-        ],
-        "chartLabels": [
-            "Mon",
-            "Tue",
-            "Wed",
-            "Thu",
-            "Fri",
-            "Sat",
-            "Sun"
-        ],
-        "chartSeries": [
-            3120,
-            2765,
-            3850,
-            5750,
-            5400,
-            5987,
-            6320
-        ],
-        "highlightRange": [
-            1,
-            5
-        ],
-        "markerLabels": [
-            {
-                "index": 1,
-                "value": "2,765"
-            },
-            {
-                "index": 5,
-                "value": "5,987"
-            }
-        ],
-        "chartMin": 0,
-        "chartMax": 7600,
-        "historical": [
-            1100,
-            1150,
-            1200,
-            1180,
-            1250,
-            1300,
-            1350
-        ],
-        "forecast": [
-            1380,
-            1400,
-            1420,
-            1440,
-            1450
-        ],
-        "confidenceRange": [
-            40,
-            60,
-            80
-        ]
+        "data": {
+            "value": "$1,450",
+            "unit": "est",
+            "metricCards": [
+                {
+                    "label": "Current LTV",
+                    "value": "$1,297",
+                    "delta": "+8.6%",
+                    "comparison": "Compared to $1,194 last month"
+                },
+                {
+                    "label": "Projected 30D",
+                    "value": "$1,450",
+                    "delta": "+11.8%",
+                    "comparison": "Forecast from active cohorts"
+                },
+                {
+                    "label": "Confidence",
+                    "value": "82%",
+                    "delta": "+4 pts",
+                    "comparison": "Model stability vs previous run"
+                }
+            ],
+            "chartLabels": [
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+                "Sun"
+            ],
+            "chartSeries": [
+                3120,
+                2765,
+                3850,
+                5750,
+                5400,
+                5987,
+                6320
+            ],
+            "highlightRange": [
+                1,
+                5
+            ],
+            "markerLabels": [
+                {
+                    "index": 1,
+                    "value": "2,765"
+                },
+                {
+                    "index": 5,
+                    "value": "5,987"
+                }
+            ],
+            "chartMin": 0,
+            "chartMax": 7600,
+            "historical": [
+                1100,
+                1150,
+                1200,
+                1180,
+                1250,
+                1300,
+                1350
+            ],
+            "forecast": [
+                1380,
+                1400,
+                1420,
+                1440,
+                1450
+            ],
+            "confidenceRange": [
+                40,
+                60,
+                80
+            ]
+        }
     },
     {
         "id": "data-saturation",
         "type": "liquid-gauge",
         "title": "ML Signal Feed",
         "subtitle": "Model Training Saturation",
-        "value": "84",
-        "unit": "%",
-        "signalOrientation": "vertical",
-        "signalScore": 84,
-        "signalLabel": "Strong",
-        "signalNote": "Training set quality is stable and ready for the next cycle.",
-        "trendValue": "+12 pts",
-        "trendDirection": "up",
-        "trendTone": "positive",
-        "trendLabel": "training coverage",
         "colorTheme": "theme-productivity",
-        "gridSpan": "default"
+        "gridSpan": "default",
+        "data": {
+            "value": "84",
+            "unit": "%",
+            "signalOrientation": "vertical",
+            "signalScore": 84,
+            "signalLabel": "Strong",
+            "signalNote": "Training set quality is stable and ready for the next cycle.",
+            "trendValue": "+12 pts",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "training coverage"
+        }
     },
     {
         "id": "ai-coverage",
         "type": "neural-nexus",
         "title": "AI Management",
         "subtitle": "Autonomous Creative Coverage",
-        "value": "98",
-        "unit": "%",
-        "sliderValue": 98,
-        "gaugeUnit": "%",
-        "gaugeColor": "#6ae3a7",
         "footerText": "Operational Limit Reach",
         "colorTheme": "theme-light",
-        "gridSpan": "default"
+        "gridSpan": "default",
+        "data": {
+            "value": "98",
+            "unit": "%",
+            "sliderValue": 98,
+            "gaugeUnit": "%",
+            "gaugeColor": "#6ae3a7"
+        }
+    },
+    {
+        "id": "llm-train-loss",
+        "type": "mpl-training-loss",
+        "title": "LLM Loss Curves",
+        "subtitle": "Train vs validation convergence",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "steps": [
+                "80",
+                "160",
+                "240",
+                "320",
+                "400",
+                "480",
+                "560",
+                "640"
+            ],
+            "trainLoss": [
+                2.84,
+                2.41,
+                2.02,
+                1.78,
+                1.59,
+                1.42,
+                1.34,
+                1.29
+            ],
+            "valLoss": [
+                2.95,
+                2.58,
+                2.19,
+                1.96,
+                1.84,
+                1.73,
+                1.76,
+                1.81
+            ],
+            "perplexity": [
+                18.3,
+                14.8,
+                11.7,
+                9.4,
+                8.2,
+                7.3,
+                7.6,
+                8.1
+            ],
+            "stats": [
+                {
+                    "label": "Best val loss",
+                    "value": "1.73",
+                    "accent": "#7cff5b",
+                    "meta": "checkpoint 480"
+                },
+                {
+                    "label": "Grad norm",
+                    "value": "0.92",
+                    "accent": "#7bd3ff",
+                    "meta": "stable window"
+                },
+                {
+                    "label": "Tokens / sec",
+                    "value": "38.4k",
+                    "accent": "#ffc857",
+                    "meta": "8x H100"
+                }
+            ]
+        }
+    },
+    {
+        "id": "llm-eval-guards",
+        "type": "mpl-benchmark-bars",
+        "title": "Eval Guardrails",
+        "subtitle": "Benchmarks before checkpoint promote",
+        "colorTheme": "theme-audience",
+        "gridSpan": "row-span-2",
+        "data": {
+            "benchmarks": [
+                {
+                    "label": "MMLU",
+                    "score": 73.2,
+                    "target": 72,
+                    "delta": "+1.1"
+                },
+                {
+                    "label": "GSM8K",
+                    "score": 61.8,
+                    "target": 60,
+                    "delta": "+2.8"
+                },
+                {
+                    "label": "TruthfulQA",
+                    "score": 54.4,
+                    "target": 56,
+                    "delta": "-1.2"
+                },
+                {
+                    "label": "CodeEval",
+                    "score": 48.6,
+                    "target": 47,
+                    "delta": "+0.9"
+                }
+            ]
+        }
+    },
+    {
+        "id": "llm-attention-drift",
+        "type": "mpl-attention-heatmap",
+        "title": "Attention Drift",
+        "subtitle": "Layer activations during finetune",
+        "colorTheme": "theme-natural",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "xLabels": [
+                "B1",
+                "B2",
+                "B3",
+                "B4",
+                "B5",
+                "B6"
+            ],
+            "yLabels": [
+                "L0",
+                "L8",
+                "L16",
+                "L24",
+                "L32",
+                "L40"
+            ],
+            "matrix": [
+                [
+                    0.19,
+                    0.24,
+                    0.28,
+                    0.32,
+                    0.36,
+                    0.39
+                ],
+                [
+                    0.22,
+                    0.26,
+                    0.31,
+                    0.37,
+                    0.44,
+                    0.48
+                ],
+                [
+                    0.24,
+                    0.3,
+                    0.35,
+                    0.42,
+                    0.49,
+                    0.53
+                ],
+                [
+                    0.21,
+                    0.28,
+                    0.34,
+                    0.46,
+                    0.55,
+                    0.62
+                ],
+                [
+                    0.18,
+                    0.24,
+                    0.33,
+                    0.41,
+                    0.52,
+                    0.65
+                ],
+                [
+                    0.14,
+                    0.18,
+                    0.25,
+                    0.34,
+                    0.45,
+                    0.58
+                ]
+            ],
+            "sideNotes": [
+                {
+                    "label": "drift peak",
+                    "value": "L32 / B6"
+                },
+                {
+                    "label": "memory headroom",
+                    "value": "14%"
+                },
+                {
+                    "label": "seq len",
+                    "value": "8,192"
+                }
+            ]
+        }
     },
     {
         "id": "ad-fatigue",
         "type": "intensity-heat",
         "title": "Ad Fatigue",
         "subtitle": "Audience Saturaion Index",
-        "value": "29",
-        "unit": "deg",
-        "signalOrientation": "horizontal",
-        "signalScore": 29,
-        "signalLabel": "Low fatigue",
-        "goodAtHigh": false,
         "footerText": "High Rotation Suggested",
         "colorTheme": "theme-red",
-        "gridSpan": "default"
+        "gridSpan": "default",
+        "data": {
+            "value": "29",
+            "unit": "deg",
+            "signalOrientation": "horizontal",
+            "signalScore": 29,
+            "signalLabel": "Low fatigue",
+            "goodAtHigh": false
+        }
     },
     {
         "id": "refresh-cycle",
         "type": "chrono-dial",
         "title": "Creative Health",
         "subtitle": "Asset Freshness Score",
-        "value": "86",
-        "unit": "pts",
-        "trendValue": "+5 pts",
-        "trendDirection": "up",
-        "trendTone": "positive",
-        "trendLabel": "since last refresh",
         "footerText": "Scheduled for Monday",
         "colorTheme": "theme-color",
-        "gridSpan": "default"
+        "gridSpan": "default",
+        "data": {
+            "value": "86",
+            "unit": "pts",
+            "trendValue": "+5 pts",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "since last refresh"
+        }
     },
     {
         "id": "budget-burn",
         "type": "natural",
         "title": "Budget Pacing",
         "subtitle": "Monthly Spend Momentum",
-        "value": "72",
-        "unit": "%",
-        "sparklineColor": "#ff7676",
-        "dataPoints": [
-            54,
-            57,
-            60,
-            63,
-            66,
-            69,
-            71,
-            72
-        ],
-        "trendTone": "negative",
         "footerText": "12 days left at current pace",
         "colorTheme": "theme-red",
-        "gridSpan": "default"
+        "gridSpan": "default",
+        "data": {
+            "value": "72",
+            "unit": "%",
+            "sparklineColor": "#ff7676",
+            "dataPoints": [
+                54,
+                57,
+                60,
+                63,
+                66,
+                69,
+                71,
+                72
+            ],
+            "trendTone": "negative"
+        }
     },
     {
         "id": "viral-k-factor",
         "type": "light-dial",
         "title": "Viral Multiplier",
         "subtitle": "Organic Lift per Paid Click",
-        "value": "1.4",
-        "unit": "x",
-        "sliderValue": 45,
-        "trendValue": "+0.2x",
-        "trendDirection": "up",
-        "trendTone": "positive",
-        "trendLabel": "organic amplification",
         "colorTheme": "theme-color",
-        "gridSpan": "default"
+        "gridSpan": "default",
+        "data": {
+            "value": "1.4",
+            "unit": "x",
+            "sliderValue": 45,
+            "trendValue": "+0.2x",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "organic amplification"
+        }
     },
     {
         "id": "incremental-lift",
         "type": "incremental-lift",
         "title": "Incremental Lift",
         "subtitle": "Paid vs. Baseline Organic",
-        "value": "+22%",
-        "unit": "lift",
         "colorTheme": "theme-revenue",
-        "gridSpan": "default"
+        "gridSpan": "default",
+        "data": {
+            "value": "+22%",
+            "unit": "lift"
+        }
     },
     {
         "id": "optimal-time",
         "type": "optimal-time",
         "title": "Peak Engagement",
         "subtitle": "Best Campaign Window",
-        "value": "18:00",
-        "unit": "GMT",
-        "engagementMatrix": [
-            [
+        "colorTheme": "theme-natural",
+        "gridSpan": "row-span-2",
+        "data": {
+            "value": "18:00",
+            "unit": "GMT",
+            "calendarMonth": "April 2026",
+            "calendarOffset": 2,
+            "daysInMonth": 30,
+            "totalCalendarCells": 56,
+            "calendarValues": [
                 28,
                 31,
                 33,
@@ -264,9 +488,7 @@
                 44,
                 48,
                 55,
-                56
-            ],
-            [
+                56,
                 32,
                 31,
                 34,
@@ -274,9 +496,7 @@
                 26,
                 28,
                 22,
-                35
-            ],
-            [
+                35,
                 36,
                 35,
                 35,
@@ -284,184 +504,225 @@
                 35,
                 21,
                 36,
-                36
-            ],
-            [
+                36,
                 27,
                 29,
                 32,
                 22,
                 34,
-                23,
-                29,
-                35
+                23
             ],
-            [
-                14,
-                16,
-                18,
-                11,
-                13,
-                12,
-                16,
-                11
+            "engagementMatrix": [
+                [
+                    28,
+                    31,
+                    33,
+                    35,
+                    44,
+                    48,
+                    55,
+                    56
+                ],
+                [
+                    32,
+                    31,
+                    34,
+                    35,
+                    26,
+                    28,
+                    22,
+                    35
+                ],
+                [
+                    36,
+                    35,
+                    35,
+                    35,
+                    35,
+                    21,
+                    36,
+                    36
+                ],
+                [
+                    27,
+                    29,
+                    32,
+                    22,
+                    34,
+                    23,
+                    29,
+                    35
+                ],
+                [
+                    14,
+                    16,
+                    18,
+                    11,
+                    13,
+                    12,
+                    16,
+                    11
+                ],
+                [
+                    32,
+                    32,
+                    32,
+                    1,
+                    31,
+                    31,
+                    11,
+                    32
+                ],
+                [
+                    3,
+                    6,
+                    8,
+                    11,
+                    31,
+                    11,
+                    12,
+                    14
+                ],
+                [
+                    3,
+                    2,
+                    7,
+                    30,
+                    31,
+                    11,
+                    19,
+                    33
+                ]
             ],
-            [
-                32,
-                32,
-                32,
-                1,
-                31,
-                31,
-                11,
-                32
+            "summaryCards": [
+                {
+                    "id": "weekly-peak",
+                    "icon": "sparkles",
+                    "label": "Weekly Peak",
+                    "value": "8,097",
+                    "delta": "+19.6%",
+                    "note": "42,214 engaged sessions",
+                    "tone": "positive"
+                },
+                {
+                    "id": "quarter-reach",
+                    "icon": "orbit",
+                    "label": "Quarter Reach",
+                    "value": "312,134",
+                    "delta": "+2.5%",
+                    "note": "301,002 prior baseline",
+                    "tone": "positive"
+                }
             ],
-            [
-                3,
-                6,
-                8,
-                11,
-                31,
-                11,
-                12,
-                14
-            ],
-            [
-                3,
-                2,
-                7,
-                30,
-                31,
-                11,
-                19,
-                33
+            "marketBreakdown": [
+                {
+                    "label": "Los Angeles",
+                    "value": "201,192"
+                },
+                {
+                    "label": "New York",
+                    "value": "192,054"
+                },
+                {
+                    "label": "Canada",
+                    "value": "166,401"
+                }
             ]
-        ],
-        "summaryCards": [
-            {
-                "id": "weekly-peak",
-                "icon": "sparkles",
-                "label": "Weekly Peak",
-                "value": "8,097",
-                "delta": "+19.6%",
-                "note": "42,214 engaged sessions",
-                "tone": "positive"
-            },
-            {
-                "id": "quarter-reach",
-                "icon": "orbit",
-                "label": "Quarter Reach",
-                "value": "312,134",
-                "delta": "+2.5%",
-                "note": "301,002 prior baseline",
-                "tone": "positive"
-            }
-        ],
-        "marketBreakdown": [
-            {
-                "label": "Los Angeles",
-                "value": "201,192"
-            },
-            {
-                "label": "New York",
-                "value": "192,054"
-            },
-            {
-                "label": "Canada",
-                "value": "166,401"
-            }
-        ],
-        "colorTheme": "theme-natural",
-        "gridSpan": "row-span-2"
+        }
     },
     {
         "id": "live-traffic",
         "type": "animated-line",
-        "title": "Live Pulse",
+        "title": "Live trafic",
         "subtitle": "Real-time Concurrent Users",
-        "value": "1,204",
-        "unit": "usr",
         "footerText": "Last 5 Minutes Activity",
         "colorTheme": "theme-productivity",
         "gridSpan": "col-span-2",
-        "metricCards": [
-            {
-                "icon": "sparkles",
-                "label": "Active now",
-                "value": "462",
-                "delta": "+7.0%",
-                "note": "users online"
+        "description": "Concurrent traffic over the last 5 minutes, highlighting where the active session count accelerates.",
+        "data": {
+            "value": "1,204",
+            "unit": "usr",
+            "metricCards": [
+                {
+                    "icon": "sparkles",
+                    "label": "Active now",
+                    "value": "462",
+                    "delta": "+7.0%",
+                    "note": "users online"
+                },
+                {
+                    "icon": "medal",
+                    "label": "Peak today",
+                    "value": "512",
+                    "delta": "+12.4%",
+                    "note": "highest concurrent users"
+                }
+            ],
+            "chartLabels": [
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+                "Sun"
+            ],
+            "chartSeries": [
+                280,
+                310,
+                395,
+                382,
+                462,
+                null,
+                null
+            ],
+            "chartMin": 100,
+            "chartMax": 700,
+            "annotation": {
+                "index": 4,
+                "label": "ACTIVE USERS",
+                "value": "462"
             },
-            {
-                "icon": "medal",
-                "label": "Peak today",
-                "value": "512",
-                "delta": "+12.4%",
-                "note": "highest concurrent users"
-            }
-        ],
-        "chartLabels": [
-            "Mon",
-            "Tue",
-            "Wed",
-            "Thu",
-            "Fri",
-            "Sat",
-            "Sun"
-        ],
-        "chartSeries": [
-            280,
-            310,
-            395,
-            382,
-            462,
-            null,
-            null
-        ],
-        "chartMin": 100,
-        "chartMax": 700,
-        "annotation": {
-            "index": 4,
-            "label": "ACTIVE USERS",
-            "value": "462"
-        },
-        "dataPoints": [
-            280,
-            310,
-            395,
-            382,
-            462
-        ]
+            "dataPoints": [
+                280,
+                310,
+                395,
+                382,
+                462
+            ]
+        }
     },
     {
         "id": "revenue-forecast",
         "type": "predictive",
         "title": "Revenue Performance",
         "subtitle": "Predictive Forecast Model",
-        "value": "$452K",
-        "unit": "est",
         "colorTheme": "theme-revenue",
         "gridSpan": "col-span-2",
-        "historical": [
-            320,
-            335,
-            310,
-            350,
-            380,
-            400
-        ],
-        "forecast": [
-            410,
-            425,
-            440,
-            435,
-            452
-        ],
-        "confidenceRange": [
-            30,
-            45,
-            60
-        ]
+        "data": {
+            "value": "$452K",
+            "unit": "est",
+            "historical": [
+                320,
+                335,
+                310,
+                350,
+                380,
+                400
+            ],
+            "forecast": [
+                410,
+                425,
+                440,
+                435,
+                452
+            ],
+            "confidenceRange": [
+                30,
+                45,
+                60
+            ]
+        }
     },
     {
         "id": "retention-cohorts",
@@ -470,299 +731,309 @@
         "subtitle": "User Stickiness",
         "colorTheme": "theme-audience",
         "gridSpan": "default",
-        "summaryValue": "38.4%",
-        "summaryDelta": "+3.1 pts",
-        "summaryCompare": "Average last-step retention across active cohorts",
-        "retentionBars": [
-            {
-                "label": "500",
-                "segments": [
-                    39,
-                    11,
-                    10,
-                    10
-                ],
-                "marker": 97
-            },
-            {
-                "label": "400",
-                "segments": [
-                    39,
-                    15,
-                    14,
-                    15
-                ],
-                "marker": 87
-            },
-            {
-                "label": "300",
-                "segments": [
-                    16,
-                    9,
-                    8,
-                    8
-                ],
-                "marker": 49
-            },
-            {
-                "label": "200",
-                "segments": [
-                    16,
-                    13,
-                    13,
-                    13
-                ],
-                "marker": 63
-            },
-            {
-                "label": "100",
-                "segments": [
-                    39,
-                    15,
-                    14,
-                    15
-                ],
-                "marker": 97
-            }
-        ],
-        "cohorts": [
-            {
-                "week": "Feb 01",
-                "size": 1200,
-                "data": [
-                    100,
-                    85,
-                    70,
-                    62
-                ]
-            },
-            {
-                "week": "Feb 08",
-                "size": 1150,
-                "data": [
-                    100,
-                    82,
-                    68
-                ]
-            },
-            {
-                "week": "Feb 15",
-                "size": 1300,
-                "data": [
-                    100,
-                    88
-                ]
-            },
-            {
-                "week": "Feb 22",
-                "size": 1250,
-                "data": [
-                    100
-                ]
-            }
-        ]
+        "data": {
+            "summaryValue": "38.4%",
+            "summaryDelta": "+3.1 pts",
+            "summaryCompare": "Average last-step retention across active cohorts",
+            "retentionBars": [
+                {
+                    "label": "500",
+                    "segments": [
+                        39,
+                        11,
+                        10,
+                        10
+                    ],
+                    "marker": 97
+                },
+                {
+                    "label": "400",
+                    "segments": [
+                        39,
+                        15,
+                        14,
+                        15
+                    ],
+                    "marker": 87
+                },
+                {
+                    "label": "300",
+                    "segments": [
+                        16,
+                        9,
+                        8,
+                        8
+                    ],
+                    "marker": 49
+                },
+                {
+                    "label": "200",
+                    "segments": [
+                        16,
+                        13,
+                        13,
+                        13
+                    ],
+                    "marker": 63
+                },
+                {
+                    "label": "100",
+                    "segments": [
+                        39,
+                        15,
+                        14,
+                        15
+                    ],
+                    "marker": 97
+                }
+            ],
+            "cohorts": [
+                {
+                    "week": "Feb 01",
+                    "size": 1200,
+                    "data": [
+                        100,
+                        85,
+                        70,
+                        62
+                    ]
+                },
+                {
+                    "week": "Feb 08",
+                    "size": 1150,
+                    "data": [
+                        100,
+                        82,
+                        68
+                    ]
+                },
+                {
+                    "week": "Feb 15",
+                    "size": 1300,
+                    "data": [
+                        100,
+                        88
+                    ]
+                },
+                {
+                    "week": "Feb 22",
+                    "size": 1250,
+                    "data": [
+                        100
+                    ]
+                }
+            ]
+        }
     },
     {
         "id": "technical-health",
         "type": "vitals",
         "title": "Health",
         "subtitle": "Service Uptime",
-        "value": "99.94",
-        "unit": "%",
         "colorTheme": "theme-weather",
         "gridSpan": "default",
-        "uptimeBars": [
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "warn",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "warn",
-            "good",
-            "good",
-            "good",
-            "good",
-            "down",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good",
-            "good"
-        ],
-        "metrics": [
-            {
-                "name": "LCP",
-                "value": "1.2s",
-                "status": "good"
-            },
-            {
-                "name": "FID",
-                "value": "14ms",
-                "status": "good"
-            },
-            {
-                "name": "CLS",
-                "value": "0.04",
-                "status": "good"
-            },
-            {
-                "name": "Errors",
-                "value": "0.1%",
-                "status": "good"
-            }
-        ]
+        "data": {
+            "value": "99.94",
+            "unit": "%",
+            "uptimeBars": [
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "warn",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "warn",
+                "good",
+                "good",
+                "good",
+                "good",
+                "down",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good"
+            ],
+            "metrics": [
+                {
+                    "name": "LCP",
+                    "value": "1.2s",
+                    "status": "good"
+                },
+                {
+                    "name": "FID",
+                    "value": "14ms",
+                    "status": "good"
+                },
+                {
+                    "name": "CLS",
+                    "value": "0.04",
+                    "status": "good"
+                },
+                {
+                    "name": "Errors",
+                    "value": "0.1%",
+                    "status": "good"
+                }
+            ]
+        }
     },
     {
         "id": "stat-leads",
         "type": "leads-list",
         "title": "Recent Leads",
         "subtitle": "Active Conversions",
-        "leads": [
-            {
-                "name": "Andrei Popescu",
-                "value": "Google Ads",
-                "status": "vip",
-                "time": "2m ago"
-            },
-            {
-                "name": "Maria Ionescu",
-                "value": "Facebook",
-                "status": "warm",
-                "time": "15m ago"
-            },
-            {
-                "name": "Digital Solutions",
-                "value": "Direct",
-                "status": "vip",
-                "time": "1h ago"
-            },
-            {
-                "name": "Tech Global",
-                "value": "LinkedIn",
-                "status": "cold",
-                "time": "3h ago"
-            },
-            {
-                "name": "Retail Edge",
-                "value": "TikTok",
-                "status": "warm",
-                "time": "4h ago"
-            },
-            {
-                "name": "North Star Media",
-                "value": "Referral",
-                "status": "vip",
-                "time": "5h ago"
-            },
-            {
-                "name": "Orbital Labs",
-                "value": "Email",
-                "status": "cold",
-                "time": "6h ago"
-            },
-            {
-                "name": "Creative Harbor",
-                "value": "Instagram",
-                "status": "warm",
-                "time": "7h ago"
-            }
-        ],
         "colorTheme": "theme-productivity",
-        "gridSpan": "col-span-2 row-span-2"
+        "gridSpan": "row-span-2",
+        "data": {
+            "leads": [
+                {
+                    "name": "Andrei Popescu",
+                    "value": "Google Ads",
+                    "status": "vip",
+                    "time": "2m ago"
+                },
+                {
+                    "name": "Maria Ionescu",
+                    "value": "Facebook",
+                    "status": "warm",
+                    "time": "15m ago"
+                },
+                {
+                    "name": "Digital Solutions",
+                    "value": "Direct",
+                    "status": "vip",
+                    "time": "1h ago"
+                },
+                {
+                    "name": "Tech Global",
+                    "value": "LinkedIn",
+                    "status": "cold",
+                    "time": "3h ago"
+                },
+                {
+                    "name": "Retail Edge",
+                    "value": "TikTok",
+                    "status": "warm",
+                    "time": "4h ago"
+                },
+                {
+                    "name": "North Star Media",
+                    "value": "Referral",
+                    "status": "vip",
+                    "time": "5h ago"
+                },
+                {
+                    "name": "Orbital Labs",
+                    "value": "Email",
+                    "status": "cold",
+                    "time": "6h ago"
+                },
+                {
+                    "name": "Creative Harbor",
+                    "value": "Instagram",
+                    "status": "warm",
+                    "time": "7h ago"
+                }
+            ]
+        }
     },
     {
         "id": "top-routes",
         "type": "leads-list",
         "title": "Top Routes",
         "subtitle": "Most Visited Pages",
-        "leads": [
-            {
-                "name": "/dashboard/stats",
-                "value": "2.4k views",
-                "time": "+12%"
-            },
-            {
-                "name": "/campaign/summer",
-                "value": "1.8k views",
-                "time": "+5%"
-            },
-            {
-                "name": "/products/new",
-                "value": "1.2k views",
-                "time": "+22%"
-            },
-            {
-                "name": "/cart/checkout",
-                "value": "800 views",
-                "time": "-2%"
-            }
-        ],
         "colorTheme": "theme-natural",
-        "gridSpan": "default"
+        "gridSpan": "default",
+        "data": {
+            "leads": [
+                {
+                    "name": "/dashboard/stats",
+                    "value": "2.4k views",
+                    "time": "+12%"
+                },
+                {
+                    "name": "/campaign/summer",
+                    "value": "1.8k views",
+                    "time": "+5%"
+                },
+                {
+                    "name": "/products/new",
+                    "value": "1.2k views",
+                    "time": "+22%"
+                },
+                {
+                    "name": "/cart/checkout",
+                    "value": "800 views",
+                    "time": "-2%"
+                }
+            ]
+        }
     },
     {
         "id": "financial-waterfall",
         "type": "waterfall",
         "title": "Net Profit Bridge",
         "subtitle": "Gross to Net Visibility",
-        "value": "$42.5K",
-        "unit": "net",
         "colorTheme": "theme-revenue",
         "gridSpan": "col-span-2",
-        "steps": [
-            {
-                "name": "Gross Revenue",
-                "value": 124000
-            },
-            {
-                "name": "COGS",
-                "value": -45000
-            },
-            {
-                "name": "Ad Spend",
-                "value": -28000
-            },
-            {
-                "name": "OpEx",
-                "value": -8500
-            },
-            {
-                "name": "Net Profit",
-                "isTotal": true
-            }
-        ]
+        "data": {
+            "value": "$42.5K",
+            "unit": "net",
+            "steps": [
+                {
+                    "name": "Gross Revenue",
+                    "value": 124000
+                },
+                {
+                    "name": "COGS",
+                    "value": -45000
+                },
+                {
+                    "name": "Ad Spend",
+                    "value": -28000
+                },
+                {
+                    "name": "OpEx",
+                    "value": -8500
+                },
+                {
+                    "name": "Net Profit",
+                    "isTotal": true
+                }
+            ]
+        }
     },
     {
         "id": "market-sentiment",
@@ -771,66 +1042,68 @@
         "subtitle": "Aggregated Brand Health",
         "colorTheme": "theme-audience",
         "gridSpan": "col-span-2",
-        "indicator": [
-            {
-                "name": "Trust",
-                "max": 100
-            },
-            {
-                "name": "Innovation",
-                "max": 100
-            },
-            {
-                "name": "Price",
-                "max": 100
-            },
-            {
-                "name": "Service",
-                "max": 100
-            },
-            {
-                "name": "Quality",
-                "max": 100
-            }
-        ],
-        "radarData": [
-            {
-                "value": [
-                    92,
-                    80,
-                    65,
-                    88,
-                    85
-                ],
-                "name": "Current Metric",
-                "symbol": "none",
-                "itemStyle": {
-                    "color": "#ec4899"
+        "data": {
+            "indicator": [
+                {
+                    "name": "Trust",
+                    "max": 100
                 },
-                "areaStyle": {
-                    "color": {
-                        "type": "radial",
-                        "x": 0.5,
-                        "y": 0.5,
-                        "r": 1,
-                        "colorStops": [
-                            {
-                                "offset": 0,
-                                "color": "rgba(236, 72, 153, 0.1)"
-                            },
-                            {
-                                "offset": 1,
-                                "color": "rgba(236, 72, 153, 0.4)"
-                            }
-                        ]
-                    }
+                {
+                    "name": "Innovation",
+                    "max": 100
                 },
-                "lineStyle": {
-                    "width": 2,
-                    "type": "solid"
+                {
+                    "name": "Price",
+                    "max": 100
+                },
+                {
+                    "name": "Service",
+                    "max": 100
+                },
+                {
+                    "name": "Quality",
+                    "max": 100
                 }
-            }
-        ]
+            ],
+            "radarData": [
+                {
+                    "value": [
+                        92,
+                        80,
+                        65,
+                        88,
+                        85
+                    ],
+                    "name": "Current Metric",
+                    "symbol": "none",
+                    "itemStyle": {
+                        "color": "#ec4899"
+                    },
+                    "areaStyle": {
+                        "color": {
+                            "type": "radial",
+                            "x": 0.5,
+                            "y": 0.5,
+                            "r": 1,
+                            "colorStops": [
+                                {
+                                    "offset": 0,
+                                    "color": "rgba(236, 72, 153, 0.1)"
+                                },
+                                {
+                                    "offset": 1,
+                                    "color": "rgba(236, 72, 153, 0.4)"
+                                }
+                            ]
+                        }
+                    },
+                    "lineStyle": {
+                        "width": 2,
+                        "type": "solid"
+                    }
+                }
+            ]
+        }
     },
     {
         "id": "attribution-models",
@@ -839,76 +1112,68 @@
         "subtitle": "Monthly and Yearly Budget Allocation",
         "colorTheme": "theme-productivity",
         "gridSpan": "col-span-2 row-span-2",
-        "summaryValue": "$22.3K",
-        "summaryLabel": "Monthly Budget",
-        "periodMetrics": [
-            {
-                "label": "Monthly",
-                "value": "$22.3K",
-                "delta": "+19.6%",
-                "note": "$18.4K baseline",
-                "tone": "#7CFF5B"
-            },
-            {
-                "label": "Yearly",
-                "value": "$343K",
-                "delta": "+2.5%",
-                "note": "$334K baseline",
-                "tone": "#FFC533"
-            }
-        ],
-        "footerMetrics": [
-            {
-                "label": "Total earning",
-                "value": "$540.3K",
-                "iconBg": "linear-gradient(180deg, #5b47e8 0%, #4338ca 100%)"
-            },
-            {
-                "label": "Sales",
-                "value": "$1.4M",
-                "iconBg": "linear-gradient(180deg, #3a3a3a 0%, #232323 100%)"
-            }
-        ],
-        "models": [
-            {
-                "channel": "Google",
-                "monthly": 8097,
-                "yearly": 145000,
-                "yearlyColor": "#2EF0B2",
-                "monthlyColor": "#FFBF1F"
-            },
-            {
-                "channel": "Meta",
-                "monthly": 6402,
-                "yearly": 118000,
-                "yearlyColor": "#31E9C9",
-                "monthlyColor": "#FF9F1F"
-            },
-            {
-                "channel": "Direct",
-                "monthly": 4421,
-                "yearly": 54000,
-                "yearlyColor": "#8B5CF6",
-                "monthlyColor": "#FF5A36"
-            },
-            {
-                "channel": "Other",
-                "monthly": 3397,
-                "yearly": 26000,
-                "yearlyColor": "#7B6D87",
-                "monthlyColor": "#F33B1D"
-            }
-        ]
+        "data": {
+            "summaryValue": "$22.3K",
+            "summaryLabel": "Monthly Budget",
+            "periodMetrics": [
+                {
+                    "label": "Monthly",
+                    "value": "$22.3K",
+                    "delta": "+19.6%",
+                    "note": "$18.4K baseline",
+                    "tone": "#7CFF5B"
+                },
+                {
+                    "label": "Yearly",
+                    "value": "$343K",
+                    "delta": "+2.5%",
+                    "note": "$334K baseline",
+                    "tone": "#FFC533"
+                }
+            ],
+            "models": [
+                {
+                    "channel": "Google",
+                    "monthly": 8097,
+                    "yearly": 145000,
+                    "yearlyColor": "#2EF0B2",
+                    "monthlyColor": "#FFBF1F"
+                },
+                {
+                    "channel": "Meta",
+                    "monthly": 6402,
+                    "yearly": 118000,
+                    "yearlyColor": "#31E9C9",
+                    "monthlyColor": "#FF9F1F"
+                },
+                {
+                    "channel": "Direct",
+                    "monthly": 4421,
+                    "yearly": 54000,
+                    "yearlyColor": "#8B5CF6",
+                    "monthlyColor": "#FF5A36"
+                },
+                {
+                    "channel": "Other",
+                    "monthly": 3397,
+                    "yearly": 26000,
+                    "yearlyColor": "#7B6D87",
+                    "monthlyColor": "#F33B1D"
+                }
+            ]
+        }
     },
     {
         "id": "anomaly-detection",
         "type": "anomaly-stream",
         "title": "Anomaly Pulse",
         "subtitle": "ML-Driven Variance Detection",
-        "value": "2 Spikes",
-        "unit": "warn",
         "colorTheme": "theme-weather",
-        "gridSpan": "col-span-2"
+        "gridSpan": "col-span-2",
+        "data": {
+            "value": "2 Spikes",
+            "unit": "warn"
+        }
     },
     {
         "id": "romania-3d",
@@ -916,7 +1181,8 @@
         "title": "Local Engagement",
         "subtitle": "Active RO Campaigns",
         "colorTheme": "theme-audience",
-        "gridSpan": "col-span-2 row-span-2"
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {}
     },
     {
         "id": "data-scatter",
@@ -925,90 +1191,98 @@
         "subtitle": "Cohort Efficiency Over Time",
         "colorTheme": "theme-audience",
         "gridSpan": "col-span-2 row-span-2",
-        "periodLabels": [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct"
-        ],
-        "scatterData": [
-            [
-                45,
-                450
+        "data": {
+            "periodLabels": [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct"
             ],
-            [
-                60,
-                724
-            ],
-            [
-                70,
-                482
-            ],
-            [
-                85,
-                720
-            ],
-            [
-                100,
-                804
-            ],
-            [
-                120,
-                1084
-            ],
-            [
-                130,
-                758
-            ],
-            [
-                145,
-                1050
-            ],
-            [
-                160,
-                1200
-            ],
-            [
-                180,
-                1280
+            "scatterData": [
+                [
+                    45,
+                    450
+                ],
+                [
+                    60,
+                    724
+                ],
+                [
+                    70,
+                    482
+                ],
+                [
+                    85,
+                    720
+                ],
+                [
+                    100,
+                    804
+                ],
+                [
+                    120,
+                    1084
+                ],
+                [
+                    130,
+                    758
+                ],
+                [
+                    145,
+                    1050
+                ],
+                [
+                    160,
+                    1200
+                ],
+                [
+                    180,
+                    1280
+                ]
             ]
-        ]
+        }
     },
     {
         "id": "sales-funnel",
         "type": "funnel",
         "title": "Sales Funnel",
-        "subtitle": "Conversion Steps",
-        "colorTheme": "theme-weather",
+        "subtitle": "Revenue flow composition",
+        "colorTheme": "theme-productivity",
         "gridSpan": "col-span-2",
-        "funnel": [
-            {
-                "value": 100,
-                "name": "Visits"
-            },
-            {
-                "value": 85,
-                "name": "Inquiry"
-            },
-            {
-                "value": 50,
-                "name": "Lead"
-            },
-            {
-                "value": 25,
-                "name": "Cart"
-            },
-            {
-                "value": 12,
-                "name": "Purchase"
-            }
-        ]
+        "data": {
+            "summaryLabel": "Income",
+            "summaryValue": "$32,134",
+            "summaryDelta": "↑2.5%",
+            "summaryCompare": "Compared to $21,340 last month",
+            "funnel": [
+                {
+                    "value": 100,
+                    "name": "Visits"
+                },
+                {
+                    "value": 85,
+                    "name": "Inquiry"
+                },
+                {
+                    "value": 50,
+                    "name": "Lead"
+                },
+                {
+                    "value": 25,
+                    "name": "Cart"
+                },
+                {
+                    "value": 12,
+                    "name": "Purchase"
+                }
+            ]
+        }
     },
     {
         "id": "market-evolution",
@@ -1017,87 +1291,89 @@
         "subtitle": "Cross-Channel Influence & Temporal Evolution",
         "colorTheme": "theme-audience",
         "gridSpan": "col-span-2 row-span-2",
-        "channels": [
-            {
-                "name": "Paid Search",
-                "color": "#3B82F6",
-                "value": 85,
-                "synergy": "High"
-            },
-            {
-                "name": "Social Ads",
-                "color": "#10B981",
-                "value": 72,
-                "synergy": "High"
-            },
-            {
-                "name": "Retargeting",
-                "color": "#F59E0B",
-                "value": 94,
-                "synergy": "Critical"
-            },
-            {
-                "name": "Email Flow",
-                "color": "#EF4444",
-                "value": 58,
-                "synergy": "Mid"
-            },
-            {
-                "name": "Organic SEO",
-                "color": "#8B5CF6",
-                "value": 88,
-                "synergy": "High"
-            },
-            {
-                "name": "Referral",
-                "color": "#EC4899",
-                "value": 45,
-                "synergy": "Mid"
-            },
-            {
-                "name": "Influencer",
-                "color": "#06B6D4",
-                "value": 65,
-                "synergy": "High"
-            }
-        ],
-        "links": [
-            {
-                "source": "Paid Search",
-                "target": "Organic SEO",
-                "value": 5
-            },
-            {
-                "source": "Social Ads",
-                "target": "Retargeting",
-                "value": 8
-            },
-            {
-                "source": "Email Flow",
-                "target": "Retargeting",
-                "value": 6
-            },
-            {
-                "source": "Organic SEO",
-                "target": "Direct",
-                "value": 4
-            },
-            {
-                "source": "Influencer",
-                "target": "Social Ads",
-                "value": 9
-            },
-            {
-                "source": "Paid Search",
-                "target": "Retargeting",
-                "value": 7
-            },
-            {
-                "source": "Organic SEO",
-                "target": "Social Ads",
-                "value": 5
-            }
-        ]
+        "data": {
+            "channels": [
+                {
+                    "name": "Paid Search",
+                    "color": "#3B82F6",
+                    "value": 85,
+                    "synergy": "High"
+                },
+                {
+                    "name": "Social Ads",
+                    "color": "#10B981",
+                    "value": 72,
+                    "synergy": "High"
+                },
+                {
+                    "name": "Retargeting",
+                    "color": "#F59E0B",
+                    "value": 94,
+                    "synergy": "Critical"
+                },
+                {
+                    "name": "Email Flow",
+                    "color": "#EF4444",
+                    "value": 58,
+                    "synergy": "Mid"
+                },
+                {
+                    "name": "Organic SEO",
+                    "color": "#8B5CF6",
+                    "value": 88,
+                    "synergy": "High"
+                },
+                {
+                    "name": "Referral",
+                    "color": "#EC4899",
+                    "value": 45,
+                    "synergy": "Mid"
+                },
+                {
+                    "name": "Influencer",
+                    "color": "#06B6D4",
+                    "value": 65,
+                    "synergy": "High"
+                }
+            ],
+            "links": [
+                {
+                    "source": "Paid Search",
+                    "target": "Organic SEO",
+                    "value": 5
+                },
+                {
+                    "source": "Social Ads",
+                    "target": "Retargeting",
+                    "value": 8
+                },
+                {
+                    "source": "Email Flow",
+                    "target": "Retargeting",
+                    "value": 6
+                },
+                {
+                    "source": "Organic SEO",
+                    "target": "Direct",
+                    "value": 4
+                },
+                {
+                    "source": "Influencer",
+                    "target": "Social Ads",
+                    "value": 9
+                },
+                {
+                    "source": "Paid Search",
+                    "target": "Retargeting",
+                    "value": 7
+                },
+                {
+                    "source": "Organic SEO",
+                    "target": "Social Ads",
+                    "value": 5
+                }
+            ]
+        }
     },
     {
         "id": "creative-quadrant",
@@ -1106,50 +1382,52 @@
         "subtitle": "CTR vs Conversion Rate Intelligence",
         "colorTheme": "theme-productivity",
         "gridSpan": "row-span-2",
-        "creatives": [
-            [
-                4.5,
-                6.2,
-                "Video: Spring Launch",
-                "Video"
-            ],
-            [
-                3.9,
-                6.5,
-                "Static: Product Close-up",
-                "Static"
-            ],
-            [
-                1.5,
-                9.0,
-                "Testimonial: Alex B.",
-                "Review"
-            ],
-            [
-                6.0,
-                1.5,
-                "Flash Sale Banner",
-                "Static"
-            ],
-            [
-                2.5,
-                4.8,
-                "Video: How it works",
-                "Video"
-            ],
-            [
-                0.5,
-                1.0,
-                "Static: Old Generic",
-                "Static"
-            ],
-            [
-                7.2,
-                0.8,
-                "Meme: Friday Vibe",
-                "Social"
+        "data": {
+            "creatives": [
+                [
+                    4.5,
+                    6.2,
+                    "Video: Spring Launch",
+                    "Video"
+                ],
+                [
+                    3.9,
+                    6.5,
+                    "Static: Product Close-up",
+                    "Static"
+                ],
+                [
+                    1.5,
+                    9,
+                    "Testimonial: Alex B.",
+                    "Review"
+                ],
+                [
+                    6,
+                    1.5,
+                    "Flash Sale Banner",
+                    "Static"
+                ],
+                [
+                    2.5,
+                    4.8,
+                    "Video: How it works",
+                    "Video"
+                ],
+                [
+                    0.5,
+                    1,
+                    "Static: Old Generic",
+                    "Static"
+                ],
+                [
+                    7.2,
+                    0.8,
+                    "Meme: Friday Vibe",
+                    "Social"
+                ]
             ]
-        ]
+        }
     },
     {
         "id": "budget-sensitivity",
@@ -1158,212 +1436,214 @@
         "subtitle": "Elasticity & Diminishing Returns",
         "colorTheme": "theme-revenue",
         "gridSpan": "col-span-2",
-        "curvePoints": [
-            [
-                0,
-                0.6692850924284856
-            ],
-            [
-                2,
-                0.816257115315989
-            ],
-            [
-                4,
-                0.9951801866904316
-            ],
-            [
-                6,
-                1.2128434984274237
-            ],
-            [
-                8,
-                1.4774031693273055
-            ],
-            [
-                10,
-                1.798620996209156
-            ],
-            [
-                12,
-                2.188127093613047
-            ],
-            [
-                14,
-                2.6596993576865855
-            ],
-            [
-                16,
-                3.2295464698450496
-            ],
-            [
-                18,
-                3.9165722796764353
-            ],
-            [
-                20,
-                4.742587317756678
-            ],
-            [
-                22,
-                5.7324175898868726
-            ],
-            [
-                24,
-                6.913842034334682
-            ],
-            [
-                26,
-                8.317269649392236
-            ],
-            [
-                28,
-                9.975048911968514
-            ],
-            [
-                30,
-                11.920292202211755
-            ],
-            [
-                32,
-                14.185106490048778
-            ],
-            [
-                34,
-                16.79816148660755
-            ],
-            [
-                36,
-                19.781611144141824
-            ],
-            [
-                38,
-                23.14752165009823
-            ],
-            [
-                40,
-                26.894142136999513
-            ],
-            [
-                42,
-                31.002551887238752
-            ],
-            [
-                44,
-                35.43436937742045
-            ],
-            [
-                46,
-                40.1312339887548
-            ],
-            [
-                48,
-                45.016600268752214
-            ],
-            [
-                50,
-                50.0
-            ],
-            [
-                52,
-                54.98339973124779
-            ],
-            [
-                54,
-                59.8687660112452
-            ],
-            [
-                56,
-                64.56563062257955
-            ],
-            [
-                58,
-                68.99744811276125
-            ],
-            [
-                60,
-                73.10585786300048
-            ],
-            [
-                62,
-                76.85247834990177
-            ],
-            [
-                64,
-                80.21838885585818
-            ],
-            [
-                66,
-                83.20183851339245
-            ],
-            [
-                68,
-                85.81489350995123
-            ],
-            [
-                70,
-                88.07970779778823
-            ],
-            [
-                72,
-                90.02495108803149
-            ],
-            [
-                74,
-                91.68273035060777
-            ],
-            [
-                76,
-                93.08615796566532
-            ],
-            [
-                78,
-                94.26758241011314
-            ],
-            [
-                80,
-                95.25741268224333
-            ],
-            [
-                82,
-                96.08342772032357
-            ],
-            [
-                84,
-                96.77045353015495
-            ],
-            [
-                86,
-                97.34030064231341
-            ],
-            [
-                88,
-                97.81187290638695
-            ],
-            [
-                90,
-                98.20137900379083
-            ],
-            [
-                92,
-                98.5225968306727
-            ],
-            [
-                94,
-                98.78715650157258
-            ],
-            [
-                96,
-                99.00481981330957
-            ],
-            [
-                98,
-                99.18374288468401
-            ],
-            [
-                100,
-                99.33071490757152
+        "data": {
+            "curvePoints": [
+                [
+                    0,
+                    0.6692850924284856
+                ],
+                [
+                    2,
+                    0.816257115315989
+                ],
+                [
+                    4,
+                    0.9951801866904316
+                ],
+                [
+                    6,
+                    1.2128434984274237
+                ],
+                [
+                    8,
+                    1.4774031693273055
+                ],
+                [
+                    10,
+                    1.798620996209156
+                ],
+                [
+                    12,
+                    2.188127093613047
+                ],
+                [
+                    14,
+                    2.6596993576865855
+                ],
+                [
+                    16,
+                    3.2295464698450496
+                ],
+                [
+                    18,
+                    3.9165722796764353
+                ],
+                [
+                    20,
+                    4.742587317756678
+                ],
+                [
+                    22,
+                    5.7324175898868726
+                ],
+                [
+                    24,
+                    6.913842034334682
+                ],
+                [
+                    26,
+                    8.317269649392236
+                ],
+                [
+                    28,
+                    9.975048911968514
+                ],
+                [
+                    30,
+                    11.920292202211755
+                ],
+                [
+                    32,
+                    14.185106490048778
+                ],
+                [
+                    34,
+                    16.79816148660755
+                ],
+                [
+                    36,
+                    19.781611144141824
+                ],
+                [
+                    38,
+                    23.14752165009823
+                ],
+                [
+                    40,
+                    26.894142136999513
+                ],
+                [
+                    42,
+                    31.002551887238752
+                ],
+                [
+                    44,
+                    35.43436937742045
+                ],
+                [
+                    46,
+                    40.1312339887548
+                ],
+                [
+                    48,
+                    45.016600268752214
+                ],
+                [
+                    50,
+                    50
+                ],
+                [
+                    52,
+                    54.98339973124779
+                ],
+                [
+                    54,
+                    59.8687660112452
+                ],
+                [
+                    56,
+                    64.56563062257955
+                ],
+                [
+                    58,
+                    68.99744811276125
+                ],
+                [
+                    60,
+                    73.10585786300048
+                ],
+                [
+                    62,
+                    76.85247834990177
+                ],
+                [
+                    64,
+                    80.21838885585818
+                ],
+                [
+                    66,
+                    83.20183851339245
+                ],
+                [
+                    68,
+                    85.81489350995123
+                ],
+                [
+                    70,
+                    88.07970779778823
+                ],
+                [
+                    72,
+                    90.02495108803149
+                ],
+                [
+                    74,
+                    91.68273035060777
+                ],
+                [
+                    76,
+                    93.08615796566532
+                ],
+                [
+                    78,
+                    94.26758241011314
+                ],
+                [
+                    80,
+                    95.25741268224333
+                ],
+                [
+                    82,
+                    96.08342772032357
+                ],
+                [
+                    84,
+                    96.77045353015495
+                ],
+                [
+                    86,
+                    97.34030064231341
+                ],
+                [
+                    88,
+                    97.81187290638695
+                ],
+                [
+                    90,
+                    98.20137900379083
+                ],
+                [
+                    92,
+                    98.5225968306727
+                ],
+                [
+                    94,
+                    98.78715650157258
+                ],
+                [
+                    96,
+                    99.00481981330957
+                ],
+                [
+                    98,
+                    99.18374288468401
+                ],
+                [
+                    100,
+                    99.33071490757152
+                ]
             ]
-        ]
+        }
     },
     {
         "id": "intent-sunburst",
@@ -1372,40 +1652,42 @@
         "subtitle": "Real-time Classification",
         "colorTheme": "theme-audience",
         "gridSpan": "col-span-2 row-span-2",
-        "sunburstData": [
-            {
-                "name": "Ready to Buy",
-                "itemStyle": {
-                    "color": "#10B981"
-                },
-                "children": [
-                    {
-                        "name": "Product X",
-                        "value": 20
+        "data": {
+            "sunburstData": [
+                {
+                    "name": "Ready to Buy",
+                    "itemStyle": {
+                        "color": "#10B981"
                     },
-                    {
-                        "name": "Checkout",
-                        "value": 25
-                    }
-                ]
-            },
-            {
-                "name": "Researching",
-                "itemStyle": {
-                    "color": "#3B82F6"
+                    "children": [
+                        {
+                            "name": "Product X",
+                            "value": 20
+                        },
+                        {
+                            "name": "Checkout",
+                            "value": 25
+                        }
+                    ]
                 },
-                "children": [
-                    {
-                        "name": "Pricing",
-                        "value": 15
+                {
+                    "name": "Researching",
+                    "itemStyle": {
+                        "color": "#3B82F6"
                     },
-                    {
-                        "name": "Features",
-                        "value": 15
-                    }
-                ]
-            }
-        ]
+                    "children": [
+                        {
+                            "name": "Pricing",
+                            "value": 15
+                        },
+                        {
+                            "name": "Features",
+                            "value": 15
+                        }
+                    ]
+                }
+            ]
+        }
     },
     {
         "id": "shapley-attribution",
@@ -1414,233 +1696,235 @@
         "subtitle": "Channel contribution by period",
         "colorTheme": "theme-productivity",
         "gridSpan": "col-span-2 row-span-2",
-        "rawData": [
-            [
-                "Email",
-                19.683019058189853,
-                2021
-            ],
-            [
-                "Email",
-                24.6833903211189,
-                2021
-            ],
-            [
-                "Email",
-                23.64701871671297,
-                2021
-            ],
-            [
-                "Email",
-                33.91222823701676,
-                2022
-            ],
-            [
-                "Email",
-                32.716793702194735,
-                2022
-            ],
-            [
-                "Email",
-                37.026395307833425,
-                2022
-            ],
-            [
-                "Email",
-                20.921580606324838,
-                2023
-            ],
-            [
-                "Email",
-                27.621240347441923,
-                2023
-            ],
-            [
-                "Email",
-                19.77874834249792,
-                2023
-            ],
-            [
-                "Search",
-                16.66624500617535,
-                2021
-            ],
-            [
-                "Search",
-                7.089858637785376,
-                2021
-            ],
-            [
-                "Search",
-                10.535892257841073,
-                2021
-            ],
-            [
-                "Search",
-                19.556827999698566,
-                2022
-            ],
-            [
-                "Search",
-                17.457968856172435,
-                2022
-            ],
-            [
-                "Search",
-                10.967951684922037,
-                2022
-            ],
-            [
-                "Search",
-                18.344452921626278,
-                2023
-            ],
-            [
-                "Search",
-                22.747748377664635,
-                2023
-            ],
-            [
-                "Search",
-                6.689114437669323,
-                2023
-            ],
-            [
-                "Meta",
-                38.137365454748775,
-                2021
-            ],
-            [
-                "Meta",
-                30.979587885344078,
-                2021
-            ],
-            [
-                "Meta",
-                27.28416755121987,
-                2021
-            ],
-            [
-                "Meta",
-                43.31883899911986,
-                2022
-            ],
-            [
-                "Meta",
-                30.906468457236777,
-                2022
-            ],
-            [
-                "Meta",
-                26.0294944225872,
-                2022
-            ],
-            [
-                "Meta",
-                26.10890509165352,
-                2023
-            ],
-            [
-                "Meta",
-                41.124464881933434,
-                2023
-            ],
-            [
-                "Meta",
-                36.24909818232206,
-                2023
-            ],
-            [
-                "Direct",
-                38.80848393210776,
-                2021
-            ],
-            [
-                "Direct",
-                34.93841002732542,
-                2021
-            ],
-            [
-                "Direct",
-                43.67616347781882,
-                2021
-            ],
-            [
-                "Direct",
-                31.784535742398475,
-                2022
-            ],
-            [
-                "Direct",
-                35.25466082369594,
-                2022
-            ],
-            [
-                "Direct",
-                40.8019414832913,
-                2022
-            ],
-            [
-                "Direct",
-                36.584243245516326,
-                2023
-            ],
-            [
-                "Direct",
-                41.44798620444695,
-                2023
-            ],
-            [
-                "Direct",
-                35.760891103366646,
-                2023
-            ],
-            [
-                "Referral",
-                22.05364275956095,
-                2021
-            ],
-            [
-                "Referral",
-                25.695120599478642,
-                2021
-            ],
-            [
-                "Referral",
-                26.92491435848985,
-                2021
-            ],
-            [
-                "Referral",
-                22.732994624920256,
-                2022
-            ],
-            [
-                "Referral",
-                25.79297281366831,
-                2022
-            ],
-            [
-                "Referral",
-                23.15718367464229,
-                2022
-            ],
-            [
-                "Referral",
-                26.696627148649547,
-                2023
-            ],
-            [
-                "Referral",
-                33.85084397173571,
-                2023
-            ],
-            [
-                "Referral",
-                28.43379866584939,
-                2023
+        "data": {
+            "rawData": [
+                [
+                    "Email",
+                    19.683019058189853,
+                    2021
+                ],
+                [
+                    "Email",
+                    24.6833903211189,
+                    2021
+                ],
+                [
+                    "Email",
+                    23.64701871671297,
+                    2021
+                ],
+                [
+                    "Email",
+                    33.91222823701676,
+                    2022
+                ],
+                [
+                    "Email",
+                    32.716793702194735,
+                    2022
+                ],
+                [
+                    "Email",
+                    37.026395307833425,
+                    2022
+                ],
+                [
+                    "Email",
+                    20.921580606324838,
+                    2023
+                ],
+                [
+                    "Email",
+                    27.621240347441923,
+                    2023
+                ],
+                [
+                    "Email",
+                    19.77874834249792,
+                    2023
+                ],
+                [
+                    "Search",
+                    16.66624500617535,
+                    2021
+                ],
+                [
+                    "Search",
+                    7.089858637785376,
+                    2021
+                ],
+                [
+                    "Search",
+                    10.535892257841073,
+                    2021
+                ],
+                [
+                    "Search",
+                    19.556827999698566,
+                    2022
+                ],
+                [
+                    "Search",
+                    17.457968856172435,
+                    2022
+                ],
+                [
+                    "Search",
+                    10.967951684922037,
+                    2022
+                ],
+                [
+                    "Search",
+                    18.344452921626278,
+                    2023
+                ],
+                [
+                    "Search",
+                    22.747748377664635,
+                    2023
+                ],
+                [
+                    "Search",
+                    6.689114437669323,
+                    2023
+                ],
+                [
+                    "Meta",
+                    38.137365454748775,
+                    2021
+                ],
+                [
+                    "Meta",
+                    30.979587885344078,
+                    2021
+                ],
+                [
+                    "Meta",
+                    27.28416755121987,
+                    2021
+                ],
+                [
+                    "Meta",
+                    43.31883899911986,
+                    2022
+                ],
+                [
+                    "Meta",
+                    30.906468457236777,
+                    2022
+                ],
+                [
+                    "Meta",
+                    26.0294944225872,
+                    2022
+                ],
+                [
+                    "Meta",
+                    26.10890509165352,
+                    2023
+                ],
+                [
+                    "Meta",
+                    41.124464881933434,
+                    2023
+                ],
+                [
+                    "Meta",
+                    36.24909818232206,
+                    2023
+                ],
+                [
+                    "Direct",
+                    38.80848393210776,
+                    2021
+                ],
+                [
+                    "Direct",
+                    34.93841002732542,
+                    2021
+                ],
+                [
+                    "Direct",
+                    43.67616347781882,
+                    2021
+                ],
+                [
+                    "Direct",
+                    31.784535742398475,
+                    2022
+                ],
+                [
+                    "Direct",
+                    35.25466082369594,
+                    2022
+                ],
+                [
+                    "Direct",
+                    40.8019414832913,
+                    2022
+                ],
+                [
+                    "Direct",
+                    36.584243245516326,
+                    2023
+                ],
+                [
+                    "Direct",
+                    41.44798620444695,
+                    2023
+                ],
+                [
+                    "Direct",
+                    35.760891103366646,
+                    2023
+                ],
+                [
+                    "Referral",
+                    22.05364275956095,
+                    2021
+                ],
+                [
+                    "Referral",
+                    25.695120599478642,
+                    2021
+                ],
+                [
+                    "Referral",
+                    26.92491435848985,
+                    2021
+                ],
+                [
+                    "Referral",
+                    22.732994624920256,
+                    2022
+                ],
+                [
+                    "Referral",
+                    25.79297281366831,
+                    2022
+                ],
+                [
+                    "Referral",
+                    23.15718367464229,
+                    2022
+                ],
+                [
+                    "Referral",
+                    26.696627148649547,
+                    2023
+                ],
+                [
+                    "Referral",
+                    33.85084397173571,
+                    2023
+                ],
+                [
+                    "Referral",
+                    28.43379866584939,
+                    2023
+                ]
             ]
-        ]
+        }
     },
     {
         "id": "trend-spotter",
@@ -1649,67 +1933,69 @@
         "subtitle": "Emerging Market Signals",
         "colorTheme": "theme-audience",
         "gridSpan": "col-span-2 row-span-2",
-        "keywords": [
-            {
-                "text": "AI Automation",
-                "weight": 95,
-                "trend": "up"
-            },
-            {
-                "text": "Sustainable",
-                "weight": 80,
-                "trend": "up"
-            },
-            {
-                "text": "Zero-Party Data",
-                "weight": 70,
-                "trend": "up"
-            },
-            {
-                "text": "Omnichannel",
-                "weight": 60,
-                "trend": "stable"
-            },
-            {
-                "text": "Crypto",
-                "weight": 35,
-                "trend": "down"
-            },
-            {
-                "text": "Hyper-Personalization",
-                "weight": 88,
-                "trend": "up"
-            },
-            {
-                "text": "Voice Search",
-                "weight": 65,
-                "trend": "stable"
-            },
-            {
-                "text": "Web3",
-                "weight": 40,
-                "trend": "down"
-            },
-            {
-                "text": "Privacy First",
-                "weight": 85,
-                "trend": "up"
-            },
-            {
-                "text": "Cookieless",
-                "weight": 75,
-                "trend": "up"
-            },
-            {
-                "text": "GenZ Retail",
-                "weight": 68,
-                "trend": "stable"
-            },
-            {
-                "text": "Metadata",
-                "weight": 55,
-                "trend": "up"
-            }
-        ]
+        "data": {
+            "keywords": [
+                {
+                    "text": "AI Automation",
+                    "weight": 95,
+                    "trend": "up"
+                },
+                {
+                    "text": "Sustainable",
+                    "weight": 80,
+                    "trend": "up"
+                },
+                {
+                    "text": "Zero-Party Data",
+                    "weight": 70,
+                    "trend": "up"
+                },
+                {
+                    "text": "Omnichannel",
+                    "weight": 60,
+                    "trend": "stable"
+                },
+                {
+                    "text": "Crypto",
+                    "weight": 35,
+                    "trend": "down"
+                },
+                {
+                    "text": "Hyper-Personalization",
+                    "weight": 88,
+                    "trend": "up"
+                },
+                {
+                    "text": "Voice Search",
+                    "weight": 65,
+                    "trend": "stable"
+                },
+                {
+                    "text": "Web3",
+                    "weight": 40,
+                    "trend": "down"
+                },
+                {
+                    "text": "Privacy First",
+                    "weight": 85,
+                    "trend": "up"
+                },
+                {
+                    "text": "Cookieless",
+                    "weight": 75,
+                    "trend": "up"
+                },
+                {
+                    "text": "GenZ Retail",
+                    "weight": 68,
+                    "trend": "stable"
+                },
+                {
+                    "text": "Metadata",
+                    "weight": 55,
+                    "trend": "up"
+                }
+            ]
+        }
     }
 ]

@@ -73,6 +73,7 @@ const LiveTrafficChart = ({ data = {} }) => {
     const values = data.chartSeries || defaultSeries;
     const labels = data.chartLabels || buildSequentialLabels(values.length, 'D');
     const metricCards = data.metricCards || buildTrafficMetrics(values);
+    const description = data.description || 'Concurrent traffic over the last 5 minutes with live session peaks and load shifts.';
     const ticks = buildTrafficTicks(values, data.chartMin, data.chartMax);
     const chartMin = data.chartMin ?? ticks[0];
     const chartMax = data.chartMax ?? ticks[ticks.length - 1];
@@ -191,29 +192,37 @@ const LiveTrafficChart = ({ data = {} }) => {
 
     return (
         <div className="live-pulse-widget">
-            <div className="live-pulse-metrics">
-                {metricCards.map((card) => (
-                    <section key={card.label} className="live-pulse-metric-card">
-                        <div className="live-pulse-metric-label">
-                            <span className={`live-pulse-metric-icon ${card.icon === 'medal' ? 'is-gold' : ''}`}>
-                                {renderMetricIcon(card.icon)}
-                            </span>
-                            <span>{card.label}</span>
-                        </div>
+            <div className="live-pulse-layout">
+                <div className="live-pulse-main">
+                    <div className="live-pulse-copy">
+                        {/* <div className="live-pulse-description">{description}</div> */}
+                    </div>
 
-                        <div className="live-pulse-metric-value">{card.value}</div>
+                    <div className="live-pulse-chart-shell">
+                        <div className="live-pulse-glow" />
+                        <ReactECharts option={option} notMerge lazyUpdate className="live-pulse-chart" />
+                    </div>
+                </div>
 
-                        <div className="live-pulse-metric-meta">
-                            <span className="live-pulse-metric-delta">{card.delta}</span>
-                            <span className="live-pulse-metric-note">{card.note}</span>
-                        </div>
-                    </section>
-                ))}
-            </div>
+                <div className="live-pulse-metrics">
+                    {metricCards.map((card) => (
+                        <section key={card.label} className="live-pulse-metric-card">
+                            <div className="live-pulse-metric-label">
+                                <span className={`live-pulse-metric-icon ${card.icon === 'medal' ? 'is-gold' : ''}`}>
+                                    {renderMetricIcon(card.icon)}
+                                </span>
+                                <span>{card.label}</span>
+                            </div>
 
-            <div className="live-pulse-chart-shell">
-                <div className="live-pulse-glow" />
-                <ReactECharts option={option} notMerge lazyUpdate className="live-pulse-chart" />
+                            <div className="live-pulse-metric-value">{card.value}</div>
+
+                            <div className="live-pulse-metric-meta">
+                                <span className="live-pulse-metric-delta">{card.delta}</span>
+                                <span className="live-pulse-metric-note">{card.note}</span>
+                            </div>
+                        </section>
+                    ))}
+                </div>
             </div>
         </div>
     );

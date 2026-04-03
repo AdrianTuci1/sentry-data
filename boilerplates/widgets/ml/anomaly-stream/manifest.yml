@@ -1,0 +1,92 @@
+title: "Anomaly Stream"
+description: "Scatter plot of anomaly candidates using x/y dispersion and entity label."
+component: "AnomalyStream"
+runtime_type: "anomaly-stream"
+aliases: []
+category: "ml"
+selection_hints:
+  - "anomaly candidates"
+  - "frequency vs impact"
+  - "dispersion plot"
+component_id_overrides: []
+data_requirements:
+  - "dispersionData: Scatter points as [x_value, y_value, label]."
+sql_aliases:
+  - alias: "dispersionData"
+    path: "data.dispersionData"
+    required: true
+    sql_type: "array[]"
+    expression_hint: "list([x_metric, y_metric, entity_name] ORDER BY y_metric DESC)"
+    description: "Scatter points as [x_value, y_value, label]."
+  - alias: "xAxisLabel"
+    path: "data.xAxisLabel"
+    required: false
+    sql_type: "string"
+    expression_hint: "xAxisLabel"
+    description: "Optional x-axis label."
+  - alias: "yAxisLabel"
+    path: "data.yAxisLabel"
+    required: false
+    sql_type: "string"
+    expression_hint: "yAxisLabel"
+    description: "Optional y-axis label."
+  - alias: "valueLabel"
+    path: "data.valueLabel"
+    required: false
+    sql_type: "string"
+    expression_hint: "valueLabel"
+    description: "Optional tooltip value label."
+data_structure_template:
+  data:
+    dispersionData:
+      - - 120
+        - 32000
+        - "Service A"
+      - - 180
+        - 41000
+        - "Service B"
+    xAxisLabel: "Frequency"
+    yAxisLabel: "Variance"
+    valueLabel: "score"
+grid_span: "col-span-2"
+color_theme: "theme-weather"
+sdui:
+  root_key: "data"
+  mapping_mode: "array"
+query_guidance:
+  sql_shape: "single_row"
+  data_root: "data"
+  return_shape: "array"
+  rules:
+    - "Return SQL-derived fields under the `data` object."
+    - "Use aliases exactly as listed in `sql_aliases`."
+    - "Prefer one final row per widget payload; use DuckDB list/struct aggregations for nested arrays or objects."
+  duckdb_patterns:
+    - "Use `list(value ORDER BY sort_key)` for arrays."
+    - "Use `struct_pack(key := value, ...)` for nested objects."
+    - "Use `list(struct_pack(... ) ORDER BY sort_key)` for arrays of objects."
+  alias_projection_examples:
+    dispersionData: "list([x_metric, y_metric, entity_name] ORDER BY y_metric DESC)"
+    xAxisLabel: "xAxisLabel"
+    yAxisLabel: "yAxisLabel"
+    valueLabel: "valueLabel"
+  recommended_grain: "single row"
+  implementation_notes:
+    - "Aggregate to the widget grain before packaging the payload."
+    - "Return metadata like title, type, gridSpan and colorTheme outside the `data` object; place SQL-derived fields inside `data`."
+    - "Format strings in SQL only when the component explicitly expects formatted labels; otherwise return numerics and let the UI format them."
+insight_payload_contract:
+  type: "anomaly-stream"
+  gridSpan: "col-span-2"
+  colorTheme: "theme-weather"
+  data:
+    dispersionData:
+      - - 120
+        - 32000
+        - "Service A"
+      - - 180
+        - 41000
+        - "Service B"
+    xAxisLabel: "Frequency"
+    yAxisLabel: "Variance"
+    valueLabel: "score"

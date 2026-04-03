@@ -1,0 +1,83 @@
+title: "Market Sentiment Radar"
+description: "Radar chart summarising current posture or sentiment."
+component: "MarketSentimentRadar"
+runtime_type: "market-radar"
+aliases: []
+category: "marketing"
+selection_hints:
+  - "brand or posture radar"
+  - "aggregate category scores"
+  - "multi-axis snapshot"
+component_id_overrides: []
+data_requirements:
+  - "indicator: Radar axes as [{name,max}]."
+  - "radarData: One or more radar series."
+sql_aliases:
+  - alias: "indicator"
+    path: "data.indicator"
+    required: true
+    sql_type: "object[]"
+    expression_hint: "list(struct_pack(name := axis_name, max := axis_max) ORDER BY axis_index)"
+    description: "Radar axes as [{name,max}]."
+  - alias: "radarData"
+    path: "data.radarData"
+    required: true
+    sql_type: "object[]"
+    expression_hint: "list(struct_pack(name := series_name, value := axis_values, itemStyle := item_style, areaStyle := area_style, lineStyle := line_style) ORDER BY series_index)"
+    description: "One or more radar series."
+data_structure_template:
+  data:
+    indicator:
+      - name: "Trust"
+        max: 100
+      - name: "Innovation"
+        max: 100
+    radarData:
+      - name: "Current Metric"
+        value:
+          - 92
+          - 80
+        itemStyle:
+          color: "#ec4899"
+grid_span: "col-span-2"
+color_theme: "theme-audience"
+sdui:
+  root_key: "data"
+  mapping_mode: "single"
+query_guidance:
+  sql_shape: "single_row"
+  data_root: "data"
+  return_shape: "single"
+  rules:
+    - "Return SQL-derived fields under the `data` object."
+    - "Use aliases exactly as listed in `sql_aliases`."
+    - "Prefer one final row per widget payload; use DuckDB list/struct aggregations for nested arrays or objects."
+  duckdb_patterns:
+    - "Use `list(value ORDER BY sort_key)` for arrays."
+    - "Use `struct_pack(key := value, ...)` for nested objects."
+    - "Use `list(struct_pack(... ) ORDER BY sort_key)` for arrays of objects."
+  alias_projection_examples:
+    indicator: "list(struct_pack(name := axis_name, max := axis_max) ORDER BY axis_index)"
+    radarData: "list(struct_pack(name := series_name, value := axis_values, itemStyle := item_style, areaStyle := area_style, lineStyle := line_style) ORDER BY series_index)"
+  recommended_grain: "single row"
+  implementation_notes:
+    - "Aggregate to the widget grain before packaging the payload."
+    - "Return metadata like title, type, gridSpan and colorTheme outside the `data` object; place SQL-derived fields inside `data`."
+    - "Format strings in SQL only when the component explicitly expects formatted labels; otherwise return numerics and let the UI format them."
+insight_payload_contract:
+  type: "market-radar"
+  gridSpan: "col-span-2"
+  colorTheme: "theme-audience"
+  data:
+    indicator:
+      - name: "Trust"
+        max: 100
+      - name: "Innovation"
+        max: 100
+    radarData:
+      - name: "Current Metric"
+        value:
+          - 92
+          - 80
+        itemStyle:
+          color: "#ec4899"

@@ -1,0 +1,65 @@
+title: "Semi-Circle Donut"
+description: "Half-donut chart of platform shares."
+component: "SemiCircleDonut"
+runtime_type: "semi-circle-donut"
+aliases: []
+category: "charts"
+selection_hints:
+  - "share by category"
+  - "donut split"
+  - "platform mix"
+component_id_overrides: []
+data_requirements:
+  - "platforms: List of slices."
+sql_aliases:
+  - alias: "platforms"
+    path: "data.platforms"
+    required: true
+    sql_type: "object[]"
+    expression_hint: "list(struct_pack(name := label_col, value := metric_value, color := color_hex) ORDER BY metric_value DESC)"
+    description: "List of slices."
+data_structure_template:
+  data:
+    platforms:
+      - name: "Google"
+        value: 42
+        color: "#34D399"
+      - name: "Meta"
+        value: 31
+        color: "#818CF8"
+grid_span: "col-span-2"
+color_theme: "theme-audience"
+sdui:
+  root_key: "data"
+  mapping_mode: "list"
+query_guidance:
+  sql_shape: "single_row"
+  data_root: "data"
+  return_shape: "list"
+  rules:
+    - "Return SQL-derived fields under the `data` object."
+    - "Use aliases exactly as listed in `sql_aliases`."
+    - "Prefer one final row per widget payload; use DuckDB list/struct aggregations for nested arrays or objects."
+  duckdb_patterns:
+    - "Use `list(value ORDER BY sort_key)` for arrays."
+    - "Use `struct_pack(key := value, ...)` for nested objects."
+    - "Use `list(struct_pack(... ) ORDER BY sort_key)` for arrays of objects."
+  alias_projection_examples:
+    platforms: "list(struct_pack(name := label_col, value := metric_value, color := color_hex) ORDER BY metric_value DESC)"
+  recommended_grain: "single row"
+  implementation_notes:
+    - "Aggregate to the widget grain before packaging the payload."
+    - "Return metadata like title, type, gridSpan and colorTheme outside the `data` object; place SQL-derived fields inside `data`."
+    - "Format strings in SQL only when the component explicitly expects formatted labels; otherwise return numerics and let the UI format them."
+insight_payload_contract:
+  type: "semi-circle-donut"
+  gridSpan: "col-span-2"
+  colorTheme: "theme-audience"
+  data:
+    platforms:
+      - name: "Google"
+        value: 42
+        color: "#34D399"
+      - name: "Meta"
+        value: 31
+        color: "#818CF8"
