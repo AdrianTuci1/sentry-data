@@ -1,0 +1,2001 @@
+[
+    {
+        "id": "marketing-roas",
+        "type": "weather",
+        "title": "ROAS Pulse",
+        "subtitle": "Blended Media Efficiency",
+        "footerText": "Paid + organic mix",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "default",
+        "data": {
+            "value": "5.2",
+            "unit": "x",
+            "trendValue": "+0.5x",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "vs yesterday"
+        }
+    },
+    {
+        "id": "marketing-cpa",
+        "type": "natural",
+        "title": "Acquisition Cost",
+        "subtitle": "CPA efficiency vs target",
+        "footerText": "Target $20, ceiling $30",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "default",
+        "data": {
+            "value": "$21",
+            "unit": "avg",
+            "sparklineColor": "#49d793",
+            "dataPoints": [
+                27,
+                26,
+                25,
+                24,
+                23,
+                22,
+                22,
+                21
+            ]
+        }
+    },
+    {
+        "id": "marketing-conv-rate",
+        "type": "light-dial",
+        "title": "Conversion Flow",
+        "subtitle": "Visitor to qualified lead %",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "default",
+        "data": {
+            "value": "4.1",
+            "unit": "%",
+            "signalOrientation": "horizontal",
+            "signalScore": 76,
+            "signalLabel": "Healthy throughput",
+            "trendValue": "+0.4 pts",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "vs last cohort"
+        }
+    },
+    {
+        "id": "marketing-pclv",
+        "type": "predictive",
+        "title": "Predictive LTV",
+        "subtitle": "Future value of active customers",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "value": "$1,620",
+            "unit": "est",
+            "metricCards": [
+                {
+                    "label": "Current LTV",
+                    "value": "$1,438",
+                    "delta": "+7.2%",
+                    "comparison": "Compared to $1,342 last month"
+                },
+                {
+                    "label": "Projected 30D",
+                    "value": "$1,620",
+                    "delta": "+9.5%",
+                    "comparison": "Forecast from active cohorts"
+                },
+                {
+                    "label": "Confidence",
+                    "value": "85%",
+                    "delta": "+3 pts",
+                    "comparison": "Model stability vs previous run"
+                }
+            ],
+            "chartLabels": [
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+                "Sun"
+            ],
+            "chartSeries": [
+                3280,
+                2940,
+                4010,
+                5620,
+                5890,
+                6240,
+                6710
+            ],
+            "highlightRange": [
+                1,
+                5
+            ],
+            "markerLabels": [
+                {
+                    "index": 1,
+                    "value": "2,940"
+                },
+                {
+                    "index": 5,
+                    "value": "6,240"
+                }
+            ],
+            "chartMin": 0,
+            "chartMax": 7800,
+            "historical": [
+                1180,
+                1220,
+                1270,
+                1290,
+                1340,
+                1390,
+                1440
+            ],
+            "forecast": [
+                1480,
+                1520,
+                1560,
+                1590,
+                1620
+            ],
+            "confidenceRange": [
+                40,
+                60,
+                80
+            ]
+        }
+    },
+    {
+        "id": "data-saturation",
+        "type": "liquid-gauge",
+        "title": "Audience Signal Feed",
+        "subtitle": "Cross-channel data saturation",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "default",
+        "data": {
+            "value": "88",
+            "unit": "%",
+            "signalOrientation": "vertical",
+            "signalScore": 88,
+            "signalLabel": "Strong",
+            "signalNote": "Audience, campaign and conversion feeds are fresh enough for reliable optimization.",
+            "trendValue": "+10 pts",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "tracking coverage"
+        }
+    },
+    {
+        "id": "ai-coverage",
+        "type": "neural-nexus",
+        "title": "Creative AI Coverage",
+        "subtitle": "Assisted asset generation usage",
+        "footerText": "In-brand templates active",
+        "colorTheme": "theme-light",
+        "gridSpan": "default",
+        "data": {
+            "value": "81",
+            "unit": "%",
+            "sliderValue": 81,
+            "gaugeUnit": "%",
+            "gaugeColor": "#6ae3a7"
+        }
+    },
+    {
+        "id": "llm-train-loss",
+        "type": "mpl-training-loss",
+        "title": "MMM Training Curves",
+        "subtitle": "Media mix model convergence",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "steps": [
+                "W1",
+                "W2",
+                "W3",
+                "W4",
+                "W5",
+                "W6",
+                "W7",
+                "W8"
+            ],
+            "trainLoss": [
+                2.31,
+                2.05,
+                1.84,
+                1.68,
+                1.54,
+                1.43,
+                1.37,
+                1.31
+            ],
+            "valLoss": [
+                2.43,
+                2.17,
+                1.95,
+                1.8,
+                1.69,
+                1.62,
+                1.64,
+                1.68
+            ],
+            "perplexity": [
+                15.6,
+                13.2,
+                10.9,
+                9.4,
+                8.3,
+                7.7,
+                7.9,
+                8.2
+            ],
+            "stats": [
+                {
+                    "label": "Best val loss",
+                    "value": "1.62",
+                    "accent": "#7cff5b",
+                    "meta": "week 6"
+                },
+                {
+                    "label": "Drift gap",
+                    "value": "0.21",
+                    "accent": "#7bd3ff",
+                    "meta": "healthy separation"
+                },
+                {
+                    "label": "Rows / sec",
+                    "value": "5.8M",
+                    "accent": "#ffc857",
+                    "meta": "blended sources"
+                }
+            ]
+        }
+    },
+    {
+        "id": "llm-eval-guards",
+        "type": "mpl-benchmark-bars",
+        "title": "Experiment Guardrails",
+        "subtitle": "Benchmarks before budget unlock",
+        "colorTheme": "theme-audience",
+        "gridSpan": "row-span-2",
+        "data": {
+            "benchmarks": [
+                {
+                    "label": "ROAS",
+                    "score": 5.2,
+                    "target": 5,
+                    "delta": "+0.2"
+                },
+                {
+                    "label": "CVR",
+                    "score": 4.1,
+                    "target": 3.8,
+                    "delta": "+0.3"
+                },
+                {
+                    "label": "CAC",
+                    "score": 79,
+                    "target": 82,
+                    "delta": "+3.0"
+                },
+                {
+                    "label": "Lift",
+                    "score": 23,
+                    "target": 20,
+                    "delta": "+3.0"
+                }
+            ]
+        }
+    },
+    {
+        "id": "llm-attention-drift",
+        "type": "mpl-attention-heatmap",
+        "title": "Channel Attention Drift",
+        "subtitle": "Creative focus across cohorts",
+        "colorTheme": "theme-natural",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "xLabels": [
+                "C1",
+                "C2",
+                "C3",
+                "C4",
+                "C5",
+                "C6"
+            ],
+            "yLabels": [
+                "TOF",
+                "MOF",
+                "BOF",
+                "CRM",
+                "Paid",
+                "Organic"
+            ],
+            "matrix": [
+                [
+                    0.22,
+                    0.26,
+                    0.31,
+                    0.34,
+                    0.37,
+                    0.4
+                ],
+                [
+                    0.24,
+                    0.28,
+                    0.34,
+                    0.39,
+                    0.44,
+                    0.49
+                ],
+                [
+                    0.25,
+                    0.31,
+                    0.37,
+                    0.43,
+                    0.5,
+                    0.55
+                ],
+                [
+                    0.2,
+                    0.27,
+                    0.33,
+                    0.45,
+                    0.54,
+                    0.6
+                ],
+                [
+                    0.18,
+                    0.24,
+                    0.31,
+                    0.4,
+                    0.51,
+                    0.63
+                ],
+                [
+                    0.14,
+                    0.19,
+                    0.25,
+                    0.33,
+                    0.43,
+                    0.56
+                ]
+            ],
+            "sideNotes": [
+                {
+                    "label": "peak focus",
+                    "value": "Paid / C6"
+                },
+                {
+                    "label": "creative headroom",
+                    "value": "22%"
+                },
+                {
+                    "label": "active audiences",
+                    "value": "148"
+                }
+            ]
+        }
+    },
+    {
+        "id": "ad-fatigue",
+        "type": "intensity-heat",
+        "title": "Ad Fatigue",
+        "subtitle": "Audience saturation index",
+        "footerText": "Rotation still healthy",
+        "colorTheme": "theme-red",
+        "gridSpan": "default",
+        "data": {
+            "value": "27",
+            "unit": "deg",
+            "signalOrientation": "horizontal",
+            "signalScore": 27,
+            "signalLabel": "Low fatigue",
+            "goodAtHigh": false
+        }
+    },
+    {
+        "id": "refresh-cycle",
+        "type": "chrono-dial",
+        "title": "Creative Health",
+        "subtitle": "Asset freshness score",
+        "footerText": "Next batch on Monday",
+        "colorTheme": "theme-color",
+        "gridSpan": "default",
+        "data": {
+            "value": "89",
+            "unit": "pts",
+            "trendValue": "+6 pts",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "since last refresh"
+        }
+    },
+    {
+        "id": "budget-burn",
+        "type": "natural",
+        "title": "Budget Pacing",
+        "subtitle": "Monthly spend momentum",
+        "footerText": "10 days left at current pace",
+        "colorTheme": "theme-red",
+        "gridSpan": "default",
+        "data": {
+            "value": "68",
+            "unit": "%",
+            "sparklineColor": "#ff7676",
+            "dataPoints": [
+                52,
+                56,
+                59,
+                61,
+                64,
+                66,
+                67,
+                68
+            ],
+            "trendTone": "negative"
+        }
+    },
+    {
+        "id": "viral-k-factor",
+        "type": "light-dial",
+        "title": "Viral Multiplier",
+        "subtitle": "Organic lift per paid click",
+        "colorTheme": "theme-color",
+        "gridSpan": "default",
+        "data": {
+            "value": "1.6",
+            "unit": "x",
+            "sliderValue": 49,
+            "trendValue": "+0.3x",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "organic amplification"
+        }
+    },
+    {
+        "id": "incremental-lift",
+        "type": "incremental-lift",
+        "title": "Incremental Lift",
+        "subtitle": "Paid vs baseline organic",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "default",
+        "data": {
+            "value": "+24%",
+            "unit": "lift"
+        }
+    },
+    {
+        "id": "optimal-time",
+        "type": "optimal-time",
+        "title": "Peak Engagement",
+        "subtitle": "Best campaign window",
+        "colorTheme": "theme-natural",
+        "gridSpan": "row-span-2",
+        "data": {
+            "value": "19:00",
+            "unit": "GMT+2",
+            "calendarMonth": "April 2026",
+            "calendarOffset": 2,
+            "daysInMonth": 30,
+            "totalCalendarCells": 56,
+            "calendarValues": [
+                28,
+                31,
+                33,
+                35,
+                44,
+                48,
+                55,
+                56,
+                32,
+                31,
+                34,
+                35,
+                26,
+                28,
+                22,
+                35,
+                36,
+                35,
+                35,
+                35,
+                35,
+                21,
+                36,
+                36,
+                27,
+                29,
+                32,
+                22,
+                34,
+                23
+            ],
+            "engagementMatrix": [
+                [
+                    28,
+                    31,
+                    33,
+                    35,
+                    44,
+                    48,
+                    55,
+                    56
+                ],
+                [
+                    32,
+                    31,
+                    34,
+                    35,
+                    26,
+                    28,
+                    22,
+                    35
+                ],
+                [
+                    36,
+                    35,
+                    35,
+                    35,
+                    35,
+                    21,
+                    36,
+                    36
+                ],
+                [
+                    27,
+                    29,
+                    32,
+                    22,
+                    34,
+                    23,
+                    29,
+                    35
+                ],
+                [
+                    14,
+                    16,
+                    18,
+                    11,
+                    13,
+                    12,
+                    16,
+                    11
+                ],
+                [
+                    32,
+                    32,
+                    32,
+                    1,
+                    31,
+                    31,
+                    11,
+                    32
+                ],
+                [
+                    3,
+                    6,
+                    8,
+                    11,
+                    31,
+                    11,
+                    12,
+                    14
+                ],
+                [
+                    3,
+                    2,
+                    7,
+                    30,
+                    31,
+                    11,
+                    19,
+                    33
+                ]
+            ],
+            "summaryCards": [
+                {
+                    "id": "weekly-peak",
+                    "icon": "sparkles",
+                    "label": "Weekly Peak",
+                    "value": "8,944",
+                    "delta": "+16.8%",
+                    "note": "48,110 engaged sessions",
+                    "tone": "positive"
+                },
+                {
+                    "id": "quarter-reach",
+                    "icon": "orbit",
+                    "label": "Quarter Reach",
+                    "value": "336,420",
+                    "delta": "+4.1%",
+                    "note": "323,188 prior baseline",
+                    "tone": "positive"
+                }
+            ],
+            "marketBreakdown": [
+                {
+                    "label": "Bucharest",
+                    "value": "214,320"
+                },
+                {
+                    "label": "Cluj",
+                    "value": "188,450"
+                },
+                {
+                    "label": "Timisoara",
+                    "value": "163,740"
+                }
+            ]
+        }
+    },
+    {
+        "id": "live-traffic",
+        "type": "animated-line",
+        "title": "Live Traffic",
+        "subtitle": "Real-time concurrent visitors",
+        "footerText": "Last 5 Minutes Activity",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2",
+        "description": "Concurrent traffic across campaign landing pages and organic discovery surfaces.",
+        "data": {
+            "value": "1,482",
+            "unit": "usr",
+            "metricCards": [
+                {
+                    "icon": "sparkles",
+                    "label": "Active now",
+                    "value": "538",
+                    "delta": "+8.4%",
+                    "note": "users online"
+                },
+                {
+                    "icon": "medal",
+                    "label": "Peak today",
+                    "value": "614",
+                    "delta": "+13.1%",
+                    "note": "highest concurrent users"
+                }
+            ],
+            "chartLabels": [
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+                "Sun"
+            ],
+            "chartSeries": [
+                320,
+                356,
+                401,
+                462,
+                538,
+                null,
+                null
+            ],
+            "chartMin": 120,
+            "chartMax": 760,
+            "annotation": {
+                "index": 4,
+                "label": "ACTIVE USERS",
+                "value": "538"
+            },
+            "dataPoints": [
+                320,
+                356,
+                401,
+                462,
+                538
+            ]
+        }
+    },
+    {
+        "id": "revenue-forecast",
+        "type": "predictive",
+        "title": "Revenue Forecast",
+        "subtitle": "Predictive pipeline outcome",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "col-span-2",
+        "data": {
+            "value": "$528K",
+            "unit": "est",
+            "historical": [
+                348,
+                362,
+                338,
+                379,
+                406,
+                438
+            ],
+            "forecast": [
+                451,
+                472,
+                491,
+                507,
+                528
+            ],
+            "confidenceRange": [
+                30,
+                45,
+                60
+            ]
+        }
+    },
+    {
+        "id": "retention-cohorts",
+        "type": "cohorts",
+        "title": "Retention",
+        "subtitle": "Customer stickiness by cohort",
+        "colorTheme": "theme-audience",
+        "gridSpan": "default",
+        "data": {
+            "summaryValue": "41.2%",
+            "summaryDelta": "+2.8 pts",
+            "summaryCompare": "Average last-step retention across active cohorts",
+            "retentionBars": [
+                {
+                    "label": "500",
+                    "segments": [
+                        39,
+                        11,
+                        10,
+                        10
+                    ],
+                    "marker": 97
+                },
+                {
+                    "label": "400",
+                    "segments": [
+                        39,
+                        15,
+                        14,
+                        15
+                    ],
+                    "marker": 87
+                },
+                {
+                    "label": "300",
+                    "segments": [
+                        16,
+                        9,
+                        8,
+                        8
+                    ],
+                    "marker": 49
+                },
+                {
+                    "label": "200",
+                    "segments": [
+                        16,
+                        13,
+                        13,
+                        13
+                    ],
+                    "marker": 63
+                },
+                {
+                    "label": "100",
+                    "segments": [
+                        39,
+                        15,
+                        14,
+                        15
+                    ],
+                    "marker": 97
+                }
+            ],
+            "cohorts": [
+                {
+                    "week": "Feb 01",
+                    "size": 1320,
+                    "data": [
+                        100,
+                        86,
+                        73,
+                        65
+                    ]
+                },
+                {
+                    "week": "Feb 08",
+                    "size": 1280,
+                    "data": [
+                        100,
+                        83,
+                        70
+                    ]
+                },
+                {
+                    "week": "Feb 15",
+                    "size": 1410,
+                    "data": [
+                        100,
+                        87
+                    ]
+                },
+                {
+                    "week": "Feb 22",
+                    "size": 1370,
+                    "data": [
+                        100
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "id": "technical-health",
+        "type": "vitals",
+        "title": "Tracking Health",
+        "subtitle": "Measurement and attribution uptime",
+        "colorTheme": "theme-weather",
+        "gridSpan": "default",
+        "data": {
+            "value": "99.96",
+            "unit": "%",
+            "uptimeBars": [
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "warn",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "warn",
+                "good",
+                "good",
+                "good",
+                "good",
+                "down",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good"
+            ],
+            "metrics": [
+                {
+                    "name": "Pixel",
+                    "value": "99.9%",
+                    "status": "good"
+                },
+                {
+                    "name": "CAPI",
+                    "value": "99.8%",
+                    "status": "good"
+                },
+                {
+                    "name": "GA4",
+                    "value": "99.9%",
+                    "status": "good"
+                },
+                {
+                    "name": "Drop",
+                    "value": "0.1%",
+                    "status": "good"
+                }
+            ]
+        }
+    },
+    {
+        "id": "stat-leads",
+        "type": "leads-list",
+        "title": "Recent Leads",
+        "subtitle": "High-intent conversions",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "row-span-2",
+        "data": {
+            "leads": [
+                {
+                    "name": "Northline Energy",
+                    "value": "Google Ads",
+                    "status": "vip",
+                    "time": "3m ago"
+                },
+                {
+                    "name": "Aurora Dental",
+                    "value": "Meta",
+                    "status": "warm",
+                    "time": "11m ago"
+                },
+                {
+                    "name": "ScaleGrid Labs",
+                    "value": "LinkedIn",
+                    "status": "vip",
+                    "time": "24m ago"
+                },
+                {
+                    "name": "Atelier Verde",
+                    "value": "Organic",
+                    "status": "warm",
+                    "time": "42m ago"
+                },
+                {
+                    "name": "Urban Move",
+                    "value": "TikTok",
+                    "status": "cold",
+                    "time": "58m ago"
+                },
+                {
+                    "name": "Prime Habitat",
+                    "value": "Referral",
+                    "status": "vip",
+                    "time": "1h ago"
+                },
+                {
+                    "name": "Nova Clinic",
+                    "value": "Email",
+                    "status": "warm",
+                    "time": "2h ago"
+                },
+                {
+                    "name": "Craft Circle",
+                    "value": "Instagram",
+                    "status": "cold",
+                    "time": "3h ago"
+                }
+            ]
+        }
+    },
+    {
+        "id": "top-routes",
+        "type": "leads-list",
+        "title": "Top Routes",
+        "subtitle": "Highest-converting journeys",
+        "colorTheme": "theme-natural",
+        "gridSpan": "default",
+        "data": {
+            "leads": [
+                {
+                    "name": "/lp/offer-a",
+                    "value": "3.1k sessions",
+                    "time": "+18%"
+                },
+                {
+                    "name": "/pricing/demo",
+                    "value": "2.4k sessions",
+                    "time": "+9%"
+                },
+                {
+                    "name": "/case-study/xdr",
+                    "value": "1.6k sessions",
+                    "time": "+21%"
+                },
+                {
+                    "name": "/checkout/pro",
+                    "value": "940 sessions",
+                    "time": "-1%"
+                }
+            ]
+        }
+    },
+    {
+        "id": "financial-waterfall",
+        "type": "waterfall",
+        "title": "Net Profit Bridge",
+        "subtitle": "Gross to net visibility",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "col-span-2",
+        "data": {
+            "value": "$56.2K",
+            "unit": "net",
+            "steps": [
+                {
+                    "name": "Gross Revenue",
+                    "value": 148000
+                },
+                {
+                    "name": "COGS",
+                    "value": -52000
+                },
+                {
+                    "name": "Ad Spend",
+                    "value": -29000
+                },
+                {
+                    "name": "OpEx",
+                    "value": -10800
+                },
+                {
+                    "name": "Net Profit",
+                    "isTotal": true
+                }
+            ]
+        }
+    },
+    {
+        "id": "market-sentiment",
+        "type": "market-radar",
+        "title": "Brand Sentiment",
+        "subtitle": "Aggregated category perception",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2",
+        "data": {
+            "indicator": [
+                {
+                    "name": "Trust",
+                    "max": 100
+                },
+                {
+                    "name": "Innovation",
+                    "max": 100
+                },
+                {
+                    "name": "Price",
+                    "max": 100
+                },
+                {
+                    "name": "Service",
+                    "max": 100
+                },
+                {
+                    "name": "Quality",
+                    "max": 100
+                }
+            ],
+            "radarData": [
+                {
+                    "value": [
+                        94,
+                        83,
+                        68,
+                        90,
+                        88
+                    ],
+                    "name": "Current Metric",
+                    "symbol": "none",
+                    "itemStyle": {
+                        "color": "#ec4899"
+                    },
+                    "areaStyle": {
+                        "color": {
+                            "type": "radial",
+                            "x": 0.5,
+                            "y": 0.5,
+                            "r": 1,
+                            "colorStops": [
+                                {
+                                    "offset": 0,
+                                    "color": "rgba(236, 72, 153, 0.1)"
+                                },
+                                {
+                                    "offset": 1,
+                                    "color": "rgba(236, 72, 153, 0.4)"
+                                }
+                            ]
+                        }
+                    },
+                    "lineStyle": {
+                        "width": 2,
+                        "type": "solid"
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "id": "attribution-models",
+        "type": "attribution",
+        "title": "Marketing Attribution",
+        "subtitle": "Monthly and yearly budget allocation",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "summaryValue": "$24.8K",
+            "summaryLabel": "Monthly Budget",
+            "periodMetrics": [
+                {
+                    "label": "Monthly",
+                    "value": "$24.8K",
+                    "delta": "+14.2%",
+                    "note": "$21.7K baseline",
+                    "tone": "#7CFF5B"
+                },
+                {
+                    "label": "Yearly",
+                    "value": "$361K",
+                    "delta": "+5.4%",
+                    "note": "$342K baseline",
+                    "tone": "#FFC533"
+                }
+            ],
+            "models": [
+                {
+                    "channel": "Google",
+                    "monthly": 9200,
+                    "yearly": 152000,
+                    "yearlyColor": "#2EF0B2",
+                    "monthlyColor": "#FFBF1F"
+                },
+                {
+                    "channel": "Meta",
+                    "monthly": 7100,
+                    "yearly": 126000,
+                    "yearlyColor": "#31E9C9",
+                    "monthlyColor": "#FF9F1F"
+                },
+                {
+                    "channel": "LinkedIn",
+                    "monthly": 4800,
+                    "yearly": 59000,
+                    "yearlyColor": "#8B5CF6",
+                    "monthlyColor": "#FF5A36"
+                },
+                {
+                    "channel": "Other",
+                    "monthly": 3700,
+                    "yearly": 24000,
+                    "yearlyColor": "#7B6D87",
+                    "monthlyColor": "#F33B1D"
+                }
+            ]
+        }
+    },
+    {
+        "id": "anomaly-detection",
+        "type": "anomaly-stream",
+        "title": "Spend Anomalies",
+        "subtitle": "ML-driven pacing variance detection",
+        "colorTheme": "theme-weather",
+        "gridSpan": "col-span-2",
+        "data": {
+            "value": "2 Spikes",
+            "unit": "warn"
+        }
+    },
+    {
+        "id": "romania-3d",
+        "type": "3d-map",
+        "title": "Regional Reach",
+        "subtitle": "Active campaign footprint",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {}
+    },
+    {
+        "id": "data-scatter",
+        "type": "scatter",
+        "title": "LTV vs CAC",
+        "subtitle": "Cohort efficiency over time",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "periodLabels": [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct"
+            ],
+            "scatterData": [
+                [
+                    42,
+                    462
+                ],
+                [
+                    56,
+                    718
+                ],
+                [
+                    68,
+                    501
+                ],
+                [
+                    83,
+                    742
+                ],
+                [
+                    97,
+                    836
+                ],
+                [
+                    116,
+                    1092
+                ],
+                [
+                    129,
+                    781
+                ],
+                [
+                    144,
+                    1088
+                ],
+                [
+                    159,
+                    1224
+                ],
+                [
+                    176,
+                    1315
+                ]
+            ]
+        }
+    },
+    {
+        "id": "sales-funnel",
+        "type": "funnel",
+        "title": "Sales Funnel",
+        "subtitle": "Revenue flow composition",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2",
+        "data": {
+            "summaryLabel": "Income",
+            "summaryValue": "$38,420",
+            "summaryDelta": "↑4.2%",
+            "summaryCompare": "Compared to $36,870 last month",
+            "funnel": [
+                {
+                    "value": 100,
+                    "name": "Visits"
+                },
+                {
+                    "value": 87,
+                    "name": "Inquiry"
+                },
+                {
+                    "value": 56,
+                    "name": "Lead"
+                },
+                {
+                    "value": 28,
+                    "name": "Cart"
+                },
+                {
+                    "value": 14,
+                    "name": "Purchase"
+                }
+            ]
+        }
+    },
+    {
+        "id": "market-evolution",
+        "type": "market-evolution",
+        "title": "Channel Synergy Dynamics",
+        "subtitle": "Cross-channel influence and temporal evolution",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "channels": [
+                {
+                    "name": "Paid Search",
+                    "color": "#3B82F6",
+                    "value": 88,
+                    "synergy": "High"
+                },
+                {
+                    "name": "Social Ads",
+                    "color": "#10B981",
+                    "value": 76,
+                    "synergy": "High"
+                },
+                {
+                    "name": "Retargeting",
+                    "color": "#F59E0B",
+                    "value": 96,
+                    "synergy": "Critical"
+                },
+                {
+                    "name": "Email Flow",
+                    "color": "#EF4444",
+                    "value": 62,
+                    "synergy": "Mid"
+                },
+                {
+                    "name": "Organic SEO",
+                    "color": "#8B5CF6",
+                    "value": 91,
+                    "synergy": "High"
+                },
+                {
+                    "name": "Referral",
+                    "color": "#EC4899",
+                    "value": 49,
+                    "synergy": "Mid"
+                },
+                {
+                    "name": "Creator",
+                    "color": "#06B6D4",
+                    "value": 71,
+                    "synergy": "High"
+                }
+            ],
+            "links": [
+                {
+                    "source": "Paid Search",
+                    "target": "Organic SEO",
+                    "value": 6
+                },
+                {
+                    "source": "Social Ads",
+                    "target": "Retargeting",
+                    "value": 9
+                },
+                {
+                    "source": "Email Flow",
+                    "target": "Retargeting",
+                    "value": 7
+                },
+                {
+                    "source": "Organic SEO",
+                    "target": "Referral",
+                    "value": 5
+                },
+                {
+                    "source": "Creator",
+                    "target": "Social Ads",
+                    "value": 8
+                },
+                {
+                    "source": "Paid Search",
+                    "target": "Retargeting",
+                    "value": 8
+                },
+                {
+                    "source": "Organic SEO",
+                    "target": "Social Ads",
+                    "value": 6
+                }
+            ]
+        }
+    },
+    {
+        "id": "creative-quadrant",
+        "type": "creative-quadrant",
+        "title": "Creative Performance Quadrant",
+        "subtitle": "CTR vs conversion rate intelligence",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "row-span-2",
+        "data": {
+            "creatives": [
+                [
+                    4.8,
+                    6.8,
+                    "Video: Founder Angle",
+                    "Video"
+                ],
+                [
+                    4.1,
+                    7,
+                    "Static: Social Proof",
+                    "Static"
+                ],
+                [
+                    1.8,
+                    9.2,
+                    "UGC: Testimonial",
+                    "UGC"
+                ],
+                [
+                    6.4,
+                    1.7,
+                    "Promo Banner",
+                    "Static"
+                ],
+                [
+                    2.7,
+                    5.1,
+                    "Video: Product Tour",
+                    "Video"
+                ],
+                [
+                    0.7,
+                    1.4,
+                    "Legacy Generic",
+                    "Static"
+                ],
+                [
+                    7.5,
+                    1.1,
+                    "Meme Hook",
+                    "Social"
+                ]
+            ]
+        }
+    },
+    {
+        "id": "budget-sensitivity",
+        "type": "budget-sensitivity",
+        "title": "Budget Sensitivity",
+        "subtitle": "Elasticity and diminishing returns",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "col-span-2",
+        "data": {
+            "curvePoints": [
+                [
+                    0,
+                    0.6692850924284856
+                ],
+                [
+                    2,
+                    0.816257115315989
+                ],
+                [
+                    4,
+                    0.9951801866904316
+                ],
+                [
+                    6,
+                    1.2128434984274237
+                ],
+                [
+                    8,
+                    1.4774031693273055
+                ],
+                [
+                    10,
+                    1.798620996209156
+                ],
+                [
+                    12,
+                    2.188127093613047
+                ],
+                [
+                    14,
+                    2.6596993576865855
+                ],
+                [
+                    16,
+                    3.2295464698450496
+                ],
+                [
+                    18,
+                    3.9165722796764353
+                ],
+                [
+                    20,
+                    4.742587317756678
+                ],
+                [
+                    22,
+                    5.7324175898868726
+                ],
+                [
+                    24,
+                    6.913842034334682
+                ],
+                [
+                    26,
+                    8.317269649392236
+                ],
+                [
+                    28,
+                    9.975048911968514
+                ],
+                [
+                    30,
+                    11.920292202211755
+                ],
+                [
+                    32,
+                    14.185106490048778
+                ],
+                [
+                    34,
+                    16.79816148660755
+                ],
+                [
+                    36,
+                    19.781611144141824
+                ],
+                [
+                    38,
+                    23.14752165009823
+                ],
+                [
+                    40,
+                    26.894142136999513
+                ],
+                [
+                    42,
+                    31.002551887238752
+                ],
+                [
+                    44,
+                    35.43436937742045
+                ],
+                [
+                    46,
+                    40.1312339887548
+                ],
+                [
+                    48,
+                    45.016600268752214
+                ],
+                [
+                    50,
+                    50
+                ],
+                [
+                    52,
+                    54.98339973124779
+                ],
+                [
+                    54,
+                    59.8687660112452
+                ],
+                [
+                    56,
+                    64.56563062257955
+                ],
+                [
+                    58,
+                    68.99744811276125
+                ],
+                [
+                    60,
+                    73.10585786300048
+                ],
+                [
+                    62,
+                    76.85247834990177
+                ],
+                [
+                    64,
+                    80.21838885585818
+                ],
+                [
+                    66,
+                    83.20183851339245
+                ],
+                [
+                    68,
+                    85.81489350995123
+                ],
+                [
+                    70,
+                    88.07970779778823
+                ],
+                [
+                    72,
+                    90.02495108803149
+                ],
+                [
+                    74,
+                    91.68273035060777
+                ],
+                [
+                    76,
+                    93.08615796566532
+                ],
+                [
+                    78,
+                    94.26758241011314
+                ],
+                [
+                    80,
+                    95.25741268224333
+                ],
+                [
+                    82,
+                    96.08342772032357
+                ],
+                [
+                    84,
+                    96.77045353015495
+                ],
+                [
+                    86,
+                    97.34030064231341
+                ],
+                [
+                    88,
+                    97.81187290638695
+                ],
+                [
+                    90,
+                    98.20137900379083
+                ],
+                [
+                    92,
+                    98.5225968306727
+                ],
+                [
+                    94,
+                    98.78715650157258
+                ],
+                [
+                    96,
+                    99.00481981330957
+                ],
+                [
+                    98,
+                    99.18374288468401
+                ],
+                [
+                    100,
+                    99.33071490757152
+                ]
+            ]
+        }
+    },
+    {
+        "id": "intent-sunburst",
+        "type": "intent-sunburst",
+        "title": "Traffic Intent",
+        "subtitle": "Real-time audience classification",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "sunburstData": [
+                {
+                    "name": "Ready to Buy",
+                    "itemStyle": {
+                        "color": "#10B981"
+                    },
+                    "children": [
+                        {
+                            "name": "Pricing",
+                            "value": 24
+                        },
+                        {
+                            "name": "Checkout",
+                            "value": 22
+                        }
+                    ]
+                },
+                {
+                    "name": "Researching",
+                    "itemStyle": {
+                        "color": "#3B82F6"
+                    },
+                    "children": [
+                        {
+                            "name": "Case Study",
+                            "value": 18
+                        },
+                        {
+                            "name": "Features",
+                            "value": 16
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "id": "shapley-attribution",
+        "type": "shapley-attribution",
+        "title": "Shapley Attribution",
+        "subtitle": "Channel contribution by period",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "rawData": [
+                [
+                    "Email",
+                    19.683019058189853,
+                    2021
+                ],
+                [
+                    "Email",
+                    24.6833903211189,
+                    2021
+                ],
+                [
+                    "Email",
+                    23.64701871671297,
+                    2021
+                ],
+                [
+                    "Email",
+                    33.91222823701676,
+                    2022
+                ],
+                [
+                    "Email",
+                    32.716793702194735,
+                    2022
+                ],
+                [
+                    "Email",
+                    37.026395307833425,
+                    2022
+                ],
+                [
+                    "Email",
+                    20.921580606324838,
+                    2023
+                ],
+                [
+                    "Email",
+                    27.621240347441923,
+                    2023
+                ],
+                [
+                    "Email",
+                    19.77874834249792,
+                    2023
+                ],
+                [
+                    "Google",
+                    16.66624500617535,
+                    2021
+                ],
+                [
+                    "Google",
+                    7.089858637785376,
+                    2021
+                ],
+                [
+                    "Google",
+                    10.535892257841073,
+                    2021
+                ],
+                [
+                    "Google",
+                    19.556827999698566,
+                    2022
+                ],
+                [
+                    "Google",
+                    17.457968856172435,
+                    2022
+                ],
+                [
+                    "Google",
+                    10.967951684922037,
+                    2022
+                ],
+                [
+                    "Google",
+                    18.344452921626278,
+                    2023
+                ],
+                [
+                    "Google",
+                    22.747748377664635,
+                    2023
+                ],
+                [
+                    "Google",
+                    6.689114437669323,
+                    2023
+                ],
+                [
+                    "Meta",
+                    38.137365454748775,
+                    2021
+                ],
+                [
+                    "Meta",
+                    30.979587885344078,
+                    2021
+                ],
+                [
+                    "Meta",
+                    27.28416755121987,
+                    2021
+                ],
+                [
+                    "Meta",
+                    43.31883899911986,
+                    2022
+                ],
+                [
+                    "Meta",
+                    30.906468457236777,
+                    2022
+                ],
+                [
+                    "Meta",
+                    26.0294944225872,
+                    2022
+                ],
+                [
+                    "Meta",
+                    26.10890509165352,
+                    2023
+                ],
+                [
+                    "Meta",
+                    41.124464881933434,
+                    2023
+                ],
+                [
+                    "Meta",
+                    36.24909818232206,
+                    2023
+                ],
+                [
+                    "Direct",
+                    38.80848393210776,
+                    2021
+                ],
+                [
+                    "Direct",
+                    34.93841002732542,
+                    2021
+                ],
+                [
+                    "Direct",
+                    43.67616347781882,
+                    2021
+                ],
+                [
+                    "Direct",
+                    31.784535742398475,
+                    2022
+                ],
+                [
+                    "Direct",
+                    35.25466082369594,
+                    2022
+                ],
+                [
+                    "Direct",
+                    40.8019414832913,
+                    2022
+                ],
+                [
+                    "Direct",
+                    36.584243245516326,
+                    2023
+                ],
+                [
+                    "Direct",
+                    41.44798620444695,
+                    2023
+                ],
+                [
+                    "Direct",
+                    35.760891103366646,
+                    2023
+                ],
+                [
+                    "Affiliate",
+                    22.05364275956095,
+                    2021
+                ],
+                [
+                    "Affiliate",
+                    25.695120599478642,
+                    2021
+                ],
+                [
+                    "Affiliate",
+                    26.92491435848985,
+                    2021
+                ],
+                [
+                    "Affiliate",
+                    22.732994624920256,
+                    2022
+                ],
+                [
+                    "Affiliate",
+                    25.79297281366831,
+                    2022
+                ],
+                [
+                    "Affiliate",
+                    23.15718367464229,
+                    2022
+                ],
+                [
+                    "Affiliate",
+                    26.696627148649547,
+                    2023
+                ],
+                [
+                    "Affiliate",
+                    33.85084397173571,
+                    2023
+                ],
+                [
+                    "Affiliate",
+                    28.43379866584939,
+                    2023
+                ]
+            ]
+        }
+    },
+    {
+        "id": "trend-spotter",
+        "type": "trend-spotter",
+        "title": "Keyword Early Warning",
+        "subtitle": "Emerging market signals",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "keywords": [
+                {
+                    "text": "creator-led",
+                    "weight": 93,
+                    "trend": "up"
+                },
+                {
+                    "text": "ugc proof",
+                    "weight": 87,
+                    "trend": "up"
+                },
+                {
+                    "text": "zero-party data",
+                    "weight": 79,
+                    "trend": "up"
+                },
+                {
+                    "text": "omnichannel",
+                    "weight": 66,
+                    "trend": "stable"
+                },
+                {
+                    "text": "flash discounts",
+                    "weight": 41,
+                    "trend": "down"
+                },
+                {
+                    "text": "high-intent search",
+                    "weight": 91,
+                    "trend": "up"
+                },
+                {
+                    "text": "retention loops",
+                    "weight": 72,
+                    "trend": "stable"
+                },
+                {
+                    "text": "brand community",
+                    "weight": 69,
+                    "trend": "up"
+                },
+                {
+                    "text": "privacy first",
+                    "weight": 84,
+                    "trend": "up"
+                },
+                {
+                    "text": "offline lift",
+                    "weight": 77,
+                    "trend": "up"
+                },
+                {
+                    "text": "micro creators",
+                    "weight": 74,
+                    "trend": "up"
+                },
+                {
+                    "text": "promo fatigue",
+                    "weight": 52,
+                    "trend": "down"
+                }
+            ]
+        }
+    }
+]

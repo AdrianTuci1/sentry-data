@@ -1,0 +1,69 @@
+title: "Intent Sunburst"
+description: "Hierarchical sunburst for nested audience or behavior intent."
+component: "IntentSunburst"
+runtime_type: "intent-sunburst"
+aliases: []
+category: "marketing"
+selection_hints:
+  - "hierarchy"
+  - "nested categories"
+  - "intent tree"
+component_id_overrides: []
+data_requirements:
+  - "sunburstData: Hierarchy tree with nested children arrays."
+sql_aliases:
+  - alias: "sunburstData"
+    path: "data.sunburstData"
+    required: true
+    sql_type: "object[]"
+    expression_hint: "Return a nested JSON-compatible tree using list(struct_pack(..., children := ...))."
+    description: "Hierarchy tree with nested children arrays."
+data_structure_template:
+  data:
+    sunburstData:
+      - name: "Ready to Buy"
+        itemStyle:
+          color: "#10B981"
+        children:
+          - name: "Pricing"
+            value: 24
+          - name: "Checkout"
+            value: 22
+grid_span: "col-span-2 row-span-2"
+color_theme: "theme-audience"
+sdui:
+  root_key: "data"
+  mapping_mode: "list"
+query_guidance:
+  sql_shape: "single_row"
+  data_root: "data"
+  return_shape: "list"
+  rules:
+    - "Return SQL-derived fields under the `data` object."
+    - "Use aliases exactly as listed in `sql_aliases`."
+    - "Prefer one final row per widget payload; use DuckDB list/struct aggregations for nested arrays or objects."
+  duckdb_patterns:
+    - "Use `list(value ORDER BY sort_key)` for arrays."
+    - "Use `struct_pack(key := value, ...)` for nested objects."
+    - "Use `list(struct_pack(... ) ORDER BY sort_key)` for arrays of objects."
+  alias_projection_examples:
+    sunburstData: "Return a nested JSON-compatible tree using list(struct_pack(..., children := ...))."
+  recommended_grain: "single row"
+  implementation_notes:
+    - "Aggregate to the widget grain before packaging the payload."
+    - "Return metadata like title, type, gridSpan and colorTheme outside the `data` object; place SQL-derived fields inside `data`."
+    - "Format strings in SQL only when the component explicitly expects formatted labels; otherwise return numerics and let the UI format them."
+insight_payload_contract:
+  type: "intent-sunburst"
+  gridSpan: "col-span-2 row-span-2"
+  colorTheme: "theme-audience"
+  data:
+    sunburstData:
+      - name: "Ready to Buy"
+        itemStyle:
+          color: "#10B981"
+        children:
+          - name: "Pricing"
+            value: 24
+          - name: "Checkout"
+            value: 22

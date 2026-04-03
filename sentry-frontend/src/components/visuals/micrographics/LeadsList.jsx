@@ -20,8 +20,13 @@ const LeadsList = ({ data }) => {
     };
 
     return (
-        <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', gap: '10px', padding: '8px 0' }}>
-            {leads.map((lead, i) => (
+        <div style={{ width: '100%', height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <div style={{ color: 'rgba(255,255,255,0.42)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '8px 0 10px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                Latest qualified accounts
+            </div>
+
+            <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '10px 4px 0 0', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {leads.map((lead, i) => (
                 <div
                     key={i}
                     style={{
@@ -55,7 +60,8 @@ const LeadsList = ({ data }) => {
                         <span style={{ fontSize: '10px', color: '#6B7280' }}>{lead.time}</span>
                     </div>
                 </div>
-            ))}
+                ))}
+            </div>
         </div>
     );
 };

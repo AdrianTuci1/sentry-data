@@ -1,0 +1,2001 @@
+[
+    {
+        "id": "marketing-roas",
+        "type": "weather",
+        "title": "Training Throughput",
+        "subtitle": "Stable Tokens Processed Per Second",
+        "footerText": "8x H100 cluster",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "default",
+        "data": {
+            "value": "42.6",
+            "unit": "k/s",
+            "trendValue": "+3.1k",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "vs yesterday"
+        }
+    },
+    {
+        "id": "marketing-cpa",
+        "type": "natural",
+        "title": "Cost Per 1M Tokens",
+        "subtitle": "Effective compute efficiency",
+        "footerText": "Target $16, ceiling $24",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "default",
+        "data": {
+            "value": "$18",
+            "unit": "avg",
+            "sparklineColor": "#49d793",
+            "dataPoints": [
+                24,
+                23,
+                22,
+                21,
+                20,
+                19,
+                18,
+                18
+            ]
+        }
+    },
+    {
+        "id": "marketing-conv-rate",
+        "type": "light-dial",
+        "title": "Validation Pass Rate",
+        "subtitle": "Promotable checkpoints share",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "default",
+        "data": {
+            "value": "71",
+            "unit": "%",
+            "signalOrientation": "horizontal",
+            "signalScore": 71,
+            "signalLabel": "Stable convergence",
+            "trendValue": "+5 pts",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "vs previous run"
+        }
+    },
+    {
+        "id": "marketing-pclv",
+        "type": "predictive",
+        "title": "Projected Model Utility",
+        "subtitle": "30-day blended capability forecast",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "value": "86.4",
+            "unit": "score",
+            "metricCards": [
+                {
+                    "label": "Current utility",
+                    "value": "81.7",
+                    "delta": "+3.2%",
+                    "comparison": "Compared to 79.2 last month"
+                },
+                {
+                    "label": "Projected 30D",
+                    "value": "86.4",
+                    "delta": "+5.8%",
+                    "comparison": "Forecast from active runs"
+                },
+                {
+                    "label": "Confidence",
+                    "value": "84%",
+                    "delta": "+5 pts",
+                    "comparison": "Eval stability vs previous run"
+                }
+            ],
+            "chartLabels": [
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+                "Sun"
+            ],
+            "chartSeries": [
+                64,
+                66,
+                71,
+                75,
+                77,
+                81,
+                84
+            ],
+            "highlightRange": [
+                1,
+                5
+            ],
+            "markerLabels": [
+                {
+                    "index": 1,
+                    "value": "66"
+                },
+                {
+                    "index": 5,
+                    "value": "81"
+                }
+            ],
+            "chartMin": 0,
+            "chartMax": 100,
+            "historical": [
+                72,
+                74,
+                75,
+                76,
+                78,
+                79,
+                81
+            ],
+            "forecast": [
+                82,
+                83,
+                84,
+                85,
+                86.4
+            ],
+            "confidenceRange": [
+                40,
+                60,
+                80
+            ]
+        }
+    },
+    {
+        "id": "data-saturation",
+        "type": "liquid-gauge",
+        "title": "Dataset Coverage",
+        "subtitle": "Training corpus saturation",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "default",
+        "data": {
+            "value": "89",
+            "unit": "%",
+            "signalOrientation": "vertical",
+            "signalScore": 89,
+            "signalLabel": "Broad mix",
+            "signalNote": "Core domains are well represented and aligned for the next full training cycle.",
+            "trendValue": "+7 pts",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "data coverage"
+        }
+    },
+    {
+        "id": "ai-coverage",
+        "type": "neural-nexus",
+        "title": "GPU Occupancy",
+        "subtitle": "Accelerator utilization coverage",
+        "footerText": "Queue depth in green zone",
+        "colorTheme": "theme-light",
+        "gridSpan": "default",
+        "data": {
+            "value": "93",
+            "unit": "%",
+            "sliderValue": 93,
+            "gaugeUnit": "%",
+            "gaugeColor": "#6ae3a7"
+        }
+    },
+    {
+        "id": "llm-train-loss",
+        "type": "mpl-training-loss",
+        "title": "LLM Loss Curves",
+        "subtitle": "Train vs validation convergence",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "steps": [
+                "80",
+                "160",
+                "240",
+                "320",
+                "400",
+                "480",
+                "560",
+                "640"
+            ],
+            "trainLoss": [
+                2.78,
+                2.38,
+                2.01,
+                1.75,
+                1.57,
+                1.43,
+                1.35,
+                1.28
+            ],
+            "valLoss": [
+                2.9,
+                2.53,
+                2.16,
+                1.94,
+                1.81,
+                1.69,
+                1.72,
+                1.77
+            ],
+            "perplexity": [
+                17.9,
+                14.4,
+                11.2,
+                9.1,
+                7.9,
+                7,
+                7.3,
+                7.8
+            ],
+            "stats": [
+                {
+                    "label": "Best val loss",
+                    "value": "1.69",
+                    "accent": "#7cff5b",
+                    "meta": "checkpoint 480"
+                },
+                {
+                    "label": "Grad norm",
+                    "value": "0.88",
+                    "accent": "#7bd3ff",
+                    "meta": "stable window"
+                },
+                {
+                    "label": "Tokens / sec",
+                    "value": "42.6k",
+                    "accent": "#ffc857",
+                    "meta": "8x H100"
+                }
+            ]
+        }
+    },
+    {
+        "id": "llm-eval-guards",
+        "type": "mpl-benchmark-bars",
+        "title": "Eval Guardrails",
+        "subtitle": "Benchmarks before checkpoint promote",
+        "colorTheme": "theme-audience",
+        "gridSpan": "row-span-2",
+        "data": {
+            "benchmarks": [
+                {
+                    "label": "MMLU",
+                    "score": 75.1,
+                    "target": 74,
+                    "delta": "+1.1"
+                },
+                {
+                    "label": "GSM8K",
+                    "score": 63.7,
+                    "target": 62,
+                    "delta": "+1.7"
+                },
+                {
+                    "label": "TruthfulQA",
+                    "score": 57.4,
+                    "target": 56,
+                    "delta": "+1.4"
+                },
+                {
+                    "label": "CodeEval",
+                    "score": 49.8,
+                    "target": 48,
+                    "delta": "+1.8"
+                }
+            ]
+        }
+    },
+    {
+        "id": "llm-attention-drift",
+        "type": "mpl-attention-heatmap",
+        "title": "Attention Drift",
+        "subtitle": "Layer activations during finetune",
+        "colorTheme": "theme-natural",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "xLabels": [
+                "B1",
+                "B2",
+                "B3",
+                "B4",
+                "B5",
+                "B6"
+            ],
+            "yLabels": [
+                "L0",
+                "L8",
+                "L16",
+                "L24",
+                "L32",
+                "L40"
+            ],
+            "matrix": [
+                [
+                    0.18,
+                    0.23,
+                    0.29,
+                    0.34,
+                    0.38,
+                    0.41
+                ],
+                [
+                    0.21,
+                    0.27,
+                    0.32,
+                    0.38,
+                    0.45,
+                    0.49
+                ],
+                [
+                    0.24,
+                    0.31,
+                    0.36,
+                    0.44,
+                    0.51,
+                    0.56
+                ],
+                [
+                    0.22,
+                    0.29,
+                    0.35,
+                    0.47,
+                    0.57,
+                    0.63
+                ],
+                [
+                    0.18,
+                    0.25,
+                    0.34,
+                    0.43,
+                    0.54,
+                    0.66
+                ],
+                [
+                    0.13,
+                    0.19,
+                    0.27,
+                    0.36,
+                    0.47,
+                    0.6
+                ]
+            ],
+            "sideNotes": [
+                {
+                    "label": "drift peak",
+                    "value": "L32 / B6"
+                },
+                {
+                    "label": "memory headroom",
+                    "value": "16%"
+                },
+                {
+                    "label": "seq len",
+                    "value": "16,384"
+                }
+            ]
+        }
+    },
+    {
+        "id": "ad-fatigue",
+        "type": "intensity-heat",
+        "title": "Overfit Risk",
+        "subtitle": "Generalization saturation index",
+        "footerText": "Fresh eval data still recommended",
+        "colorTheme": "theme-red",
+        "gridSpan": "default",
+        "data": {
+            "value": "34",
+            "unit": "deg",
+            "signalOrientation": "horizontal",
+            "signalScore": 34,
+            "signalLabel": "Controlled",
+            "goodAtHigh": false
+        }
+    },
+    {
+        "id": "refresh-cycle",
+        "type": "chrono-dial",
+        "title": "Checkpoint Freshness",
+        "subtitle": "Latest promoted model recency",
+        "footerText": "Next full eval tonight",
+        "colorTheme": "theme-color",
+        "gridSpan": "default",
+        "data": {
+            "value": "91",
+            "unit": "pts",
+            "trendValue": "+4 pts",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "since last promote"
+        }
+    },
+    {
+        "id": "budget-burn",
+        "type": "natural",
+        "title": "Compute Budget Pacing",
+        "subtitle": "Monthly GPU spend momentum",
+        "footerText": "9 days left at current pace",
+        "colorTheme": "theme-red",
+        "gridSpan": "default",
+        "data": {
+            "value": "69",
+            "unit": "%",
+            "sparklineColor": "#ff7676",
+            "dataPoints": [
+                51,
+                55,
+                58,
+                61,
+                63,
+                66,
+                68,
+                69
+            ],
+            "trendTone": "negative"
+        }
+    },
+    {
+        "id": "viral-k-factor",
+        "type": "light-dial",
+        "title": "Sampling Diversity",
+        "subtitle": "Novel output gain per prompt batch",
+        "colorTheme": "theme-color",
+        "gridSpan": "default",
+        "data": {
+            "value": "1.6",
+            "unit": "x",
+            "sliderValue": 52,
+            "trendValue": "+0.1x",
+            "trendDirection": "up",
+            "trendTone": "positive",
+            "trendLabel": "diversity uplift"
+        }
+    },
+    {
+        "id": "incremental-lift",
+        "type": "incremental-lift",
+        "title": "Eval Lift",
+        "subtitle": "Current run vs previous baseline",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "default",
+        "data": {
+            "value": "+18%",
+            "unit": "lift"
+        }
+    },
+    {
+        "id": "optimal-time",
+        "type": "optimal-time",
+        "title": "Best Retrain Window",
+        "subtitle": "Lowest contention launch slot",
+        "colorTheme": "theme-natural",
+        "gridSpan": "row-span-2",
+        "data": {
+            "value": "01:00",
+            "unit": "UTC+2",
+            "calendarMonth": "April 2026",
+            "calendarOffset": 2,
+            "daysInMonth": 30,
+            "totalCalendarCells": 56,
+            "calendarValues": [
+                28,
+                31,
+                33,
+                35,
+                44,
+                48,
+                55,
+                56,
+                32,
+                31,
+                34,
+                35,
+                26,
+                28,
+                22,
+                35,
+                36,
+                35,
+                35,
+                35,
+                35,
+                21,
+                36,
+                36,
+                27,
+                29,
+                32,
+                22,
+                34,
+                23
+            ],
+            "engagementMatrix": [
+                [
+                    28,
+                    31,
+                    33,
+                    35,
+                    44,
+                    48,
+                    55,
+                    56
+                ],
+                [
+                    32,
+                    31,
+                    34,
+                    35,
+                    26,
+                    28,
+                    22,
+                    35
+                ],
+                [
+                    36,
+                    35,
+                    35,
+                    35,
+                    35,
+                    21,
+                    36,
+                    36
+                ],
+                [
+                    27,
+                    29,
+                    32,
+                    22,
+                    34,
+                    23,
+                    29,
+                    35
+                ],
+                [
+                    14,
+                    16,
+                    18,
+                    11,
+                    13,
+                    12,
+                    16,
+                    11
+                ],
+                [
+                    32,
+                    32,
+                    32,
+                    1,
+                    31,
+                    31,
+                    11,
+                    32
+                ],
+                [
+                    3,
+                    6,
+                    8,
+                    11,
+                    31,
+                    11,
+                    12,
+                    14
+                ],
+                [
+                    3,
+                    2,
+                    7,
+                    30,
+                    31,
+                    11,
+                    19,
+                    33
+                ]
+            ],
+            "summaryCards": [
+                {
+                    "id": "weekly-peak",
+                    "icon": "sparkles",
+                    "label": "Weekly Peak",
+                    "value": "9.2T",
+                    "delta": "+8.4%",
+                    "note": "tokens processed",
+                    "tone": "positive"
+                },
+                {
+                    "id": "quarter-reach",
+                    "icon": "orbit",
+                    "label": "Quarter Budget",
+                    "value": "$2.8M",
+                    "delta": "-1.9%",
+                    "note": "$2.85M prior baseline",
+                    "tone": "positive"
+                }
+            ],
+            "marketBreakdown": [
+                {
+                    "label": "EU-West",
+                    "value": "41%"
+                },
+                {
+                    "label": "US-East",
+                    "value": "37%"
+                },
+                {
+                    "label": "AP-South",
+                    "value": "22%"
+                }
+            ]
+        }
+    },
+    {
+        "id": "live-traffic",
+        "type": "animated-line",
+        "title": "Live Token Stream",
+        "subtitle": "Real-time training throughput",
+        "footerText": "Last 5 Minutes Activity",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2",
+        "description": "Live throughput across active training workers and data-loader stages.",
+        "data": {
+            "value": "42.6k",
+            "unit": "tok/s",
+            "metricCards": [
+                {
+                    "icon": "sparkles",
+                    "label": "Active workers",
+                    "value": "384",
+                    "delta": "+4.1%",
+                    "note": "nodes online"
+                },
+                {
+                    "icon": "medal",
+                    "label": "Peak today",
+                    "value": "46.3k",
+                    "delta": "+7.6%",
+                    "note": "highest observed throughput"
+                }
+            ],
+            "chartLabels": [
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+                "Sun"
+            ],
+            "chartSeries": [
+                31900,
+                33800,
+                36200,
+                39100,
+                42600,
+                null,
+                null
+            ],
+            "chartMin": 24000,
+            "chartMax": 52000,
+            "annotation": {
+                "index": 4,
+                "label": "TOKENS / SEC",
+                "value": "42.6k"
+            },
+            "dataPoints": [
+                31900,
+                33800,
+                36200,
+                39100,
+                42600
+            ]
+        }
+    },
+    {
+        "id": "revenue-forecast",
+        "type": "predictive",
+        "title": "Compute Forecast",
+        "subtitle": "Predicted spend for active training plan",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "col-span-2",
+        "data": {
+            "value": "$3.4M",
+            "unit": "est",
+            "historical": [
+                2.1,
+                2.2,
+                2.15,
+                2.4,
+                2.6,
+                2.8
+            ],
+            "forecast": [
+                2.95,
+                3.05,
+                3.18,
+                3.27,
+                3.4
+            ],
+            "confidenceRange": [
+                20,
+                40,
+                55
+            ]
+        }
+    },
+    {
+        "id": "retention-cohorts",
+        "type": "cohorts",
+        "title": "Prompt Retention",
+        "subtitle": "Instruction-following stability by run",
+        "colorTheme": "theme-audience",
+        "gridSpan": "default",
+        "data": {
+            "summaryValue": "41.6%",
+            "summaryDelta": "+2.4 pts",
+            "summaryCompare": "Average last-step consistency across held-out eval cohorts",
+            "retentionBars": [
+                {
+                    "label": "500",
+                    "segments": [
+                        39,
+                        11,
+                        10,
+                        10
+                    ],
+                    "marker": 97
+                },
+                {
+                    "label": "400",
+                    "segments": [
+                        39,
+                        15,
+                        14,
+                        15
+                    ],
+                    "marker": 87
+                },
+                {
+                    "label": "300",
+                    "segments": [
+                        16,
+                        9,
+                        8,
+                        8
+                    ],
+                    "marker": 49
+                },
+                {
+                    "label": "200",
+                    "segments": [
+                        16,
+                        13,
+                        13,
+                        13
+                    ],
+                    "marker": 63
+                },
+                {
+                    "label": "100",
+                    "segments": [
+                        39,
+                        15,
+                        14,
+                        15
+                    ],
+                    "marker": 97
+                }
+            ],
+            "cohorts": [
+                {
+                    "week": "Feb 01",
+                    "size": 24000,
+                    "data": [
+                        100,
+                        84,
+                        71,
+                        65
+                    ]
+                },
+                {
+                    "week": "Feb 08",
+                    "size": 22800,
+                    "data": [
+                        100,
+                        82,
+                        69
+                    ]
+                },
+                {
+                    "week": "Feb 15",
+                    "size": 25200,
+                    "data": [
+                        100,
+                        86
+                    ]
+                },
+                {
+                    "week": "Feb 22",
+                    "size": 26100,
+                    "data": [
+                        100
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "id": "technical-health",
+        "type": "vitals",
+        "title": "Training Infra Health",
+        "subtitle": "Cluster uptime and job reliability",
+        "colorTheme": "theme-weather",
+        "gridSpan": "default",
+        "data": {
+            "value": "99.91",
+            "unit": "%",
+            "uptimeBars": [
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "warn",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "warn",
+                "good",
+                "good",
+                "good",
+                "good",
+                "down",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good"
+            ],
+            "metrics": [
+                {
+                    "name": "GPU",
+                    "value": "99.8%",
+                    "status": "good"
+                },
+                {
+                    "name": "FS",
+                    "value": "99.9%",
+                    "status": "good"
+                },
+                {
+                    "name": "Queue",
+                    "value": "12ms",
+                    "status": "good"
+                },
+                {
+                    "name": "OOM",
+                    "value": "0.2%",
+                    "status": "warn"
+                }
+            ]
+        }
+    },
+    {
+        "id": "stat-leads",
+        "type": "leads-list",
+        "title": "Recent Runs",
+        "subtitle": "Active training jobs",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "row-span-2",
+        "data": {
+            "leads": [
+                {
+                    "name": "Base 13B SFT",
+                    "value": "8x H100",
+                    "status": "vip",
+                    "time": "4m ago"
+                },
+                {
+                    "name": "RLAIF Reward Model",
+                    "value": "4x H100",
+                    "status": "warm",
+                    "time": "11m ago"
+                },
+                {
+                    "name": "Tokenizer Refresh",
+                    "value": "CPU cluster",
+                    "status": "cold",
+                    "time": "22m ago"
+                },
+                {
+                    "name": "Math Corpus Mix",
+                    "value": "6x H100",
+                    "status": "warm",
+                    "time": "36m ago"
+                },
+                {
+                    "name": "Code Alignment",
+                    "value": "8x H100",
+                    "status": "vip",
+                    "time": "53m ago"
+                },
+                {
+                    "name": "Long Context Eval",
+                    "value": "A100 pool",
+                    "status": "cold",
+                    "time": "1h ago"
+                },
+                {
+                    "name": "Preference Tune",
+                    "value": "4x H100",
+                    "status": "warm",
+                    "time": "2h ago"
+                },
+                {
+                    "name": "Safety Sweep",
+                    "value": "eval farm",
+                    "status": "vip",
+                    "time": "3h ago"
+                }
+            ]
+        }
+    },
+    {
+        "id": "top-routes",
+        "type": "leads-list",
+        "title": "Top Pipelines",
+        "subtitle": "Most active data routes",
+        "colorTheme": "theme-natural",
+        "gridSpan": "default",
+        "data": {
+            "leads": [
+                {
+                    "name": "raw/web -> clean/text",
+                    "value": "4.2B rows",
+                    "time": "+9%"
+                },
+                {
+                    "name": "sft -> packer -> train",
+                    "value": "3.6B rows",
+                    "time": "+12%"
+                },
+                {
+                    "name": "prefs -> RM -> DPO",
+                    "value": "1.1B rows",
+                    "time": "+18%"
+                },
+                {
+                    "name": "eval -> gating -> promote",
+                    "value": "380M rows",
+                    "time": "-1%"
+                }
+            ]
+        }
+    },
+    {
+        "id": "financial-waterfall",
+        "type": "waterfall",
+        "title": "Compute Cost Bridge",
+        "subtitle": "Gross to optimized training spend",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "col-span-2",
+        "data": {
+            "value": "$1.12M",
+            "unit": "net",
+            "steps": [
+                {
+                    "name": "Gross Compute",
+                    "value": 1940000
+                },
+                {
+                    "name": "Spot Savings",
+                    "value": -320000
+                },
+                {
+                    "name": "Packing Gains",
+                    "value": -210000
+                },
+                {
+                    "name": "Cache Hits",
+                    "value": -140000
+                },
+                {
+                    "name": "Net Spend",
+                    "isTotal": true
+                }
+            ]
+        }
+    },
+    {
+        "id": "market-sentiment",
+        "type": "market-radar",
+        "title": "Capability Radar",
+        "subtitle": "Aggregated model quality profile",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2",
+        "data": {
+            "indicator": [
+                {
+                    "name": "Reasoning",
+                    "max": 100
+                },
+                {
+                    "name": "Factuality",
+                    "max": 100
+                },
+                {
+                    "name": "Coding",
+                    "max": 100
+                },
+                {
+                    "name": "Safety",
+                    "max": 100
+                },
+                {
+                    "name": "Latency",
+                    "max": 100
+                }
+            ],
+            "radarData": [
+                {
+                    "value": [
+                        82,
+                        77,
+                        74,
+                        91,
+                        69
+                    ],
+                    "name": "Current Model",
+                    "symbol": "none",
+                    "itemStyle": {
+                        "color": "#ec4899"
+                    },
+                    "areaStyle": {
+                        "color": {
+                            "type": "radial",
+                            "x": 0.5,
+                            "y": 0.5,
+                            "r": 1,
+                            "colorStops": [
+                                {
+                                    "offset": 0,
+                                    "color": "rgba(236, 72, 153, 0.1)"
+                                },
+                                {
+                                    "offset": 1,
+                                    "color": "rgba(236, 72, 153, 0.4)"
+                                }
+                            ]
+                        }
+                    },
+                    "lineStyle": {
+                        "width": 2,
+                        "type": "solid"
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "id": "attribution-models",
+        "type": "attribution",
+        "title": "Data Source Attribution",
+        "subtitle": "Daily and quarterly token allocation",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "summaryValue": "14.8T",
+            "summaryLabel": "Quarter Tokens",
+            "periodMetrics": [
+                {
+                    "label": "Weekly",
+                    "value": "1.2T",
+                    "delta": "+10.2%",
+                    "note": "1.09T baseline",
+                    "tone": "#7CFF5B"
+                },
+                {
+                    "label": "Quarter",
+                    "value": "14.8T",
+                    "delta": "+6.4%",
+                    "note": "13.9T baseline",
+                    "tone": "#FFC533"
+                }
+            ],
+            "models": [
+                {
+                    "channel": "Web",
+                    "monthly": 420,
+                    "yearly": 5200,
+                    "yearlyColor": "#2EF0B2",
+                    "monthlyColor": "#FFBF1F"
+                },
+                {
+                    "channel": "Code",
+                    "monthly": 360,
+                    "yearly": 4100,
+                    "yearlyColor": "#31E9C9",
+                    "monthlyColor": "#FF9F1F"
+                },
+                {
+                    "channel": "Dialogue",
+                    "monthly": 290,
+                    "yearly": 3200,
+                    "yearlyColor": "#8B5CF6",
+                    "monthlyColor": "#FF5A36"
+                },
+                {
+                    "channel": "Synthetic",
+                    "monthly": 130,
+                    "yearly": 1400,
+                    "yearlyColor": "#7B6D87",
+                    "monthlyColor": "#F33B1D"
+                }
+            ]
+        }
+    },
+    {
+        "id": "anomaly-detection",
+        "type": "anomaly-stream",
+        "title": "Gradient Anomalies",
+        "subtitle": "ML-driven instability detection",
+        "colorTheme": "theme-weather",
+        "gridSpan": "col-span-2",
+        "data": {
+            "value": "3 Spikes",
+            "unit": "warn"
+        }
+    },
+    {
+        "id": "romania-3d",
+        "type": "3d-map",
+        "title": "Cluster Footprint",
+        "subtitle": "Active training regions",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {}
+    },
+    {
+        "id": "data-scatter",
+        "type": "scatter",
+        "title": "Quality vs Cost",
+        "subtitle": "Eval score over effective spend",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "periodLabels": [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct"
+            ],
+            "scatterData": [
+                [
+                    18,
+                    58
+                ],
+                [
+                    24,
+                    61
+                ],
+                [
+                    29,
+                    63
+                ],
+                [
+                    35,
+                    67
+                ],
+                [
+                    42,
+                    71
+                ],
+                [
+                    51,
+                    75
+                ],
+                [
+                    59,
+                    77
+                ],
+                [
+                    66,
+                    81
+                ],
+                [
+                    73,
+                    84
+                ],
+                [
+                    82,
+                    87
+                ]
+            ]
+        }
+    },
+    {
+        "id": "sales-funnel",
+        "type": "funnel",
+        "title": "Training Funnel",
+        "subtitle": "Corpus to promoted checkpoint",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2",
+        "data": {
+            "summaryLabel": "Runs",
+            "summaryValue": "142",
+            "summaryDelta": "↑4.8%",
+            "summaryCompare": "Compared to 135 last month",
+            "funnel": [
+                {
+                    "value": 100,
+                    "name": "Raw Data"
+                },
+                {
+                    "value": 74,
+                    "name": "Curated"
+                },
+                {
+                    "value": 39,
+                    "name": "Train"
+                },
+                {
+                    "value": 17,
+                    "name": "Eval"
+                },
+                {
+                    "value": 9,
+                    "name": "Promote"
+                }
+            ]
+        }
+    },
+    {
+        "id": "market-evolution",
+        "type": "market-evolution",
+        "title": "Data Mixture Dynamics",
+        "subtitle": "Cross-domain influence over training quality",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "channels": [
+                {
+                    "name": "Web",
+                    "color": "#3B82F6",
+                    "value": 82,
+                    "synergy": "High"
+                },
+                {
+                    "name": "Code",
+                    "color": "#10B981",
+                    "value": 88,
+                    "synergy": "Critical"
+                },
+                {
+                    "name": "Math",
+                    "color": "#F59E0B",
+                    "value": 73,
+                    "synergy": "High"
+                },
+                {
+                    "name": "Dialogue",
+                    "color": "#EF4444",
+                    "value": 64,
+                    "synergy": "Mid"
+                },
+                {
+                    "name": "Safety",
+                    "color": "#8B5CF6",
+                    "value": 77,
+                    "synergy": "High"
+                },
+                {
+                    "name": "Synthetic",
+                    "color": "#EC4899",
+                    "value": 52,
+                    "synergy": "Mid"
+                },
+                {
+                    "name": "Eval",
+                    "color": "#06B6D4",
+                    "value": 69,
+                    "synergy": "High"
+                }
+            ],
+            "links": [
+                {
+                    "source": "Web",
+                    "target": "Dialogue",
+                    "value": 5
+                },
+                {
+                    "source": "Code",
+                    "target": "Math",
+                    "value": 7
+                },
+                {
+                    "source": "Dialogue",
+                    "target": "Safety",
+                    "value": 4
+                },
+                {
+                    "source": "Safety",
+                    "target": "Eval",
+                    "value": 6
+                },
+                {
+                    "source": "Synthetic",
+                    "target": "Dialogue",
+                    "value": 5
+                },
+                {
+                    "source": "Code",
+                    "target": "Eval",
+                    "value": 8
+                },
+                {
+                    "source": "Web",
+                    "target": "Safety",
+                    "value": 4
+                }
+            ]
+        }
+    },
+    {
+        "id": "creative-quadrant",
+        "type": "creative-quadrant",
+        "title": "Experiment Quadrant",
+        "subtitle": "Loss gain vs eval gain by run",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "row-span-2",
+        "data": {
+            "creatives": [
+                [
+                    6.1,
+                    7.3,
+                    "SFT v4",
+                    "SFT"
+                ],
+                [
+                    5.8,
+                    8.1,
+                    "Code Tune",
+                    "Code"
+                ],
+                [
+                    3.2,
+                    9,
+                    "Math Booster",
+                    "Math"
+                ],
+                [
+                    8.4,
+                    3.1,
+                    "Long Context",
+                    "Context"
+                ],
+                [
+                    4.7,
+                    6,
+                    "DPO Sweep",
+                    "Align"
+                ],
+                [
+                    1.4,
+                    1.9,
+                    "Legacy Mix",
+                    "Archive"
+                ],
+                [
+                    7.2,
+                    5.4,
+                    "Safety RM",
+                    "Safety"
+                ]
+            ]
+        }
+    },
+    {
+        "id": "budget-sensitivity",
+        "type": "budget-sensitivity",
+        "title": "Scaling Law Sensitivity",
+        "subtitle": "Compute elasticity and diminishing returns",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "col-span-2",
+        "data": {
+            "curvePoints": [
+                [
+                    0,
+                    0.6692850924284856
+                ],
+                [
+                    2,
+                    0.816257115315989
+                ],
+                [
+                    4,
+                    0.9951801866904316
+                ],
+                [
+                    6,
+                    1.2128434984274237
+                ],
+                [
+                    8,
+                    1.4774031693273055
+                ],
+                [
+                    10,
+                    1.798620996209156
+                ],
+                [
+                    12,
+                    2.188127093613047
+                ],
+                [
+                    14,
+                    2.6596993576865855
+                ],
+                [
+                    16,
+                    3.2295464698450496
+                ],
+                [
+                    18,
+                    3.9165722796764353
+                ],
+                [
+                    20,
+                    4.742587317756678
+                ],
+                [
+                    22,
+                    5.7324175898868726
+                ],
+                [
+                    24,
+                    6.913842034334682
+                ],
+                [
+                    26,
+                    8.317269649392236
+                ],
+                [
+                    28,
+                    9.975048911968514
+                ],
+                [
+                    30,
+                    11.920292202211755
+                ],
+                [
+                    32,
+                    14.185106490048778
+                ],
+                [
+                    34,
+                    16.79816148660755
+                ],
+                [
+                    36,
+                    19.781611144141824
+                ],
+                [
+                    38,
+                    23.14752165009823
+                ],
+                [
+                    40,
+                    26.894142136999513
+                ],
+                [
+                    42,
+                    31.002551887238752
+                ],
+                [
+                    44,
+                    35.43436937742045
+                ],
+                [
+                    46,
+                    40.1312339887548
+                ],
+                [
+                    48,
+                    45.016600268752214
+                ],
+                [
+                    50,
+                    50
+                ],
+                [
+                    52,
+                    54.98339973124779
+                ],
+                [
+                    54,
+                    59.8687660112452
+                ],
+                [
+                    56,
+                    64.56563062257955
+                ],
+                [
+                    58,
+                    68.99744811276125
+                ],
+                [
+                    60,
+                    73.10585786300048
+                ],
+                [
+                    62,
+                    76.85247834990177
+                ],
+                [
+                    64,
+                    80.21838885585818
+                ],
+                [
+                    66,
+                    83.20183851339245
+                ],
+                [
+                    68,
+                    85.81489350995123
+                ],
+                [
+                    70,
+                    88.07970779778823
+                ],
+                [
+                    72,
+                    90.02495108803149
+                ],
+                [
+                    74,
+                    91.68273035060777
+                ],
+                [
+                    76,
+                    93.08615796566532
+                ],
+                [
+                    78,
+                    94.26758241011314
+                ],
+                [
+                    80,
+                    95.25741268224333
+                ],
+                [
+                    82,
+                    96.08342772032357
+                ],
+                [
+                    84,
+                    96.77045353015495
+                ],
+                [
+                    86,
+                    97.34030064231341
+                ],
+                [
+                    88,
+                    97.81187290638695
+                ],
+                [
+                    90,
+                    98.20137900379083
+                ],
+                [
+                    92,
+                    98.5225968306727
+                ],
+                [
+                    94,
+                    98.78715650157258
+                ],
+                [
+                    96,
+                    99.00481981330957
+                ],
+                [
+                    98,
+                    99.18374288468401
+                ],
+                [
+                    100,
+                    99.33071490757152
+                ]
+            ]
+        }
+    },
+    {
+        "id": "intent-sunburst",
+        "type": "intent-sunburst",
+        "title": "Corpus Intent",
+        "subtitle": "Real-time dataset classification",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "sunburstData": [
+                {
+                    "name": "Instruction",
+                    "itemStyle": {
+                        "color": "#10B981"
+                    },
+                    "children": [
+                        {
+                            "name": "Assistant QA",
+                            "value": 22
+                        },
+                        {
+                            "name": "Tool Use",
+                            "value": 18
+                        }
+                    ]
+                },
+                {
+                    "name": "Knowledge",
+                    "itemStyle": {
+                        "color": "#3B82F6"
+                    },
+                    "children": [
+                        {
+                            "name": "Code",
+                            "value": 17
+                        },
+                        {
+                            "name": "Math",
+                            "value": 15
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "id": "shapley-attribution",
+        "type": "shapley-attribution",
+        "title": "Dataset Shapley",
+        "subtitle": "Capability contribution by source",
+        "colorTheme": "theme-productivity",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "rawData": [
+                [
+                    "Dialogue",
+                    19.683019058189853,
+                    2021
+                ],
+                [
+                    "Dialogue",
+                    24.6833903211189,
+                    2021
+                ],
+                [
+                    "Dialogue",
+                    23.64701871671297,
+                    2021
+                ],
+                [
+                    "Dialogue",
+                    33.91222823701676,
+                    2022
+                ],
+                [
+                    "Dialogue",
+                    32.716793702194735,
+                    2022
+                ],
+                [
+                    "Dialogue",
+                    37.026395307833425,
+                    2022
+                ],
+                [
+                    "Dialogue",
+                    20.921580606324838,
+                    2023
+                ],
+                [
+                    "Dialogue",
+                    27.621240347441923,
+                    2023
+                ],
+                [
+                    "Dialogue",
+                    19.77874834249792,
+                    2023
+                ],
+                [
+                    "Web",
+                    16.66624500617535,
+                    2021
+                ],
+                [
+                    "Web",
+                    7.089858637785376,
+                    2021
+                ],
+                [
+                    "Web",
+                    10.535892257841073,
+                    2021
+                ],
+                [
+                    "Web",
+                    19.556827999698566,
+                    2022
+                ],
+                [
+                    "Web",
+                    17.457968856172435,
+                    2022
+                ],
+                [
+                    "Web",
+                    10.967951684922037,
+                    2022
+                ],
+                [
+                    "Web",
+                    18.344452921626278,
+                    2023
+                ],
+                [
+                    "Web",
+                    22.747748377664635,
+                    2023
+                ],
+                [
+                    "Web",
+                    6.689114437669323,
+                    2023
+                ],
+                [
+                    "Code",
+                    38.137365454748775,
+                    2021
+                ],
+                [
+                    "Code",
+                    30.979587885344078,
+                    2021
+                ],
+                [
+                    "Code",
+                    27.28416755121987,
+                    2021
+                ],
+                [
+                    "Code",
+                    43.31883899911986,
+                    2022
+                ],
+                [
+                    "Code",
+                    30.906468457236777,
+                    2022
+                ],
+                [
+                    "Code",
+                    26.0294944225872,
+                    2022
+                ],
+                [
+                    "Code",
+                    26.10890509165352,
+                    2023
+                ],
+                [
+                    "Code",
+                    41.124464881933434,
+                    2023
+                ],
+                [
+                    "Code",
+                    36.24909818232206,
+                    2023
+                ],
+                [
+                    "Math",
+                    38.80848393210776,
+                    2021
+                ],
+                [
+                    "Math",
+                    34.93841002732542,
+                    2021
+                ],
+                [
+                    "Math",
+                    43.67616347781882,
+                    2021
+                ],
+                [
+                    "Math",
+                    31.784535742398475,
+                    2022
+                ],
+                [
+                    "Math",
+                    35.25466082369594,
+                    2022
+                ],
+                [
+                    "Math",
+                    40.8019414832913,
+                    2022
+                ],
+                [
+                    "Math",
+                    36.584243245516326,
+                    2023
+                ],
+                [
+                    "Math",
+                    41.44798620444695,
+                    2023
+                ],
+                [
+                    "Math",
+                    35.760891103366646,
+                    2023
+                ],
+                [
+                    "Synthetic",
+                    22.05364275956095,
+                    2021
+                ],
+                [
+                    "Synthetic",
+                    25.695120599478642,
+                    2021
+                ],
+                [
+                    "Synthetic",
+                    26.92491435848985,
+                    2021
+                ],
+                [
+                    "Synthetic",
+                    22.732994624920256,
+                    2022
+                ],
+                [
+                    "Synthetic",
+                    25.79297281366831,
+                    2022
+                ],
+                [
+                    "Synthetic",
+                    23.15718367464229,
+                    2022
+                ],
+                [
+                    "Synthetic",
+                    26.696627148649547,
+                    2023
+                ],
+                [
+                    "Synthetic",
+                    33.85084397173571,
+                    2023
+                ],
+                [
+                    "Synthetic",
+                    28.43379866584939,
+                    2023
+                ]
+            ]
+        }
+    },
+    {
+        "id": "trend-spotter",
+        "type": "trend-spotter",
+        "title": "Emerging Training Signals",
+        "subtitle": "What the next run should bias toward",
+        "colorTheme": "theme-audience",
+        "gridSpan": "col-span-2 row-span-2",
+        "data": {
+            "keywords": [
+                {
+                    "text": "tool use",
+                    "weight": 96,
+                    "trend": "up"
+                },
+                {
+                    "text": "long context",
+                    "weight": 90,
+                    "trend": "up"
+                },
+                {
+                    "text": "verifiable math",
+                    "weight": 82,
+                    "trend": "up"
+                },
+                {
+                    "text": "multilingual",
+                    "weight": 74,
+                    "trend": "stable"
+                },
+                {
+                    "text": "synthetic drift",
+                    "weight": 39,
+                    "trend": "down"
+                },
+                {
+                    "text": "reasoning traces",
+                    "weight": 88,
+                    "trend": "up"
+                },
+                {
+                    "text": "agent memory",
+                    "weight": 67,
+                    "trend": "stable"
+                },
+                {
+                    "text": "vision OCR",
+                    "weight": 62,
+                    "trend": "up"
+                },
+                {
+                    "text": "safety refusals",
+                    "weight": 85,
+                    "trend": "up"
+                },
+                {
+                    "text": "grounded search",
+                    "weight": 79,
+                    "trend": "up"
+                },
+                {
+                    "text": "code repair",
+                    "weight": 73,
+                    "trend": "stable"
+                },
+                {
+                    "text": "hallucination",
+                    "weight": 57,
+                    "trend": "down"
+                }
+            ]
+        }
+    }
+]

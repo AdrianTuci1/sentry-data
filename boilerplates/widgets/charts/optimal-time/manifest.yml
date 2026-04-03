@@ -1,0 +1,159 @@
+title: "Optimal Time Heatmap"
+description: "Calendar-style matrix for best-performing time windows with summary cards."
+component: "OptimalTimeHeatmap"
+runtime_type: "optimal-time"
+aliases: []
+category: "charts"
+selection_hints:
+  - "best window"
+  - "calendar heatmap"
+  - "time-of-day optimisation"
+component_id_overrides: []
+data_requirements:
+  - "calendarValues: Flat ordered day intensities."
+  - "engagementMatrix: Matrix of intensity values."
+sql_aliases:
+  - alias: "calendarMonth"
+    path: "data.calendarMonth"
+    required: false
+    sql_type: "string"
+    expression_hint: "calendarMonth"
+    description: "Displayed month label."
+  - alias: "calendarOffset"
+    path: "data.calendarOffset"
+    required: false
+    sql_type: "number"
+    expression_hint: "calendarOffset"
+    description: "Leading offset before day 1."
+  - alias: "daysInMonth"
+    path: "data.daysInMonth"
+    required: false
+    sql_type: "number"
+    expression_hint: "daysInMonth"
+    description: "Number of in-month cells."
+  - alias: "totalCalendarCells"
+    path: "data.totalCalendarCells"
+    required: false
+    sql_type: "number"
+    expression_hint: "totalCalendarCells"
+    description: "Total rendered cells."
+  - alias: "calendarValues"
+    path: "data.calendarValues"
+    required: true
+    sql_type: "number[]"
+    expression_hint: "list(day_value ORDER BY day_number)"
+    description: "Flat ordered day intensities."
+  - alias: "engagementMatrix"
+    path: "data.engagementMatrix"
+    required: true
+    sql_type: "number[][]"
+    expression_hint: "list(row_values ORDER BY row_index)"
+    description: "Matrix of intensity values."
+  - alias: "summaryCards"
+    path: "data.summaryCards"
+    required: false
+    sql_type: "object[]"
+    expression_hint: "list(struct_pack(id := card_id, icon := icon_name, label := card_label, value := card_value, delta := card_delta, note := card_note, tone := card_tone) ORDER BY card_index)"
+    description: "Summary list of top highlights."
+  - alias: "marketBreakdown"
+    path: "data.marketBreakdown"
+    required: false
+    sql_type: "object[]"
+    expression_hint: "list(struct_pack(label := label_col, value := value_col) ORDER BY value_sort DESC)"
+    description: "Top markets or segments."
+data_structure_template:
+  data:
+    calendarMonth: "April 2026"
+    calendarOffset: 2
+    daysInMonth: 30
+    totalCalendarCells: 56
+    calendarValues:
+      - 28
+      - 31
+      - 33
+      - 35
+    engagementMatrix:
+      - - 28
+        - 31
+        - 33
+        - 35
+      - - 32
+        - 31
+        - 34
+        - 35
+    summaryCards:
+      - id: "weekly-peak"
+        icon: "sparkles"
+        label: "Weekly Peak"
+        value: "8,097"
+        delta: "+19.6%"
+        note: "42,214 engaged sessions"
+        tone: "positive"
+    marketBreakdown:
+      - label: "Los Angeles"
+        value: "201,192"
+grid_span: "row-span-2"
+color_theme: "theme-natural"
+sdui:
+  root_key: "data"
+  mapping_mode: "matrix"
+query_guidance:
+  sql_shape: "single_row"
+  data_root: "data"
+  return_shape: "matrix"
+  rules:
+    - "Return SQL-derived fields under the `data` object."
+    - "Use aliases exactly as listed in `sql_aliases`."
+    - "Prefer one final row per widget payload; use DuckDB list/struct aggregations for nested arrays or objects."
+  duckdb_patterns:
+    - "Use `list(value ORDER BY sort_key)` for arrays."
+    - "Use `struct_pack(key := value, ...)` for nested objects."
+    - "Use `list(struct_pack(... ) ORDER BY sort_key)` for arrays of objects."
+  alias_projection_examples:
+    calendarMonth: "calendarMonth"
+    calendarOffset: "calendarOffset"
+    daysInMonth: "daysInMonth"
+    totalCalendarCells: "totalCalendarCells"
+    calendarValues: "list(day_value ORDER BY day_number)"
+    engagementMatrix: "list(row_values ORDER BY row_index)"
+    summaryCards: "list(struct_pack(id := card_id, icon := icon_name, label := card_label, value := card_value, delta := card_delta, note := card_note, tone := card_tone) ORDER BY card_index)"
+    marketBreakdown: "list(struct_pack(label := label_col, value := value_col) ORDER BY value_sort DESC)"
+  recommended_grain: "single row"
+  implementation_notes:
+    - "Aggregate to the widget grain before packaging the payload."
+    - "Return metadata like title, type, gridSpan and colorTheme outside the `data` object; place SQL-derived fields inside `data`."
+    - "Format strings in SQL only when the component explicitly expects formatted labels; otherwise return numerics and let the UI format them."
+insight_payload_contract:
+  type: "optimal-time"
+  gridSpan: "row-span-2"
+  colorTheme: "theme-natural"
+  data:
+    calendarMonth: "April 2026"
+    calendarOffset: 2
+    daysInMonth: 30
+    totalCalendarCells: 56
+    calendarValues:
+      - 28
+      - 31
+      - 33
+      - 35
+    engagementMatrix:
+      - - 28
+        - 31
+        - 33
+        - 35
+      - - 32
+        - 31
+        - 34
+        - 35
+    summaryCards:
+      - id: "weekly-peak"
+        icon: "sparkles"
+        label: "Weekly Peak"
+        value: "8,097"
+        delta: "+19.6%"
+        note: "42,214 engaged sessions"
+        tone: "positive"
+    marketBreakdown:
+      - label: "Los Angeles"
+        value: "201,192"

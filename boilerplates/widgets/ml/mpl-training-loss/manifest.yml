@@ -1,0 +1,131 @@
+title: "Training Loss Panel"
+description: "Dual-loss panel with auxiliary perplexity and headline stats."
+component: "MatplotlibTrainingPanel"
+runtime_type: "mpl-training-loss"
+aliases: []
+category: "ml"
+selection_hints:
+  - "training curves"
+  - "train vs validation"
+  - "ML convergence"
+component_id_overrides: []
+data_requirements:
+  - "steps: Ordered checkpoint or step labels."
+  - "trainLoss: Ordered training loss values."
+  - "valLoss: Ordered validation loss values."
+sql_aliases:
+  - alias: "steps"
+    path: "data.steps"
+    required: true
+    sql_type: "string[]"
+    expression_hint: "list(step_label ORDER BY step_index)"
+    description: "Ordered checkpoint or step labels."
+  - alias: "trainLoss"
+    path: "data.trainLoss"
+    required: true
+    sql_type: "number[]"
+    expression_hint: "list(train_loss ORDER BY step_index)"
+    description: "Ordered training loss values."
+  - alias: "valLoss"
+    path: "data.valLoss"
+    required: true
+    sql_type: "number[]"
+    expression_hint: "list(val_loss ORDER BY step_index)"
+    description: "Ordered validation loss values."
+  - alias: "perplexity"
+    path: "data.perplexity"
+    required: false
+    sql_type: "number[]"
+    expression_hint: "list(perplexity ORDER BY step_index)"
+    description: "Ordered perplexity values."
+  - alias: "stats"
+    path: "data.stats"
+    required: false
+    sql_type: "object[]"
+    expression_hint: "list(struct_pack(label := stat_label, value := stat_value, accent := accent_color, meta := stat_note) ORDER BY stat_index)"
+    description: "Summary stat cards."
+data_structure_template:
+  data:
+    steps:
+      - "80"
+      - "160"
+      - "240"
+      - "320"
+    trainLoss:
+      - 2.84
+      - 2.41
+      - 2.02
+      - 1.78
+    valLoss:
+      - 2.95
+      - 2.58
+      - 2.19
+      - 1.96
+    perplexity:
+      - 18.3
+      - 14.8
+      - 11.7
+      - 9.4
+    stats:
+      - label: "Best val loss"
+        value: "1.73"
+        accent: "#7cff5b"
+        meta: "checkpoint 480"
+grid_span: "col-span-2 row-span-2"
+color_theme: "theme-productivity"
+sdui:
+  root_key: "data"
+  mapping_mode: "single"
+query_guidance:
+  sql_shape: "single_row"
+  data_root: "data"
+  return_shape: "single"
+  rules:
+    - "Return SQL-derived fields under the `data` object."
+    - "Use aliases exactly as listed in `sql_aliases`."
+    - "Prefer one final row per widget payload; use DuckDB list/struct aggregations for nested arrays or objects."
+  duckdb_patterns:
+    - "Use `list(value ORDER BY sort_key)` for arrays."
+    - "Use `struct_pack(key := value, ...)` for nested objects."
+    - "Use `list(struct_pack(... ) ORDER BY sort_key)` for arrays of objects."
+  alias_projection_examples:
+    steps: "list(step_label ORDER BY step_index)"
+    trainLoss: "list(train_loss ORDER BY step_index)"
+    valLoss: "list(val_loss ORDER BY step_index)"
+    perplexity: "list(perplexity ORDER BY step_index)"
+    stats: "list(struct_pack(label := stat_label, value := stat_value, accent := accent_color, meta := stat_note) ORDER BY stat_index)"
+  recommended_grain: "single row"
+  implementation_notes:
+    - "Aggregate to the widget grain before packaging the payload."
+    - "Return metadata like title, type, gridSpan and colorTheme outside the `data` object; place SQL-derived fields inside `data`."
+    - "Format strings in SQL only when the component explicitly expects formatted labels; otherwise return numerics and let the UI format them."
+insight_payload_contract:
+  type: "mpl-training-loss"
+  gridSpan: "col-span-2 row-span-2"
+  colorTheme: "theme-productivity"
+  data:
+    steps:
+      - "80"
+      - "160"
+      - "240"
+      - "320"
+    trainLoss:
+      - 2.84
+      - 2.41
+      - 2.02
+      - 1.78
+    valLoss:
+      - 2.95
+      - 2.58
+      - 2.19
+      - 1.96
+    perplexity:
+      - 18.3
+      - 14.8
+      - 11.7
+      - 9.4
+    stats:
+      - label: "Best val loss"
+        value: "1.73"
+        accent: "#7cff5b"
+        meta: "checkpoint 480"

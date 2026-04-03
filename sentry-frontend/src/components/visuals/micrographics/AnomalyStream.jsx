@@ -2,24 +2,19 @@ import React from 'react';
 import ReactECharts from 'echarts-for-react';
 
 const AnomalyStream = ({ data }) => {
-    const services = ['Google Ads', 'Meta Ads', 'SEO', 'Email Marketing', 'Direct Traffic', 'Affiliate', 'Display Ads'];
-
-    // Generate dispersion mock data with service context
-    const dispersionData = [];
-    for (let i = 0; i < 250; i++) {
-        const service = services[Math.floor(Math.random() * services.length)];
-        const x = Math.random() * 1000;
-        const y = Math.random() * 100000 + 20000;
-        // Format: [x, y, serviceName]
-        dispersionData.push([x, y, service]);
-    }
-
-    // Add specific anomalies with clear labels
-    dispersionData.push(
-        [900, 150000, 'Meta Ads (Spike)'],
-        [100, 160000, 'Google Ads (Alert)'],
-        [500, 10000, 'SEO (Anomaly)']
-    );
+    const defaultServices = ['Service A', 'Service B', 'Service C', 'Service D', 'Service E', 'Service F', 'Service G'];
+    const dispersionData = Array.isArray(data?.dispersionData) && data.dispersionData.length
+        ? data.dispersionData
+        : defaultServices.flatMap((service, index) => ([
+            [120 + (index * 90), 32000 + (index * 9500), service],
+            [160 + (index * 90), 41000 + (index * 12000), service],
+        ]));
+    const xAxisLabel = data?.xAxisLabel || 'Frequency';
+    const yAxisLabel = data?.yAxisLabel || 'Variance';
+    const valueLabel = data?.valueLabel || 'score';
+    const yValues = dispersionData.map((point) => Number(point?.[1]) || 0);
+    const minValue = Math.min(...yValues, 0);
+    const maxValue = Math.max(...yValues, 1);
 
     const option = {
         grid: {
@@ -30,8 +25,8 @@ const AnomalyStream = ({ data }) => {
             containLabel: true
         },
         visualMap: {
-            min: 20000,
-            max: 160000,
+            min: minValue,
+            max: maxValue,
             dimension: 1,
             orient: 'vertical',
             right: 0,
@@ -55,8 +50,8 @@ const AnomalyStream = ({ data }) => {
                 return `
                     <div style="padding: 4px;">
                         <div style="font-weight: bold; color: #9CA3AF; margin-bottom: 4px;">${service}</div>
-                        <div style="font-size: 12px;">Variance: <span style="color: #24b7f2;">${y.toLocaleString()}</span></div>
-                        <div style="font-size: 12px; opacity: 0.7;">Frequency: ${x.toFixed(0)}</div>
+                        <div style="font-size: 12px;">${valueLabel}: <span style="color: #24b7f2;">${y.toLocaleString()}</span></div>
+                        <div style="font-size: 12px; opacity: 0.7;">${xAxisLabel}: ${x.toFixed(0)}</div>
                     </div>
                 `;
             },
@@ -67,6 +62,7 @@ const AnomalyStream = ({ data }) => {
         xAxis: [
             {
                 type: 'value',
+                name: xAxisLabel,
                 splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.05)' } },
                 axisLabel: { color: '#6B7280', fontSize: 9 }
             }
@@ -74,6 +70,7 @@ const AnomalyStream = ({ data }) => {
         yAxis: [
             {
                 type: 'value',
+                name: yAxisLabel,
                 splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.05)' } },
                 axisLabel: { color: '#6B7280', fontSize: 9 }
             }
@@ -83,8 +80,9 @@ const AnomalyStream = ({ data }) => {
                 name: 'service-dispersion',
                 type: 'scatter',
                 symbolSize: (data) => {
-                    // Make anomalies larger
-                    return data[1] > 140000 || data[1] < 15000 ? 8 : 4;
+                    const magnitude = Number(data?.[1]) || 0;
+                    const ratio = maxValue > minValue ? (magnitude - minValue) / (maxValue - minValue) : 0.5;
+                    return 4 + (ratio * 5);
                 },
                 data: dispersionData,
                 itemStyle: {

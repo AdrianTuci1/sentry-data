@@ -1,0 +1,77 @@
+title: "Market Evolution"
+description: "Force graph of nodes and weighted links."
+component: "MarketEvolution"
+runtime_type: "market-evolution"
+aliases: []
+category: "marketing"
+selection_hints:
+  - "network graph"
+  - "force layout"
+  - "entity interactions"
+component_id_overrides: []
+data_requirements:
+  - "channels: Node definitions."
+  - "links: Edge definitions."
+sql_aliases:
+  - alias: "channels"
+    path: "data.channels"
+    required: true
+    sql_type: "object[]"
+    expression_hint: "list(struct_pack(name := node_name, color := color_hex, value := node_value, synergy := tier_label) ORDER BY node_order)"
+    description: "Node definitions."
+  - alias: "links"
+    path: "data.links"
+    required: true
+    sql_type: "object[]"
+    expression_hint: "list(struct_pack(source := source_name, target := target_name, value := edge_weight) ORDER BY edge_order)"
+    description: "Edge definitions."
+data_structure_template:
+  data:
+    channels:
+      - name: "Paid Search"
+        color: "#3B82F6"
+        value: 85
+        synergy: "High"
+    links:
+      - source: "Paid Search"
+        target: "Organic SEO"
+        value: 5
+grid_span: "col-span-2 row-span-2"
+color_theme: "theme-audience"
+sdui:
+  root_key: "data"
+  mapping_mode: "list"
+query_guidance:
+  sql_shape: "single_row"
+  data_root: "data"
+  return_shape: "list"
+  rules:
+    - "Return SQL-derived fields under the `data` object."
+    - "Use aliases exactly as listed in `sql_aliases`."
+    - "Prefer one final row per widget payload; use DuckDB list/struct aggregations for nested arrays or objects."
+  duckdb_patterns:
+    - "Use `list(value ORDER BY sort_key)` for arrays."
+    - "Use `struct_pack(key := value, ...)` for nested objects."
+    - "Use `list(struct_pack(... ) ORDER BY sort_key)` for arrays of objects."
+  alias_projection_examples:
+    channels: "list(struct_pack(name := node_name, color := color_hex, value := node_value, synergy := tier_label) ORDER BY node_order)"
+    links: "list(struct_pack(source := source_name, target := target_name, value := edge_weight) ORDER BY edge_order)"
+  recommended_grain: "single row"
+  implementation_notes:
+    - "Aggregate to the widget grain before packaging the payload."
+    - "Return metadata like title, type, gridSpan and colorTheme outside the `data` object; place SQL-derived fields inside `data`."
+    - "Format strings in SQL only when the component explicitly expects formatted labels; otherwise return numerics and let the UI format them."
+insight_payload_contract:
+  type: "market-evolution"
+  gridSpan: "col-span-2 row-span-2"
+  colorTheme: "theme-audience"
+  data:
+    channels:
+      - name: "Paid Search"
+        color: "#3B82F6"
+        value: 85
+        synergy: "High"
+    links:
+      - source: "Paid Search"
+        target: "Organic SEO"
+        value: 5

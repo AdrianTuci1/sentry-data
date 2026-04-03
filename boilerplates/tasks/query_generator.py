@@ -3,6 +3,7 @@ import duckdb
 import json
 import yaml
 import boto3
+import re
 from urllib.parse import urlparse
 
 # ==========================================
@@ -39,11 +40,100 @@ def fetch_batch_from_r2(uris: list) -> dict:
             results[uri] = f"Error: {str(e)}"
     return results
 
+def normalize_lookup_key(value: str) -> str:
+    normalized = ''.join(
+        character.lower() if character.isalnum() else '-'
+        for character in str(value or '').strip()
+    )
+    return re.sub(r'-+', '-', normalized).strip('-')
+
+def parse_widget_catalog(content: str) -> dict:
+    parsed = yaml.safe_load(content) if content else {}
+    if not isinstance(parsed, dict):
+        return {}
+
+    widgets = parsed.get('widgets', parsed)
+
+    if isinstance(widgets, dict):
+        return widgets
+
+    if isinstance(widgets, list):
+        widget_map = {}
+        for entry in widgets:
+            if isinstance(entry, dict) and entry.get('id'):
+                widget_map[entry['id']] = entry
+        return widget_map
+
+    return {}
+
+def parse_widget_index(content: str) -> dict:
+    parsed = yaml.safe_load(content) if content else {}
+    if not isinstance(parsed, dict):
+        return {
+            'aliases': {},
+            'runtime_types': {},
+            'components': {},
+            'component_ids': {},
+            'manifest_paths': {},
+        }
+
+    lookups = parsed.get('lookups', {})
+
+    return {
+        'aliases': lookups.get('aliases', parsed.get('aliases', {})) or {},
+        'runtime_types': lookups.get('runtime_types', parsed.get('runtime_types', {})) or {},
+        'components': lookups.get('components', parsed.get('components', {})) or {},
+        'component_ids': lookups.get('component_ids', parsed.get('component_ids', {})) or {},
+        'manifest_paths': lookups.get('manifest_paths', parsed.get('manifest_paths', {})) or {},
+    }
+
+def resolve_widget_id(selection: str, catalog: dict, index: dict):
+    if not selection:
+        return None
+
+    if selection in catalog:
+        return selection
+
+    normalized = normalize_lookup_key(selection)
+
+    if normalized in catalog:
+        return normalized
+
+    for lookup_name in ['aliases', 'runtime_types', 'components', 'component_ids']:
+        resolved = index.get(lookup_name, {}).get(normalized)
+        if resolved and resolved in catalog:
+            return resolved
+
+    return None
+
+def resolve_manifest_paths(selected_widgets: list, catalog: dict, index: dict) -> list:
+    manifest_paths = []
+
+    for selection in selected_widgets:
+        widget_id = resolve_widget_id(selection, catalog, index)
+        if not widget_id:
+            continue
+
+        widget_entry = catalog.get(widget_id, {})
+        manifest_path = (
+            widget_entry.get('manifest_path')
+            or widget_entry.get('path')
+            or index.get('manifest_paths', {}).get(widget_id)
+        )
+
+        if manifest_path and manifest_path not in manifest_paths:
+            manifest_paths.append(manifest_path)
+
+    return manifest_paths
+
 def run_query_generation():
     # Path Inference (Zero-Injection)
     strategy_uri = f"s3://{r2_bucket}/system/config/business-metrics-strategy.yml"
     widget_catalog_uri = f"s3://{r2_bucket}/system/widgets/catalog.yml"
+    widget_index_uri = f"s3://{r2_bucket}/system/widgets/index.yml"
     discovery_uri = f"s3://{r2_bucket}/tenants/{tenant_id}/projects/{project_id}/discovery/source_classification.json"
+    catalog_content = ""
+    index_content = ""
 
     # 1. [Discovery] Pull Pipeline Discovery and Business Strategy
     print(f"\n1. [Discovery] Pulling context from R2...")
@@ -63,6 +153,14 @@ def run_query_generation():
         print("--- WIDGET_CATALOG_END ---")
     except:
         print("    Warning: Could not fetch Widget Catalog.")
+
+    try:
+        index_content = fetch_from_r2(widget_index_uri)
+        print("\n--- WIDGET_INDEX_START ---")
+        print(index_content)
+        print("--- WIDGET_INDEX_END ---")
+    except:
+        print("    Warning: Could not fetch Widget Index.")
 
     try:
         pipeline_discovery = fetch_from_r2(discovery_uri)
@@ -113,9 +211,9 @@ def run_query_generation():
         print("--- TASK_SPECIFIC_INSTRUCTIONS_START ---")
         print("A. ANALYZE SCHEMAS: Review the Gold Layer table schemas above.")
         print("B. CONSULT WISHLIST: Prioritize metrics from the Business Strategy.")
-        print("C. PICK VISUALIZERS: Pick EXACTLY ONE valid key from the WIDGET_CATALOG (e.g. 'animated-line', 'sankey'). DO NOT invent widget types!")
-        print("D. BATCH FETCH MANIFESTS: Use fetch_batch_from_r2([f's3://{r2_bucket}/system/widgets/{p}' for p in paths]).")
-        print("E. CONTRACT COMPLIANCE: Use 'sql_aliases' and 'data_structure_template' from manifests.")
+        print("C. PICK VISUALIZERS: Pick canonical widget IDs from the WIDGET_CATALOG. If you think in aliases or runtime types first, resolve them through WIDGET_INDEX before continuing.")
+        print("D. BATCH FETCH MANIFESTS: Resolve widget IDs to manifest paths using catalog.yml + index.yml, then use fetch_batch_from_r2([f's3://{r2_bucket}/system/widgets/{p}' for p in paths]).")
+        print("E. CONTRACT COMPLIANCE: Use 'sql_aliases' and 'data_structure_template' from manifests. All SQL-derived fields must live under the `data` object.")
         print("F. IMPLEMENT: Write final SQL queries tailored for DuckDB and report results.")
         print("G. SINGLE JSON OUTPUT: Populate and print the AGENT_DISCOVERY JSON using the provided scaffolding at the bottom of this script.")
         print("--- TASK_SPECIFIC_INSTRUCTIONS_END ---")
@@ -129,8 +227,9 @@ def run_query_generation():
         
         if selected_widgets:
             print("\n--- SELECTED_WIDGETS_MANIFESTS_START ---")
-            catalog_dict = yaml.safe_load(catalog_content)
-            paths = [catalog_dict[w]['path'] for w in selected_widgets if w in catalog_dict and 'path' in catalog_dict[w]]
+            catalog_dict = parse_widget_catalog(catalog_content)
+            widget_index = parse_widget_index(index_content)
+            paths = resolve_manifest_paths(selected_widgets, catalog_dict, widget_index)
             manifests = fetch_batch_from_r2([f"s3://{r2_bucket}/system/widgets/{p}" for p in paths])
             for uri, content in manifests.items():
                 if not content.startswith("Error"):

@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import './Insights.css';
 import MicroGraphicCard from './MicroGraphicCard';
-import fallbackAnalyticsData from '../../data/analyticsData.json';
 import { useStore } from '../../store/StoreProvider';
 import { ProjectService } from '../../api/core';
 import { observer } from 'mobx-react-lite';
 import { Star, Building2, LayoutGrid } from 'lucide-react';
+import fallbackAnalyticsData from '../../data/analyticsData-marketing.json'
 
 const MOST_RELEVANT_ORDER = {
     'marketing-roas': 1,

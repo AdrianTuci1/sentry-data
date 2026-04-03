@@ -1,0 +1,106 @@
+title: "Cohort Analysis"
+description: "Retention cohorts with headline summary."
+component: "CohortAnalysis"
+runtime_type: "cohorts"
+aliases: []
+category: "marketing"
+selection_hints:
+  - "retention"
+  - "cohort decay"
+  - "stickiness"
+component_id_overrides: []
+data_requirements:
+  - "cohorts: Ordered cohort rows."
+sql_aliases:
+  - alias: "summaryValue"
+    path: "data.summaryValue"
+    required: false
+    sql_type: "string"
+    expression_hint: "summaryValue"
+    description: "Headline retention summary."
+  - alias: "summaryDelta"
+    path: "data.summaryDelta"
+    required: false
+    sql_type: "string"
+    expression_hint: "summaryDelta"
+    description: "Comparison delta."
+  - alias: "summaryCompare"
+    path: "data.summaryCompare"
+    required: false
+    sql_type: "string"
+    expression_hint: "summaryCompare"
+    description: "Supporting comparison copy."
+  - alias: "cohorts"
+    path: "data.cohorts"
+    required: true
+    sql_type: "object[]"
+    expression_hint: "list(struct_pack(week := cohort_label, size := cohort_size, data := retention_values) ORDER BY cohort_order)"
+    description: "Ordered cohort rows."
+data_structure_template:
+  data:
+    summaryValue: "38.4%"
+    summaryDelta: "+3.1 pts"
+    summaryCompare: "Average last-step retention across active cohorts"
+    cohorts:
+      - week: "Feb 01"
+        size: 1200
+        data:
+          - 100
+          - 85
+          - 70
+          - 62
+      - week: "Feb 08"
+        size: 1150
+        data:
+          - 100
+          - 82
+          - 68
+grid_span: "default"
+color_theme: "theme-audience"
+sdui:
+  root_key: "data"
+  mapping_mode: "matrix"
+query_guidance:
+  sql_shape: "single_row"
+  data_root: "data"
+  return_shape: "matrix"
+  rules:
+    - "Return SQL-derived fields under the `data` object."
+    - "Use aliases exactly as listed in `sql_aliases`."
+    - "Prefer one final row per widget payload; use DuckDB list/struct aggregations for nested arrays or objects."
+  duckdb_patterns:
+    - "Use `list(value ORDER BY sort_key)` for arrays."
+    - "Use `struct_pack(key := value, ...)` for nested objects."
+    - "Use `list(struct_pack(... ) ORDER BY sort_key)` for arrays of objects."
+  alias_projection_examples:
+    summaryValue: "summaryValue"
+    summaryDelta: "summaryDelta"
+    summaryCompare: "summaryCompare"
+    cohorts: "list(struct_pack(week := cohort_label, size := cohort_size, data := retention_values) ORDER BY cohort_order)"
+  recommended_grain: "single row"
+  implementation_notes:
+    - "Aggregate to the widget grain before packaging the payload."
+    - "Return metadata like title, type, gridSpan and colorTheme outside the `data` object; place SQL-derived fields inside `data`."
+    - "Format strings in SQL only when the component explicitly expects formatted labels; otherwise return numerics and let the UI format them."
+insight_payload_contract:
+  type: "cohorts"
+  gridSpan: "default"
+  colorTheme: "theme-audience"
+  data:
+    summaryValue: "38.4%"
+    summaryDelta: "+3.1 pts"
+    summaryCompare: "Average last-step retention across active cohorts"
+    cohorts:
+      - week: "Feb 01"
+        size: 1200
+        data:
+          - 100
+          - 85
+          - 70
+          - 62
+      - week: "Feb 08"
+        size: 1150
+        data:
+          - 100
+          - 82
+          - 68

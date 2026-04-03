@@ -1,0 +1,66 @@
+title: "Technical Health"
+description: "Grid of named metrics with value and status."
+component: "TechnicalHealth"
+runtime_type: "technical-health"
+aliases:
+  - "vitals"
+category: "misc"
+selection_hints:
+  - "service metrics"
+  - "health matrix"
+  - "status grid"
+component_id_overrides: []
+data_requirements:
+  - "metrics: List of metric rows."
+sql_aliases:
+  - alias: "metrics"
+    path: "data.metrics"
+    required: true
+    sql_type: "object[]"
+    expression_hint: "list(struct_pack(name := metric_name, value := metric_value, status := metric_status) ORDER BY metric_index)"
+    description: "List of metric rows."
+data_structure_template:
+  data:
+    metrics:
+      - name: "API"
+        value: "99.97%"
+        status: "good"
+      - name: "DB"
+        value: "99.99%"
+        status: "good"
+grid_span: "default"
+color_theme: "theme-weather"
+sdui:
+  root_key: "data"
+  mapping_mode: "list"
+query_guidance:
+  sql_shape: "single_row"
+  data_root: "data"
+  return_shape: "list"
+  rules:
+    - "Return SQL-derived fields under the `data` object."
+    - "Use aliases exactly as listed in `sql_aliases`."
+    - "Prefer one final row per widget payload; use DuckDB list/struct aggregations for nested arrays or objects."
+  duckdb_patterns:
+    - "Use `list(value ORDER BY sort_key)` for arrays."
+    - "Use `struct_pack(key := value, ...)` for nested objects."
+    - "Use `list(struct_pack(... ) ORDER BY sort_key)` for arrays of objects."
+  alias_projection_examples:
+    metrics: "list(struct_pack(name := metric_name, value := metric_value, status := metric_status) ORDER BY metric_index)"
+  recommended_grain: "single row"
+  implementation_notes:
+    - "Aggregate to the widget grain before packaging the payload."
+    - "Return metadata like title, type, gridSpan and colorTheme outside the `data` object; place SQL-derived fields inside `data`."
+    - "Format strings in SQL only when the component explicitly expects formatted labels; otherwise return numerics and let the UI format them."
+insight_payload_contract:
+  type: "technical-health"
+  gridSpan: "default"
+  colorTheme: "theme-weather"
+  data:
+    metrics:
+      - name: "API"
+        value: "99.97%"
+        status: "good"
+      - name: "DB"
+        value: "99.99%"
+        status: "good"

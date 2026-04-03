@@ -1,0 +1,126 @@
+title: "Creative Quadrant"
+description: "Scatter quadrant with configurable axes and zone labels."
+component: "CreativeQuadrant"
+runtime_type: "creative-quadrant"
+aliases: []
+category: "marketing"
+selection_hints:
+  - "2x2 comparison"
+  - "quadrant analysis"
+  - "precision vs value"
+component_id_overrides: []
+data_requirements:
+  - "creatives: Scatter rows as [x_value, y_value, label, type]."
+sql_aliases:
+  - alias: "creatives"
+    path: "data.creatives"
+    required: true
+    sql_type: "array[]"
+    expression_hint: "list([x_metric, y_metric, entity_name, entity_type] ORDER BY score DESC)"
+    description: "Scatter rows as [x_value, y_value, label, type]."
+  - alias: "axisMetricLabels"
+    path: "data.axisMetricLabels"
+    required: false
+    sql_type: "object"
+    expression_hint: "axisMetricLabels"
+    description: "Optional custom axis metric labels."
+  - alias: "axisMetricFormats"
+    path: "data.axisMetricFormats"
+    required: false
+    sql_type: "object"
+    expression_hint: "axisMetricFormats"
+    description: "Optional formatting config."
+  - alias: "axisLabels"
+    path: "data.axisLabels"
+    required: false
+    sql_type: "object"
+    expression_hint: "axisLabels"
+    description: "Optional low/high labels per axis."
+  - alias: "quadrantLabels"
+    path: "data.quadrantLabels"
+    required: false
+    sql_type: "object"
+    expression_hint: "quadrantLabels"
+    description: "Optional quadrant copy overrides."
+  - alias: "listItemLabel"
+    path: "data.listItemLabel"
+    required: false
+    sql_type: "string"
+    expression_hint: "listItemLabel"
+    description: "Optional table label override."
+data_structure_template:
+  data:
+    creatives:
+      - - 4.8
+        - 6.8
+        - "Video: Founder Angle"
+        - "Video"
+      - - 4.1
+        - 7
+        - "Static: Social Proof"
+        - "Static"
+    axisMetricLabels:
+      x: "CTR"
+      "y": "CVR"
+    axisMetricFormats:
+      x: "percent"
+      "y": "percent"
+    axisLabels:
+      xLow: "Low CTR"
+      xHigh: "High CTR"
+      yLow: "Low CVR"
+      yHigh: "High CVR"
+grid_span: "row-span-2"
+color_theme: "theme-productivity"
+sdui:
+  root_key: "data"
+  mapping_mode: "single"
+query_guidance:
+  sql_shape: "single_row"
+  data_root: "data"
+  return_shape: "single"
+  rules:
+    - "Return SQL-derived fields under the `data` object."
+    - "Use aliases exactly as listed in `sql_aliases`."
+    - "Prefer one final row per widget payload; use DuckDB list/struct aggregations for nested arrays or objects."
+  duckdb_patterns:
+    - "Use `list(value ORDER BY sort_key)` for arrays."
+    - "Use `struct_pack(key := value, ...)` for nested objects."
+    - "Use `list(struct_pack(... ) ORDER BY sort_key)` for arrays of objects."
+  alias_projection_examples:
+    creatives: "list([x_metric, y_metric, entity_name, entity_type] ORDER BY score DESC)"
+    axisMetricLabels: "axisMetricLabels"
+    axisMetricFormats: "axisMetricFormats"
+    axisLabels: "axisLabels"
+    quadrantLabels: "quadrantLabels"
+    listItemLabel: "listItemLabel"
+  recommended_grain: "single row"
+  implementation_notes:
+    - "Aggregate to the widget grain before packaging the payload."
+    - "Return metadata like title, type, gridSpan and colorTheme outside the `data` object; place SQL-derived fields inside `data`."
+    - "Format strings in SQL only when the component explicitly expects formatted labels; otherwise return numerics and let the UI format them."
+insight_payload_contract:
+  type: "creative-quadrant"
+  gridSpan: "row-span-2"
+  colorTheme: "theme-productivity"
+  data:
+    creatives:
+      - - 4.8
+        - 6.8
+        - "Video: Founder Angle"
+        - "Video"
+      - - 4.1
+        - 7
+        - "Static: Social Proof"
+        - "Static"
+    axisMetricLabels:
+      x: "CTR"
+      "y": "CVR"
+    axisMetricFormats:
+      x: "percent"
+      "y": "percent"
+    axisLabels:
+      xLow: "Low CTR"
+      xHigh: "High CTR"
+      yLow: "Low CVR"
+      yHigh: "High CVR"

@@ -1,0 +1,54 @@
+title: "Color Slider"
+description: "Tick-based slider used for rate or progress style metrics."
+component: "ColorSliderMicro"
+runtime_type: "color-slider"
+aliases:
+  - "light-dial"
+category: "micro"
+selection_hints:
+  - "simple progress"
+  - "percentage on scale"
+  - "compact slider"
+component_id_overrides: []
+data_requirements:
+  - "sliderValue: 0-100 slider position."
+sql_aliases:
+  - alias: "sliderValue"
+    path: "data.sliderValue"
+    required: true
+    sql_type: "number"
+    expression_hint: "sliderValue"
+    description: "0-100 slider position."
+data_structure_template:
+  data:
+    sliderValue: 72
+grid_span: "default"
+color_theme: "theme-productivity"
+sdui:
+  root_key: "data"
+  mapping_mode: "single"
+query_guidance:
+  sql_shape: "single_row"
+  data_root: "data"
+  return_shape: "single"
+  rules:
+    - "Return SQL-derived fields under the `data` object."
+    - "Use aliases exactly as listed in `sql_aliases`."
+    - "Prefer one final row per widget payload; use DuckDB list/struct aggregations for nested arrays or objects."
+  duckdb_patterns:
+    - "Use `list(value ORDER BY sort_key)` for arrays."
+    - "Use `struct_pack(key := value, ...)` for nested objects."
+    - "Use `list(struct_pack(... ) ORDER BY sort_key)` for arrays of objects."
+  alias_projection_examples:
+    sliderValue: "sliderValue"
+  recommended_grain: "single row"
+  implementation_notes:
+    - "Aggregate to the widget grain before packaging the payload."
+    - "Return metadata like title, type, gridSpan and colorTheme outside the `data` object; place SQL-derived fields inside `data`."
+    - "Format strings in SQL only when the component explicitly expects formatted labels; otherwise return numerics and let the UI format them."
+insight_payload_contract:
+  type: "color-slider"
+  gridSpan: "default"
+  colorTheme: "theme-productivity"
+  data:
+    sliderValue: 72

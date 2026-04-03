@@ -3,6 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 const BUCHAREST_CENTER = [26.1025, 44.4268];
+const GLOBE_CENTER = [14, 22];
 const CLUSTER_LON_STEP = 0.028;
 const CLUSTER_LAT_STEP = 0.018;
 const AVATAR_COLORS = ['#7CFF5B', '#35C9FF', '#8B5CF6', '#FF4D8D', '#FFC533', '#7A7F87'];
@@ -169,6 +170,14 @@ const RealMapbox = ({ data }) => {
     const map = useRef(null);
     const markersRef = useRef([]);
     const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || '';
+    const isGlobe = data?.mapProjection === 'globe' || data?.mapMode === 'globe';
+    const mapCenter = Array.isArray(data?.mapCenter) && data.mapCenter.length === 2 ? data.mapCenter : (isGlobe ? GLOBE_CENTER : BUCHAREST_CENTER);
+    const mapZoom = Number.isFinite(Number(data?.mapZoom)) ? Number(data.mapZoom) : (isGlobe ? 1.15 : 9.8);
+    const mapPitch = Number.isFinite(Number(data?.mapPitch)) ? Number(data.mapPitch) : (isGlobe ? 0 : 12);
+    const mapBearing = Number.isFinite(Number(data?.mapBearing)) ? Number(data.mapBearing) : (isGlobe ? 0 : -8);
+    const fitMapToMarkers = data?.mapFitBounds ?? !isGlobe;
+    const rotationSpeed = Number.isFinite(Number(data?.mapRotationSpeed)) ? Number(data.mapRotationSpeed) : 2.8;
+    const shouldAutoRotate = Boolean(isGlobe && (data?.mapAutoRotate ?? true));
 
     const clusteredLocations = useMemo(
         () => clusterLocations(Array.isArray(data?.locations) && data.locations.length ? data.locations : fallbackLocations),
@@ -184,10 +193,10 @@ const RealMapbox = ({ data }) => {
         map.current = new mapboxgl.Map({
             container: mapContainer.current,
             style: 'mapbox://styles/mapbox/dark-v11',
-            center: BUCHAREST_CENTER,
-            zoom: 9.8,
-            pitch: 12,
-            bearing: -8,
+            center: mapCenter,
+            zoom: mapZoom,
+            pitch: mapPitch,
+            bearing: mapBearing,
             antialias: true,
             scrollZoom: false,
             boxZoom: false,
@@ -201,6 +210,10 @@ const RealMapbox = ({ data }) => {
 
         map.current.on('load', () => {
             if (!map.current) return;
+
+            if (typeof map.current.setProjection === 'function') {
+                map.current.setProjection(isGlobe ? 'globe' : 'mercator');
+            }
 
             map.current.setFog({
                 color: 'rgba(6, 11, 18, 0.96)',
@@ -228,7 +241,23 @@ const RealMapbox = ({ data }) => {
 
             resizeObserver.disconnect();
         };
-    }, [MAPBOX_TOKEN]);
+    }, [MAPBOX_TOKEN, isGlobe, mapBearing, mapCenter, mapPitch, mapZoom]);
+
+    useEffect(() => {
+        if (!map.current) return;
+
+        if (typeof map.current.setProjection === 'function') {
+            map.current.setProjection(isGlobe ? 'globe' : 'mercator');
+        }
+
+        map.current.easeTo({
+            center: mapCenter,
+            zoom: mapZoom,
+            pitch: mapPitch,
+            bearing: mapBearing,
+            duration: 0,
+        });
+    }, [isGlobe, mapBearing, mapCenter, mapPitch, mapZoom]);
 
     useEffect(() => {
         if (!map.current) return;
@@ -258,16 +287,51 @@ const RealMapbox = ({ data }) => {
             bounds.extend([cluster.longitude, cluster.latitude]);
         });
 
-        if (!bounds.isEmpty()) {
+        if (fitMapToMarkers && !bounds.isEmpty()) {
             map.current.fitBounds(bounds, {
                 padding: { top: 88, right: 36, bottom: 30, left: 36 },
-                maxZoom: 11.2,
+                maxZoom: isGlobe ? 2.6 : 11.2,
                 duration: 0,
             });
         } else {
-            map.current.easeTo({ center: BUCHAREST_CENTER, zoom: 9.8, duration: 0 });
+            map.current.easeTo({
+                center: mapCenter,
+                zoom: mapZoom,
+                pitch: mapPitch,
+                bearing: mapBearing,
+                duration: 0,
+            });
         }
-    }, [clusteredLocations]);
+    }, [clusteredLocations, fitMapToMarkers, isGlobe, mapBearing, mapCenter, mapPitch, mapZoom]);
+
+    useEffect(() => {
+        if (!map.current || !shouldAutoRotate) return undefined;
+
+        let frameId = 0;
+        const originLongitude = mapCenter[0];
+        const latitude = mapCenter[1];
+        const startTimestamp = performance.now();
+
+        const animate = (timestamp) => {
+            if (!map.current) return;
+
+            const elapsedSeconds = (timestamp - startTimestamp) / 1000;
+            const nextLongitude = ((((originLongitude + (elapsedSeconds * rotationSpeed)) + 180) % 360) + 360) % 360 - 180;
+
+            map.current.jumpTo({
+                center: [nextLongitude, latitude],
+                zoom: mapZoom,
+                pitch: mapPitch,
+                bearing: mapBearing,
+            });
+
+            frameId = window.requestAnimationFrame(animate);
+        };
+
+        frameId = window.requestAnimationFrame(animate);
+
+        return () => window.cancelAnimationFrame(frameId);
+    }, [mapBearing, mapCenter, mapPitch, mapZoom, rotationSpeed, shouldAutoRotate]);
 
     if (!MAPBOX_TOKEN || MAPBOX_TOKEN === 'your_mapbox_token_here') {
         return (

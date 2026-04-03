@@ -54,13 +54,16 @@ const MicroGraphicCard = ({ data: initialData = {}, isExpanded, onClick }) => {
     const explorerPayload = getExplorerPayload(data);
     const spanClass = data.gridSpan && data.gridSpan !== 'default' ? data.gridSpan : '';
     const editorialCardIds = new Set(['marketing-pclv', 'live-traffic', 'retention-cohorts']);
+    const immersiveEditorialCardIds = new Set(['marketing-pclv', 'retention-cohorts']);
+    const immersiveCardIds = new Set(['sales-funnel']);
     const visualClass = [
         data.type === '3d-map' ? 'map-bleed-card' : '',
         data.type === 'optimal-time' ? 'optimal-time-card' : '',
         editorialCardIds.has(data.id) ? 'editorial-card' : '',
         data.id === 'live-traffic' ? 'compact-editorial-card' : '',
+        data.id === 'sales-funnel' ? 'funnel-hero-card' : '',
     ].filter(Boolean).join(' ');
-    const isImmersiveCard = data.type === '3d-map' || data.type === 'optimal-time' || editorialCardIds.has(data.id);
+    const isImmersiveCard = data.type === '3d-map' || data.type === 'optimal-time' || immersiveEditorialCardIds.has(data.id) || immersiveCardIds.has(data.id);
 
     // Render specific graphic based on type
     const renderGraphic = () => {

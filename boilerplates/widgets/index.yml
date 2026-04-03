@@ -1,0 +1,2380 @@
+version: 1
+source_of_truth: "boilerplates/widgets/index.js"
+widget_count: 51
+widgets:
+  metric-trend:
+    manifest_path: "micro/metric-trend/manifest.yml"
+    runtime_type: "metric-trend"
+    component: "MetricTrendMicro"
+    category: "micro"
+    aliases:
+      - "trend"
+      - "delta-kpi"
+    selection_hints:
+      - "single KPI"
+      - "delta vs previous period"
+      - "executive summary"
+    component_id_overrides:
+      - "marketing-roas"
+      - "refresh-cycle"
+      - "viral-k-factor"
+    search_keywords:
+      - "metric-trend"
+      - "metric-trend"
+      - "Metric Trend"
+      - "MetricTrendMicro"
+      - "micro"
+      - "trend"
+      - "delta-kpi"
+      - "single KPI"
+      - "delta vs previous period"
+      - "executive summary"
+      - "marketing-roas"
+      - "refresh-cycle"
+      - "viral-k-factor"
+  weather:
+    manifest_path: "micro/weather/manifest.yml"
+    runtime_type: "weather"
+    component: "WeatherMicro"
+    category: "micro"
+    aliases:
+      - "kpi-chip"
+    selection_hints:
+      - "single KPI"
+      - "compact metric"
+      - "minimal card"
+    component_id_overrides: []
+    search_keywords:
+      - "weather"
+      - "weather"
+      - "Weather Micro"
+      - "WeatherMicro"
+      - "micro"
+      - "kpi-chip"
+      - "single KPI"
+      - "compact metric"
+      - "minimal card"
+  natural:
+    manifest_path: "micro/natural/manifest.yml"
+    runtime_type: "natural"
+    component: "NaturalMicro"
+    category: "micro"
+    aliases:
+      - "linear-kpi"
+    selection_hints:
+      - "single KPI"
+      - "progress against scale"
+      - "current status"
+    component_id_overrides: []
+    search_keywords:
+      - "natural"
+      - "natural"
+      - "Natural Micro"
+      - "NaturalMicro"
+      - "micro"
+      - "linear-kpi"
+      - "single KPI"
+      - "progress against scale"
+      - "current status"
+  signal-scale:
+    manifest_path: "micro/signal-scale/manifest.yml"
+    runtime_type: "signal-scale"
+    component: "SignalScaleMicro"
+    category: "micro"
+    aliases:
+      - "signal-bars"
+      - "score-scale"
+    selection_hints:
+      - "score 0-100"
+      - "quality signal"
+      - "health scale"
+    component_id_overrides:
+      - "data-saturation"
+      - "marketing-conv-rate"
+      - "ad-fatigue"
+    search_keywords:
+      - "signal-scale"
+      - "signal-scale"
+      - "Signal Scale"
+      - "SignalScaleMicro"
+      - "micro"
+      - "signal-bars"
+      - "score-scale"
+      - "score 0-100"
+      - "quality signal"
+      - "health scale"
+      - "data-saturation"
+      - "marketing-conv-rate"
+      - "ad-fatigue"
+  sparkline-stat:
+    manifest_path: "micro/sparkline-stat/manifest.yml"
+    runtime_type: "sparkline-stat"
+    component: "SparklineStatMicro"
+    category: "micro"
+    aliases:
+      - "sparkline"
+      - "mini-trend"
+    selection_hints:
+      - "single KPI + history"
+      - "recent trend"
+      - "small time series"
+    component_id_overrides:
+      - "marketing-cpa"
+      - "budget-burn"
+    search_keywords:
+      - "sparkline-stat"
+      - "sparkline-stat"
+      - "Sparkline Stat"
+      - "SparklineStatMicro"
+      - "micro"
+      - "sparkline"
+      - "mini-trend"
+      - "single KPI + history"
+      - "recent trend"
+      - "small time series"
+      - "marketing-cpa"
+      - "budget-burn"
+  gauge-panel:
+    manifest_path: "micro/gauge-panel/manifest.yml"
+    runtime_type: "gauge-panel"
+    component: "GaugePanelMicro"
+    category: "micro"
+    aliases:
+      - "radial-gauge"
+    selection_hints:
+      - "single percentage"
+      - "utilization"
+      - "coverage"
+    component_id_overrides:
+      - "ai-coverage"
+    search_keywords:
+      - "gauge-panel"
+      - "gauge-panel"
+      - "Gauge Panel"
+      - "GaugePanelMicro"
+      - "micro"
+      - "radial-gauge"
+      - "single percentage"
+      - "utilization"
+      - "coverage"
+      - "ai-coverage"
+  color-slider:
+    manifest_path: "micro/color-slider/manifest.yml"
+    runtime_type: "color-slider"
+    component: "ColorSliderMicro"
+    category: "micro"
+    aliases:
+      - "light-dial"
+    selection_hints:
+      - "simple progress"
+      - "percentage on scale"
+      - "compact slider"
+    component_id_overrides: []
+    search_keywords:
+      - "color-slider"
+      - "color-slider"
+      - "Color Slider"
+      - "ColorSliderMicro"
+      - "micro"
+      - "light-dial"
+      - "simple progress"
+      - "percentage on scale"
+      - "compact slider"
+  liquid-gauge:
+    manifest_path: "micro/liquid-gauge/manifest.yml"
+    runtime_type: "liquid-gauge"
+    component: "LiquidGauge"
+    category: "micro"
+    aliases: []
+    selection_hints:
+      - "percentage fill"
+      - "saturation"
+      - "coverage"
+    component_id_overrides: []
+    search_keywords:
+      - "liquid-gauge"
+      - "liquid-gauge"
+      - "Liquid Gauge"
+      - "LiquidGauge"
+      - "micro"
+      - "percentage fill"
+      - "saturation"
+      - "coverage"
+  neural-nexus:
+    manifest_path: "micro/neural-nexus/manifest.yml"
+    runtime_type: "neural-nexus"
+    component: "NeuralNexus"
+    category: "micro"
+    aliases: []
+    selection_hints:
+      - "score dial"
+      - "control coverage"
+      - "single KPI"
+    component_id_overrides: []
+    search_keywords:
+      - "neural-nexus"
+      - "neural-nexus"
+      - "Neural Nexus"
+      - "NeuralNexus"
+      - "micro"
+      - "score dial"
+      - "control coverage"
+      - "single KPI"
+  intensity-heat:
+    manifest_path: "micro/intensity-heat/manifest.yml"
+    runtime_type: "intensity-heat"
+    component: "IntensityHeat"
+    category: "micro"
+    aliases: []
+    selection_hints:
+      - "single severity value"
+      - "saturation index"
+      - "fatigue score"
+    component_id_overrides: []
+    search_keywords:
+      - "intensity-heat"
+      - "intensity-heat"
+      - "Intensity Heat"
+      - "IntensityHeat"
+      - "micro"
+      - "single severity value"
+      - "saturation index"
+      - "fatigue score"
+  chrono-dial:
+    manifest_path: "micro/chrono-dial/manifest.yml"
+    runtime_type: "chrono-dial"
+    component: "ChronoDial"
+    category: "micro"
+    aliases: []
+    selection_hints:
+      - "freshness"
+      - "release health"
+      - "recency score"
+    component_id_overrides: []
+    search_keywords:
+      - "chrono-dial"
+      - "chrono-dial"
+      - "Chrono Dial"
+      - "ChronoDial"
+      - "micro"
+      - "freshness"
+      - "release health"
+      - "recency score"
+  pulse-circle:
+    manifest_path: "micro/pulse-circle/manifest.yml"
+    runtime_type: "pulse-circle"
+    component: "PulseCircle"
+    category: "micro"
+    aliases: []
+    selection_hints:
+      - "heartbeat KPI"
+      - "status pulse"
+      - "compact status"
+    component_id_overrides: []
+    search_keywords:
+      - "pulse-circle"
+      - "pulse-circle"
+      - "Pulse Circle"
+      - "PulseCircle"
+      - "micro"
+      - "heartbeat KPI"
+      - "status pulse"
+      - "compact status"
+  scanning-orbit:
+    manifest_path: "micro/scanning-orbit/manifest.yml"
+    runtime_type: "scanning-orbit"
+    component: "ScanningOrbit"
+    category: "micro"
+    aliases: []
+    selection_hints:
+      - "ops per second"
+      - "scan rate"
+      - "compact sci-fi KPI"
+    component_id_overrides: []
+    search_keywords:
+      - "scanning-orbit"
+      - "scanning-orbit"
+      - "Scanning Orbit"
+      - "ScanningOrbit"
+      - "micro"
+      - "ops per second"
+      - "scan rate"
+      - "compact sci-fi KPI"
+  red-gradient:
+    manifest_path: "micro/red-gradient/manifest.yml"
+    runtime_type: "red-gradient"
+    component: "RedGradientMicro"
+    category: "micro"
+    aliases: []
+    selection_hints:
+      - "risk progress"
+      - "danger intensity"
+      - "simple horizontal gauge"
+    component_id_overrides: []
+    search_keywords:
+      - "red-gradient"
+      - "red-gradient"
+      - "Red Gradient"
+      - "RedGradientMicro"
+      - "micro"
+      - "risk progress"
+      - "danger intensity"
+      - "simple horizontal gauge"
+  productivity:
+    manifest_path: "micro/productivity/manifest.yml"
+    runtime_type: "productivity"
+    component: "ProductivityMicro"
+    category: "micro"
+    aliases: []
+    selection_hints:
+      - "mini histogram"
+      - "activity pulse"
+      - "density spark"
+    component_id_overrides: []
+    search_keywords:
+      - "productivity"
+      - "productivity"
+      - "Productivity Micro"
+      - "ProductivityMicro"
+      - "micro"
+      - "mini histogram"
+      - "activity pulse"
+      - "density spark"
+  uptime-strip:
+    manifest_path: "micro/uptime-strip/manifest.yml"
+    runtime_type: "uptime-strip"
+    component: "UptimeStripMicro"
+    category: "micro"
+    aliases: []
+    selection_hints:
+      - "uptime window"
+      - "availability strip"
+      - "health streak"
+    component_id_overrides:
+      - "technical-health"
+    search_keywords:
+      - "uptime-strip"
+      - "uptime-strip"
+      - "Uptime Strip"
+      - "UptimeStripMicro"
+      - "micro"
+      - "uptime window"
+      - "availability strip"
+      - "health streak"
+      - "technical-health"
+  campaign-list:
+    manifest_path: "lists/campaign-list/manifest.yml"
+    runtime_type: "campaign-list"
+    component: "CampaignListMicro"
+    category: "lists"
+    aliases:
+      - "campaigns"
+    selection_hints:
+      - "ranked list"
+      - "campaign leaderboard"
+      - "compact comparison"
+    component_id_overrides: []
+    search_keywords:
+      - "campaign-list"
+      - "campaign-list"
+      - "Campaign List"
+      - "CampaignListMicro"
+      - "lists"
+      - "campaigns"
+      - "ranked list"
+      - "campaign leaderboard"
+      - "compact comparison"
+  leads-list:
+    manifest_path: "lists/leads-list/manifest.yml"
+    runtime_type: "leads-list"
+    component: "LeadsList"
+    category: "lists"
+    aliases: []
+    selection_hints:
+      - "top entities"
+      - "recent items"
+      - "operational feed"
+    component_id_overrides: []
+    search_keywords:
+      - "leads-list"
+      - "leads-list"
+      - "Leads List"
+      - "LeadsList"
+      - "lists"
+      - "top entities"
+      - "recent items"
+      - "operational feed"
+  audience-copilot:
+    manifest_path: "assistant/audience-copilot/manifest.yml"
+    runtime_type: "audience-copilot"
+    component: "AudienceCopilot"
+    category: "assistant"
+    aliases: []
+    selection_hints:
+      - "recommendations"
+      - "AI text actions"
+      - "next best action"
+    component_id_overrides: []
+    search_keywords:
+      - "audience-copilot"
+      - "audience-copilot"
+      - "Audience Copilot"
+      - "AudienceCopilot"
+      - "assistant"
+      - "recommendations"
+      - "AI text actions"
+      - "next best action"
+  emotion-wave:
+    manifest_path: "micro/emotion-wave/manifest.yml"
+    runtime_type: "emotion-wave"
+    component: "EmotionWave"
+    category: "micro"
+    aliases: []
+    selection_hints:
+      - "sentiment score"
+      - "mood level"
+      - "single qualitative score"
+    component_id_overrides: []
+    search_keywords:
+      - "emotion-wave"
+      - "emotion-wave"
+      - "Emotion Wave"
+      - "EmotionWave"
+      - "micro"
+      - "sentiment score"
+      - "mood level"
+      - "single qualitative score"
+  live-traffic:
+    manifest_path: "charts/live-traffic/manifest.yml"
+    runtime_type: "live-traffic"
+    component: "LiveTrafficChart"
+    category: "charts"
+    aliases:
+      - "animated-line"
+    selection_hints:
+      - "recent time series"
+      - "concurrent activity"
+      - "hero metric with trend"
+    component_id_overrides: []
+    search_keywords:
+      - "live-traffic"
+      - "live-traffic"
+      - "Live Traffic Chart"
+      - "LiveTrafficChart"
+      - "charts"
+      - "animated-line"
+      - "recent time series"
+      - "concurrent activity"
+      - "hero metric with trend"
+  predictive:
+    manifest_path: "predictive/predictive/manifest.yml"
+    runtime_type: "predictive"
+    component: "PredictiveForecast"
+    category: "predictive"
+    aliases: []
+    selection_hints:
+      - "forecast"
+      - "projection"
+      - "historical plus future"
+    component_id_overrides: []
+    search_keywords:
+      - "predictive"
+      - "predictive"
+      - "Predictive Forecast"
+      - "PredictiveForecast"
+      - "predictive"
+      - "forecast"
+      - "projection"
+      - "historical plus future"
+  range-area-chart:
+    manifest_path: "charts/range-area-chart/manifest.yml"
+    runtime_type: "range-area-chart"
+    component: "RangeAreaChart"
+    category: "charts"
+    aliases: []
+    selection_hints:
+      - "min max avg"
+      - "confidence band"
+      - "range over time"
+    component_id_overrides: []
+    search_keywords:
+      - "range-area-chart"
+      - "range-area-chart"
+      - "Range Area Chart"
+      - "RangeAreaChart"
+      - "charts"
+      - "min max avg"
+      - "confidence band"
+      - "range over time"
+  activity-heatmap:
+    manifest_path: "charts/activity-heatmap/manifest.yml"
+    runtime_type: "activity-heatmap"
+    component: "ActivityHeatmap"
+    category: "charts"
+    aliases: []
+    selection_hints:
+      - "day vs hour"
+      - "matrix intensity"
+      - "bucket heatmap"
+    component_id_overrides: []
+    search_keywords:
+      - "activity-heatmap"
+      - "activity-heatmap"
+      - "Activity Heatmap"
+      - "ActivityHeatmap"
+      - "charts"
+      - "day vs hour"
+      - "matrix intensity"
+      - "bucket heatmap"
+  optimal-time:
+    manifest_path: "charts/optimal-time/manifest.yml"
+    runtime_type: "optimal-time"
+    component: "OptimalTimeHeatmap"
+    category: "charts"
+    aliases: []
+    selection_hints:
+      - "best window"
+      - "calendar heatmap"
+      - "time-of-day optimisation"
+    component_id_overrides: []
+    search_keywords:
+      - "optimal-time"
+      - "optimal-time"
+      - "Optimal Time Heatmap"
+      - "OptimalTimeHeatmap"
+      - "charts"
+      - "best window"
+      - "calendar heatmap"
+      - "time-of-day optimisation"
+  covariance-matrix:
+    manifest_path: "charts/covariance-matrix/manifest.yml"
+    runtime_type: "covariance-matrix"
+    component: "CovarianceMatrix"
+    category: "charts"
+    aliases: []
+    selection_hints:
+      - "feature correlation"
+      - "covariance"
+      - "NxN matrix"
+    component_id_overrides: []
+    search_keywords:
+      - "covariance-matrix"
+      - "covariance-matrix"
+      - "Covariance Matrix"
+      - "CovarianceMatrix"
+      - "charts"
+      - "feature correlation"
+      - "covariance"
+      - "NxN matrix"
+  cohorts:
+    manifest_path: "marketing/cohorts/manifest.yml"
+    runtime_type: "cohorts"
+    component: "CohortAnalysis"
+    category: "marketing"
+    aliases: []
+    selection_hints:
+      - "retention"
+      - "cohort decay"
+      - "stickiness"
+    component_id_overrides: []
+    search_keywords:
+      - "cohorts"
+      - "cohorts"
+      - "Cohort Analysis"
+      - "CohortAnalysis"
+      - "marketing"
+      - "retention"
+      - "cohort decay"
+      - "stickiness"
+  mpl-training-loss:
+    manifest_path: "ml/mpl-training-loss/manifest.yml"
+    runtime_type: "mpl-training-loss"
+    component: "MatplotlibTrainingPanel"
+    category: "ml"
+    aliases: []
+    selection_hints:
+      - "training curves"
+      - "train vs validation"
+      - "ML convergence"
+    component_id_overrides: []
+    search_keywords:
+      - "mpl-training-loss"
+      - "mpl-training-loss"
+      - "Training Loss Panel"
+      - "MatplotlibTrainingPanel"
+      - "ml"
+      - "training curves"
+      - "train vs validation"
+      - "ML convergence"
+  mpl-benchmark-bars:
+    manifest_path: "ml/mpl-benchmark-bars/manifest.yml"
+    runtime_type: "mpl-benchmark-bars"
+    component: "MatplotlibBenchmarkBars"
+    category: "ml"
+    aliases: []
+    selection_hints:
+      - "benchmark comparison"
+      - "threshold pass/fail"
+      - "eval guardrails"
+    component_id_overrides: []
+    search_keywords:
+      - "mpl-benchmark-bars"
+      - "mpl-benchmark-bars"
+      - "Benchmark Bars"
+      - "MatplotlibBenchmarkBars"
+      - "ml"
+      - "benchmark comparison"
+      - "threshold pass/fail"
+      - "eval guardrails"
+  mpl-attention-heatmap:
+    manifest_path: "ml/mpl-attention-heatmap/manifest.yml"
+    runtime_type: "mpl-attention-heatmap"
+    component: "MatplotlibAttentionHeatmap"
+    category: "ml"
+    aliases: []
+    selection_hints:
+      - "activation heatmap"
+      - "layer vs block matrix"
+      - "drift matrix"
+    component_id_overrides: []
+    search_keywords:
+      - "mpl-attention-heatmap"
+      - "mpl-attention-heatmap"
+      - "Attention Heatmap"
+      - "MatplotlibAttentionHeatmap"
+      - "ml"
+      - "activation heatmap"
+      - "layer vs block matrix"
+      - "drift matrix"
+  budget-sensitivity:
+    manifest_path: "financial/budget-sensitivity/manifest.yml"
+    runtime_type: "budget-sensitivity"
+    component: "BudgetSensitivity"
+    category: "financial"
+    aliases: []
+    selection_hints:
+      - "elasticity curve"
+      - "diminishing returns"
+      - "response curve"
+    component_id_overrides: []
+    search_keywords:
+      - "budget-sensitivity"
+      - "budget-sensitivity"
+      - "Budget Sensitivity"
+      - "BudgetSensitivity"
+      - "financial"
+      - "elasticity curve"
+      - "diminishing returns"
+      - "response curve"
+  waterfall:
+    manifest_path: "financial/waterfall/manifest.yml"
+    runtime_type: "waterfall"
+    component: "FinancialBreakdown"
+    category: "financial"
+    aliases: []
+    selection_hints:
+      - "bridge analysis"
+      - "gross to net"
+      - "step breakdown"
+    component_id_overrides: []
+    search_keywords:
+      - "waterfall"
+      - "waterfall"
+      - "Waterfall"
+      - "FinancialBreakdown"
+      - "financial"
+      - "bridge analysis"
+      - "gross to net"
+      - "step breakdown"
+  attribution:
+    manifest_path: "marketing/attribution/manifest.yml"
+    runtime_type: "attribution"
+    component: "AttributionModels"
+    category: "marketing"
+    aliases: []
+    selection_hints:
+      - "allocation by source"
+      - "channel mix"
+      - "contribution share"
+    component_id_overrides: []
+    search_keywords:
+      - "attribution"
+      - "attribution"
+      - "Attribution"
+      - "AttributionModels"
+      - "marketing"
+      - "allocation by source"
+      - "channel mix"
+      - "contribution share"
+  funnel:
+    manifest_path: "marketing/funnel/manifest.yml"
+    runtime_type: "funnel"
+    component: "FunnelChart"
+    category: "marketing"
+    aliases: []
+    selection_hints:
+      - "stage drop-off"
+      - "journey funnel"
+      - "hero conversion flow"
+    component_id_overrides: []
+    search_keywords:
+      - "funnel"
+      - "funnel"
+      - "Funnel"
+      - "FunnelChart"
+      - "marketing"
+      - "stage drop-off"
+      - "journey funnel"
+      - "hero conversion flow"
+  incremental-lift:
+    manifest_path: "marketing/incremental-lift/manifest.yml"
+    runtime_type: "incremental-lift"
+    component: "IncrementalLift"
+    category: "marketing"
+    aliases: []
+    selection_hints:
+      - "control vs test"
+      - "incremental value"
+      - "lift decomposition"
+    component_id_overrides: []
+    search_keywords:
+      - "incremental-lift"
+      - "incremental-lift"
+      - "Incremental Lift"
+      - "IncrementalLift"
+      - "marketing"
+      - "control vs test"
+      - "incremental value"
+      - "lift decomposition"
+  intent-sunburst:
+    manifest_path: "marketing/intent-sunburst/manifest.yml"
+    runtime_type: "intent-sunburst"
+    component: "IntentSunburst"
+    category: "marketing"
+    aliases: []
+    selection_hints:
+      - "hierarchy"
+      - "nested categories"
+      - "intent tree"
+    component_id_overrides: []
+    search_keywords:
+      - "intent-sunburst"
+      - "intent-sunburst"
+      - "Intent Sunburst"
+      - "IntentSunburst"
+      - "marketing"
+      - "hierarchy"
+      - "nested categories"
+      - "intent tree"
+  interest-radar:
+    manifest_path: "marketing/interest-radar/manifest.yml"
+    runtime_type: "interest-radar"
+    component: "InterestRadar"
+    category: "marketing"
+    aliases: []
+    selection_hints:
+      - "radar profile"
+      - "multi-axis attributes"
+      - "interest mix"
+    component_id_overrides: []
+    search_keywords:
+      - "interest-radar"
+      - "interest-radar"
+      - "Interest Radar"
+      - "InterestRadar"
+      - "marketing"
+      - "radar profile"
+      - "multi-axis attributes"
+      - "interest mix"
+  market-radar:
+    manifest_path: "marketing/market-radar/manifest.yml"
+    runtime_type: "market-radar"
+    component: "MarketSentimentRadar"
+    category: "marketing"
+    aliases: []
+    selection_hints:
+      - "brand or posture radar"
+      - "aggregate category scores"
+      - "multi-axis snapshot"
+    component_id_overrides: []
+    search_keywords:
+      - "market-radar"
+      - "market-radar"
+      - "Market Sentiment Radar"
+      - "MarketSentimentRadar"
+      - "marketing"
+      - "brand or posture radar"
+      - "aggregate category scores"
+      - "multi-axis snapshot"
+  market-evolution:
+    manifest_path: "marketing/market-evolution/manifest.yml"
+    runtime_type: "market-evolution"
+    component: "MarketEvolution"
+    category: "marketing"
+    aliases: []
+    selection_hints:
+      - "network graph"
+      - "force layout"
+      - "entity interactions"
+    component_id_overrides: []
+    search_keywords:
+      - "market-evolution"
+      - "market-evolution"
+      - "Market Evolution"
+      - "MarketEvolution"
+      - "marketing"
+      - "network graph"
+      - "force layout"
+      - "entity interactions"
+  creative-quadrant:
+    manifest_path: "marketing/creative-quadrant/manifest.yml"
+    runtime_type: "creative-quadrant"
+    component: "CreativeQuadrant"
+    category: "marketing"
+    aliases: []
+    selection_hints:
+      - "2x2 comparison"
+      - "quadrant analysis"
+      - "precision vs value"
+    component_id_overrides: []
+    search_keywords:
+      - "creative-quadrant"
+      - "creative-quadrant"
+      - "Creative Quadrant"
+      - "CreativeQuadrant"
+      - "marketing"
+      - "2x2 comparison"
+      - "quadrant analysis"
+      - "precision vs value"
+  scatter:
+    manifest_path: "charts/scatter/manifest.yml"
+    runtime_type: "scatter"
+    component: "ScatterPlot"
+    category: "charts"
+    aliases: []
+    selection_hints:
+      - "x vs y"
+      - "efficiency distribution"
+      - "cohort spread"
+    component_id_overrides: []
+    search_keywords:
+      - "scatter"
+      - "scatter"
+      - "Scatter Plot"
+      - "ScatterPlot"
+      - "charts"
+      - "x vs y"
+      - "efficiency distribution"
+      - "cohort spread"
+  shapley-attribution:
+    manifest_path: "marketing/shapley-attribution/manifest.yml"
+    runtime_type: "shapley-attribution"
+    component: "ShapleyAttribution"
+    category: "marketing"
+    aliases: []
+    selection_hints:
+      - "contribution over time"
+      - "channel attribution"
+      - "stacked period analysis"
+    component_id_overrides: []
+    search_keywords:
+      - "shapley-attribution"
+      - "shapley-attribution"
+      - "Shapley Attribution"
+      - "ShapleyAttribution"
+      - "marketing"
+      - "contribution over time"
+      - "channel attribution"
+      - "stacked period analysis"
+  trend-spotter:
+    manifest_path: "misc/trend-spotter/manifest.yml"
+    runtime_type: "trend-spotter"
+    component: "TrendSpotter"
+    category: "misc"
+    aliases: []
+    selection_hints:
+      - "keyword cloud"
+      - "emerging terms"
+      - "weighted trend list"
+    component_id_overrides: []
+    search_keywords:
+      - "trend-spotter"
+      - "trend-spotter"
+      - "Trend Spotter"
+      - "TrendSpotter"
+      - "misc"
+      - "keyword cloud"
+      - "emerging terms"
+      - "weighted trend list"
+  anomaly-stream:
+    manifest_path: "ml/anomaly-stream/manifest.yml"
+    runtime_type: "anomaly-stream"
+    component: "AnomalyStream"
+    category: "ml"
+    aliases: []
+    selection_hints:
+      - "anomaly candidates"
+      - "frequency vs impact"
+      - "dispersion plot"
+    component_id_overrides: []
+    search_keywords:
+      - "anomaly-stream"
+      - "anomaly-stream"
+      - "Anomaly Stream"
+      - "AnomalyStream"
+      - "ml"
+      - "anomaly candidates"
+      - "frequency vs impact"
+      - "dispersion plot"
+  lead-clustering:
+    manifest_path: "ml/lead-clustering/manifest.yml"
+    runtime_type: "lead-clustering"
+    component: "LeadClustering"
+    category: "ml"
+    aliases: []
+    selection_hints:
+      - "k-means style clusters"
+      - "segment scatter"
+      - "lead clustering"
+    component_id_overrides: []
+    search_keywords:
+      - "lead-clustering"
+      - "lead-clustering"
+      - "Lead Clustering"
+      - "LeadClustering"
+      - "ml"
+      - "k-means style clusters"
+      - "segment scatter"
+      - "lead clustering"
+  real-mapbox:
+    manifest_path: "geospatial/real-mapbox/manifest.yml"
+    runtime_type: "real-mapbox"
+    component: "RealMapbox"
+    category: "geospatial"
+    aliases:
+      - "3d-map"
+    selection_hints:
+      - "geo distribution"
+      - "global map"
+      - "regional hotspots"
+    component_id_overrides: []
+    search_keywords:
+      - "real-mapbox"
+      - "real-mapbox"
+      - "Mapbox / Globe"
+      - "RealMapbox"
+      - "geospatial"
+      - "3d-map"
+      - "geo distribution"
+      - "global map"
+      - "regional hotspots"
+  technical-health:
+    manifest_path: "misc/technical-health/manifest.yml"
+    runtime_type: "technical-health"
+    component: "TechnicalHealth"
+    category: "misc"
+    aliases:
+      - "vitals"
+    selection_hints:
+      - "service metrics"
+      - "health matrix"
+      - "status grid"
+    component_id_overrides: []
+    search_keywords:
+      - "technical-health"
+      - "technical-health"
+      - "Technical Health"
+      - "TechnicalHealth"
+      - "misc"
+      - "vitals"
+      - "service metrics"
+      - "health matrix"
+      - "status grid"
+  semi-circle-donut:
+    manifest_path: "charts/semi-circle-donut/manifest.yml"
+    runtime_type: "semi-circle-donut"
+    component: "SemiCircleDonut"
+    category: "charts"
+    aliases: []
+    selection_hints:
+      - "share by category"
+      - "donut split"
+      - "platform mix"
+    component_id_overrides: []
+    search_keywords:
+      - "semi-circle-donut"
+      - "semi-circle-donut"
+      - "Semi-Circle Donut"
+      - "SemiCircleDonut"
+      - "charts"
+      - "share by category"
+      - "donut split"
+      - "platform mix"
+  sankey:
+    manifest_path: "charts/sankey/manifest.yml"
+    runtime_type: "sankey"
+    component: "SankeyChart"
+    category: "charts"
+    aliases:
+      - "sankey-chart"
+    selection_hints:
+      - "flow diagram"
+      - "source to target"
+      - "funnel movement"
+    component_id_overrides: []
+    search_keywords:
+      - "sankey"
+      - "sankey"
+      - "Sankey Flow"
+      - "SankeyChart"
+      - "charts"
+      - "sankey-chart"
+      - "flow diagram"
+      - "source to target"
+      - "funnel movement"
+  stream-graph:
+    manifest_path: "charts/stream-graph/manifest.yml"
+    runtime_type: "stream-graph"
+    component: "StreamGraph"
+    category: "charts"
+    aliases: []
+    selection_hints:
+      - "stacked trends"
+      - "category flow over time"
+      - "streamgraph"
+    component_id_overrides: []
+    search_keywords:
+      - "stream-graph"
+      - "stream-graph"
+      - "Stream Graph"
+      - "StreamGraph"
+      - "charts"
+      - "stacked trends"
+      - "category flow over time"
+      - "streamgraph"
+  waffle:
+    manifest_path: "charts/waffle/manifest.yml"
+    runtime_type: "waffle"
+    component: "WaffleChart"
+    category: "charts"
+    aliases: []
+    selection_hints:
+      - "percentage occupancy"
+      - "share of total"
+      - "simple proportion"
+    component_id_overrides: []
+    search_keywords:
+      - "waffle"
+      - "waffle"
+      - "Waffle Chart"
+      - "WaffleChart"
+      - "charts"
+      - "percentage occupancy"
+      - "share of total"
+      - "simple proportion"
+lookups:
+  widgets:
+    metric-trend:
+      manifest_path: "micro/metric-trend/manifest.yml"
+      runtime_type: "metric-trend"
+      component: "MetricTrendMicro"
+      category: "micro"
+      aliases:
+        - "trend"
+        - "delta-kpi"
+      selection_hints:
+        - "single KPI"
+        - "delta vs previous period"
+        - "executive summary"
+      component_id_overrides:
+        - "marketing-roas"
+        - "refresh-cycle"
+        - "viral-k-factor"
+      search_keywords:
+        - "metric-trend"
+        - "metric-trend"
+        - "Metric Trend"
+        - "MetricTrendMicro"
+        - "micro"
+        - "trend"
+        - "delta-kpi"
+        - "single KPI"
+        - "delta vs previous period"
+        - "executive summary"
+        - "marketing-roas"
+        - "refresh-cycle"
+        - "viral-k-factor"
+    weather:
+      manifest_path: "micro/weather/manifest.yml"
+      runtime_type: "weather"
+      component: "WeatherMicro"
+      category: "micro"
+      aliases:
+        - "kpi-chip"
+      selection_hints:
+        - "single KPI"
+        - "compact metric"
+        - "minimal card"
+      component_id_overrides: []
+      search_keywords:
+        - "weather"
+        - "weather"
+        - "Weather Micro"
+        - "WeatherMicro"
+        - "micro"
+        - "kpi-chip"
+        - "single KPI"
+        - "compact metric"
+        - "minimal card"
+    natural:
+      manifest_path: "micro/natural/manifest.yml"
+      runtime_type: "natural"
+      component: "NaturalMicro"
+      category: "micro"
+      aliases:
+        - "linear-kpi"
+      selection_hints:
+        - "single KPI"
+        - "progress against scale"
+        - "current status"
+      component_id_overrides: []
+      search_keywords:
+        - "natural"
+        - "natural"
+        - "Natural Micro"
+        - "NaturalMicro"
+        - "micro"
+        - "linear-kpi"
+        - "single KPI"
+        - "progress against scale"
+        - "current status"
+    signal-scale:
+      manifest_path: "micro/signal-scale/manifest.yml"
+      runtime_type: "signal-scale"
+      component: "SignalScaleMicro"
+      category: "micro"
+      aliases:
+        - "signal-bars"
+        - "score-scale"
+      selection_hints:
+        - "score 0-100"
+        - "quality signal"
+        - "health scale"
+      component_id_overrides:
+        - "data-saturation"
+        - "marketing-conv-rate"
+        - "ad-fatigue"
+      search_keywords:
+        - "signal-scale"
+        - "signal-scale"
+        - "Signal Scale"
+        - "SignalScaleMicro"
+        - "micro"
+        - "signal-bars"
+        - "score-scale"
+        - "score 0-100"
+        - "quality signal"
+        - "health scale"
+        - "data-saturation"
+        - "marketing-conv-rate"
+        - "ad-fatigue"
+    sparkline-stat:
+      manifest_path: "micro/sparkline-stat/manifest.yml"
+      runtime_type: "sparkline-stat"
+      component: "SparklineStatMicro"
+      category: "micro"
+      aliases:
+        - "sparkline"
+        - "mini-trend"
+      selection_hints:
+        - "single KPI + history"
+        - "recent trend"
+        - "small time series"
+      component_id_overrides:
+        - "marketing-cpa"
+        - "budget-burn"
+      search_keywords:
+        - "sparkline-stat"
+        - "sparkline-stat"
+        - "Sparkline Stat"
+        - "SparklineStatMicro"
+        - "micro"
+        - "sparkline"
+        - "mini-trend"
+        - "single KPI + history"
+        - "recent trend"
+        - "small time series"
+        - "marketing-cpa"
+        - "budget-burn"
+    gauge-panel:
+      manifest_path: "micro/gauge-panel/manifest.yml"
+      runtime_type: "gauge-panel"
+      component: "GaugePanelMicro"
+      category: "micro"
+      aliases:
+        - "radial-gauge"
+      selection_hints:
+        - "single percentage"
+        - "utilization"
+        - "coverage"
+      component_id_overrides:
+        - "ai-coverage"
+      search_keywords:
+        - "gauge-panel"
+        - "gauge-panel"
+        - "Gauge Panel"
+        - "GaugePanelMicro"
+        - "micro"
+        - "radial-gauge"
+        - "single percentage"
+        - "utilization"
+        - "coverage"
+        - "ai-coverage"
+    color-slider:
+      manifest_path: "micro/color-slider/manifest.yml"
+      runtime_type: "color-slider"
+      component: "ColorSliderMicro"
+      category: "micro"
+      aliases:
+        - "light-dial"
+      selection_hints:
+        - "simple progress"
+        - "percentage on scale"
+        - "compact slider"
+      component_id_overrides: []
+      search_keywords:
+        - "color-slider"
+        - "color-slider"
+        - "Color Slider"
+        - "ColorSliderMicro"
+        - "micro"
+        - "light-dial"
+        - "simple progress"
+        - "percentage on scale"
+        - "compact slider"
+    liquid-gauge:
+      manifest_path: "micro/liquid-gauge/manifest.yml"
+      runtime_type: "liquid-gauge"
+      component: "LiquidGauge"
+      category: "micro"
+      aliases: []
+      selection_hints:
+        - "percentage fill"
+        - "saturation"
+        - "coverage"
+      component_id_overrides: []
+      search_keywords:
+        - "liquid-gauge"
+        - "liquid-gauge"
+        - "Liquid Gauge"
+        - "LiquidGauge"
+        - "micro"
+        - "percentage fill"
+        - "saturation"
+        - "coverage"
+    neural-nexus:
+      manifest_path: "micro/neural-nexus/manifest.yml"
+      runtime_type: "neural-nexus"
+      component: "NeuralNexus"
+      category: "micro"
+      aliases: []
+      selection_hints:
+        - "score dial"
+        - "control coverage"
+        - "single KPI"
+      component_id_overrides: []
+      search_keywords:
+        - "neural-nexus"
+        - "neural-nexus"
+        - "Neural Nexus"
+        - "NeuralNexus"
+        - "micro"
+        - "score dial"
+        - "control coverage"
+        - "single KPI"
+    intensity-heat:
+      manifest_path: "micro/intensity-heat/manifest.yml"
+      runtime_type: "intensity-heat"
+      component: "IntensityHeat"
+      category: "micro"
+      aliases: []
+      selection_hints:
+        - "single severity value"
+        - "saturation index"
+        - "fatigue score"
+      component_id_overrides: []
+      search_keywords:
+        - "intensity-heat"
+        - "intensity-heat"
+        - "Intensity Heat"
+        - "IntensityHeat"
+        - "micro"
+        - "single severity value"
+        - "saturation index"
+        - "fatigue score"
+    chrono-dial:
+      manifest_path: "micro/chrono-dial/manifest.yml"
+      runtime_type: "chrono-dial"
+      component: "ChronoDial"
+      category: "micro"
+      aliases: []
+      selection_hints:
+        - "freshness"
+        - "release health"
+        - "recency score"
+      component_id_overrides: []
+      search_keywords:
+        - "chrono-dial"
+        - "chrono-dial"
+        - "Chrono Dial"
+        - "ChronoDial"
+        - "micro"
+        - "freshness"
+        - "release health"
+        - "recency score"
+    pulse-circle:
+      manifest_path: "micro/pulse-circle/manifest.yml"
+      runtime_type: "pulse-circle"
+      component: "PulseCircle"
+      category: "micro"
+      aliases: []
+      selection_hints:
+        - "heartbeat KPI"
+        - "status pulse"
+        - "compact status"
+      component_id_overrides: []
+      search_keywords:
+        - "pulse-circle"
+        - "pulse-circle"
+        - "Pulse Circle"
+        - "PulseCircle"
+        - "micro"
+        - "heartbeat KPI"
+        - "status pulse"
+        - "compact status"
+    scanning-orbit:
+      manifest_path: "micro/scanning-orbit/manifest.yml"
+      runtime_type: "scanning-orbit"
+      component: "ScanningOrbit"
+      category: "micro"
+      aliases: []
+      selection_hints:
+        - "ops per second"
+        - "scan rate"
+        - "compact sci-fi KPI"
+      component_id_overrides: []
+      search_keywords:
+        - "scanning-orbit"
+        - "scanning-orbit"
+        - "Scanning Orbit"
+        - "ScanningOrbit"
+        - "micro"
+        - "ops per second"
+        - "scan rate"
+        - "compact sci-fi KPI"
+    red-gradient:
+      manifest_path: "micro/red-gradient/manifest.yml"
+      runtime_type: "red-gradient"
+      component: "RedGradientMicro"
+      category: "micro"
+      aliases: []
+      selection_hints:
+        - "risk progress"
+        - "danger intensity"
+        - "simple horizontal gauge"
+      component_id_overrides: []
+      search_keywords:
+        - "red-gradient"
+        - "red-gradient"
+        - "Red Gradient"
+        - "RedGradientMicro"
+        - "micro"
+        - "risk progress"
+        - "danger intensity"
+        - "simple horizontal gauge"
+    productivity:
+      manifest_path: "micro/productivity/manifest.yml"
+      runtime_type: "productivity"
+      component: "ProductivityMicro"
+      category: "micro"
+      aliases: []
+      selection_hints:
+        - "mini histogram"
+        - "activity pulse"
+        - "density spark"
+      component_id_overrides: []
+      search_keywords:
+        - "productivity"
+        - "productivity"
+        - "Productivity Micro"
+        - "ProductivityMicro"
+        - "micro"
+        - "mini histogram"
+        - "activity pulse"
+        - "density spark"
+    uptime-strip:
+      manifest_path: "micro/uptime-strip/manifest.yml"
+      runtime_type: "uptime-strip"
+      component: "UptimeStripMicro"
+      category: "micro"
+      aliases: []
+      selection_hints:
+        - "uptime window"
+        - "availability strip"
+        - "health streak"
+      component_id_overrides:
+        - "technical-health"
+      search_keywords:
+        - "uptime-strip"
+        - "uptime-strip"
+        - "Uptime Strip"
+        - "UptimeStripMicro"
+        - "micro"
+        - "uptime window"
+        - "availability strip"
+        - "health streak"
+        - "technical-health"
+    campaign-list:
+      manifest_path: "lists/campaign-list/manifest.yml"
+      runtime_type: "campaign-list"
+      component: "CampaignListMicro"
+      category: "lists"
+      aliases:
+        - "campaigns"
+      selection_hints:
+        - "ranked list"
+        - "campaign leaderboard"
+        - "compact comparison"
+      component_id_overrides: []
+      search_keywords:
+        - "campaign-list"
+        - "campaign-list"
+        - "Campaign List"
+        - "CampaignListMicro"
+        - "lists"
+        - "campaigns"
+        - "ranked list"
+        - "campaign leaderboard"
+        - "compact comparison"
+    leads-list:
+      manifest_path: "lists/leads-list/manifest.yml"
+      runtime_type: "leads-list"
+      component: "LeadsList"
+      category: "lists"
+      aliases: []
+      selection_hints:
+        - "top entities"
+        - "recent items"
+        - "operational feed"
+      component_id_overrides: []
+      search_keywords:
+        - "leads-list"
+        - "leads-list"
+        - "Leads List"
+        - "LeadsList"
+        - "lists"
+        - "top entities"
+        - "recent items"
+        - "operational feed"
+    audience-copilot:
+      manifest_path: "assistant/audience-copilot/manifest.yml"
+      runtime_type: "audience-copilot"
+      component: "AudienceCopilot"
+      category: "assistant"
+      aliases: []
+      selection_hints:
+        - "recommendations"
+        - "AI text actions"
+        - "next best action"
+      component_id_overrides: []
+      search_keywords:
+        - "audience-copilot"
+        - "audience-copilot"
+        - "Audience Copilot"
+        - "AudienceCopilot"
+        - "assistant"
+        - "recommendations"
+        - "AI text actions"
+        - "next best action"
+    emotion-wave:
+      manifest_path: "micro/emotion-wave/manifest.yml"
+      runtime_type: "emotion-wave"
+      component: "EmotionWave"
+      category: "micro"
+      aliases: []
+      selection_hints:
+        - "sentiment score"
+        - "mood level"
+        - "single qualitative score"
+      component_id_overrides: []
+      search_keywords:
+        - "emotion-wave"
+        - "emotion-wave"
+        - "Emotion Wave"
+        - "EmotionWave"
+        - "micro"
+        - "sentiment score"
+        - "mood level"
+        - "single qualitative score"
+    live-traffic:
+      manifest_path: "charts/live-traffic/manifest.yml"
+      runtime_type: "live-traffic"
+      component: "LiveTrafficChart"
+      category: "charts"
+      aliases:
+        - "animated-line"
+      selection_hints:
+        - "recent time series"
+        - "concurrent activity"
+        - "hero metric with trend"
+      component_id_overrides: []
+      search_keywords:
+        - "live-traffic"
+        - "live-traffic"
+        - "Live Traffic Chart"
+        - "LiveTrafficChart"
+        - "charts"
+        - "animated-line"
+        - "recent time series"
+        - "concurrent activity"
+        - "hero metric with trend"
+    predictive:
+      manifest_path: "predictive/predictive/manifest.yml"
+      runtime_type: "predictive"
+      component: "PredictiveForecast"
+      category: "predictive"
+      aliases: []
+      selection_hints:
+        - "forecast"
+        - "projection"
+        - "historical plus future"
+      component_id_overrides: []
+      search_keywords:
+        - "predictive"
+        - "predictive"
+        - "Predictive Forecast"
+        - "PredictiveForecast"
+        - "predictive"
+        - "forecast"
+        - "projection"
+        - "historical plus future"
+    range-area-chart:
+      manifest_path: "charts/range-area-chart/manifest.yml"
+      runtime_type: "range-area-chart"
+      component: "RangeAreaChart"
+      category: "charts"
+      aliases: []
+      selection_hints:
+        - "min max avg"
+        - "confidence band"
+        - "range over time"
+      component_id_overrides: []
+      search_keywords:
+        - "range-area-chart"
+        - "range-area-chart"
+        - "Range Area Chart"
+        - "RangeAreaChart"
+        - "charts"
+        - "min max avg"
+        - "confidence band"
+        - "range over time"
+    activity-heatmap:
+      manifest_path: "charts/activity-heatmap/manifest.yml"
+      runtime_type: "activity-heatmap"
+      component: "ActivityHeatmap"
+      category: "charts"
+      aliases: []
+      selection_hints:
+        - "day vs hour"
+        - "matrix intensity"
+        - "bucket heatmap"
+      component_id_overrides: []
+      search_keywords:
+        - "activity-heatmap"
+        - "activity-heatmap"
+        - "Activity Heatmap"
+        - "ActivityHeatmap"
+        - "charts"
+        - "day vs hour"
+        - "matrix intensity"
+        - "bucket heatmap"
+    optimal-time:
+      manifest_path: "charts/optimal-time/manifest.yml"
+      runtime_type: "optimal-time"
+      component: "OptimalTimeHeatmap"
+      category: "charts"
+      aliases: []
+      selection_hints:
+        - "best window"
+        - "calendar heatmap"
+        - "time-of-day optimisation"
+      component_id_overrides: []
+      search_keywords:
+        - "optimal-time"
+        - "optimal-time"
+        - "Optimal Time Heatmap"
+        - "OptimalTimeHeatmap"
+        - "charts"
+        - "best window"
+        - "calendar heatmap"
+        - "time-of-day optimisation"
+    covariance-matrix:
+      manifest_path: "charts/covariance-matrix/manifest.yml"
+      runtime_type: "covariance-matrix"
+      component: "CovarianceMatrix"
+      category: "charts"
+      aliases: []
+      selection_hints:
+        - "feature correlation"
+        - "covariance"
+        - "NxN matrix"
+      component_id_overrides: []
+      search_keywords:
+        - "covariance-matrix"
+        - "covariance-matrix"
+        - "Covariance Matrix"
+        - "CovarianceMatrix"
+        - "charts"
+        - "feature correlation"
+        - "covariance"
+        - "NxN matrix"
+    cohorts:
+      manifest_path: "marketing/cohorts/manifest.yml"
+      runtime_type: "cohorts"
+      component: "CohortAnalysis"
+      category: "marketing"
+      aliases: []
+      selection_hints:
+        - "retention"
+        - "cohort decay"
+        - "stickiness"
+      component_id_overrides: []
+      search_keywords:
+        - "cohorts"
+        - "cohorts"
+        - "Cohort Analysis"
+        - "CohortAnalysis"
+        - "marketing"
+        - "retention"
+        - "cohort decay"
+        - "stickiness"
+    mpl-training-loss:
+      manifest_path: "ml/mpl-training-loss/manifest.yml"
+      runtime_type: "mpl-training-loss"
+      component: "MatplotlibTrainingPanel"
+      category: "ml"
+      aliases: []
+      selection_hints:
+        - "training curves"
+        - "train vs validation"
+        - "ML convergence"
+      component_id_overrides: []
+      search_keywords:
+        - "mpl-training-loss"
+        - "mpl-training-loss"
+        - "Training Loss Panel"
+        - "MatplotlibTrainingPanel"
+        - "ml"
+        - "training curves"
+        - "train vs validation"
+        - "ML convergence"
+    mpl-benchmark-bars:
+      manifest_path: "ml/mpl-benchmark-bars/manifest.yml"
+      runtime_type: "mpl-benchmark-bars"
+      component: "MatplotlibBenchmarkBars"
+      category: "ml"
+      aliases: []
+      selection_hints:
+        - "benchmark comparison"
+        - "threshold pass/fail"
+        - "eval guardrails"
+      component_id_overrides: []
+      search_keywords:
+        - "mpl-benchmark-bars"
+        - "mpl-benchmark-bars"
+        - "Benchmark Bars"
+        - "MatplotlibBenchmarkBars"
+        - "ml"
+        - "benchmark comparison"
+        - "threshold pass/fail"
+        - "eval guardrails"
+    mpl-attention-heatmap:
+      manifest_path: "ml/mpl-attention-heatmap/manifest.yml"
+      runtime_type: "mpl-attention-heatmap"
+      component: "MatplotlibAttentionHeatmap"
+      category: "ml"
+      aliases: []
+      selection_hints:
+        - "activation heatmap"
+        - "layer vs block matrix"
+        - "drift matrix"
+      component_id_overrides: []
+      search_keywords:
+        - "mpl-attention-heatmap"
+        - "mpl-attention-heatmap"
+        - "Attention Heatmap"
+        - "MatplotlibAttentionHeatmap"
+        - "ml"
+        - "activation heatmap"
+        - "layer vs block matrix"
+        - "drift matrix"
+    budget-sensitivity:
+      manifest_path: "financial/budget-sensitivity/manifest.yml"
+      runtime_type: "budget-sensitivity"
+      component: "BudgetSensitivity"
+      category: "financial"
+      aliases: []
+      selection_hints:
+        - "elasticity curve"
+        - "diminishing returns"
+        - "response curve"
+      component_id_overrides: []
+      search_keywords:
+        - "budget-sensitivity"
+        - "budget-sensitivity"
+        - "Budget Sensitivity"
+        - "BudgetSensitivity"
+        - "financial"
+        - "elasticity curve"
+        - "diminishing returns"
+        - "response curve"
+    waterfall:
+      manifest_path: "financial/waterfall/manifest.yml"
+      runtime_type: "waterfall"
+      component: "FinancialBreakdown"
+      category: "financial"
+      aliases: []
+      selection_hints:
+        - "bridge analysis"
+        - "gross to net"
+        - "step breakdown"
+      component_id_overrides: []
+      search_keywords:
+        - "waterfall"
+        - "waterfall"
+        - "Waterfall"
+        - "FinancialBreakdown"
+        - "financial"
+        - "bridge analysis"
+        - "gross to net"
+        - "step breakdown"
+    attribution:
+      manifest_path: "marketing/attribution/manifest.yml"
+      runtime_type: "attribution"
+      component: "AttributionModels"
+      category: "marketing"
+      aliases: []
+      selection_hints:
+        - "allocation by source"
+        - "channel mix"
+        - "contribution share"
+      component_id_overrides: []
+      search_keywords:
+        - "attribution"
+        - "attribution"
+        - "Attribution"
+        - "AttributionModels"
+        - "marketing"
+        - "allocation by source"
+        - "channel mix"
+        - "contribution share"
+    funnel:
+      manifest_path: "marketing/funnel/manifest.yml"
+      runtime_type: "funnel"
+      component: "FunnelChart"
+      category: "marketing"
+      aliases: []
+      selection_hints:
+        - "stage drop-off"
+        - "journey funnel"
+        - "hero conversion flow"
+      component_id_overrides: []
+      search_keywords:
+        - "funnel"
+        - "funnel"
+        - "Funnel"
+        - "FunnelChart"
+        - "marketing"
+        - "stage drop-off"
+        - "journey funnel"
+        - "hero conversion flow"
+    incremental-lift:
+      manifest_path: "marketing/incremental-lift/manifest.yml"
+      runtime_type: "incremental-lift"
+      component: "IncrementalLift"
+      category: "marketing"
+      aliases: []
+      selection_hints:
+        - "control vs test"
+        - "incremental value"
+        - "lift decomposition"
+      component_id_overrides: []
+      search_keywords:
+        - "incremental-lift"
+        - "incremental-lift"
+        - "Incremental Lift"
+        - "IncrementalLift"
+        - "marketing"
+        - "control vs test"
+        - "incremental value"
+        - "lift decomposition"
+    intent-sunburst:
+      manifest_path: "marketing/intent-sunburst/manifest.yml"
+      runtime_type: "intent-sunburst"
+      component: "IntentSunburst"
+      category: "marketing"
+      aliases: []
+      selection_hints:
+        - "hierarchy"
+        - "nested categories"
+        - "intent tree"
+      component_id_overrides: []
+      search_keywords:
+        - "intent-sunburst"
+        - "intent-sunburst"
+        - "Intent Sunburst"
+        - "IntentSunburst"
+        - "marketing"
+        - "hierarchy"
+        - "nested categories"
+        - "intent tree"
+    interest-radar:
+      manifest_path: "marketing/interest-radar/manifest.yml"
+      runtime_type: "interest-radar"
+      component: "InterestRadar"
+      category: "marketing"
+      aliases: []
+      selection_hints:
+        - "radar profile"
+        - "multi-axis attributes"
+        - "interest mix"
+      component_id_overrides: []
+      search_keywords:
+        - "interest-radar"
+        - "interest-radar"
+        - "Interest Radar"
+        - "InterestRadar"
+        - "marketing"
+        - "radar profile"
+        - "multi-axis attributes"
+        - "interest mix"
+    market-radar:
+      manifest_path: "marketing/market-radar/manifest.yml"
+      runtime_type: "market-radar"
+      component: "MarketSentimentRadar"
+      category: "marketing"
+      aliases: []
+      selection_hints:
+        - "brand or posture radar"
+        - "aggregate category scores"
+        - "multi-axis snapshot"
+      component_id_overrides: []
+      search_keywords:
+        - "market-radar"
+        - "market-radar"
+        - "Market Sentiment Radar"
+        - "MarketSentimentRadar"
+        - "marketing"
+        - "brand or posture radar"
+        - "aggregate category scores"
+        - "multi-axis snapshot"
+    market-evolution:
+      manifest_path: "marketing/market-evolution/manifest.yml"
+      runtime_type: "market-evolution"
+      component: "MarketEvolution"
+      category: "marketing"
+      aliases: []
+      selection_hints:
+        - "network graph"
+        - "force layout"
+        - "entity interactions"
+      component_id_overrides: []
+      search_keywords:
+        - "market-evolution"
+        - "market-evolution"
+        - "Market Evolution"
+        - "MarketEvolution"
+        - "marketing"
+        - "network graph"
+        - "force layout"
+        - "entity interactions"
+    creative-quadrant:
+      manifest_path: "marketing/creative-quadrant/manifest.yml"
+      runtime_type: "creative-quadrant"
+      component: "CreativeQuadrant"
+      category: "marketing"
+      aliases: []
+      selection_hints:
+        - "2x2 comparison"
+        - "quadrant analysis"
+        - "precision vs value"
+      component_id_overrides: []
+      search_keywords:
+        - "creative-quadrant"
+        - "creative-quadrant"
+        - "Creative Quadrant"
+        - "CreativeQuadrant"
+        - "marketing"
+        - "2x2 comparison"
+        - "quadrant analysis"
+        - "precision vs value"
+    scatter:
+      manifest_path: "charts/scatter/manifest.yml"
+      runtime_type: "scatter"
+      component: "ScatterPlot"
+      category: "charts"
+      aliases: []
+      selection_hints:
+        - "x vs y"
+        - "efficiency distribution"
+        - "cohort spread"
+      component_id_overrides: []
+      search_keywords:
+        - "scatter"
+        - "scatter"
+        - "Scatter Plot"
+        - "ScatterPlot"
+        - "charts"
+        - "x vs y"
+        - "efficiency distribution"
+        - "cohort spread"
+    shapley-attribution:
+      manifest_path: "marketing/shapley-attribution/manifest.yml"
+      runtime_type: "shapley-attribution"
+      component: "ShapleyAttribution"
+      category: "marketing"
+      aliases: []
+      selection_hints:
+        - "contribution over time"
+        - "channel attribution"
+        - "stacked period analysis"
+      component_id_overrides: []
+      search_keywords:
+        - "shapley-attribution"
+        - "shapley-attribution"
+        - "Shapley Attribution"
+        - "ShapleyAttribution"
+        - "marketing"
+        - "contribution over time"
+        - "channel attribution"
+        - "stacked period analysis"
+    trend-spotter:
+      manifest_path: "misc/trend-spotter/manifest.yml"
+      runtime_type: "trend-spotter"
+      component: "TrendSpotter"
+      category: "misc"
+      aliases: []
+      selection_hints:
+        - "keyword cloud"
+        - "emerging terms"
+        - "weighted trend list"
+      component_id_overrides: []
+      search_keywords:
+        - "trend-spotter"
+        - "trend-spotter"
+        - "Trend Spotter"
+        - "TrendSpotter"
+        - "misc"
+        - "keyword cloud"
+        - "emerging terms"
+        - "weighted trend list"
+    anomaly-stream:
+      manifest_path: "ml/anomaly-stream/manifest.yml"
+      runtime_type: "anomaly-stream"
+      component: "AnomalyStream"
+      category: "ml"
+      aliases: []
+      selection_hints:
+        - "anomaly candidates"
+        - "frequency vs impact"
+        - "dispersion plot"
+      component_id_overrides: []
+      search_keywords:
+        - "anomaly-stream"
+        - "anomaly-stream"
+        - "Anomaly Stream"
+        - "AnomalyStream"
+        - "ml"
+        - "anomaly candidates"
+        - "frequency vs impact"
+        - "dispersion plot"
+    lead-clustering:
+      manifest_path: "ml/lead-clustering/manifest.yml"
+      runtime_type: "lead-clustering"
+      component: "LeadClustering"
+      category: "ml"
+      aliases: []
+      selection_hints:
+        - "k-means style clusters"
+        - "segment scatter"
+        - "lead clustering"
+      component_id_overrides: []
+      search_keywords:
+        - "lead-clustering"
+        - "lead-clustering"
+        - "Lead Clustering"
+        - "LeadClustering"
+        - "ml"
+        - "k-means style clusters"
+        - "segment scatter"
+        - "lead clustering"
+    real-mapbox:
+      manifest_path: "geospatial/real-mapbox/manifest.yml"
+      runtime_type: "real-mapbox"
+      component: "RealMapbox"
+      category: "geospatial"
+      aliases:
+        - "3d-map"
+      selection_hints:
+        - "geo distribution"
+        - "global map"
+        - "regional hotspots"
+      component_id_overrides: []
+      search_keywords:
+        - "real-mapbox"
+        - "real-mapbox"
+        - "Mapbox / Globe"
+        - "RealMapbox"
+        - "geospatial"
+        - "3d-map"
+        - "geo distribution"
+        - "global map"
+        - "regional hotspots"
+    technical-health:
+      manifest_path: "misc/technical-health/manifest.yml"
+      runtime_type: "technical-health"
+      component: "TechnicalHealth"
+      category: "misc"
+      aliases:
+        - "vitals"
+      selection_hints:
+        - "service metrics"
+        - "health matrix"
+        - "status grid"
+      component_id_overrides: []
+      search_keywords:
+        - "technical-health"
+        - "technical-health"
+        - "Technical Health"
+        - "TechnicalHealth"
+        - "misc"
+        - "vitals"
+        - "service metrics"
+        - "health matrix"
+        - "status grid"
+    semi-circle-donut:
+      manifest_path: "charts/semi-circle-donut/manifest.yml"
+      runtime_type: "semi-circle-donut"
+      component: "SemiCircleDonut"
+      category: "charts"
+      aliases: []
+      selection_hints:
+        - "share by category"
+        - "donut split"
+        - "platform mix"
+      component_id_overrides: []
+      search_keywords:
+        - "semi-circle-donut"
+        - "semi-circle-donut"
+        - "Semi-Circle Donut"
+        - "SemiCircleDonut"
+        - "charts"
+        - "share by category"
+        - "donut split"
+        - "platform mix"
+    sankey:
+      manifest_path: "charts/sankey/manifest.yml"
+      runtime_type: "sankey"
+      component: "SankeyChart"
+      category: "charts"
+      aliases:
+        - "sankey-chart"
+      selection_hints:
+        - "flow diagram"
+        - "source to target"
+        - "funnel movement"
+      component_id_overrides: []
+      search_keywords:
+        - "sankey"
+        - "sankey"
+        - "Sankey Flow"
+        - "SankeyChart"
+        - "charts"
+        - "sankey-chart"
+        - "flow diagram"
+        - "source to target"
+        - "funnel movement"
+    stream-graph:
+      manifest_path: "charts/stream-graph/manifest.yml"
+      runtime_type: "stream-graph"
+      component: "StreamGraph"
+      category: "charts"
+      aliases: []
+      selection_hints:
+        - "stacked trends"
+        - "category flow over time"
+        - "streamgraph"
+      component_id_overrides: []
+      search_keywords:
+        - "stream-graph"
+        - "stream-graph"
+        - "Stream Graph"
+        - "StreamGraph"
+        - "charts"
+        - "stacked trends"
+        - "category flow over time"
+        - "streamgraph"
+    waffle:
+      manifest_path: "charts/waffle/manifest.yml"
+      runtime_type: "waffle"
+      component: "WaffleChart"
+      category: "charts"
+      aliases: []
+      selection_hints:
+        - "percentage occupancy"
+        - "share of total"
+        - "simple proportion"
+      component_id_overrides: []
+      search_keywords:
+        - "waffle"
+        - "waffle"
+        - "Waffle Chart"
+        - "WaffleChart"
+        - "charts"
+        - "percentage occupancy"
+        - "share of total"
+        - "simple proportion"
+  aliases:
+    metric-trend: "metric-trend"
+    trend: "metric-trend"
+    delta-kpi: "metric-trend"
+    weather: "weather"
+    kpi-chip: "weather"
+    natural: "natural"
+    linear-kpi: "natural"
+    signal-scale: "signal-scale"
+    signal-bars: "signal-scale"
+    score-scale: "signal-scale"
+    sparkline-stat: "sparkline-stat"
+    sparkline: "sparkline-stat"
+    mini-trend: "sparkline-stat"
+    gauge-panel: "gauge-panel"
+    radial-gauge: "gauge-panel"
+    color-slider: "color-slider"
+    light-dial: "color-slider"
+    liquid-gauge: "liquid-gauge"
+    neural-nexus: "neural-nexus"
+    intensity-heat: "intensity-heat"
+    chrono-dial: "chrono-dial"
+    pulse-circle: "pulse-circle"
+    scanning-orbit: "scanning-orbit"
+    red-gradient: "red-gradient"
+    productivity: "productivity"
+    uptime-strip: "uptime-strip"
+    campaign-list: "campaign-list"
+    campaigns: "campaign-list"
+    leads-list: "leads-list"
+    audience-copilot: "audience-copilot"
+    emotion-wave: "emotion-wave"
+    live-traffic: "live-traffic"
+    animated-line: "live-traffic"
+    predictive: "predictive"
+    range-area-chart: "range-area-chart"
+    activity-heatmap: "activity-heatmap"
+    optimal-time: "optimal-time"
+    covariance-matrix: "covariance-matrix"
+    cohorts: "cohorts"
+    mpl-training-loss: "mpl-training-loss"
+    mpl-benchmark-bars: "mpl-benchmark-bars"
+    mpl-attention-heatmap: "mpl-attention-heatmap"
+    budget-sensitivity: "budget-sensitivity"
+    waterfall: "waterfall"
+    attribution: "attribution"
+    funnel: "funnel"
+    incremental-lift: "incremental-lift"
+    intent-sunburst: "intent-sunburst"
+    interest-radar: "interest-radar"
+    market-radar: "market-radar"
+    market-evolution: "market-evolution"
+    creative-quadrant: "creative-quadrant"
+    scatter: "scatter"
+    shapley-attribution: "shapley-attribution"
+    trend-spotter: "trend-spotter"
+    anomaly-stream: "anomaly-stream"
+    lead-clustering: "lead-clustering"
+    real-mapbox: "real-mapbox"
+    3d-map: "real-mapbox"
+    technical-health: "technical-health"
+    vitals: "technical-health"
+    semi-circle-donut: "semi-circle-donut"
+    sankey: "sankey"
+    sankey-chart: "sankey"
+    stream-graph: "stream-graph"
+    waffle: "waffle"
+  runtime_types:
+    metric-trend: "metric-trend"
+    weather: "weather"
+    natural: "natural"
+    signal-scale: "signal-scale"
+    sparkline-stat: "sparkline-stat"
+    gauge-panel: "gauge-panel"
+    color-slider: "color-slider"
+    liquid-gauge: "liquid-gauge"
+    neural-nexus: "neural-nexus"
+    intensity-heat: "intensity-heat"
+    chrono-dial: "chrono-dial"
+    pulse-circle: "pulse-circle"
+    scanning-orbit: "scanning-orbit"
+    red-gradient: "red-gradient"
+    productivity: "productivity"
+    uptime-strip: "uptime-strip"
+    campaign-list: "campaign-list"
+    leads-list: "leads-list"
+    audience-copilot: "audience-copilot"
+    emotion-wave: "emotion-wave"
+    live-traffic: "live-traffic"
+    predictive: "predictive"
+    range-area-chart: "range-area-chart"
+    activity-heatmap: "activity-heatmap"
+    optimal-time: "optimal-time"
+    covariance-matrix: "covariance-matrix"
+    cohorts: "cohorts"
+    mpl-training-loss: "mpl-training-loss"
+    mpl-benchmark-bars: "mpl-benchmark-bars"
+    mpl-attention-heatmap: "mpl-attention-heatmap"
+    budget-sensitivity: "budget-sensitivity"
+    waterfall: "waterfall"
+    attribution: "attribution"
+    funnel: "funnel"
+    incremental-lift: "incremental-lift"
+    intent-sunburst: "intent-sunburst"
+    interest-radar: "interest-radar"
+    market-radar: "market-radar"
+    market-evolution: "market-evolution"
+    creative-quadrant: "creative-quadrant"
+    scatter: "scatter"
+    shapley-attribution: "shapley-attribution"
+    trend-spotter: "trend-spotter"
+    anomaly-stream: "anomaly-stream"
+    lead-clustering: "lead-clustering"
+    real-mapbox: "real-mapbox"
+    technical-health: "technical-health"
+    semi-circle-donut: "semi-circle-donut"
+    sankey: "sankey"
+    stream-graph: "stream-graph"
+    waffle: "waffle"
+  components:
+    metric-trend-micro: "metric-trend"
+    weather-micro: "weather"
+    natural-micro: "natural"
+    signal-scale-micro: "signal-scale"
+    sparkline-stat-micro: "sparkline-stat"
+    gauge-panel-micro: "gauge-panel"
+    color-slider-micro: "color-slider"
+    liquid-gauge: "liquid-gauge"
+    neural-nexus: "neural-nexus"
+    intensity-heat: "intensity-heat"
+    chrono-dial: "chrono-dial"
+    pulse-circle: "pulse-circle"
+    scanning-orbit: "scanning-orbit"
+    red-gradient-micro: "red-gradient"
+    productivity-micro: "productivity"
+    uptime-strip-micro: "uptime-strip"
+    campaign-list-micro: "campaign-list"
+    leads-list: "leads-list"
+    audience-copilot: "audience-copilot"
+    emotion-wave: "emotion-wave"
+    live-traffic-chart: "live-traffic"
+    predictive-forecast: "predictive"
+    range-area-chart: "range-area-chart"
+    activity-heatmap: "activity-heatmap"
+    optimal-time-heatmap: "optimal-time"
+    covariance-matrix: "covariance-matrix"
+    cohort-analysis: "cohorts"
+    matplotlib-training-panel: "mpl-training-loss"
+    matplotlib-benchmark-bars: "mpl-benchmark-bars"
+    matplotlib-attention-heatmap: "mpl-attention-heatmap"
+    budget-sensitivity: "budget-sensitivity"
+    financial-breakdown: "waterfall"
+    attribution-models: "attribution"
+    funnel-chart: "funnel"
+    incremental-lift: "incremental-lift"
+    intent-sunburst: "intent-sunburst"
+    interest-radar: "interest-radar"
+    market-sentiment-radar: "market-radar"
+    market-evolution: "market-evolution"
+    creative-quadrant: "creative-quadrant"
+    scatter-plot: "scatter"
+    shapley-attribution: "shapley-attribution"
+    trend-spotter: "trend-spotter"
+    anomaly-stream: "anomaly-stream"
+    lead-clustering: "lead-clustering"
+    real-mapbox: "real-mapbox"
+    technical-health: "technical-health"
+    semi-circle-donut: "semi-circle-donut"
+    sankey-chart: "sankey"
+    stream-graph: "stream-graph"
+    waffle-chart: "waffle"
+  component_ids:
+    marketing-roas: "metric-trend"
+    refresh-cycle: "metric-trend"
+    viral-k-factor: "metric-trend"
+    data-saturation: "signal-scale"
+    marketing-conv-rate: "signal-scale"
+    ad-fatigue: "signal-scale"
+    marketing-cpa: "sparkline-stat"
+    budget-burn: "sparkline-stat"
+    ai-coverage: "gauge-panel"
+    technical-health: "uptime-strip"
+  manifest_paths:
+    metric-trend: "micro/metric-trend/manifest.yml"
+    weather: "micro/weather/manifest.yml"
+    natural: "micro/natural/manifest.yml"
+    signal-scale: "micro/signal-scale/manifest.yml"
+    sparkline-stat: "micro/sparkline-stat/manifest.yml"
+    gauge-panel: "micro/gauge-panel/manifest.yml"
+    color-slider: "micro/color-slider/manifest.yml"
+    liquid-gauge: "micro/liquid-gauge/manifest.yml"
+    neural-nexus: "micro/neural-nexus/manifest.yml"
+    intensity-heat: "micro/intensity-heat/manifest.yml"
+    chrono-dial: "micro/chrono-dial/manifest.yml"
+    pulse-circle: "micro/pulse-circle/manifest.yml"
+    scanning-orbit: "micro/scanning-orbit/manifest.yml"
+    red-gradient: "micro/red-gradient/manifest.yml"
+    productivity: "micro/productivity/manifest.yml"
+    uptime-strip: "micro/uptime-strip/manifest.yml"
+    campaign-list: "lists/campaign-list/manifest.yml"
+    leads-list: "lists/leads-list/manifest.yml"
+    audience-copilot: "assistant/audience-copilot/manifest.yml"
+    emotion-wave: "micro/emotion-wave/manifest.yml"
+    live-traffic: "charts/live-traffic/manifest.yml"
+    predictive: "predictive/predictive/manifest.yml"
+    range-area-chart: "charts/range-area-chart/manifest.yml"
+    activity-heatmap: "charts/activity-heatmap/manifest.yml"
+    optimal-time: "charts/optimal-time/manifest.yml"
+    covariance-matrix: "charts/covariance-matrix/manifest.yml"
+    cohorts: "marketing/cohorts/manifest.yml"
+    mpl-training-loss: "ml/mpl-training-loss/manifest.yml"
+    mpl-benchmark-bars: "ml/mpl-benchmark-bars/manifest.yml"
+    mpl-attention-heatmap: "ml/mpl-attention-heatmap/manifest.yml"
+    budget-sensitivity: "financial/budget-sensitivity/manifest.yml"
+    waterfall: "financial/waterfall/manifest.yml"
+    attribution: "marketing/attribution/manifest.yml"
+    funnel: "marketing/funnel/manifest.yml"
+    incremental-lift: "marketing/incremental-lift/manifest.yml"
+    intent-sunburst: "marketing/intent-sunburst/manifest.yml"
+    interest-radar: "marketing/interest-radar/manifest.yml"
+    market-radar: "marketing/market-radar/manifest.yml"
+    market-evolution: "marketing/market-evolution/manifest.yml"
+    creative-quadrant: "marketing/creative-quadrant/manifest.yml"
+    scatter: "charts/scatter/manifest.yml"
+    shapley-attribution: "marketing/shapley-attribution/manifest.yml"
+    trend-spotter: "misc/trend-spotter/manifest.yml"
+    anomaly-stream: "ml/anomaly-stream/manifest.yml"
+    lead-clustering: "ml/lead-clustering/manifest.yml"
+    real-mapbox: "geospatial/real-mapbox/manifest.yml"
+    technical-health: "misc/technical-health/manifest.yml"
+    semi-circle-donut: "charts/semi-circle-donut/manifest.yml"
+    sankey: "charts/sankey/manifest.yml"
+    stream-graph: "charts/stream-graph/manifest.yml"
+    waffle: "charts/waffle/manifest.yml"
