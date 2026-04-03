@@ -36,6 +36,7 @@ export { default as ChronoDial } from './ChronoDial';
 export { default as PulseCircle } from './PulseCircle';
 export { default as ScanningOrbit } from './ScanningOrbit';
 export { default as TrendSpotter } from './TrendSpotter';
+export { GaugePanelMicro, MetricTrendMicro, SignalScaleMicro, SparklineStatMicro, UptimeStripMicro } from './DashboardMicros';
 
 
 // Simple/Shared Graphics

@@ -20,15 +20,14 @@ const LeadClustering = ({ data: componentData }) => {
         [98, 0.99, 'Visionary Ltd'], [10, 0.04, 'Skybridge Inc']
     ];
 
-    const CLUSTER_COUNT = 4;
+    const CLUSTER_COUNT = 3;
     const DIENSIION_CLUSTER_INDEX = 3;
-    const COLOR_ALL = ['#10B981', '#3B82F6', '#F59E0B', '#6B7280'];
+    const COLOR_ALL = ['#7CFF5B', '#FFC533', '#35C9FF'];
 
     const pieces = [
         { value: 0, label: 'VIP', color: COLOR_ALL[0] },
-        { value: 1, label: 'Promising', color: COLOR_ALL[1] },
-        { value: 2, label: 'Window', color: COLOR_ALL[2] },
-        { value: 3, label: 'Cold', color: COLOR_ALL[3] }
+        { value: 1, label: 'Warm', color: COLOR_ALL[1] },
+        { value: 2, label: 'Cold', color: COLOR_ALL[2] }
     ];
 
     const option = {
@@ -110,11 +109,10 @@ const LeadClustering = ({ data: componentData }) => {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '8px' }}>
                     {data.slice(0, 12).map((lead, i) => {
                         const prob = lead[1];
-                        let statusColor = '#6B7280';
+                        let statusColor = '#35C9FF';
                         let statusLabel = 'Cold';
-                        if (prob > 0.9) { statusColor = '#10B981'; statusLabel = 'VIP'; }
-                        else if (prob > 0.7) { statusColor = '#3B82F6'; statusLabel = 'Warm'; }
-                        else if (prob > 0.4) { statusColor = '#F59E0B'; statusLabel = 'Mid'; }
+                        if (prob > 0.9) { statusColor = '#7CFF5B'; statusLabel = 'VIP'; }
+                        else if (prob > 0.55) { statusColor = '#FFC533'; statusLabel = 'Warm'; }
 
                         return (
                             <div key={i} style={{

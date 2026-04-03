@@ -1,151 +1,267 @@
 import React from 'react';
 import ReactECharts from 'echarts-for-react';
-import * as echarts from 'echarts';
+
+const QUADRANT_THRESHOLD = 5;
+
+const QUADRANT_STYLES = {
+    heroes: {
+        label: 'Hero',
+        detail: 'Scale',
+        color: '#7CFF5B',
+    },
+    seekers: {
+        label: 'Reach',
+        detail: 'Tune CVR',
+        color: '#35C9FF',
+    },
+    intent: {
+        label: 'Intent',
+        detail: 'Tune CTR',
+        color: '#FFC533',
+    },
+    burners: {
+        label: 'Burn',
+        detail: 'Refresh',
+        color: '#FF4D8D',
+    },
+};
+
+const getQuadrantKey = (ctr, conv) => {
+    if (ctr >= QUADRANT_THRESHOLD && conv >= QUADRANT_THRESHOLD) {
+        return 'heroes';
+    }
+
+    if (ctr >= QUADRANT_THRESHOLD && conv < QUADRANT_THRESHOLD) {
+        return 'seekers';
+    }
+
+    if (ctr < QUADRANT_THRESHOLD && conv >= QUADRANT_THRESHOLD) {
+        return 'intent';
+    }
+
+    return 'burners';
+};
+
+const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+const formatPercent = (value) => `${Number(value).toFixed(1)}%`;
 
 const CreativeQuadrant = ({ data: componentData }) => {
-    // Top-tier marketing creatives: [CTR (%), Conv. Rate (%), Name, Type]
     const creatives = componentData?.creatives || [
-        [4.2, 5.8, 'Video: Summer Lifestyle', 'Video'],
-        [3.8, 6.2, 'Static: Product Hero', 'Static'],
-        [1.2, 8.5, 'Testimonial: Andrei P.', 'Review'],
-        [5.5, 1.2, 'Clickbait: Huge Sale', 'Static'],
-        [2.1, 4.2, 'Video: Feature Walkthrough', 'Video'],
-        [0.8, 1.5, 'Static: Legacy Banner', 'Static'],
-        [4.8, 4.5, 'Video: User Story', 'Video'],
-        [3.2, 2.8, 'Static: Discount Code', 'Static'],
-        [1.5, 7.2, 'Review: Maria I.', 'Review'],
-        [6.2, 6.8, 'Hiring: Creative Lead', 'Static'],
-        [7.5, 0.5, 'Meme: Monday Coffee', 'Social']
+        [4.5, 6.2, 'Video: Spring Launch', 'Video'],
+        [3.9, 6.5, 'Static: Product Close-up', 'Static'],
+        [1.5, 9.0, 'Testimonial: Alex B.', 'Review'],
+        [6.0, 1.5, 'Flash Sale Banner', 'Static'],
+        [2.5, 4.8, 'Video: How it works', 'Video'],
+        [0.5, 1.0, 'Static: Old Generic', 'Static'],
+        [7.2, 0.8, 'Meme: Friday Vibe', 'Social'],
     ];
 
-    const pieces = [
-        { label: 'Heroes', color: '#10B981', note: 'Scale Now' },
-        { label: 'Seekers', color: '#3B82F6', note: 'Optimize Landing' },
-        { label: 'Intent', color: '#F59E0B', note: 'Optimize Visual' },
-        { label: 'Burners', color: '#EF4444', note: 'Stop Budget' }
-    ];
+    const scoredCreatives = creatives
+        .map(([ctr, conv, name, type], index) => {
+            const quadrantKey = getQuadrantKey(ctr, conv);
+            const quadrant = QUADRANT_STYLES[quadrantKey];
+            const score = Math.round(clamp((ctr * 4.6) + (conv * 5.4), 0, 100));
+
+            return {
+                id: `${name}-${index}`,
+                ctr,
+                conv,
+                name,
+                type,
+                score,
+                quadrant,
+            };
+        })
+        .sort((left, right) => right.score - left.score);
 
     const option = {
+        animation: true,
+        animationDuration: 700,
+        animationEasing: 'cubicOut',
         grid: {
-            top: 40,
-            right: 40,
-            bottom: 50,
-            left: 50,
-            containLabel: true
+            top: 18,
+            right: 16,
+            bottom: 16,
+            left: 16,
+            containLabel: false,
         },
         tooltip: {
-            backgroundColor: 'rgba(17, 24, 39, 0.95)',
-            borderColor: 'rgba(255, 255, 255, 0.1)',
+            backgroundColor: 'rgba(10, 10, 10, 0.95)',
+            borderColor: 'rgba(255, 255, 255, 0.08)',
             textStyle: { color: '#fff' },
             formatter: (params) => {
-                if (params.seriesType === 'scatter') {
-                    const [ctr, conv, name] = params.data;
-                    return `
-                        <div style="padding: 2px;">
-                            <div style="font-weight: bold; margin-bottom: 2px;">${name}</div>
-                            <div style="font-size: 11px;">CTR: ${ctr}% | Conv: ${conv}%</div>
-                        </div>
-                    `;
+                if (params.seriesType !== 'scatter') {
+                    return '';
                 }
-            }
+
+                const [ctr, conv, name, type] = params.data;
+                const quadrant = QUADRANT_STYLES[getQuadrantKey(ctr, conv)];
+                const score = Math.round(clamp((ctr * 4.6) + (conv * 5.4), 0, 100));
+
+                return `
+                    <div style="padding:2px 4px;">
+                        <div style="font-weight:700; margin-bottom:4px;">${name}</div>
+                        <div style="font-size:11px; color:rgba(255,255,255,0.72); margin-bottom:2px;">${type} · ${quadrant.label}</div>
+                        <div style="font-size:11px;">CTR ${formatPercent(ctr)} · CVR ${formatPercent(conv)} · Score ${score}</div>
+                    </div>
+                `;
+            },
         },
         xAxis: {
             type: 'value',
             min: 0,
             max: 10,
-            name: 'CTR %',
-            nameLocation: 'middle',
-            nameGap: 30,
-            nameTextStyle: { color: '#6B7280', fontSize: 10 },
             splitLine: { show: false },
-            axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } },
-            axisLabel: { color: '#4B5563', fontSize: 9 }
+            axisTick: { show: false },
+            axisLine: { show: false },
+            axisLabel: { show: false },
         },
         yAxis: {
             type: 'value',
             min: 0,
             max: 10,
-            name: 'Conv %',
-            nameLocation: 'middle',
-            nameGap: 35,
-            nameTextStyle: { color: '#6B7280', fontSize: 10 },
             splitLine: { show: false },
-            axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } },
-            axisLabel: { color: '#4B5563', fontSize: 9 }
+            axisTick: { show: false },
+            axisLine: { show: false },
+            axisLabel: { show: false },
         },
         series: [
             {
                 type: 'scatter',
                 data: creatives,
-                symbolSize: 14,
+                symbolSize: (value) => Math.max(10, Math.min(16, 8 + (value[1] * 0.7))),
                 itemStyle: {
-                    color: (params) => {
-                        const [ctr, conv] = params.data;
-                        if (ctr >= 5 && conv >= 5) return '#10B981';
-                        if (ctr >= 5 && conv < 5) return '#3B82F6';
-                        if (ctr < 5 && conv >= 5) return '#F59E0B';
-                        return '#EF4444';
-                    },
-                    borderColor: 'rgba(0,0,0,0.4)',
-                    borderWidth: 1.5
+                    color: (params) => QUADRANT_STYLES[getQuadrantKey(params.data[0], params.data[1])].color,
+                    borderColor: '#050505',
+                    borderWidth: 2,
+                    shadowBlur: 16,
+                    shadowColor: 'rgba(0,0,0,0.35)',
                 },
-                markArea: {
+                markLine: {
                     silent: true,
+                    symbol: 'none',
+                    z: 0,
+                    lineStyle: {
+                        color: 'rgba(255,255,255,0.24)',
+                        width: 1.5,
+                    },
+                    label: { show: false },
                     data: [
-                        [
-                            { name: 'HEROES', coord: [5, 5], itemStyle: { color: 'rgba(16, 185, 129, 0.05)' } },
-                            { coord: [10, 10] }
-                        ],
-                        [
-                            { name: 'SEEKERS', coord: [5, 0], itemStyle: { color: 'rgba(59, 130, 246, 0.05)' } },
-                            { coord: [10, 5] }
-                        ],
-                        [
-                            { name: 'INTENT', coord: [0, 5], itemStyle: { color: 'rgba(245, 158, 11, 0.05)' } },
-                            { coord: [5, 10] }
-                        ],
-                        [
-                            { name: 'BURNERS', coord: [0, 0], itemStyle: { color: 'rgba(239, 68, 68, 0.05)' } },
-                            { coord: [5, 5] }
-                        ]
+                        { xAxis: QUADRANT_THRESHOLD },
+                        { yAxis: QUADRANT_THRESHOLD },
                     ],
-                    label: {
-                        show: true,
-                        position: 'inside',
-                        color: 'rgba(255,255,255,0.05)',
-                        fontSize: 22,
-                        fontWeight: '900'
-                    }
-                }
-            }
-        ]
+                },
+            },
+        ],
+        graphic: [
+            {
+                type: 'text',
+                left: '7%',
+                top: '6%',
+                style: {
+                    text: 'Low CTR',
+                    fill: 'rgba(255,255,255,0.28)',
+                    fontSize: 10,
+                    fontWeight: 600,
+                },
+            },
+            {
+                type: 'text',
+                right: '7%',
+                top: '6%',
+                style: {
+                    text: 'High CTR',
+                    fill: 'rgba(255,255,255,0.28)',
+                    fontSize: 10,
+                    fontWeight: 600,
+                    textAlign: 'right',
+                },
+            },
+            {
+                type: 'text',
+                left: '7%',
+                bottom: '6%',
+                style: {
+                    text: 'Low CVR',
+                    fill: 'rgba(255,255,255,0.28)',
+                    fontSize: 10,
+                    fontWeight: 600,
+                },
+            },
+            {
+                type: 'text',
+                right: '7%',
+                bottom: '6%',
+                style: {
+                    text: 'High CVR',
+                    fill: 'rgba(255,255,255,0.28)',
+                    fontSize: 10,
+                    fontWeight: 600,
+                    textAlign: 'right',
+                },
+            },
+        ],
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', minHeight: '380px' }}>
-            {/* Main Quadrant Plot */}
-            <div style={{ flex: 1, width: '100%', position: 'relative' }}>
+        <div style={{ display: 'grid', gridTemplateRows: '220px minmax(0, 1fr)', gap: '14px', height: '100%', minHeight: '420px' }}>
+            <div style={{ width: '100%', minHeight: 0 }}>
                 <ReactECharts
                     option={option}
                     style={{ height: '100%', width: '100%' }}
                     notMerge={true}
+                    opts={{ renderer: 'svg' }}
                 />
             </div>
 
-            {/* Simple Minimalist Legend */}
-            <div style={{
-                display: 'flex',
-                justifyContent: 'space-around',
-                padding: '10px 0',
-                borderTop: '1px solid rgba(255,255,255,0.05)',
-                marginTop: '5px'
-            }}>
-                {pieces.map((p, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: p.color }} />
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <span style={{ color: '#E5E7EB', fontSize: '9px', fontWeight: 'bold', lineHeight: 1 }}>{p.label}</span>
-                            <span style={{ color: '#4B5563', fontSize: '7px' }}>{p.note}</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', minHeight: 0 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto auto', gap: '12px', padding: '0 0 6px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                    <span style={{ color: 'rgba(255,255,255,0.42)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Creative</span>
+                    <span style={{ color: 'rgba(255,255,255,0.42)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Zone</span>
+                    <span style={{ color: 'rgba(255,255,255,0.42)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', textAlign: 'right' }}>Score</span>
+                </div>
+
+                {scoredCreatives.map((creative) => (
+                    <div
+                        key={creative.id}
+                        style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'minmax(0, 1fr) auto auto',
+                            gap: '12px',
+                            alignItems: 'center',
+                            padding: '8px 0',
+                            borderBottom: '1px solid rgba(255,255,255,0.06)',
+                        }}
+                    >
+                        <div style={{ minWidth: 0 }}>
+                            <div style={{ color: '#fff', fontSize: '13px', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {creative.name}
+                            </div>
+                            <div style={{ color: 'rgba(255,255,255,0.34)', fontSize: '10px', marginTop: '3px' }}>
+                                {creative.type} · CTR {formatPercent(creative.ctr)} · CVR {formatPercent(creative.conv)}
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+                            <span
+                                style={{
+                                    width: '8px',
+                                    height: '8px',
+                                    borderRadius: '50%',
+                                    background: creative.quadrant.color,
+                                    boxShadow: `0 0 14px ${creative.quadrant.color}66`,
+                                    flexShrink: 0,
+                                }}
+                            />
+                            <span style={{ color: 'rgba(255,255,255,0.72)', fontSize: '11px', whiteSpace: 'nowrap' }}>
+                                {creative.quadrant.label}
+                            </span>
+                        </div>
+
+                        <div style={{ textAlign: 'right' }}>
+                            <div style={{ color: '#fff', fontSize: '18px', fontWeight: 700, lineHeight: 1 }}>{creative.score}</div>
+                            <div style={{ color: 'rgba(255,255,255,0.28)', fontSize: '10px', marginTop: '4px' }}>{creative.quadrant.detail}</div>
                         </div>
                     </div>
                 ))}

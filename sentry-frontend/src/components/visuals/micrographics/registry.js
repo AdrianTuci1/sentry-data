@@ -12,6 +12,7 @@ import {
     EmotionWave,
     FinancialBreakdown,
     FunnelChart,
+    GaugePanelMicro,
     IncrementalLift,
     IntentSunburst,
     InterestRadar,
@@ -35,14 +36,18 @@ import {
     ScatterPlot,
     SemiCircleDonut,
     ShapleyAttribution,
+    SignalScaleMicro,
+    SparklineStatMicro,
     StreamGraph,
     TechnicalHealth,
     TrendSpotter,
+    UptimeStripMicro,
     WaffleChart,
     WeatherMicro,
     ColorSliderMicro,
     CampaignListMicro,
     IntensityHeat,
+    MetricTrendMicro,
 } from './index';
 
 const isPlainObject = (value) => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
@@ -72,7 +77,20 @@ fallbackAnalyticsData.forEach((widget) => {
     }
 });
 
-const componentRegistry = {
+const componentRegistryById = {
+    'ai-coverage': GaugePanelMicro,
+    'budget-burn': SparklineStatMicro,
+    'data-saturation': SignalScaleMicro,
+    'marketing-conv-rate': SignalScaleMicro,
+    'marketing-cpa': SparklineStatMicro,
+    'marketing-roas': MetricTrendMicro,
+    'ad-fatigue': SignalScaleMicro,
+    'refresh-cycle': MetricTrendMicro,
+    'technical-health': UptimeStripMicro,
+    'viral-k-factor': MetricTrendMicro,
+};
+
+const componentRegistryByType = {
     '3d-map': RealMapbox,
     'activity-heatmap': ActivityHeatmap,
     'animated-line': LiveTrafficChart,
@@ -166,10 +184,15 @@ export const prepareMicroGraphicData = (payload = {}) => {
 };
 
 export const resolveMicroGraphicComponent = (payload = {}) => {
-    const candidates = [payload?.type, payload?.widget_type, payload?.id];
+    const idCandidate = componentRegistryById[normalizeLookupKey(payload?.id)];
+    if (idCandidate) {
+        return idCandidate;
+    }
+
+    const candidates = [payload?.type, payload?.widget_type, payload?.widgetType];
 
     for (const candidate of candidates) {
-        const component = componentRegistry[normalizeLookupKey(candidate)];
+        const component = componentRegistryByType[normalizeLookupKey(candidate)];
         if (component) {
             return component;
         }
