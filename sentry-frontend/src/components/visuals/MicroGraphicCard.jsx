@@ -50,9 +50,17 @@ const getExplorerPayload = (data) => data?.results ||
 
 const MicroGraphicCard = ({ data: initialData = {}, isExpanded, onClick }) => {
     const data = useMemo(() => prepareMicroGraphicData(initialData), [initialData]);
-    const GraphicComponent = useMemo(() => resolveMicroGraphicComponent(data), [data.id, data.type, data.widget_type]);
+    const GraphicComponent = useMemo(() => resolveMicroGraphicComponent(data), [data]);
     const explorerPayload = getExplorerPayload(data);
     const spanClass = data.gridSpan && data.gridSpan !== 'default' ? data.gridSpan : '';
+    const editorialCardIds = new Set(['marketing-pclv', 'live-traffic', 'retention-cohorts']);
+    const visualClass = [
+        data.type === '3d-map' ? 'map-bleed-card' : '',
+        data.type === 'optimal-time' ? 'optimal-time-card' : '',
+        editorialCardIds.has(data.id) ? 'editorial-card' : '',
+        data.id === 'live-traffic' ? 'compact-editorial-card' : '',
+    ].filter(Boolean).join(' ');
+    const isImmersiveCard = data.type === '3d-map' || data.type === 'optimal-time' || editorialCardIds.has(data.id);
 
     // Render specific graphic based on type
     const renderGraphic = () => {
@@ -74,22 +82,26 @@ const MicroGraphicCard = ({ data: initialData = {}, isExpanded, onClick }) => {
 
     return (
         <div
-            className={`micro-card ${data.colorTheme || 'theme-productivity'} ${spanClass} ${isExpanded ? 'expanded' : ''}`}
+            className={`micro-card ${data.colorTheme || 'theme-productivity'} ${spanClass} ${visualClass} ${isExpanded ? 'expanded' : ''}`}
             onClick={() => onClick?.(data.id)}
         >
-            <div className="micro-card-header">
-                {data.title && <h3 className="micro-title">{data.title}</h3>}
-                {data.subtitle && <span className="micro-subtitle">{data.subtitle}</span>}
-            </div>
+            {!isImmersiveCard && (
+                <div className="micro-card-header">
+                    {data.title && <h3 className="micro-title">{data.title}</h3>}
+                    {data.subtitle && <span className="micro-subtitle">{data.subtitle}</span>}
+                </div>
+            )}
 
             <div className="micro-card-body">
                 {renderGraphic()}
             </div>
 
-            <div className="micro-card-footer">
-                {data.footerText && <span className="footer-main">{data.footerText}</span>}
-                {data.footerBottom && <span className="footer-bottom">{data.footerBottom}</span>}
-            </div>
+            {!isImmersiveCard && (
+                <div className="micro-card-footer">
+                    {data.footerText && <span className="footer-main">{data.footerText}</span>}
+                    {data.footerBottom && <span className="footer-bottom">{data.footerBottom}</span>}
+                </div>
+            )}
 
             {/* Expand indicator icon */}
             {!isExpanded && (

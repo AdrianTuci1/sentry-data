@@ -140,12 +140,132 @@
 /* Base Body container */
 .micro-card-body {
     flex: 1;
+    min-height: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1;
     position: relative;
     width: 100%;
+}
+
+.micro-card.map-bleed-card {
+    padding: 0 !important;
+}
+
+.micro-card.optimal-time-card {
+    background: linear-gradient(180deg, #020202 0%, #050505 100%);
+}
+
+.micro-card.editorial-card {
+    background: linear-gradient(180deg, #020202 0%, #060606 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.micro-card.compact-editorial-card {
+    padding-top: 1.1rem;
+    padding-bottom: 1.1rem;
+}
+
+.micro-card.map-bleed-card .micro-card-header {
+    position: absolute;
+    inset: 0 0 auto 0;
+    padding: 1.4rem 1.5rem 3.2rem;
+    z-index: 4;
+    background: linear-gradient(180deg, rgba(4, 7, 12, 0.98) 0%, rgba(4, 7, 12, 0.82) 38%, rgba(4, 7, 12, 0) 100%);
+    pointer-events: none;
+}
+
+.micro-card.map-bleed-card .micro-card-body {
+    position: absolute;
+    inset: -1px;
+    z-index: 1;
+    width: auto;
+    height: auto;
+    align-items: stretch;
+    justify-content: stretch;
+}
+
+.micro-card.editorial-card .micro-card-body {
+    min-height: 0;
+    align-items: stretch;
+    justify-content: stretch;
+}
+
+.micro-card.editorial-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at top right, rgba(114, 255, 144, 0.08), transparent 24%),
+        radial-gradient(circle at bottom left, rgba(63, 216, 255, 0.08), transparent 28%);
+    opacity: 0.68;
+    pointer-events: none;
+    transition: opacity 0.28s ease;
+}
+
+.micro-card.map-bleed-card .micro-card-body > * {
+    width: 100%;
+    height: 100%;
+    flex: 1 1 auto;
+}
+
+.micro-card.map-bleed-card .micro-card-footer {
+    display: none;
+}
+
+.micro-card.map-bleed-card .expand-indicator,
+.micro-card.map-bleed-card .close-indicator {
+    z-index: 6;
+}
+
+.micro-card.optimal-time-card .expand-indicator,
+.micro-card.optimal-time-card .close-indicator {
+    z-index: 6;
+}
+
+.micro-card.editorial-card .expand-indicator,
+.micro-card.editorial-card .close-indicator {
+    z-index: 6;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .micro-card.editorial-card {
+        transition:
+            transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+            box-shadow 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+            border-color 0.32s ease;
+    }
+
+    .micro-card.editorial-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(255, 255, 255, 0.12);
+        box-shadow: 0 20px 44px rgba(0, 0, 0, 0.42);
+    }
+
+    .micro-card.editorial-card:hover::before {
+        opacity: 1;
+    }
+
+    .micro-card.editorial-card .predictive-metric-grid,
+    .micro-card.editorial-card .live-pulse-metrics,
+    .micro-card.editorial-card .retention-header {
+        transition:
+            transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+            opacity 0.28s ease;
+    }
+
+    .micro-card.editorial-card:hover .predictive-metric-grid,
+    .micro-card.editorial-card:hover .live-pulse-metrics,
+    .micro-card.editorial-card:hover .retention-header {
+        transform: translateY(-2px);
+    }
+}
+
+@media (max-width: 1024px) {
+    .micro-card.map-bleed-card .micro-card-header {
+        padding: 1.1rem 1.1rem 2.8rem;
+    }
 }
 
 /* Footers */

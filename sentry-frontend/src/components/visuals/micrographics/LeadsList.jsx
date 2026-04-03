@@ -2,48 +2,56 @@ import React from 'react';
 
 const LeadsList = ({ data }) => {
     const leads = data?.leads || [
-        { name: 'Andrei Popescu', value: 'Google Ads', status: 'hot', time: '2m ago' },
+        { name: 'Andrei Popescu', value: 'Google Ads', status: 'vip', time: '2m ago' },
         { name: 'Maria Ionescu', value: 'Facebook', status: 'warm', time: '15m ago' },
-        { name: 'Digital Solutions', value: 'Direct', status: 'hot', time: '1h ago' },
-        { name: 'Tech Global', value: 'LinkedIn', status: 'cool', time: '3h ago' },
-        { name: 'Creative Agency', value: 'TikTok', status: 'hot', time: '5h ago' },
+        { name: 'Digital Solutions', value: 'Direct', status: 'vip', time: '1h ago' },
+        { name: 'Tech Global', value: 'LinkedIn', status: 'cold', time: '3h ago' },
+        { name: 'Creative Agency', value: 'TikTok', status: 'vip', time: '5h ago' },
         { name: 'Retail Hub', value: 'Email', status: 'warm', time: '6h ago' }
     ];
 
-    const getStatusColor = (status) => {
+    const getStatusMeta = (status) => {
         switch (status) {
-            case 'hot': return '#EF4444';
-            case 'warm': return '#F59E0B';
-            case 'cool': return '#3B82F6';
-            default: return '#9CA3AF';
+            case 'vip': return { color: '#7CFF5B', label: 'VIP' };
+            case 'warm': return { color: '#FFC533', label: 'Warm' };
+            case 'cold': return { color: '#35C9FF', label: 'Cold' };
+            default: return null;
         }
     };
 
     return (
-        <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', gap: '14px', padding: '10px 0' }}>
+        <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', gap: '10px', padding: '8px 0' }}>
             {leads.map((lead, i) => (
-                <div key={i} style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '10px 14px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                    borderRadius: '12px',
-                    border: '1px solid rgba(255, 255, 255, 0.05)'
-                }}>
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#fff' }}>{lead.name}</span>
-                        <span style={{ fontSize: '10px', color: '#9CA3AF' }}>{lead.value}</span>
+                <div
+                    key={i}
+                    style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'minmax(0, 1fr) auto',
+                        gap: '10px',
+                        alignItems: 'center',
+                        paddingBottom: '10px',
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+                    }}
+                >
+                    <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                        <span style={{ fontSize: '12px', fontWeight: '700', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{lead.name}</span>
+                        <span style={{ fontSize: '10px', color: '#9CA3AF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{lead.value}</span>
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                        <div style={{
-                            width: '8px',
-                            height: '8px',
-                            borderRadius: '50%',
-                            backgroundColor: getStatusColor(lead.status),
-                            marginBottom: '4px',
-                            boxShadow: `0 0 8px ${getStatusColor(lead.status)}`
-                        }} />
+
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+                        {getStatusMeta(lead.status) ? (
+                            <span
+                                style={{
+                                    fontSize: '9px',
+                                    fontWeight: '700',
+                                    letterSpacing: '0.08em',
+                                    textTransform: 'uppercase',
+                                    color: getStatusMeta(lead.status).color,
+                                }}
+                            >
+                                {getStatusMeta(lead.status).label}
+                            </span>
+                        ) : null}
                         <span style={{ fontSize: '10px', color: '#6B7280' }}>{lead.time}</span>
                     </div>
                 </div>
