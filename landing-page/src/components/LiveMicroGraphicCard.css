@@ -1,0 +1,89 @@
+.micro-card {
+  position: relative;
+  min-height: 14.5rem;
+  border-radius: 24px;
+  padding: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  color: #fff;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.34);
+}
+
+.theme-weather {
+  background: radial-gradient(circle at center, #8a0c28 0%, #30040e 45%, #050102 100%);
+}
+
+.theme-natural {
+  background: radial-gradient(circle at center, #3d5a1e 0%, #1a270d 45%, #050802 100%);
+}
+
+.theme-light {
+  background: radial-gradient(circle at center, #63452c 0%, #2b1d12 45%, #080503 100%);
+}
+
+.theme-color {
+  background: radial-gradient(circle at center, #1b4d3e 0%, #0d251d 45%, #030806 100%);
+}
+
+.theme-red {
+  background: radial-gradient(circle at center, #7a1b1b 0%, #350c0c 45%, #0a0202 100%);
+}
+
+.theme-productivity {
+  background: radial-gradient(circle at center, #0f1c42 0%, #070d1f 45%, #010206 100%);
+}
+
+.theme-audience {
+  background: radial-gradient(circle at center, #1a1c26 0%, #0d0e13 45%, #020204 100%);
+}
+
+.theme-revenue {
+  background: radial-gradient(circle at center, #351523 0%, #1a0a11 45%, #040102 100%);
+}
+
+.micro-card-header {
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+}
+
+.micro-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+}
+
+.micro-subtitle {
+  font-size: 0.78rem;
+  font-weight: 400;
+  opacity: 0.8;
+  margin-top: 0.2rem;
+  line-height: 1.35;
+}
+
+.micro-card-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  position: relative;
+  width: 100%;
+}
+
+.micro-card-footer {
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.footer-main {
+  font-size: 0.74rem;
+  color: rgba(255, 255, 255, 0.62);
+}

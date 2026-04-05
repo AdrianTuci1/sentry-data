@@ -1,26 +1,37 @@
 import { useEffect, useRef } from 'react'
 import './PipelineFlow.css'
-import { goldInputs, goldViews } from '../content'
+import { goldInputs, goldViews, pipelineFlowCtx } from '../content'
 
 export function PipelineFlow() {
   const graphRef = useRef(null)
   const canvasRef = useRef(null)
   const centerRef = useRef(null)
+  const centerLeftAnchorRef = useRef(null)
+  const centerRightAnchorRef = useRef(null)
   const leftRefs = useRef([])
   const rightRefs = useRef([])
+  const flowchartVars = {
+    '--flowchart-left-group-offset': pipelineFlowCtx.leftGroupOffset,
+    '--flowchart-center-offset': pipelineFlowCtx.centerOffset,
+    '--flowchart-right-group-offset': pipelineFlowCtx.rightGroupOffset,
+  }
 
   useEffect(() => {
     const graph = graphRef.current
     const canvas = canvasRef.current
     const center = centerRef.current
+    const centerLeftAnchor = centerLeftAnchorRef.current
+    const centerRightAnchor = centerRightAnchorRef.current
 
-    if (!graph || !canvas || !center) {
+    if (!graph || !canvas || !center || !centerLeftAnchor || !centerRightAnchor) {
       return undefined
     }
 
     const draw = () => {
       const rect = graph.getBoundingClientRect()
       const centerRect = center.getBoundingClientRect()
+      const centerLeftRect = centerLeftAnchor.getBoundingClientRect()
+      const centerRightRect = centerRightAnchor.getBoundingClientRect()
       const dpr = window.devicePixelRatio || 1
 
       canvas.width = rect.width * dpr
@@ -39,8 +50,8 @@ export function PipelineFlow() {
       context.lineWidth = 1.2
       context.lineCap = 'round'
 
-      const centerLeftX = centerRect.left - rect.left + centerRect.width * 0.18
-      const centerRightX = centerRect.left - rect.left + centerRect.width * 0.82
+      const centerLeftX = centerLeftRect.left - rect.left + centerLeftRect.width / 2
+      const centerRightX = centerRightRect.left - rect.left + centerRightRect.width / 2
       const centerY = centerRect.top - rect.top + centerRect.height / 2
 
       leftRefs.current.forEach((element) => {
@@ -95,6 +106,8 @@ export function PipelineFlow() {
     })
 
     resizeObserver.observe(center)
+    resizeObserver.observe(centerLeftAnchor)
+    resizeObserver.observe(centerRightAnchor)
     window.addEventListener('resize', draw)
 
     return () => {
@@ -116,14 +129,14 @@ export function PipelineFlow() {
           <div className="flowchart-stage">
             <div className="flowchart-title-slot">
               <div className="flowchart-copy flowchart-copy-top">
-                <h2>Turn cleaned gold data into decision-ready views</h2>
+                <h2>We take raw data and give you immediate decisions.</h2>
               </div>
             </div>
 
             <div ref={graphRef} className="flowchart-graph">
               <canvas ref={canvasRef} className="flowchart-canvas" aria-hidden="true" />
 
-              <div className="flowchart-grid">
+              <div className="flowchart-grid" style={flowchartVars}>
                 <div className="flowchart-column flowchart-column-left">
                   {goldInputs.map((item, index) => (
                     <div
@@ -146,16 +159,21 @@ export function PipelineFlow() {
 
                 <div className="flowchart-center">
                   <div ref={centerRef} className="flowchart-core">
+                    <span
+                      ref={centerLeftAnchorRef}
+                      className="flowchart-core-anchor flowchart-core-anchor-left"
+                      aria-hidden="true"
+                    />
+                    <span
+                      ref={centerRightAnchorRef}
+                      className="flowchart-core-anchor flowchart-core-anchor-right"
+                      aria-hidden="true"
+                    />
                     <div className="flowchart-core-inner">
-                      <span className="core-cube cube-a" />
-                      <span className="core-cube cube-b" />
-                      <span className="core-cube cube-c" />
-                      <span className="core-cube cube-d" />
-                      <span className="core-cube cube-e" />
-                      <span className="core-cube cube-f" />
-                      <span className="core-cube cube-g" />
-                      <span className="core-cube cube-h" />
-                      <span className="core-cube cube-i" />
+                      <div className="flowchart-image-placeholder" aria-hidden="true">
+                        <span className="flowchart-image-placeholder-icon" />
+                        <span className="flowchart-image-placeholder-label">Image Placeholder</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -184,11 +202,10 @@ export function PipelineFlow() {
 
             <div className="flowchart-footer-slot">
               <div className="flowchart-copy flowchart-copy-bottom">
-                <strong>Views Layer</strong>
                 <p>
-                  Gold data is cleaned, normalized, and modeled once, then routed into
-                  decision views like LTV vs CAC, ROAS, retention, payback, and executive
-                  reporting.
+                  Our powerful neural engine lets us surface your data without extra
+                  transformations. Use smart decisions out of the box or build your own
+                  query logic.
                 </p>
               </div>
             </div>

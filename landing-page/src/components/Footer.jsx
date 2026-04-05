@@ -3,7 +3,7 @@ import { navigation } from '../content'
 
 export function Footer() {
   return (
-    <footer className="footer">
+    <footer className="footer" id="support">
       <div className="footer-shell">
         <div className="footer-brand-block">
           <a className="footer-brand" href="#home" aria-label="StatsParrot home">

@@ -16,7 +16,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 0rem;
   color: var(--text-dim);
   font-size: 0.68rem;
   letter-spacing: 0.16em;
@@ -25,11 +25,11 @@
 
 .flowchart-stage {
   display: grid;
-  grid-template-columns: minmax(260px, 1fr) 250px minmax(280px, 1fr);
+  grid-template-columns: minmax(240px, 1fr) 250px minmax(280px, 1fr);
   grid-template-rows: auto minmax(28rem, auto) auto;
-  column-gap: 1.75rem;
-  row-gap: 1.5rem;
-  margin-top: 1.5rem;
+  column-gap: 1rem;
+  row-gap: 0rem;
+  margin-top: 1rem;
   align-items: center;
 }
 
@@ -39,7 +39,7 @@
 }
 
 .flowchart-copy {
-  max-width: 21rem;
+  max-width: 30rem;
 }
 
 .flowchart-copy-top h2 {
@@ -94,10 +94,12 @@
 
 .flowchart-column-left {
   justify-items: end;
+  transform: translateX(calc(var(--flowchart-left-group-offset, 2.75rem) * -1));
 }
 
 .flowchart-column-right {
   justify-items: start;
+  transform: translateX(var(--flowchart-right-group-offset, 2.25rem));
 }
 
 .flow-pill-row {
@@ -155,12 +157,14 @@
 .flowchart-center {
   display: grid;
   place-items: center;
+  transform: translateX(var(--flowchart-center-offset, 1.5rem));
 }
 
 .flowchart-core {
-  width: 12.25rem;
-  height: 12.25rem;
-  padding: 1rem;
+  position: relative;
+  width: 9.5rem;
+  height: 9.5rem;
+  padding: 0.8rem;
   display: grid;
   place-items: center;
   clip-path: polygon(25% 6%, 75% 6%, 100% 50%, 75% 94%, 25% 94%, 0 50%);
@@ -169,69 +173,85 @@
   box-shadow: 0 26px 70px rgba(64, 30, 130, 0.2);
 }
 
+.flowchart-core-anchor {
+  position: absolute;
+  top: 50%;
+  width: 0.1rem;
+  height: 0.1rem;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.flowchart-core-anchor-left {
+  left: 0;
+}
+
+.flowchart-core-anchor-right {
+  right: 0;
+}
+
 .flowchart-core-inner {
   position: relative;
-  width: 7.8rem;
-  height: 7.8rem;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
 }
 
-.core-cube {
+.flowchart-image-placeholder {
+  width: 5.9rem;
+  height: 5.9rem;
+  border-radius: 1rem;
+  border: 1px dashed rgba(214, 204, 255, 0.5);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.03)),
+    rgba(17, 11, 34, 0.28);
+  display: grid;
+  place-items: center;
+  gap: 0.45rem;
+  color: rgba(240, 235, 255, 0.82);
+  text-align: center;
+}
+
+.flowchart-image-placeholder-icon {
+  width: 1.7rem;
+  height: 1.35rem;
+  border-radius: 0.35rem;
+  border: 1px solid rgba(231, 223, 255, 0.65);
+  position: relative;
+  display: block;
+}
+
+.flowchart-image-placeholder-icon::before {
+  content: '';
   position: absolute;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 0.38rem;
-  background: #c5c3d1;
-  box-shadow:
-    inset -8px -8px 12px rgba(92, 90, 113, 0.28),
-    0 12px 20px rgba(0, 0, 0, 0.16);
+  left: 0.26rem;
+  right: 0.26rem;
+  bottom: 0.26rem;
+  height: 0.52rem;
+  background: linear-gradient(135deg, transparent 34%, rgba(231, 223, 255, 0.8) 35% 65%, transparent 66%);
+  opacity: 0.9;
 }
 
-.cube-a {
-  top: 0.2rem;
-  left: 2.8rem;
+.flowchart-image-placeholder-icon::after {
+  content: '';
+  position: absolute;
+  top: 0.22rem;
+  right: 0.22rem;
+  width: 0.28rem;
+  height: 0.28rem;
+  border-radius: 999px;
+  background: rgba(231, 223, 255, 0.85);
 }
 
-.cube-b {
-  top: 1.4rem;
-  left: 1.4rem;
-}
-
-.cube-c {
-  top: 1.4rem;
-  right: 1.4rem;
-}
-
-.cube-d {
-  top: 2.7rem;
-  left: 0.3rem;
-}
-
-.cube-e {
-  top: 2.7rem;
-  left: 2.8rem;
-}
-
-.cube-f {
-  top: 2.7rem;
-  right: 0.3rem;
-}
-
-.cube-g {
-  bottom: 1.3rem;
-  left: 1.35rem;
-}
-
-.cube-h {
-  bottom: 1.3rem;
-  right: 1.35rem;
-}
-
-.cube-i {
-  bottom: 0.05rem;
-  left: 2.8rem;
+.flowchart-image-placeholder-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 @media (max-width: 1100px) {
+
   .flowchart-stage,
   .flowchart-grid {
     grid-template-columns: 1fr;
@@ -254,6 +274,7 @@
   .flowchart-column-left,
   .flowchart-column-right {
     justify-items: stretch;
+    transform: none;
   }
 
   .flow-pill-row-left,
@@ -264,6 +285,7 @@
   .flowchart-center {
     order: -1;
     margin-bottom: 1rem;
+    transform: none;
   }
 }
 
@@ -273,7 +295,12 @@
   }
 
   .flowchart-core {
-    width: 10rem;
-    height: 10rem;
+    width: 8.5rem;
+    height: 8.5rem;
+  }
+
+  .flowchart-image-placeholder {
+    width: 5.15rem;
+    height: 5.15rem;
   }
 }

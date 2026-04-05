@@ -2,7 +2,7 @@ import './CallToAction.css'
 
 export function CallToAction() {
   return (
-    <section className="cta-section" id="contact">
+    <section className="cta-section" id="pricing">
       <div className="cta-shell">
         <p className="cta-kicker">Pricing that scales with the work</p>
         <h2>Free to start and affordable as you grow.</h2>

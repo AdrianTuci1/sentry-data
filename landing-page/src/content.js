@@ -1,7 +1,8 @@
 export const navigation = [
   { label: 'Home', href: '#home' },
-  { label: 'Gold Views', href: '#gold-views' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Use Cases', href: '#use-cases' },
+  { label: 'Pricing', href: '#pricing' },
+  { label: 'Support', href: '#support' },
 ]
 
 export const goldInputs = [
@@ -21,6 +22,12 @@ export const goldViews = [
   'Contribution margin',
   'Executive KPI dashboard',
 ]
+
+export const pipelineFlowCtx = {
+  leftGroupOffset: '7.75rem',
+  centerOffset: '7.5rem',
+  rightGroupOffset: '9.25rem',
+}
 
 export const useCaseCards = [
   {

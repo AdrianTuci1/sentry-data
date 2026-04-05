@@ -1,8 +1,8 @@
 .architecture-section {
-  --architecture-scene-offset-x: -50px;
-  --architecture-scene-offset-y: -200px;
-  --architecture-scene-safe-top: -150px;
-  --architecture-scene-safe-bottom: 160px;
+  --architecture-scene-offset-x: 44px;
+  --architecture-scene-offset-y: -226px;
+  --architecture-scene-safe-top: -168px;
+  --architecture-scene-safe-bottom: 176px;
   position: relative;
   padding: clamp(2rem, 4vw, 3.5rem) clamp(1rem, 3vw, 2.5rem) clamp(2.5rem, 4vw, 4rem);
   background:
@@ -14,8 +14,8 @@
 
 .architecture-stage {
   display: grid;
-  grid-template-columns: minmax(22rem, 0.92fr) minmax(0, 1.08fr);
-  gap: clamp(1.5rem, 4vw, 3.5rem);
+  grid-template-columns: minmax(20rem, 0.8fr) minmax(0, 1.2fr);
+  gap: clamp(1.5rem, 4vw, 4rem);
   align-items: center;
   max-width: 1260px;
   margin: 0 auto;
@@ -25,16 +25,16 @@
 .architecture-visual {
   min-width: 0;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   overflow: visible;
 
 }
 
 .architecture-scene {
   position: relative;
-  width: min(100%, 40rem);
-  height: calc(min(42rem, 68vw) + var(--architecture-scene-safe-top) + var(--architecture-scene-safe-bottom));
-  min-height: calc(31rem + var(--architecture-scene-safe-top) + var(--architecture-scene-safe-bottom));
+  width: min(100%, 48rem);
+  height: calc(min(48rem, 76vw) + var(--architecture-scene-safe-top) + var(--architecture-scene-safe-bottom));
+  min-height: calc(36rem + var(--architecture-scene-safe-top) + var(--architecture-scene-safe-bottom));
 }
 
 .architecture-canvas {
@@ -51,40 +51,45 @@
 
 .architecture-copy h2 {
   margin: 0;
-  max-width: 10ch;
-  font-size: clamp(2rem, 4.6vw, 3.35rem);
+  max-width: 12ch;
+  font-size: clamp(2rem, 4.2vw, 3.1rem);
   font-weight: 500;
-  line-height: 0.98;
+  line-height: 1.02;
   letter-spacing: -0.04em;
 }
 
+.architecture-intro {
+  margin: 1rem 0 0;
+  max-width: 28rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.98rem;
+  line-height: 1.68;
+}
+
 .architecture-steps {
-  margin-top: 1.6rem;
+  margin-top: 1.35rem;
   display: grid;
-  gap: 0.65rem;
+  gap: 0.55rem;
 }
 
 .architecture-steps p {
   margin: 0;
   position: relative;
-  padding-left: 1.1rem;
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 0.92rem;
-  letter-spacing: 0.08em;
-  line-height: 1.55;
-  text-transform: uppercase;
+  padding-left: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
 .architecture-steps p::before {
   content: "";
   position: absolute;
-  top: 0.5rem;
+  top: 0.58rem;
   left: 0;
-  width: 0.32rem;
-  height: 0.32rem;
-  border-left: 1px solid rgba(255, 255, 255, 0.8);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.8);
-  transform: rotate(-45deg);
+  width: 0.38rem;
+  height: 0.38rem;
+  border-radius: 999px;
+  background: rgba(209, 255, 94, 0.95);
 }
 
 @media (max-width: 1040px) {
@@ -107,11 +112,12 @@
   }
 
   .architecture-scene {
-    height: calc(28rem + var(--architecture-scene-safe-top) + var(--architecture-scene-safe-bottom));
-    min-height: calc(24rem + var(--architecture-scene-safe-top) + var(--architecture-scene-safe-bottom));
+    width: min(100%, 42rem);
+    height: calc(31rem + var(--architecture-scene-safe-top) + var(--architecture-scene-safe-bottom));
+    min-height: calc(26rem + var(--architecture-scene-safe-top) + var(--architecture-scene-safe-bottom));
   }
 
   .architecture-steps p {
-    font-size: 0.84rem;
+    font-size: 0.92rem;
   }
 }
