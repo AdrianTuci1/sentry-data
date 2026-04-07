@@ -1,8 +1,4 @@
 .architecture-section {
-  --architecture-scene-offset-x: 44px;
-  --architecture-scene-offset-y: -226px;
-  --architecture-scene-safe-top: -168px;
-  --architecture-scene-safe-bottom: 176px;
   position: relative;
   padding: clamp(2rem, 4vw, 3.5rem) clamp(1rem, 3vw, 2.5rem) clamp(2.5rem, 4vw, 4rem);
   background:
@@ -25,23 +21,23 @@
 .architecture-visual {
   min-width: 0;
   display: flex;
+  align-items: center;
   justify-content: flex-end;
   overflow: visible;
-
 }
 
 .architecture-scene {
   position: relative;
-  width: min(100%, 48rem);
-  height: calc(min(48rem, 76vw) + var(--architecture-scene-safe-top) + var(--architecture-scene-safe-bottom));
-  min-height: calc(36rem + var(--architecture-scene-safe-top) + var(--architecture-scene-safe-bottom));
+  width: min(100%, 40rem);
+  height: clamp(22rem, 40vw, 29rem);
+  overflow: visible;
+  background: transparent;
 }
 
 .architecture-canvas {
   display: block;
   width: 100%;
   height: 100%;
-
 }
 
 .architecture-copy {
@@ -52,18 +48,18 @@
 .architecture-copy h2 {
   margin: 0;
   max-width: 12ch;
-  font-size: clamp(2rem, 4.2vw, 3.1rem);
+  font-size: clamp(1.8rem, 3.6vw, 2.7rem);
   font-weight: 500;
-  line-height: 1.02;
-  letter-spacing: -0.04em;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
 }
 
 .architecture-intro {
   margin: 1rem 0 0;
   max-width: 28rem;
   color: rgba(255, 255, 255, 0.7);
-  font-size: 0.98rem;
-  line-height: 1.68;
+  font-size: 0.95rem;
+  line-height: 1.64;
 }
 
 .architecture-steps {
@@ -92,9 +88,54 @@
   background: rgba(209, 255, 94, 0.95);
 }
 
+.architecture-actions {
+  margin-top: 1.6rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.architecture-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.9rem;
+  padding: 0.92rem 1.24rem;
+  border: 1px solid var(--line-strong);
+  color: var(--text-primary);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  transition:
+    border-color 180ms ease,
+    color 180ms ease,
+    background 180ms ease;
+}
+
+.architecture-action:hover {
+  border-color: var(--text-primary);
+}
+
+.architecture-action-primary {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.architecture-action-primary:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.architecture-action-secondary:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
 @media (max-width: 1040px) {
   .architecture-stage {
     grid-template-columns: 1fr;
+  }
+
+  .architecture-visual {
+    justify-content: center;
   }
 
   .architecture-copy {
@@ -112,9 +153,12 @@
   }
 
   .architecture-scene {
-    width: min(100%, 42rem);
-    height: calc(31rem + var(--architecture-scene-safe-top) + var(--architecture-scene-safe-bottom));
-    min-height: calc(26rem + var(--architecture-scene-safe-top) + var(--architecture-scene-safe-bottom));
+    width: min(100%, 32rem);
+    height: clamp(19rem, 72vw, 24rem);
+  }
+
+  .architecture-actions {
+    margin-top: 1.4rem;
   }
 
   .architecture-steps p {

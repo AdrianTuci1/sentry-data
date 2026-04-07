@@ -1,0 +1,99 @@
+.use-case-article-page {
+  width: 100%;
+  padding: 0 1.5rem 6rem;
+}
+
+.use-case-article-hero {
+  padding: 5.5rem 0 3rem;
+}
+
+.use-case-article-hero-inner {
+  width: min(52rem, 100%);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.use-case-article-kicker {
+  margin: 0 0 1rem;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.use-case-article-hero h1 {
+  margin: 0;
+  font-size: clamp(2.4rem, 5vw, 4.7rem);
+  line-height: 0.98;
+  letter-spacing: -0.06em;
+}
+
+.use-case-article-intro {
+  width: min(42rem, 100%);
+  margin: 1.5rem auto 0;
+  color: var(--text-soft);
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
+.use-case-article-body {
+  width: min(48rem, 100%);
+  margin: 0 auto;
+  padding-top: 1rem;
+}
+
+.use-case-article-section + .use-case-article-section {
+  margin-top: 3rem;
+}
+
+.use-case-article-section h2 {
+  margin: 0 0 1rem;
+  font-size: 1.45rem;
+  letter-spacing: -0.03em;
+}
+
+.use-case-article-section p {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 1rem;
+  line-height: 1.9;
+}
+
+.use-case-article-section p + p {
+  margin-top: 1rem;
+}
+
+.use-case-article-backlink {
+  display: inline-flex;
+  margin-top: 1.5rem;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.84rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 720px) {
+  .use-case-article-page {
+    padding: 0 1rem 4.5rem;
+  }
+
+  .use-case-article-hero {
+    padding: 4rem 0 2.5rem;
+  }
+
+  .use-case-article-intro {
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .use-case-article-section h2 {
+    font-size: 1.28rem;
+  }
+
+  .use-case-article-section p {
+    font-size: 0.98rem;
+    line-height: 1.8;
+  }
+}

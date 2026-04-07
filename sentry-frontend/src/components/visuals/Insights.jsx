@@ -5,7 +5,7 @@ import { useStore } from '../../store/StoreProvider';
 import { ProjectService } from '../../api/core';
 import { observer } from 'mobx-react-lite';
 import { Star, Building2, LayoutGrid } from 'lucide-react';
-import fallbackAnalyticsData from '../../data/analyticsData-hacking.json'
+import fallbackAnalyticsData from '../../data/analyticsData-saas.json'
 
 const MOST_RELEVANT_ORDER = {
     'marketing-roas': 1,

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import './PipelineFlow.css'
-import { goldInputs, goldViews, pipelineFlowCtx } from '../content'
+import pipelineCenterGraphic from '../../assets/pyramid/neural.png'
+import { pipelineFlowContent } from '../content/homePageContent'
 
 export function PipelineFlow() {
   const graphRef = useRef(null)
@@ -11,9 +12,9 @@ export function PipelineFlow() {
   const leftRefs = useRef([])
   const rightRefs = useRef([])
   const flowchartVars = {
-    '--flowchart-left-group-offset': pipelineFlowCtx.leftGroupOffset,
-    '--flowchart-center-offset': pipelineFlowCtx.centerOffset,
-    '--flowchart-right-group-offset': pipelineFlowCtx.rightGroupOffset,
+    '--flowchart-left-group-offset': pipelineFlowContent.layout.leftGroupOffset,
+    '--flowchart-center-offset': pipelineFlowContent.layout.centerOffset,
+    '--flowchart-right-group-offset': pipelineFlowContent.layout.rightGroupOffset,
   }
 
   useEffect(() => {
@@ -122,14 +123,14 @@ export function PipelineFlow() {
       <div className="flowchart-bleed">
         <div className="flowchart-panel">
           <div className="flowchart-meta">
-            <span>StatsParrot Gold</span>
-            <span>STATSPARROT</span>
+            <span>{pipelineFlowContent.meta.leftLabel}</span>
+            <span>{pipelineFlowContent.meta.rightLabel}</span>
           </div>
 
           <div className="flowchart-stage">
             <div className="flowchart-title-slot">
               <div className="flowchart-copy flowchart-copy-top">
-                <h2>We take raw data and give you immediate decisions.</h2>
+                <h2>{pipelineFlowContent.title}</h2>
               </div>
             </div>
 
@@ -138,7 +139,7 @@ export function PipelineFlow() {
 
               <div className="flowchart-grid" style={flowchartVars}>
                 <div className="flowchart-column flowchart-column-left">
-                  {goldInputs.map((item, index) => (
+                  {pipelineFlowContent.inputs.map((item, index) => (
                     <div
                       key={item}
                       className="flow-pill-row flow-pill-row-left"
@@ -171,15 +172,18 @@ export function PipelineFlow() {
                     />
                     <div className="flowchart-core-inner">
                       <div className="flowchart-image-placeholder" aria-hidden="true">
-                        <span className="flowchart-image-placeholder-icon" />
-                        <span className="flowchart-image-placeholder-label">Image Placeholder</span>
+                        <img
+                          src={pipelineCenterGraphic}
+                          alt=""
+                          className="flowchart-image-placeholder-icon"
+                        />
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <div className="flowchart-column flowchart-column-right">
-                  {goldViews.map((item, index) => (
+                  {pipelineFlowContent.views.map((item, index) => (
                     <div
                       key={item}
                       className="flow-pill-row flow-pill-row-right"
@@ -202,11 +206,7 @@ export function PipelineFlow() {
 
             <div className="flowchart-footer-slot">
               <div className="flowchart-copy flowchart-copy-bottom">
-                <p>
-                  Our powerful neural engine lets us surface your data without extra
-                  transformations. Use smart decisions out of the box or build your own
-                  query logic.
-                </p>
+                <p>{pipelineFlowContent.description}</p>
               </div>
             </div>
           </div>

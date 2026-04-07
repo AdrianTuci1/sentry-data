@@ -30,6 +30,8 @@ body {
   min-height: 100vh;
   background: var(--page-bg);
   color: var(--text-primary);
+  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 a {

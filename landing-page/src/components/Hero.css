@@ -5,12 +5,12 @@
 
 .hero-shell {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(300px, 48vw);
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 54vw);
   min-height: calc(100vh - 3.5rem);
 }
 
 .hero-copy {
-  padding: clamp(2rem, 6vw, 5rem);
+  padding: clamp(2rem, 5vw, 4.25rem);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -27,11 +27,11 @@
 
 .hero-title {
   margin: 0;
-  max-width: 18ch;
-  font-size: clamp(3rem, 7vw, 5.4rem);
+  max-width: 17ch;
+  font-size: clamp(2.55rem, 6vw, 4.65rem);
   font-weight: 300;
-  line-height: 0.98;
-  letter-spacing: -0.07em;
+  line-height: 1;
+  letter-spacing: -0.06em;
 }
 
 .hero-title em {
@@ -40,16 +40,22 @@
 }
 
 .hero-description {
-  max-width: 30rem;
-  margin: 1.5rem 0 0;
+  max-width: 28rem;
+  margin: 1.3rem 0 0;
   color: var(--text-soft);
-  font-size: 0.98rem;
-  line-height: 1.8;
+  font-size: 0.95rem;
+  line-height: 1.72;
+}
+
+.hero-actions {
+  margin-top: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
 }
 
 .hero-action {
   width: fit-content;
-  margin-top: 2rem;
   padding: 0.92rem 1.2rem;
   border: 1px solid var(--line-strong);
   color: var(--text-primary);
@@ -92,65 +98,60 @@
 .hero-collage {
   position: absolute;
   inset: 0;
-  display: grid;
-  --hero-gap: clamp(0.8rem, 1.6vw, 1.25rem);
-  --hero-pad: clamp(1.5rem, 3vw, 2.5rem);
-  --hero-base-tile: calc((100% - (var(--hero-pad) * 2) - (var(--hero-gap) * 2)) / 3);
-  --hero-tile: calc(var(--hero-base-tile) * 1.5);
-  grid-template-columns: repeat(3, var(--hero-tile));
-  grid-auto-rows: var(--hero-tile);
-  justify-content: end;
-  align-content: center;
-  gap: var(--hero-gap);
-  padding: var(--hero-pad);
-  transform: translate(100px, 30px);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
   z-index: 1;
 }
 
-.hero-card {
-  margin: 0;
-  overflow: hidden;
+.hero-collage-group {
+  position: relative;
+  width: 880px;
+  height: 880px;
+  transform: scale(0.78) translate(18px, 20px);
+  transform-origin: right center;
 }
 
-.hero-card img {
-  display: block;
-  width: 100%;
-  height: 100%;
+.hero-card {
+  position: absolute;
+  margin: 0;
+  overflow: visible;
 }
 
 .hero-card-sessions {
-  grid-column: 2 / 4;
-  grid-row: 1 / 2;
+  top: 0;
+  left: 300px;
+  width: 580px;
+  height: 280px;
 }
 
 .hero-card-funnel {
-  grid-column: 1 / 3;
-  grid-row: 2 / 3;
+  top: 300px;
+  left: 0;
+  width: 580px;
+  height: 280px;
 }
 
 .hero-card-activity {
-  grid-column: 3 / 4;
-  grid-row: 2 / 4;
+  top: 300px;
+  left: 600px;
+  width: 280px;
+  height: 580px;
 }
 
 .hero-card-infra {
-  grid-column: 1 / 2;
-  grid-row: 1 / 2;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 280px;
 }
 
 .hero-card-creative {
-  grid-column: 2 / 3;
-  grid-row: 3 / 4;
-}
-
-.hero-card-sessions img,
-.hero-card-funnel img,
-.hero-card-infra img,
-.hero-card-creative img,
-.hero-card-activity img {
-  height: 100%;
-  object-fit: contain;
-  background: rgba(255, 255, 255, 0.02);
+  top: 600px;
+  left: 300px;
+  width: 280px;
+  height: 280px;
 }
 
 @media (max-width: 900px) {
@@ -163,17 +164,42 @@
     padding-bottom: 1rem;
   }
 
+  .hero-actions {
+    margin-top: 1.8rem;
+  }
+
   .hero-visual {
     min-height: 34rem;
   }
 
   .hero-collage {
-    --hero-base-tile: calc((100% - (var(--hero-pad) * 2) - var(--hero-gap)) / 2);
-    --hero-tile: var(--hero-base-tile);
-    grid-template-columns: repeat(2, var(--hero-tile));
-    grid-auto-rows: var(--hero-tile);
+    position: relative;
+    inset: auto;
+    display: flex;
     justify-content: center;
+    align-items: flex-start;
+    padding: 0;
+  }
+
+  .hero-visual-fade {
+    display: none;
+  }
+
+  .hero-collage-group {
+    width: min(100%, 33rem);
+    height: auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: minmax(0, 1fr);
+    gap: 1rem;
     transform: none;
+  }
+
+  .hero-card {
+    position: relative;
+    inset: auto;
+    width: auto;
+    height: auto;
   }
 
   .hero-card-infra {
@@ -212,13 +238,8 @@
     min-height: 30rem;
   }
 
-  .hero-collage {
-    --hero-gap: 0.8rem;
-    --hero-pad: 0.75rem;
-    --hero-base-tile: calc((100% - (var(--hero-pad) * 2) - var(--hero-gap)) / 2);
-    --hero-tile: var(--hero-base-tile);
-    grid-template-columns: repeat(2, var(--hero-tile));
-    grid-auto-rows: var(--hero-tile);
+  .hero-collage-group {
+    gap: 0.8rem;
   }
 
   .hero-card-infra {

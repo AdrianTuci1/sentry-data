@@ -1,33 +1,42 @@
 export const navigation = [
-  { label: 'Home', href: '#home' },
-  { label: 'Use Cases', href: '#use-cases' },
-  { label: 'Pricing', href: '#pricing' },
-  { label: 'Support', href: '#support' },
+  { label: 'Home', href: '/#home' },
+  { label: 'Use Cases', href: '/#use-cases' },
+  { label: 'Pricing', href: '/pricing' },
+  { label: 'Support', href: '/#support' },
 ]
 
-export const goldInputs = [
-  'Merged ad spend by channel',
-  'Attributed orders and revenue',
-  'Customer cohorts and retention',
-  'Subscription events and churn',
-  'Sessions, funnels, and conversion paths',
-  'Product catalog and margin data',
+export const useCaseDropdownItems = [
+  {
+    label: 'Ecommerce',
+    description: 'Margins, cohorts, ROAS and merchandising signals.',
+    href: '/use-cases/ecommerce',
+  },
+  {
+    label: 'Marketing',
+    description: 'Attribution, spend pacing and channel performance.',
+    href: '/use-cases/marketing',
+  },
+  {
+    label: 'Logistics',
+    description: 'Inventory flows, fulfillment delays and route efficiency.',
+    href: '/use-cases/logistics',
+  },
+  {
+    label: 'SaaS',
+    description: 'Usage, retention, expansion and revenue health.',
+    href: '/use-cases/saas',
+  },
+  {
+    label: 'Cybersecurity',
+    description: 'Alert triage, anomaly detection and operational visibility.',
+    href: '/use-cases/cybersecurity',
+  },
+  {
+    label: 'LLM Training',
+    description: 'Dataset quality, pipeline monitoring and feedback loops.',
+    href: '/use-cases/llm-training',
+  },
 ]
-
-export const goldViews = [
-  'LTV vs CAC',
-  'ROAS by channel',
-  'Retention and cohort views',
-  'Payback period',
-  'Contribution margin',
-  'Executive KPI dashboard',
-]
-
-export const pipelineFlowCtx = {
-  leftGroupOffset: '7.75rem',
-  centerOffset: '7.5rem',
-  rightGroupOffset: '9.25rem',
-}
 
 export const useCaseCards = [
   {
