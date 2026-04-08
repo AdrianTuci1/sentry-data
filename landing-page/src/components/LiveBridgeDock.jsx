@@ -140,30 +140,31 @@ export function LiveBridgeDock({ progress, retreatProgress = 0, collapseProgress
   const retreatOpacity = clamp(1 - clampedRetreat * 1.2, 0, 1)
   const chatRetreatOpacity = clamp(1 - clampedRetreat * 1.6, 0, 1)
   const composerRetreatOpacity = clamp(1 - clampedRetreat * 1.1, 0, 1)
+  const dockVisible = clampedProgress > 0.01 && collapseProgress < 0.995
+  const chatVisible = chatWindowProgress > 0.01 && chatRetreatOpacity > 0.01
+  const composerVisible = composerProgress > 0.01 && composerRetreatOpacity > 0.01
 
   return (
     <div
       className="live-bridge-dock"
       style={{
-        opacity: clampedProgress * retreatOpacity * (1 - collapseProgress * 0.75),
-        transform: `translate3d(0, ${
-          mix(28, 0, buttonsProgress) + clampedRetreat * 26 + collapseProgress * 42
-        }px, 0) scale(${mix(mix(0.96, 1, buttonsProgress), 0.94, clampedRetreat)})`,
+        opacity: dockVisible ? 1 : 0,
+        transform: `translate3d(0, ${mix(28, 0, buttonsProgress) + clampedRetreat * 26 + collapseProgress * 42
+          }px, 0) scale(${mix(mix(0.96, 1, buttonsProgress), 0.94, clampedRetreat)})`,
       }}
     >
       <div
         className="live-bridge-chat-window"
         style={{
-          opacity: chatWindowProgress * chatRetreatOpacity,
-          transform: `translate3d(-50%, ${
-            mix(20, 0, chatWindowProgress) + clampedRetreat * 28
-          }px, 0) scale(${mix(mix(0.94, 1, chatWindowProgress), 0.9, clampedRetreat)})`,
+          opacity: chatVisible ? 1 : 0,
+          transform: `translate3d(-50%, ${mix(20, 0, chatWindowProgress) + clampedRetreat * 28
+            }px, 0) scale(${mix(mix(0.94, 1, chatWindowProgress), 0.9, clampedRetreat)})`,
         }}
       >
         <div className="live-bridge-chat-window-header">
           <span className="live-bridge-chat-status"></span>
-          <span>{dockContent.assistantLabel}</span>
-          <span className="live-bridge-chat-window-domain">{lockedDomain}</span>
+          {/* <span>{dockContent.assistantLabel}</span>
+          <span className="live-bridge-chat-window-domain">{lockedDomain}</span> */}
         </div>
 
         <div className="live-bridge-chat-thread">
@@ -176,8 +177,8 @@ export function LiveBridgeDock({ progress, retreatProgress = 0, collapseProgress
           {showAiMessage && (
             <article className="live-bridge-chat-line live-bridge-chat-line-left live-bridge-chat-line-ai">
               <div className="live-bridge-chat-line-meta">
-                <span>{dockContent.aiSystemLabel}</span>
-                <span>{dockContent.liveContextLabel}</span>
+                {/* <span>{dockContent.aiSystemLabel}</span>
+                <span>{dockContent.liveContextLabel}</span> */}
               </div>
               <p>{scenario.response.slice(0, typedResponseLength)}</p>
             </article>
@@ -194,10 +195,9 @@ export function LiveBridgeDock({ progress, retreatProgress = 0, collapseProgress
         <div
           className={`live-bridge-dock-composer ${messageSent ? 'is-sent' : ''}`}
           style={{
-            opacity: composerProgress * composerRetreatOpacity,
-            transform: `translate3d(0, ${
-              mix(8, 0, composerProgress) + clampedRetreat * 12
-            }px, 0) scale(${mix(mix(0.96, 1, composerProgress), 0.94, clampedRetreat)})`,
+            opacity: composerVisible ? 1 : 0,
+            transform: `translate3d(0, ${mix(8, 0, composerProgress) + clampedRetreat * 12
+              }px, 0) scale(${mix(mix(0.96, 1, composerProgress), 0.94, clampedRetreat)})`,
           }}
         >
           <button
@@ -226,9 +226,8 @@ export function LiveBridgeDock({ progress, retreatProgress = 0, collapseProgress
           </button>
 
           <button
-            className={`live-bridge-dock-chat-send-btn ${sendReady ? 'is-ready' : ''} ${
-              messageSent ? 'is-sent' : ''
-            }`}
+            className={`live-bridge-dock-chat-send-btn ${sendReady ? 'is-ready' : ''} ${messageSent ? 'is-sent' : ''
+              }`}
             type="button"
             aria-label={dockContent.sendMessageAriaLabel}
           >

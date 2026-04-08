@@ -10,8 +10,8 @@ const pricingPlans = [
     cadence: '/month',
     badge: null,
     accent: 'pricing-tier-surface-highlight',
-    ctaLabel: 'Join waitlist',
-    ctaHref: '/#home',
+    ctaLabel: 'Request access',
+    ctaHref: '/support',
     summary: 'For testing a workflow before you wire the full stack.',
     highlights: [
       '1 active project',
@@ -28,8 +28,8 @@ const pricingPlans = [
     cadence: '/month',
     badge: null,
     accent: 'pricing-tier-surface',
-    ctaLabel: 'Join waitlist',
-    ctaHref: '/#home',
+    ctaLabel: 'Request access',
+    ctaHref: '/support',
     summary: 'For lean teams shipping their first automated data science workflows.',
     highlights: [
       '3 active projects',
@@ -46,8 +46,8 @@ const pricingPlans = [
     cadence: '/month',
     badge: 'Popular',
     accent: 'pricing-tier-surface-popular',
-    ctaLabel: 'Join waitlist',
-    ctaHref: '/#home',
+    ctaLabel: 'Request access',
+    ctaHref: '/support',
     summary: 'For production-grade orchestration across multiple datasets and teams.',
     highlights: [
       '10 active projects',
@@ -65,7 +65,7 @@ const pricingPlans = [
     badge: null,
     accent: 'pricing-tier-surface-enterprise',
     ctaLabel: 'Talk to sales',
-    ctaHref: '/#support',
+    ctaHref: '/support',
     summary: 'For larger organizations with higher volumes, governance and private deployment needs.',
     highlights: [
       'Unlimited projects',

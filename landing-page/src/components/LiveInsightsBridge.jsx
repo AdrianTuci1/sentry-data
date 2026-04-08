@@ -143,10 +143,9 @@ function LiveInsightsBridgeScene() {
     }
 
     const snapTargets = [
-      { progress: 0.22, threshold: 0.05, delay: 140, release: 520 },
-      { progress: 0.72, threshold: 0.12, delay: 120, release: 560 },
-      { progress: 0.945, threshold: 0.16, delay: 70, release: 700 },
-      { progress: 0.995, threshold: 0.11, delay: 40, release: 820 },
+      { progress: 0.72, threshold: 0.12, delay: 120, release: 620 },
+      { progress: 0.95, threshold: 0.14, delay: 70, release: 760 },
+      { progress: 0.995, threshold: 0.08, delay: 40, release: 820 },
     ]
     const nearestTarget = snapTargets.reduce((closestTarget, target) => {
       const distance = Math.abs(scrollProgress - target.progress)
@@ -271,11 +270,11 @@ function LiveInsightsBridgeScene() {
   const shiftProgress = rangeProgress(scrollProgress, 0.18, 0.42)
   const focusCenterProgress = rangeProgress(scrollProgress, 0.28, 0.56)
   const focusFadeProgress = rangeProgress(scrollProgress, 0.38, 0.58)
-  const dockProgress = rangeProgress(scrollProgress, 0.48, 0.8)
-  const dockRetreatProgress = rangeProgress(scrollProgress, 0.74, 0.84)
-  const collapseProgress = rangeProgress(scrollProgress, 0.86, 0.94)
-  const nodeProgress = rangeProgress(scrollProgress, 0.9, 0.97)
-  const outputProgress = rangeProgress(scrollProgress, 0.93, 1)
+  const dockProgress = rangeProgress(scrollProgress, 0.42, 0.72)
+  const dockRetreatProgress = rangeProgress(scrollProgress, 0.76, 0.86)
+  const collapseProgress = rangeProgress(scrollProgress, 0.82, 0.9)
+  const nodeProgress = rangeProgress(scrollProgress, 0.88, 0.96)
+  const outputProgress = rangeProgress(scrollProgress, 0.9, 1)
   const cyclePaused = scrollProgress > 0.4
   const connectorOpacity = clamp(
     (0.16 + shiftProgress * 0.94) * (1 - focusFadeProgress) * (1 - collapseProgress),
@@ -283,26 +282,27 @@ function LiveInsightsBridgeScene() {
     1,
   )
   const networkOpacity = mix(1, 0, focusFadeProgress)
+  const isMobileLayout = viewportWidth < 700
   const safeStageWidth = Math.max(stageWidth, Math.min(viewportWidth - 24, 1440))
   const networkWidth = isCompactLayout
-    ? Math.min(safeStageWidth - 18, 460)
+    ? Math.min(safeStageWidth - (isMobileLayout ? 110 : 180), isMobileLayout ? 332 : 412)
     : Math.min(safeStageWidth * 0.36, 540)
   const widgetWidth = isCompactLayout
-    ? Math.min(safeStageWidth - 10, 520)
-    : Math.min(safeStageWidth * 0.72, 920)
+    ? Math.min(safeStageWidth - (isMobileLayout ? 26 : 44), isMobileLayout ? 362 : 476)
+    : Math.min(safeStageWidth * 0.7, 880)
   const desktopNetworkBaseOffset = isCompactLayout ? 0 : -Math.min(safeStageWidth * 0.075, 92)
   const desktopWidgetBaseOffset = isCompactLayout ? 0 : Math.min(safeStageWidth * 0.04, 52)
   const networkOffsetX = isCompactLayout
-    ? mix(0, -18, shiftProgress)
+    ? mix(0, isMobileLayout ? -6 : -10, shiftProgress)
     : mix(
-        desktopNetworkBaseOffset,
-        desktopNetworkBaseOffset - Math.min(safeStageWidth * 0.18, 220),
-        Math.max(shiftProgress, focusCenterProgress),
-      )
-  const networkOffsetY = isCompactLayout ? mix(0, -42, shiftProgress) : 0
+      desktopNetworkBaseOffset,
+      desktopNetworkBaseOffset - Math.min(safeStageWidth * 0.18, 220),
+      Math.max(shiftProgress, focusCenterProgress),
+    )
+  const networkOffsetY = isCompactLayout ? mix(0, isMobileLayout ? -12 : -18, shiftProgress) : 0
   const networkScale = mix(
     1,
-    isCompactLayout ? 0.98 : 0.9,
+    isCompactLayout ? (isMobileLayout ? 0.96 : 0.98) : 0.9,
     Math.max(shiftProgress, focusCenterProgress),
   )
   const widgetLeftStart = isCompactLayout ? 0 : safeStageWidth - widgetWidth + desktopWidgetBaseOffset
@@ -311,12 +311,12 @@ function LiveInsightsBridgeScene() {
     ? undefined
     : mix(widgetLeftStart, widgetLeftCentered, focusCenterProgress)
   const widgetOffsetY =
-    (isCompactLayout ? mix(0, -54, shiftProgress) : 0) +
-    mix(0, isCompactLayout ? 88 : 124, collapseProgress)
-  const widgetScale = mix(1, isCompactLayout ? 1.05 : 1.12, focusCenterProgress)
-  const sceneScale = mix(1, 0.18, collapseProgress)
-  const sceneTranslateY = mix(0, isCompactLayout ? 36 : 52, collapseProgress)
-  const sceneOpacity = mix(1, 0.04, collapseProgress)
+    (isCompactLayout ? mix(0, isMobileLayout ? -6 : -12, shiftProgress) : 0) +
+    mix(0, isCompactLayout ? 120 : 172, collapseProgress)
+  const widgetScale = mix(isCompactLayout ? 0.98 : 0.97, isCompactLayout ? 1.02 : 1.05, focusCenterProgress)
+  const sceneScale = mix(1, 0.08, collapseProgress)
+  const sceneTranslateY = mix(0, isCompactLayout ? 58 : 88, collapseProgress)
+  const sceneOpacity = mix(1, 0, collapseProgress)
 
   const networkPaneStyle = {
     opacity: networkOpacity,

@@ -96,10 +96,7 @@ const ArcSummaryMicro = ({ data }) => {
             };
         })
     );
-    const dots = [
-        ...buildArcTrack(17, 92, 88, 156, 184, -4, 5.8, 8.4, 0, 1),
-        ...buildArcTrack(11, 56, 54, 142, 164, 16, 6.4, 8.8, 0.06, 0.74),
-    ];
+    const dots = buildArcTrack(21, 108, 108, 176, 188, -8, 5.8, 9.4, 0, 1);
 
     return (
         <div className={`summary-arc-micro ${goodAtHigh ? 'is-positive' : 'is-alert'}`}>

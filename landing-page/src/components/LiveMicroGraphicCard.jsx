@@ -1,5 +1,9 @@
 import './LiveMicroGraphicCard.css'
 import {
+  ArcSummaryMicro,
+  RingSummaryMicro,
+} from '../../../sentry-frontend/src/components/visuals/micrographics/DashboardMicros'
+import {
   GaugePanelMicro,
   MetricTrendMicro,
   SignalScaleMicro,
@@ -9,8 +13,8 @@ import {
 const componentRegistryById = {
   'ai-coverage': GaugePanelMicro,
   'budget-burn': SparklineStatMicro,
-  'data-saturation': SignalScaleMicro,
-  'marketing-conv-rate': SignalScaleMicro,
+  'data-saturation': RingSummaryMicro,
+  'marketing-conv-rate': ArcSummaryMicro,
   'marketing-cpa': SparklineStatMicro,
   'marketing-roas': MetricTrendMicro,
   'viral-k-factor': MetricTrendMicro,

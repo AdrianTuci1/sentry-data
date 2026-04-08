@@ -1,15 +1,38 @@
 .app-shell {
-  min-height: 100vh;
+  height: 100vh;
   background: var(--page-bg);
   color: var(--text-primary);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.app-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(20, 18, 14, 0.24) transparent;
+}
+
+.app-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.app-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.app-scroll::-webkit-scrollbar-thumb {
+  background: rgba(20, 18, 14, 0.22);
+  border-radius: 999px;
+}
+
+.app-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(20, 18, 14, 0.34);
 }
 
 .app-main {
   position: relative;
   display: grid;
-  background:
-    radial-gradient(circle at top right, rgba(255, 255, 255, 0.05), transparent 26%),
-    radial-gradient(circle at 14% 32%, rgba(255, 127, 87, 0.05), transparent 22%),
-    radial-gradient(circle at 72% 58%, rgba(123, 92, 255, 0.06), transparent 24%),
-    var(--page-bg);
 }

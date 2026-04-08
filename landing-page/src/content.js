@@ -1,8 +1,7 @@
 export const navigation = [
-  { label: 'Home', href: '/#home' },
-  { label: 'Use Cases', href: '/#use-cases' },
+  { label: 'Home', href: '/' },
   { label: 'Pricing', href: '/pricing' },
-  { label: 'Support', href: '/#support' },
+  { label: 'Support', href: '/support' },
 ]
 
 export const useCaseDropdownItems = [

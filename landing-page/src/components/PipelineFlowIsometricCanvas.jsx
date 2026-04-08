@@ -185,7 +185,7 @@ function disposeScene(scene) {
 export function PipelineFlowIsometricCanvas({ progress }) {
   const frameRef = useRef(null)
   const canvasRef = useRef(null)
-  const renderRef = useRef(() => {})
+  const renderRef = useRef(() => { })
   const progressRef = useRef(progress)
 
   progressRef.current = progress
@@ -318,8 +318,8 @@ export function PipelineFlowIsometricCanvas({ progress }) {
     baseLayer.add(innerPanel)
 
     const processorBlock = createRaisedPanel({
-      width: 1.94,
-      depth: 1.94,
+      width: 4.38,
+      depth: 4.38,
       height: processorBlockHeight,
       panelMap: processorTexture,
     })

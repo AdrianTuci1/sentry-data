@@ -12,13 +12,21 @@ const specialWidgetRegistry = {
 
 export function LiveDomainWidgetCard({ widget }) {
   const SpecialGraphic = specialWidgetRegistry[widget.id]
+  const cardClassName = [
+    'feature-card',
+    widget.colorTheme || 'theme-productivity',
+    widget.id === 'romania-3d' ? 'map-bleed-card' : '',
+    widget.id === 'creative-quadrant' ? 'feature-card-stretch' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   if (!SpecialGraphic) {
     return <LiveMicroGraphicCard widget={widget} />
   }
 
   return (
-    <article className={`feature-card ${widget.colorTheme || 'theme-productivity'}`}>
+    <article className={cardClassName}>
       <div className="feature-card-header">
         {widget.title && <h3 className="feature-title">{widget.title}</h3>}
         {widget.subtitle && <span className="feature-subtitle">{widget.subtitle}</span>}

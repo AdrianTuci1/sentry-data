@@ -15,15 +15,16 @@
 
 .use-case-article-kicker {
   margin: 0 0 1rem;
-  color: rgba(255, 255, 255, 0.62);
+  color: rgba(20, 18, 14, 0.48);
   font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.24em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
 .use-case-article-hero h1 {
   margin: 0;
+  color: #11100d;
   font-size: clamp(2.4rem, 5vw, 4.7rem);
   line-height: 0.98;
   letter-spacing: -0.06em;
@@ -32,7 +33,7 @@
 .use-case-article-intro {
   width: min(42rem, 100%);
   margin: 1.5rem auto 0;
-  color: var(--text-soft);
+  color: rgba(20, 18, 14, 0.68);
   font-size: 1.05rem;
   line-height: 1.8;
 }
@@ -44,18 +45,25 @@
 }
 
 .use-case-article-section + .use-case-article-section {
-  margin-top: 3rem;
+  margin-top: 1rem;
+}
+
+.use-case-article-section {
+  padding: 1.35rem 0 0;
+  border-top: 1px solid rgba(20, 18, 14, 0.08);
 }
 
 .use-case-article-section h2 {
   margin: 0 0 1rem;
+  color: #11100d;
   font-size: 1.45rem;
+  font-weight: 500;
   letter-spacing: -0.03em;
 }
 
 .use-case-article-section p {
   margin: 0;
-  color: var(--text-soft);
+  color: rgba(20, 18, 14, 0.68);
   font-size: 1rem;
   line-height: 1.9;
 }
@@ -67,10 +75,16 @@
 .use-case-article-backlink {
   display: inline-flex;
   margin-top: 1.5rem;
-  color: rgba(255, 255, 255, 0.82);
+  min-height: 2.9rem;
+  padding: 0.7rem 1rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(20, 18, 14, 0.12);
+  background: rgba(255, 255, 255, 0.5);
+  color: #11100d;
   font-size: 0.84rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
+  font-weight: 700;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 

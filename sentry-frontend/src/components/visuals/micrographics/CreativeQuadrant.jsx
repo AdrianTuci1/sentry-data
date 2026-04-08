@@ -240,7 +240,7 @@ const CreativeQuadrant = ({ data: componentData }) => {
     };
 
     return (
-        <div style={{ display: 'grid', gridTemplateRows: '220px minmax(0, 1fr)', gap: '14px', height: '100%', minHeight: '420px', overflow: 'hidden' }}>
+        <div style={{ display: 'grid', gridTemplateRows: 'minmax(260px, 1.2fr) minmax(0, 0.8fr)', gap: '14px', height: '100%', minHeight: 0, overflow: 'hidden' }}>
             <div style={{ width: '100%', minHeight: 0 }}>
                 <ReactECharts
                     option={option}

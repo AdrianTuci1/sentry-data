@@ -23,8 +23,10 @@ export function Hero() {
         <div className="hero-visual" aria-hidden="true">
           <div className="hero-visual-fade" />
           <div className="hero-collage">
-            <div className="hero-collage-group">
-              <HeroMicroWidgets />
+            <div className="hero-collage-frame">
+              <div className="hero-collage-group">
+                <HeroMicroWidgets />
+              </div>
             </div>
           </div>
         </div>

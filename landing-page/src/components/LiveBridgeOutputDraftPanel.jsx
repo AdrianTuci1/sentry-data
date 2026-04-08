@@ -3,6 +3,8 @@ import { liveInsightsBridgeContent } from '../content/homePageContent'
 
 export function LiveBridgeOutputDraftPanel({ progress }) {
   const requestContent = liveInsightsBridgeContent.output.request
+  const cardProgress = rangeProgress(progress, 0.08, 0.62)
+  const detailProgress = rangeProgress(progress, 0.18, 0.76)
 
   return (
     <article
@@ -10,93 +12,66 @@ export function LiveBridgeOutputDraftPanel({ progress }) {
       style={{
         opacity: progress,
         '--draft-x': `${mix(-18, 0, progress)}px`,
-        '--draft-y': `${mix(24, 0, progress)}px`,
+        '--draft-y': `${mix(12, 0, progress)}px`,
       }}
     >
       <div
-        className="live-output-request-bar"
+        className="live-output-ai-card"
         style={{
-          opacity: rangeProgress(progress, 0.02, 0.48),
-          transform: `translate3d(0, ${mix(14, 0, progress)}px, 0)`,
+          opacity: cardProgress,
+          transform: `translate3d(0, ${mix(16, 0, cardProgress)}px, 0)`,
         }}
       >
-        <div className="live-output-request-method">
-          <span>{requestContent.method}</span>
-          <span className="live-output-request-caret" aria-hidden="true">
-            <span></span>
-            <span></span>
-          </span>
+        <div className="live-output-ai-card-meta">
+          <span className="live-output-ai-badge">AI Generated</span>
+          <span className="live-output-ai-status">Ready to route</span>
         </div>
 
-        <div className="live-output-request-url">
-          <span className="is-protocol">{requestContent.url.protocol}</span>
-          <span className="is-domain">{requestContent.url.domain}</span>
-          <span className="is-path">{requestContent.url.path}</span>
+        <div className="live-output-ai-card-main">
+          <h4>AI Generated</h4>
+          <p>Editable payload before routing.</p>
         </div>
-      </div>
 
-      <div
-        className="live-output-request-panel"
-        style={{
-          opacity: rangeProgress(progress, 0.1, 0.62),
-          transform: `translate3d(0, ${mix(18, 0, progress)}px, 0)`,
-        }}
-      >
-        <div className="live-output-request-tabs">
-          <div className="live-output-request-tab-list">
-            {requestContent.tabs.map((tab) => (
-              <span
-                key={tab.label}
-                className={`live-output-request-tab ${tab.active ? 'is-active' : ''}`}
-              >
-                {tab.label}
-                {tab.badge ? (
-                  <span className="live-output-request-tab-badge">{tab.badge}</span>
-                ) : null}
-                {tab.dot ? <span className="live-output-request-tab-dot" aria-hidden="true" /> : null}
-              </span>
-            ))}
+        <div
+          className="live-output-ai-json"
+          style={{
+            opacity: detailProgress,
+            transform: `translate3d(0, ${mix(10, 0, detailProgress)}px, 0)`,
+          }}
+        >
+          <div className="live-output-ai-json-header">
+            <span className="live-output-ai-callout-label">Editable JSON</span>
+            <span className="live-output-ai-json-hint">{requestContent.method}</span>
           </div>
 
-          <span className="live-output-request-code" aria-hidden="true">
-            {'</>'}
-          </span>
-        </div>
+          <div className="live-output-ai-json-editor">
+            {requestContent.lines.map((line, index) => {
+              const lineProgress = rangeProgress(detailProgress, 0.08 + index * 0.06, 0.62 + index * 0.06)
 
-        <div className="live-output-request-editor">
-          {requestContent.lines.map((line, index) => {
-            const lineProgress = rangeProgress(progress, 0.18 + index * 0.04, 0.72 + index * 0.04)
-
-            return (
-              <div
-                key={`request-line-${index + 1}`}
-                className="live-output-request-line"
-                style={{
-                  opacity: lineProgress,
-                  transform: `translate3d(0, ${mix(10, 0, lineProgress)}px, 0)`,
-                }}
-              >
-                <span className="live-output-request-line-number">{index + 1}</span>
-
-                <span className="live-output-request-line-content">
-                  {index === 0 ? (
-                    <span className="live-output-request-fold" aria-hidden="true">
-                      ▼
-                    </span>
-                  ) : null}
-
-                  {line.map((token, tokenIndex) => (
-                    <span
-                      key={`${index + 1}-${token.type}-${tokenIndex}`}
-                      className={`live-output-request-token is-${token.type}`}
-                    >
-                      {token.text}
-                    </span>
-                  ))}
-                </span>
-              </div>
-            )
-          })}
+              return (
+                <div
+                  key={`json-line-${index + 1}`}
+                  className="live-output-ai-json-line"
+                  style={{
+                    opacity: lineProgress,
+                    transform: `translate3d(0, ${mix(8, 0, lineProgress)}px, 0)`,
+                  }}
+                >
+                  <span className="live-output-ai-json-line-number">{index + 1}</span>
+                  <span className="live-output-ai-json-line-content">
+                    {line.map((token, tokenIndex) => (
+                      <span
+                        key={`${index + 1}-${token.type}-${tokenIndex}`}
+                        className={`live-output-ai-json-token is-${token.type}`}
+                      >
+                        {token.text}
+                      </span>
+                    ))}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
         </div>
       </div>
     </article>

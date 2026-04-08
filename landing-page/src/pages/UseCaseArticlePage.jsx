@@ -16,8 +16,8 @@ export function UseCaseArticlePage() {
             <p className="use-case-article-intro">
               The requested use case page is not available yet.
             </p>
-            <Link className="use-case-article-backlink" to="/#use-cases">
-              Back to use cases
+            <Link className="use-case-article-backlink" to="/">
+              Back to home
             </Link>
           </div>
         </div>
@@ -32,6 +32,9 @@ export function UseCaseArticlePage() {
           <p className="use-case-article-kicker">{article.category}</p>
           <h1>{article.title}</h1>
           <p className="use-case-article-intro">{article.intro}</p>
+          <Link className="use-case-article-backlink" to="/">
+            Back to home
+          </Link>
         </div>
       </div>
 

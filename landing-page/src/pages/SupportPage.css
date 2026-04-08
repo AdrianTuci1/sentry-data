@@ -1,0 +1,135 @@
+.support-page {
+  padding: clamp(3.8rem, 7vw, 6.4rem) clamp(1rem, 3vw, 2.6rem) clamp(3.2rem, 7vw, 5rem);
+}
+
+.support-shell {
+  max-width: 1260px;
+  margin: 0 auto;
+}
+
+.support-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(18rem, 0.72fr);
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  align-items: end;
+}
+
+.support-kicker {
+  margin: 0 0 1rem;
+  color: rgba(20, 18, 14, 0.48);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.support-header h1,
+.support-contact-row h2,
+.support-card h2 {
+  margin: 0;
+  color: #11100d;
+  letter-spacing: -0.06em;
+}
+
+.support-header h1 {
+  max-width: 11ch;
+  font-size: clamp(2.8rem, 6vw, 5.4rem);
+  font-weight: 500;
+  line-height: 0.95;
+}
+
+.support-intro p,
+.support-card p,
+.support-contact-row p {
+  margin: 0;
+  color: rgba(20, 18, 14, 0.68);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.support-grid {
+  margin-top: 2.7rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.support-card,
+.support-contact-panel {
+  border: 1px solid rgba(20, 18, 14, 0.08);
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.support-card {
+  min-height: 16rem;
+  padding: 1.5rem;
+  display: grid;
+  align-content: start;
+  gap: 0.9rem;
+}
+
+.support-card h2,
+.support-contact-row h2 {
+  font-size: clamp(1.8rem, 2.8vw, 2.6rem);
+  font-weight: 500;
+  line-height: 0.98;
+}
+
+.support-contact-panel {
+  margin-top: 2.7rem;
+  padding: 1.5rem;
+}
+
+.support-contact-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1.5rem;
+  align-items: end;
+}
+
+.support-contact-row p {
+  max-width: 34rem;
+  margin-top: 1rem;
+}
+
+.support-contact-action {
+  min-height: 3.2rem;
+  padding: 0.9rem 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(20, 18, 14, 0.12);
+  border-radius: 0;
+  background: #12110e;
+  color: #f6f1e8;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 980px) {
+  .support-header,
+  .support-contact-row {
+    grid-template-columns: 1fr;
+  }
+
+  .support-header h1 {
+    max-width: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .support-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .support-page {
+    padding-left: 0.9rem;
+    padding-right: 0.9rem;
+  }
+
+  .support-contact-action {
+    width: 100%;
+  }
+}

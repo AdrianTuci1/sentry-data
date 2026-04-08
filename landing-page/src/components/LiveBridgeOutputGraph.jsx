@@ -62,6 +62,8 @@ export function LiveBridgeOutputGraph({ progress, nodeProgress }) {
   const progressRef = useRef(progress)
   const drawRef = useRef(() => {})
   const chipProgress = rangeProgress(nodeProgress, 0.18, 0.82)
+  const handoffDropProgress = rangeProgress(progress, 0.22, 0.72)
+  const chipListOffsetY = mix(0, 8, handoffDropProgress)
 
   progressRef.current = progress
 
@@ -206,11 +208,7 @@ export function LiveBridgeOutputGraph({ progress, nodeProgress }) {
             className="live-output-origin-chip"
             style={{
               opacity: nodeProgress,
-              transform: `translate3d(0, ${mix(10, 0, chipProgress)}px, 0) scale(${mix(
-                0.9,
-                1,
-                chipProgress,
-              )})`,
+              transform: `scale(${mix(0.9, 1, chipProgress)})`,
             }}
           >
             <span ref={nodeRef} className="live-output-origin-dot" aria-hidden="true">
@@ -219,7 +217,12 @@ export function LiveBridgeOutputGraph({ progress, nodeProgress }) {
           </span>
         </div>
 
-        <div className="live-output-chip-list">
+        <div
+          className="live-output-chip-list"
+          style={{
+            '--chip-list-offset': `${chipListOffsetY}px`,
+          }}
+        >
           {OUTPUT_DESTINATIONS.map((destination, index) => {
             const chipProgress = rangeProgress(progress, 0.24 + index * 0.08, 0.78 + index * 0.1)
 
@@ -232,7 +235,7 @@ export function LiveBridgeOutputGraph({ progress, nodeProgress }) {
                 className="live-output-chip"
                 style={{
                   opacity: chipProgress,
-                  transform: `translate3d(${mix(22, 0, chipProgress)}px, ${mix(12, 0, chipProgress)}px, 0)`,
+                  transform: `translate3d(${mix(22, 0, chipProgress)}px, ${mix(8, 0, chipProgress)}px, 0)`,
                 }}
               >
                 <span className="live-output-chip-dot" aria-hidden="true" />

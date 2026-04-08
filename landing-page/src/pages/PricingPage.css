@@ -22,10 +22,10 @@
 .pricing-eyebrow,
 .pricing-header-label {
   margin: 0 0 1rem;
-  color: rgba(255, 255, 255, 0.62);
+  color: rgba(20, 18, 14, 0.48);
   font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
@@ -33,16 +33,17 @@
   margin: 0;
   max-width: 11ch;
   font-size: clamp(2.7rem, 6vw, 5.4rem);
-  font-weight: 300;
+  font-weight: 500;
   line-height: 0.95;
   letter-spacing: -0.07em;
+  color: #11100d;
 }
 
 .pricing-copy,
 .pricing-header-note p,
 .pricing-estimator-copy p,
 .pricing-comparison-copy p {
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(20, 18, 14, 0.68);
   line-height: 1.8;
 }
 
@@ -54,12 +55,9 @@
 
 .pricing-header-note {
   padding: 1.4rem 1.45rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 1.6rem;
-  background:
-    radial-gradient(circle at top left, rgba(123, 92, 255, 0.12), transparent 46%),
-    rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
+  border: 1px solid rgba(20, 18, 14, 0.08);
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.45);
 }
 
 .pricing-header-label {
@@ -83,65 +81,41 @@
   flex-direction: column;
   min-width: 0;
   padding: 0.2rem;
-  border-radius: 2rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.02);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(20, 18, 14, 0.08);
+  background: rgba(255, 255, 255, 0.35);
 }
 
 .pricing-tier-surface,
 .pricing-estimator-card {
   position: relative;
   overflow: hidden;
-  border-radius: 1.75rem;
+  border-radius: 0;
   min-height: 18.5rem;
   padding: 1.7rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(20, 18, 14, 0.08);
 }
 
 .pricing-tier-surface::before,
 .pricing-estimator-card::before {
-  content: "";
-  position: absolute;
-  inset: -35%;
-  background:
-    radial-gradient(circle at 22% 20%, rgba(255, 255, 255, 0.12), transparent 20%),
-    radial-gradient(circle at 74% 32%, rgba(123, 92, 255, 0.32), transparent 22%),
-    radial-gradient(circle at 70% 88%, rgba(255, 127, 87, 0.24), transparent 24%);
-  opacity: 0.9;
-  filter: blur(14px);
-  pointer-events: none;
+  display: none;
 }
 
 .pricing-tier-surface-highlight {
-  background:
-    radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.14), transparent 18%),
-    radial-gradient(circle at 68% 36%, rgba(123, 92, 255, 0.58), transparent 28%),
-    radial-gradient(circle at 74% 90%, rgba(255, 127, 87, 0.45), transparent 28%),
-    linear-gradient(160deg, rgba(22, 42, 106, 0.95), rgba(10, 18, 44, 0.94));
+  background: #f3e5d7;
 }
 
 .pricing-tier-surface {
-  background:
-    radial-gradient(circle at 24% 24%, rgba(255, 255, 255, 0.14), transparent 18%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+  background: rgba(255, 255, 255, 0.58);
 }
 
 .pricing-tier-surface-popular,
 .pricing-estimator-card.pricing-tier-surface-popular {
-  background:
-    radial-gradient(circle at 24% 18%, rgba(255, 255, 255, 0.18), transparent 18%),
-    radial-gradient(circle at 64% 28%, rgba(123, 92, 255, 0.62), transparent 24%),
-    radial-gradient(circle at 76% 90%, rgba(255, 127, 87, 0.44), transparent 24%),
-    linear-gradient(165deg, rgba(54, 49, 153, 0.92), rgba(32, 20, 84, 0.94));
+  background: #e7ddd2;
 }
 
 .pricing-tier-surface-enterprise,
 .pricing-estimator-card.pricing-tier-surface-enterprise {
-  background:
-    radial-gradient(circle at 22% 18%, rgba(255, 255, 255, 0.14), transparent 18%),
-    radial-gradient(circle at 82% 14%, rgba(255, 127, 87, 0.2), transparent 22%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03));
+  background: #efe8df;
 }
 
 .pricing-tier-topline,
@@ -158,8 +132,9 @@
 .pricing-estimator-card-head h3 {
   margin: 0;
   font-size: clamp(2rem, 3vw, 2.6rem);
-  font-weight: 400;
+  font-weight: 500;
   letter-spacing: -0.05em;
+  color: #11100d;
 }
 
 .pricing-tier-badge {
@@ -167,12 +142,12 @@
   align-items: center;
   min-height: 2rem;
   padding: 0.2rem 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.62);
-  border-radius: 999px;
-  background: rgba(5, 5, 5, 0.28);
-  color: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(20, 18, 14, 0.14);
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.55);
+  color: #11100d;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .pricing-tier-summary,
@@ -181,7 +156,7 @@
   z-index: 1;
   margin: 1rem 0 0;
   max-width: 24rem;
-  color: rgba(255, 255, 255, 0.76);
+  color: rgba(20, 18, 14, 0.68);
   font-size: 0.95rem;
   line-height: 1.65;
 }
@@ -201,11 +176,12 @@
   font-size: clamp(2.2rem, 3vw, 3.1rem);
   font-weight: 500;
   letter-spacing: -0.06em;
+  color: #11100d;
 }
 
 .pricing-tier-price-row span,
 .pricing-estimator-price span {
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(20, 18, 14, 0.58);
   font-size: 1rem;
 }
 
@@ -216,11 +192,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
-  background: #f6f4ee;
-  color: #0b0b0b;
+  border: 1px solid rgba(20, 18, 14, 0.12);
+  border-radius: 0;
+  background: #12110e;
+  color: #f6f1e8;
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   transition:
     transform 180ms ease,
     background 180ms ease;
@@ -229,7 +208,7 @@
 .pricing-tier-button:hover,
 .pricing-estimator-button:hover {
   transform: translateY(-1px);
-  background: #ffffff;
+  background: #25231e;
 }
 
 .pricing-tier-list,
@@ -243,10 +222,10 @@
 .pricing-estimator-list li {
   position: relative;
   padding: 1rem 0 1rem 1.25rem;
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(20, 18, 14, 0.8);
   font-size: 0.98rem;
   line-height: 1.5;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
+  border-bottom: 1px dashed rgba(20, 18, 14, 0.1);
 }
 
 .pricing-tier-list li::before,
@@ -258,7 +237,7 @@
   width: 0.42rem;
   height: 0.42rem;
   border-radius: 999px;
-  background: rgba(255, 127, 87, 0.94);
+  background: rgba(20, 18, 14, 0.72);
 }
 
 .pricing-estimator {
@@ -274,9 +253,10 @@
   margin: 0;
   max-width: 14ch;
   font-size: clamp(2.2rem, 4vw, 3.5rem);
-  font-weight: 300;
+  font-weight: 500;
   line-height: 1.02;
   letter-spacing: -0.05em;
+  color: #11100d;
 }
 
 .pricing-estimator-copy p,
@@ -292,7 +272,7 @@
 
 .pricing-range-field > span {
   display: block;
-  color: rgba(255, 255, 255, 0.9);
+  color: #11100d;
   font-size: 1.02rem;
   font-weight: 500;
 }
@@ -309,23 +289,25 @@
   font-size: 1.7rem;
   font-weight: 500;
   letter-spacing: -0.04em;
+  color: #11100d;
 }
 
 .pricing-range-meta span {
-  color: rgba(255, 255, 255, 0.52);
+  color: rgba(20, 18, 14, 0.46);
   font-size: 0.9rem;
 }
 
 .pricing-range {
   width: 100%;
   margin-top: 1rem;
-  accent-color: #ff7f57;
+  accent-color: #11100d;
 }
 
 .pricing-estimator-footnote {
   margin-top: 1rem;
   padding-left: 1rem;
-  border-left: 1px solid rgba(255, 255, 255, 0.14);
+  border-left: 1px solid rgba(20, 18, 14, 0.12);
+  color: rgba(20, 18, 14, 0.56);
 }
 
 .pricing-estimator-card {
@@ -341,9 +323,9 @@
 .pricing-comparison-table-shell {
   margin-top: 1.5rem;
   overflow-x: auto;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 1.8rem;
-  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(20, 18, 14, 0.08);
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.42);
 }
 
 .pricing-comparison-table {
@@ -355,27 +337,27 @@
 .pricing-comparison-table th,
 .pricing-comparison-table td {
   padding: 1.1rem 1.25rem;
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+  border-right: 1px solid rgba(20, 18, 14, 0.06);
+  border-bottom: 1px dashed rgba(20, 18, 14, 0.08);
   text-align: left;
 }
 
 .pricing-comparison-table thead th {
-  color: rgba(255, 255, 255, 0.92);
+  color: #11100d;
   font-size: 0.92rem;
-  font-weight: 600;
-  background: rgba(255, 255, 255, 0.03);
+  font-weight: 700;
+  background: rgba(20, 18, 14, 0.04);
 }
 
 .pricing-comparison-table tbody th {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(20, 18, 14, 0.66);
   font-size: 0.92rem;
   font-weight: 500;
   white-space: nowrap;
 }
 
 .pricing-comparison-table tbody td {
-  color: rgba(255, 255, 255, 0.88);
+  color: rgba(20, 18, 14, 0.84);
   font-size: 0.95rem;
 }
 
