@@ -10,6 +10,30 @@ const TONE_MAP = {
 };
 
 const resolveTone = (tone) => TONE_MAP[tone] || TONE_MAP.positive;
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+const parseNumericValue = (value) => Number.parseFloat(String(value ?? '').replace(/,/g, ''));
+
+const blendColor = (start, end, progress) => start.map((channel, index) => (
+    Math.round(channel + (end[index] - channel) * progress)
+));
+
+const interpolatePalette = (stops, progress) => {
+    const clamped = clamp(progress, 0, 1);
+
+    for (let index = 0; index < stops.length - 1; index += 1) {
+        const start = stops[index];
+        const end = stops[index + 1];
+
+        if (clamped >= start.at && clamped <= end.at) {
+            const localProgress = (clamped - start.at) / Math.max(0.0001, end.at - start.at);
+            const color = blendColor(start.color, end.color, localProgress);
+            return `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+        }
+    }
+
+    const lastColor = stops[stops.length - 1].color;
+    return `rgb(${lastColor[0]}, ${lastColor[1]}, ${lastColor[2]})`;
+};
 
 const buildSignalPalette = (goodAtHigh = true) => {
     const colors = goodAtHigh
@@ -17,6 +41,152 @@ const buildSignalPalette = (goodAtHigh = true) => {
         : ['#92ebf0', '#8ae8d6', '#8ee9c0', '#9deeb0', '#b8f39a', '#d9ef85', '#ffe07a', '#ffcd6b', '#ffb567', '#ff9b6d', '#ff8373', '#ff6b7a'];
 
     return colors;
+};
+
+const buildArcPalette = (goodAtHigh = true) => (
+    goodAtHigh
+        ? [
+            { at: 0, color: [4, 39, 31] },
+            { at: 0.35, color: [12, 123, 91] },
+            { at: 0.7, color: [28, 212, 155] },
+            { at: 1, color: [33, 246, 202] },
+        ]
+        : [
+            { at: 0, color: [40, 13, 15] },
+            { at: 0.4, color: [132, 41, 39] },
+            { at: 0.75, color: [250, 116, 36] },
+            { at: 1, color: [255, 201, 56] },
+        ]
+);
+
+const buildRingPalette = (goodAtHigh = true) => (
+    goodAtHigh
+        ? [
+            { at: 0, color: [24, 197, 150] },
+            { at: 1, color: [42, 247, 208] },
+        ]
+        : [
+            { at: 0, color: [255, 179, 0] },
+            { at: 0.6, color: [255, 193, 31] },
+            { at: 1, color: [255, 210, 78] },
+        ]
+);
+
+const ArcSummaryMicro = ({ data }) => {
+    const score = Number.isFinite(data?.signalScore) ? data.signalScore : parseNumericValue(data?.value) || 0;
+    const goodAtHigh = data?.goodAtHigh !== false;
+    const arcPalette = buildArcPalette(goodAtHigh);
+    const badgeText = data?.trendValue || data?.summarySymbol || data?.unit || null;
+    const scoreGlow = clamp(score / 100, 0.08, 1);
+    const buildArcTrack = (count, radiusX, radiusY, yBase, startAngle, endAngle, minDot, maxDot, inset = 0, activeBias = 1) => (
+        Array.from({ length: count }, (_, index) => {
+            const progress = index / Math.max(1, count - 1);
+            const angle = (startAngle + (endAngle - startAngle) * progress) * (Math.PI / 180);
+            const emphasis = Math.sin((progress + inset) * Math.PI) ** 1.18;
+            const activeCount = Math.max(1, Math.round(count * scoreGlow * activeBias));
+            const isActive = index < activeCount;
+
+            return {
+                id: `arc-${count}-${index}`,
+                cx: 120 + Math.cos(angle) * radiusX,
+                cy: yBase - Math.sin(angle) * radiusY,
+                radius: minDot + emphasis * (maxDot - minDot),
+                fill: interpolatePalette(arcPalette, emphasis),
+                opacity: isActive ? 0.28 + emphasis * (0.4 + scoreGlow * 0.32) : 0.08 + emphasis * 0.12,
+            };
+        })
+    );
+    const dots = [
+        ...buildArcTrack(17, 92, 88, 156, 184, -4, 5.8, 8.4, 0, 1),
+        ...buildArcTrack(11, 56, 54, 142, 164, 16, 6.4, 8.8, 0.06, 0.74),
+    ];
+
+    return (
+        <div className={`summary-arc-micro ${goodAtHigh ? 'is-positive' : 'is-alert'}`}>
+            {badgeText && <div className="summary-arc-badge">{badgeText}</div>}
+            <svg className="summary-arc-svg" viewBox="0 0 240 180" preserveAspectRatio="xMidYMid meet">
+                {dots.map((dot) => (
+                    <circle
+                        key={dot.id}
+                        cx={dot.cx}
+                        cy={dot.cy}
+                        r={dot.radius}
+                        fill={dot.fill}
+                        opacity={dot.opacity}
+                    />
+                ))}
+            </svg>
+
+            <div className="summary-arc-center">
+                <div className="summary-arc-value-line">
+                    <span className="summary-arc-value">{data?.value}</span>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const RingSummaryMicro = ({ data }) => {
+    const rawScore = Number.isFinite(data?.signalScore) ? data.signalScore : parseNumericValue(data?.value) || 0;
+    const normalizedScore = clamp(rawScore, 0, 100);
+    const goodAtHigh = data?.goodAtHigh !== false;
+    const ringPalette = buildRingPalette(goodAtHigh);
+    const symbol = data?.summarySymbol || (data?.unit === '%' ? '%' : goodAtHigh ? '•' : '!');
+    const trendText = data?.trendValue || data?.signalLabel;
+    const segmentCount = 64;
+    const activeCount = Math.max(1, Math.round((normalizedScore / 100) * segmentCount));
+    const startAngle = -90;
+
+    const segments = Array.from({ length: segmentCount }, (_, index) => {
+        const angle = startAngle + (index / segmentCount) * 360;
+        const radians = (angle * Math.PI) / 180;
+        const innerRadius = 94;
+        const outerRadius = 114;
+        const x1 = 110 + Math.cos(radians) * innerRadius;
+        const y1 = 110 + Math.sin(radians) * innerRadius;
+        const x2 = 110 + Math.cos(radians) * outerRadius;
+        const y2 = 110 + Math.sin(radians) * outerRadius;
+        const active = index < activeCount;
+
+        return {
+            id: `ring-${index}`,
+            x1,
+            y1,
+            x2,
+            y2,
+            active,
+            stroke: active ? interpolatePalette(ringPalette, index / Math.max(1, activeCount - 1 || 1)) : 'rgba(255,255,255,0.12)',
+        };
+    });
+
+    return (
+        <div className={`summary-ring-micro ${goodAtHigh ? 'is-positive' : 'is-alert'}`}>
+            <div className="summary-ring-glow" />
+            <svg className="summary-ring-svg" viewBox="0 0 220 220" preserveAspectRatio="xMidYMid meet">
+                {segments.map((segment) => (
+                    <line
+                        key={segment.id}
+                        x1={segment.x1}
+                        y1={segment.y1}
+                        x2={segment.x2}
+                        y2={segment.y2}
+                        stroke={segment.stroke}
+                        strokeWidth="6.6"
+                        strokeLinecap="round"
+                        opacity={segment.active ? 1 : 0.7}
+                    />
+                ))}
+            </svg>
+
+            <div className="summary-ring-center">
+                {symbol && <div className="summary-ring-inline-symbol">{symbol}</div>}
+                <div className="summary-ring-value-line">
+                    <span className="summary-ring-value">{data?.value}</span>
+                </div>
+                {trendText && <div className="summary-ring-trend summary-ring-trend-inline">{trendText}</div>}
+            </div>
+        </div>
+    );
 };
 
 const buildTimeSeries = (points = []) => {
@@ -147,7 +317,7 @@ const SignalScaleChart = ({ orientation = 'vertical', score = 50, goodAtHigh = t
                 {
                     type: 'bar',
                     data,
-                    barWidth: 4,
+                    barWidth: 6,
                     showBackground: false,
                 },
             ],
@@ -169,8 +339,8 @@ const SignalScaleChart = ({ orientation = 'vertical', score = 50, goodAtHigh = t
                 {
                     type: 'bar',
                     data,
-                    barWidth: 10,
-                    barCategoryGap: '38%',
+                    barWidth: 8,
+                    barCategoryGap: '18%',
                     showBackground: false,
                 },
             ],
@@ -342,3 +512,5 @@ export const UptimeStripMicro = ({ data }) => {
         </div>
     );
 };
+
+export { ArcSummaryMicro, RingSummaryMicro };

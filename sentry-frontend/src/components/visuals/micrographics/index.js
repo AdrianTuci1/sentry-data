@@ -16,6 +16,7 @@ export { default as ActivityHeatmap } from './ActivityHeatmap';
 export { default as CohortAnalysis } from './CohortAnalysis';
 export { default as PredictiveForecast } from './PredictiveForecast';
 export { default as FinancialBreakdown } from './FinancialBreakdown';
+export { default as HexDensityMap } from './HexDensityMap';
 export { default as TechnicalHealth } from './TechnicalHealth';
 export { default as AttributionModels } from './AttributionModels';
 export { default as MarketSentimentRadar } from './MarketSentimentRadar';
@@ -39,7 +40,7 @@ export { default as ChronoDial } from './ChronoDial';
 export { default as PulseCircle } from './PulseCircle';
 export { default as ScanningOrbit } from './ScanningOrbit';
 export { default as TrendSpotter } from './TrendSpotter';
-export { GaugePanelMicro, MetricTrendMicro, SignalScaleMicro, SparklineStatMicro, UptimeStripMicro } from './DashboardMicros';
+export { ArcSummaryMicro, GaugePanelMicro, MetricTrendMicro, RingSummaryMicro, SignalScaleMicro, SparklineStatMicro, UptimeStripMicro } from './DashboardMicros';
 
 
 // Simple/Shared Graphics

@@ -12,12 +12,13 @@ const MOST_RELEVANT_ORDER = {
     'attribution-models': 2,
     'data-scatter': 3,
     'sales-funnel': 4,
-    'creative-quadrant': 5,
-    'shapley-attribution': 6,
-    'financial-waterfall': 7,
-    'market-sentiment': 8,
-    'revenue-forecast': 9,
-    'romania-3d': 10,
+    'income-density': 5,
+    'creative-quadrant': 6,
+    'shapley-attribution': 7,
+    'financial-waterfall': 8,
+    'market-sentiment': 9,
+    'revenue-forecast': 10,
+    'romania-3d': 11,
 };
 
 const CLIENT_ORDER = {
@@ -27,10 +28,11 @@ const CLIENT_ORDER = {
     'market-sentiment': 4,
     'creative-quadrant': 5,
     'sales-funnel': 6,
-    'attribution-models': 7,
-    'data-scatter': 8,
-    'shapley-attribution': 9,
-    'trend-spotter': 10,
+    'income-density': 7,
+    'attribution-models': 8,
+    'data-scatter': 9,
+    'shapley-attribution': 10,
+    'trend-spotter': 11,
 };
 
 const getSortIndex = (widget, sortMode, fallbackIndex) => {

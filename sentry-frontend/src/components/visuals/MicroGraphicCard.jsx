@@ -53,8 +53,8 @@ const MicroGraphicCard = ({ data: initialData = {}, isExpanded, onClick }) => {
     const GraphicComponent = useMemo(() => resolveMicroGraphicComponent(data), [data]);
     const explorerPayload = getExplorerPayload(data);
     const spanClass = data.gridSpan && data.gridSpan !== 'default' ? data.gridSpan : '';
-    const editorialCardIds = new Set(['marketing-pclv', 'live-traffic', 'retention-cohorts']);
-    const immersiveEditorialCardIds = new Set(['marketing-pclv', 'retention-cohorts']);
+    const editorialCardIds = new Set(['marketing-pclv', 'live-traffic', 'retention-cohorts', 'income-density']);
+    const immersiveEditorialCardIds = new Set(['marketing-pclv', 'retention-cohorts', 'income-density']);
     const immersiveCardIds = new Set(['sales-funnel']);
     const visualClass = [
         data.type === '3d-map' ? 'map-bleed-card' : '',

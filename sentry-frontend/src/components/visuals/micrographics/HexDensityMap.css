@@ -1,0 +1,131 @@
+.hex-density-widget {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    color: #f7f7fb;
+}
+
+.hex-density-toolbar {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.28rem;
+}
+
+.hex-density-heading-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.hex-density-kicker {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.76);
+    letter-spacing: -0.02em;
+}
+
+.hex-density-menu {
+    color: rgba(118, 118, 132, 0.86);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hex-density-value-line {
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+}
+
+.hex-density-value-line strong {
+    font-size: clamp(2rem, 4vw, 2.55rem);
+    line-height: 0.94;
+    letter-spacing: -0.09em;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.hex-density-delta {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #22f7a8;
+    letter-spacing: -0.01em;
+}
+
+.hex-density-compare {
+    color: rgba(151, 148, 164, 0.78);
+    font-size: 0.72rem;
+    line-height: 1.4;
+}
+
+.hex-density-map-shell {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 -0.7rem -0.7rem;
+}
+
+.hex-density-map-shell::before {
+    content: '';
+    position: absolute;
+    inset: 16% 18% 12%;
+    background:
+        radial-gradient(circle at 50% 46%, rgba(255, 201, 42, 0.16), transparent 18%),
+        radial-gradient(circle at 52% 48%, rgba(255, 42, 10, 0.16), transparent 26%),
+        radial-gradient(circle at 50% 50%, rgba(123, 58, 160, 0.16), transparent 40%);
+    filter: blur(30px);
+    pointer-events: none;
+}
+
+.hex-density-map {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.hex-density-glow {
+    fill: url(#hex-density-core-glow);
+    filter: blur(16px);
+    opacity: 0.9;
+}
+
+.hex-density-cell {
+    stroke: #07080f;
+    stroke-width: 2.2;
+    stroke-linejoin: round;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.hex-density-cell.is-detached {
+    opacity: 0.8;
+}
+
+@media (max-width: 600px) {
+    .hex-density-widget {
+        gap: 0.65rem;
+    }
+
+    .hex-density-kicker {
+        font-size: 0.76rem;
+    }
+
+    .hex-density-value-line strong {
+        font-size: 1.85rem;
+    }
+
+    .hex-density-map-shell {
+        margin: 0 -0.55rem -0.55rem;
+    }
+}

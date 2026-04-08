@@ -693,6 +693,21 @@
         }
     },
     {
+        "id": "income-density",
+        "type": "hex-density-map",
+        "title": "Income Density",
+        "subtitle": "Revenue concentration by account clusters",
+        "colorTheme": "theme-revenue",
+        "gridSpan": "default",
+        "description": "Hexagonal revenue density showing where expansion and renewal income concentrates across active customer cohorts.",
+        "data": {
+            "summaryLabel": "Income",
+            "summaryValue": "$32,134",
+            "summaryDelta": "+2.5%",
+            "summaryCompare": "Compared to $21,340 last month"
+        }
+    },
+    {
         "id": "revenue-forecast",
         "type": "predictive",
         "title": "ARR Forecast",

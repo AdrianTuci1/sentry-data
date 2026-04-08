@@ -7,11 +7,50 @@
     justify-content: space-between;
     cursor: pointer;
     overflow: hidden;
+    isolation: isolate;
     color: #fff;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.34);
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease, border-color 0.3s ease;
     height: 280px;
     padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background-color: #050506;
+}
+
+.micro-card::before,
+.micro-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+.micro-card::before {
+    padding: 1px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.04) 38%, rgba(255, 255, 255, 0.08));
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.95;
+    z-index: 0;
+}
+
+.micro-card::after {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 24%),
+        radial-gradient(circle at 14% 10%, rgba(126, 255, 188, 0.08), transparent 24%);
+    z-index: 0;
+}
+
+.micro-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.42);
 }
 
 
@@ -88,6 +127,7 @@
     cursor: default;
     transform: none;
     z-index: 10;
+    box-shadow: 0 22px 52px rgba(0, 0, 0, 0.4);
 }
 
 .micro-card.expanded.row-span-2 {
@@ -104,35 +144,51 @@
 
 /* Themes matching the Image */
 .theme-weather {
-    background: radial-gradient(circle at center, #8a0c28 0%, #30040e 45%, #050102 100%);
+    background:
+        radial-gradient(circle at 18% 16%, rgba(255, 184, 204, 0.08), transparent 28%),
+        radial-gradient(circle at center, #8a0c28 0%, #30040e 45%, #050102 100%);
 }
 
 .theme-natural {
-    background: radial-gradient(circle at center, #3d5a1e 0%, #1a270d 45%, #050802 100%);
+    background:
+        radial-gradient(circle at 18% 16%, rgba(180, 255, 198, 0.08), transparent 28%),
+        radial-gradient(circle at center, #3d5a1e 0%, #1a270d 45%, #050802 100%);
 }
 
 .theme-light {
-    background: radial-gradient(circle at center, #63452c 0%, #2b1d12 45%, #080503 100%);
+    background:
+        radial-gradient(circle at 18% 16%, rgba(255, 224, 194, 0.08), transparent 28%),
+        radial-gradient(circle at center, #63452c 0%, #2b1d12 45%, #080503 100%);
 }
 
 .theme-color {
-    background: radial-gradient(circle at center, #1b4d3e 0%, #0d251d 45%, #030806 100%);
+    background:
+        radial-gradient(circle at 18% 16%, rgba(180, 255, 218, 0.08), transparent 28%),
+        radial-gradient(circle at center, #1b4d3e 0%, #0d251d 45%, #030806 100%);
 }
 
 .theme-red {
-    background: radial-gradient(circle at center, #7a1b1b 0%, #350c0c 45%, #0a0202 100%);
+    background:
+        radial-gradient(circle at 18% 16%, rgba(255, 204, 204, 0.08), transparent 28%),
+        radial-gradient(circle at center, #7a1b1b 0%, #350c0c 45%, #0a0202 100%);
 }
 
 .theme-productivity {
-    background: radial-gradient(circle at center, #0f1c42 0%, #070d1f 45%, #010206 100%);
+    background:
+        radial-gradient(circle at 18% 16%, rgba(196, 218, 255, 0.08), transparent 28%),
+        radial-gradient(circle at center, #0f1c42 0%, #070d1f 45%, #010206 100%);
 }
 
 .theme-audience {
-    background: radial-gradient(circle at center, #1a1c26 0%, #0d0e13 45%, #020204 100%);
+    background:
+        radial-gradient(circle at 18% 16%, rgba(218, 220, 255, 0.08), transparent 28%),
+        radial-gradient(circle at center, #1a1c26 0%, #0d0e13 45%, #020204 100%);
 }
 
 .theme-revenue {
-    background: radial-gradient(circle at center, #351523 0%, #1a0a11 45%, #040102 100%);
+    background:
+        radial-gradient(circle at 18% 16%, rgba(255, 198, 214, 0.08), transparent 28%),
+        radial-gradient(circle at center, #351523 0%, #1a0a11 45%, #040102 100%);
 }
 
 /* Headers */
@@ -178,8 +234,10 @@
 }
 
 .micro-card.editorial-card {
-    background: linear-gradient(180deg, #020202 0%, #060606 100%);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background:
+        radial-gradient(circle at 16% 18%, rgba(76, 206, 138, 0.12), transparent 32%),
+        radial-gradient(circle at 74% 36%, rgba(222, 66, 138, 0.14), transparent 34%),
+        linear-gradient(180deg, #020202 0%, #060606 100%);
 }
 
 .micro-card.compact-editorial-card {
@@ -189,8 +247,11 @@
 
 .micro-card.funnel-hero-card {
     padding: 0;
-    background: linear-gradient(180deg, #020202 0%, #060707 100%);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background:
+        radial-gradient(circle at 16% 16%, rgba(76, 206, 138, 0.12), transparent 32%),
+        radial-gradient(circle at 48% 58%, rgba(26, 83, 188, 0.34), transparent 42%),
+        radial-gradient(circle at 78% 52%, rgba(37, 189, 159, 0.15), transparent 28%),
+        linear-gradient(180deg, #020202 0%, #050506 100%);
 }
 
 .micro-card.map-bleed-card .micro-card-header {
@@ -224,16 +285,16 @@
     justify-content: stretch;
 }
 
-.micro-card.editorial-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
+.micro-card.editorial-card::after {
     background:
-        radial-gradient(circle at top right, rgba(114, 255, 144, 0.08), transparent 24%),
-        radial-gradient(circle at bottom left, rgba(63, 216, 255, 0.08), transparent 28%);
-    opacity: 0.68;
-    pointer-events: none;
-    transition: none;
+        linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 26%),
+        radial-gradient(circle at 15% 8%, rgba(126, 255, 188, 0.08), transparent 22%);
+}
+
+.micro-card.funnel-hero-card::after {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 24%),
+        radial-gradient(circle at 12% 10%, rgba(126, 255, 188, 0.08), transparent 24%);
 }
 
 .micro-card.map-bleed-card .micro-card-body > * {
@@ -304,7 +365,9 @@
     display: flex;
     flex-direction: column;
     padding: 0.5rem;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.045);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
     border-radius: 12px;
     overflow: hidden;
 }
@@ -362,23 +425,27 @@
     top: 1rem;
     right: 1rem;
     opacity: 0;
-    transition: opacity 0.2s;
-    background: rgba(255, 255, 255, 0.1);
+    transition: opacity 0.2s, transform 0.2s ease, background 0.2s ease;
+    background: rgba(8, 8, 10, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     padding: 6px;
     border-radius: 50%;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(8px);
     display: flex;
+    transform: translateY(2px);
 }
 
 .micro-card:hover .expand-indicator {
     opacity: 1;
+    transform: translateY(0);
 }
 
 .close-indicator {
     position: absolute;
     top: 1.25rem;
     right: 1.25rem;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(8, 8, 10, 0.78);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     padding: 8px;
     border-radius: 50%;
     backdrop-filter: blur(8px);
@@ -389,7 +456,15 @@
 }
 
 .close-indicator:hover {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(18, 18, 22, 0.92);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .micro-card,
+    .expand-indicator,
+    .close-indicator {
+        transition: none;
+    }
 }
 
 /* ========================================================================= */

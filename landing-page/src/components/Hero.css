@@ -119,6 +119,26 @@
   overflow: visible;
 }
 
+.hero-card-entrance {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0) scale(0.985);
+  animation: heroCardFadeIn 760ms cubic-bezier(0.2, 0.9, 0.22, 1) forwards;
+  animation-delay: var(--hero-card-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+@keyframes heroCardFadeIn {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 22px, 0) scale(0.98);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
 .hero-card-sessions {
   top: 0;
   left: 300px;
@@ -265,5 +285,13 @@
   .hero-card-creative {
     grid-column: 1 / 2;
     grid-row: 2 / 3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-card-entrance {
+    opacity: 1;
+    transform: none;
+    animation: none;
   }
 }

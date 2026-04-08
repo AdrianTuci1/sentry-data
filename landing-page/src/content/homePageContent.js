@@ -18,7 +18,7 @@ export const pipelineFlowContent = {
   },
   title: 'We take raw data and give you immediate decisions.',
   description:
-    'We clean the inputs, preserve the context, and turn the result into outputs your team can use immediately.',
+    'Our high-performance neural engine creates a virtual projection of your cleaned data, so your team gets decision-ready outputs without relying on classic ETL pipelines.',
   inputs: [
     'Ad spend, campaign, and channel data',
     'Orders, revenue, and refund events',

@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import './HeroMicroWidgets.css'
 
 const formatNumber = (value) => new Intl.NumberFormat('en-US').format(Math.round(value))
+const parseMetricNumber = (value) => Number.parseFloat(String(value).replace(/,/g, ''))
 
 const CARD_DIMENSIONS = {
   wide: { width: 496, height: 280 },
@@ -80,12 +81,43 @@ const technicalHealthCard = {
   },
 }
 
-function useCountUp(target, duration = 1400) {
+function easeCountUp(progress) {
+  if (progress <= 0) {
+    return 0
+  }
+
+  if (progress >= 1) {
+    return 1
+  }
+
+  if (progress < 0.62) {
+    const fastPhase = progress / 0.62
+    return 0.84 * (1 - (1 - fastPhase) ** 2.5)
+  }
+
+  if (progress < 0.9) {
+    const settlePhase = (progress - 0.62) / 0.28
+    return 0.84 + 0.12 * (1 - (1 - settlePhase) ** 1.8)
+  }
+
+  const tailPhase = (progress - 0.9) / 0.1
+  return 0.96 + 0.04 * tailPhase ** 3.6
+}
+
+function useCountUp(target, options = {}) {
+  const {
+    duration = 1400,
+    delay = 0,
+    start = 0,
+  } = typeof options === 'number' ? { duration: options } : options
   const [value, setValue] = useState(0)
 
   useEffect(() => {
     let frameId = 0
     let startTime = 0
+    let delayTimeout = 0
+
+    setValue(start)
 
     const tick = (timestamp) => {
       if (!startTime) {
@@ -93,10 +125,61 @@ function useCountUp(target, duration = 1400) {
       }
 
       const progress = Math.min((timestamp - startTime) / duration, 1)
-      const eased = 1 - (1 - progress) ** 3
-      setValue(target * eased)
+      const eased = easeCountUp(progress)
+      setValue(start + (target - start) * eased)
 
       if (progress < 1) {
+        frameId = window.requestAnimationFrame(tick)
+      }
+    }
+
+    delayTimeout = window.setTimeout(() => {
+      frameId = window.requestAnimationFrame(tick)
+    }, delay)
+
+    return () => {
+      window.clearTimeout(delayTimeout)
+      window.cancelAnimationFrame(frameId)
+    }
+  }, [delay, duration, start, target])
+
+  return value
+}
+
+function useCountUpSeries(configs) {
+  const [values, setValues] = useState(() => configs.map((config) => config.start ?? 0))
+
+  useEffect(() => {
+    let frameId = 0
+    let animationStart = 0
+
+    setValues(configs.map((config) => config.start))
+
+    const totalDuration = configs.reduce(
+      (maxDuration, config) => Math.max(maxDuration, config.delay + config.duration),
+      0,
+    )
+
+    const tick = (timestamp) => {
+      if (!animationStart) {
+        animationStart = timestamp
+      }
+
+      const elapsed = timestamp - animationStart
+
+      setValues(
+        configs.map((config) => {
+          if (elapsed <= config.delay) {
+            return config.start
+          }
+
+          const progress = Math.min((elapsed - config.delay) / config.duration, 1)
+          const eased = easeCountUp(progress)
+          return config.start + (config.target - config.start) * eased
+        }),
+      )
+
+      if (elapsed < totalDuration) {
         frameId = window.requestAnimationFrame(tick)
       }
     }
@@ -106,9 +189,9 @@ function useCountUp(target, duration = 1400) {
     return () => {
       window.cancelAnimationFrame(frameId)
     }
-  }, [target, duration])
+  }, [configs])
 
-  return value
+  return values
 }
 
 function useSequentialReveal(total, stepMs = 38, initialDelay = 120) {
@@ -150,15 +233,11 @@ function useSequentialReveal(total, stepMs = 38, initialDelay = 120) {
 
 function buildLinePath(values, width, height, padding, domain = {}, slotCount = values.length) {
   const innerWidth = width - padding.left - padding.right
-  const innerHeight = height - padding.top - padding.bottom
-  const min = Number.isFinite(domain.min) ? domain.min : Math.min(...values)
-  const max = Number.isFinite(domain.max) ? domain.max : Math.max(...values)
-  const range = Math.max(1, max - min)
   const steps = Math.max(1, slotCount - 1)
 
   const points = values.map((value, index) => {
     const x = padding.left + (innerWidth / steps) * index
-    const y = padding.top + innerHeight - ((value - min) / range) * innerHeight
+    const y = getChartY(value, height, padding, domain)
     return [x, y]
   })
 
@@ -167,6 +246,14 @@ function buildLinePath(values, width, height, padding, domain = {}, slotCount = 
     .join(' ')
 
   return { path, points }
+}
+
+function getChartY(value, height, padding, domain = {}) {
+  const innerHeight = height - padding.top - padding.bottom
+  const min = Number.isFinite(domain.min) ? domain.min : value
+  const max = Number.isFinite(domain.max) ? domain.max : value
+  const range = Math.max(1, max - min)
+  return padding.top + innerHeight - ((value - min) / range) * innerHeight
 }
 
 function buildPartialLine(points, progress) {
@@ -244,15 +331,15 @@ function tracePath(ctx, points, width, height, moveToFirst = true) {
 const funnelEnvelopes = [
   {
     stops: ['rgba(43, 17, 74, 0.2)', 'rgba(76, 52, 186, 0.86)', 'rgba(87, 41, 149, 0.98)'],
-    halfWidths: [0.045, 0.05, 0.19, 0.19, 0.325, 0.325],
+    halfWidths: [0.325, 0.325, 0.19, 0.19, 0.05, 0.045],
   },
   {
     stops: ['rgba(37, 48, 116, 0.18)', 'rgba(65, 95, 233, 0.92)', 'rgba(73, 91, 200, 0.94)'],
-    halfWidths: [0.026, 0.03, 0.115, 0.115, 0.19, 0.19],
+    halfWidths: [0.19, 0.19, 0.115, 0.115, 0.03, 0.026],
   },
   {
     stops: ['rgba(18, 238, 183, 0.18)', 'rgba(49, 202, 216, 0.92)', 'rgba(45, 248, 156, 1)'],
-    halfWidths: [0.012, 0.016, 0.06, 0.06, 0.096, 0.096],
+    halfWidths: [0.096, 0.096, 0.06, 0.06, 0.016, 0.012],
   },
 ]
 
@@ -444,6 +531,28 @@ function PeakEngagementMicro({ data }) {
   }))
   const calendarCells = [...leadingDays, ...days, ...trailingDays]
   const revealedCount = useSequentialReveal(calendarCells.length, 36, 140)
+  const summaryValueConfigs = useMemo(
+    () =>
+      summaryCards.map((card, index) => ({
+        target: parseMetricNumber(card.value),
+        duration: 1440 + index * 140,
+        delay: 880 + index * 180,
+        start: 1200 + index * 320,
+      })),
+    [summaryCards],
+  )
+  const marketValueConfigs = useMemo(
+    () =>
+      marketBreakdown.map((market, index) => ({
+        target: parseMetricNumber(market.value),
+        duration: 1380 + index * 110,
+        delay: 1160 + index * 120,
+        start: 24000 + index * 6000,
+      })),
+    [marketBreakdown],
+  )
+  const animatedSummaryValues = useCountUpSeries(summaryValueConfigs)
+  const animatedMarketValues = useCountUpSeries(marketValueConfigs)
 
   return (
     <div className="optimal-time-widget">
@@ -473,7 +582,7 @@ function PeakEngagementMicro({ data }) {
       </div>
 
       <div className="optimal-time-summary">
-        {summaryCards.map((card) => (
+        {summaryCards.map((card, index) => (
           <section key={card.id} className="optimal-time-summary-card">
             <div className="optimal-time-summary-label">
               <span className="optimal-time-summary-icon">
@@ -482,7 +591,9 @@ function PeakEngagementMicro({ data }) {
               <span>{card.label}</span>
             </div>
 
-            <div className="optimal-time-summary-value">{card.value}</div>
+            <div className="optimal-time-summary-value">
+              {formatNumber(animatedSummaryValues[index])}
+            </div>
 
             <div className="optimal-time-summary-meta">
               <span className={`optimal-time-delta optimal-time-delta-${card.tone || 'positive'}`}>
@@ -495,10 +606,12 @@ function PeakEngagementMicro({ data }) {
       </div>
 
       <div className="optimal-time-market-list">
-        {marketBreakdown.map((market) => (
+        {marketBreakdown.map((market, index) => (
           <div key={market.label} className="optimal-time-market-row">
             <span>{market.label}</span>
-            <strong>{market.value}</strong>
+            <strong>
+              {formatNumber(animatedMarketValues[index])}
+            </strong>
           </div>
         ))}
       </div>
@@ -517,26 +630,30 @@ function HeroCardFrame({ variant, children }) {
 }
 
 function HeroLiveTrafficWidget() {
-  const lineFinalValues = useMemo(() => [182, 244, 316, 428], [])
-  const lineStartValues = useMemo(() => [34, 68, 104, 146], [])
-  const activeTarget = lineFinalValues[lineFinalValues.length - 1]
-  const peakTarget = 506
+  const chartWidth = 420
+  const chartHeight = 190
+  const chartPadding = useMemo(() => ({ top: 14, right: 28, bottom: 18, left: 42 }), [])
+  const chartDomain = useMemo(() => ({ min: 100, max: 700 }), [])
+  const gridValues = useMemo(() => [100, 200, 300, 400, 500, 600, 700], [])
+  const lineFinalValues = useMemo(() => [286, 312, 392, 378, 458, 392, 448, 462], [])
+  const lineStartValues = useMemo(() => [118, 146, 172, 184, 228, 264, 304, 338], [])
+  const peakTarget = 598
   const [lineValues, setLineValues] = useState(lineStartValues)
   const [drawProgress, setDrawProgress] = useState(0)
-  const animatedActive = useCountUp(activeTarget, 1050)
-  const animatedPeak = useCountUp(peakTarget, 1250)
+  const animatedPeak = useCountUp(peakTarget, { duration: 1320, delay: 260, start: 64 })
   const chart = useMemo(
     () => buildLinePath(
       lineValues,
-      420,
-      180,
-      { top: 16, right: 24, bottom: 28, left: 24 },
-      { min: 0, max: peakTarget * 1.08 },
-      5,
+      chartWidth,
+      chartHeight,
+      chartPadding,
+      chartDomain,
+      13,
     ),
-    [lineValues, peakTarget],
+    [chartDomain, chartHeight, chartPadding, chartWidth, lineValues],
   )
   const renderedLine = useMemo(() => buildPartialLine(chart.points, drawProgress), [chart.points, drawProgress])
+  const activeMarkerThreshold = drawProgress * Math.max(0, chart.points.length - 1)
   const focusPoint = renderedLine.point
   const tagLabel = `${formatNumber(interpolateSeriesValue(lineValues, drawProgress))} live`
 
@@ -570,19 +687,10 @@ function HeroLiveTrafficWidget() {
     <div className="hero-widget hero-widget-live">
       <div className="hero-live-top">
         <div className="hero-widget-header">
-          <span className="hero-widget-kicker">Live Traffic</span>
+          <span className="hero-widget-kicker hero-live-title">Live Traffic</span>
         </div>
 
-        <div className="hero-live-metrics hero-live-metrics-top">
-          <section className="hero-live-metric-card">
-            <div className="hero-live-metric-label">Active now</div>
-            <div className="hero-live-metric-value">{formatNumber(animatedActive)}</div>
-            <div className="hero-live-metric-meta">
-              <span className="hero-live-metric-delta">+7.0%</span>
-              <span className="hero-live-metric-note">users online</span>
-            </div>
-          </section>
-
+        <div className="hero-live-metrics">
           <section className="hero-live-metric-card">
             <div className="hero-live-metric-label">Peak today</div>
             <div className="hero-live-metric-value">{formatNumber(animatedPeak)}</div>
@@ -596,33 +704,58 @@ function HeroLiveTrafficWidget() {
 
       <div className="hero-live-chart-shell">
         <div className="hero-live-glow" />
-        <svg className="hero-live-chart" viewBox="0 0 420 180" preserveAspectRatio="none">
+        <svg className="hero-live-chart" viewBox={`0 0 ${chartWidth} ${chartHeight}`} preserveAspectRatio="none">
           <defs>
             <linearGradient id="hero-live-line" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#ef8b43" />
-              <stop offset="100%" stopColor="#db3e93" />
+              <stop offset="54%" stopColor="#ef4f7f" />
+              <stop offset="100%" stopColor="#d94fca" />
             </linearGradient>
+            <radialGradient id="hero-live-point-glow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="rgba(255,255,255,0.95)" />
+              <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+            </radialGradient>
           </defs>
-          {[32, 76, 120, 164].map((y) => (
-            <line
-              key={y}
-              x1="24"
-              x2="396"
-              y1={y}
-              y2={y}
-              className="hero-live-grid-line"
-            />
-          ))}
+          {gridValues.map((value) => {
+            const y = getChartY(value, chartHeight, chartPadding, chartDomain)
+
+            return (
+              <g key={value}>
+                <text x="0" y={y + 4} className="hero-live-axis-label">{value}</text>
+                <line
+                  x1={chartPadding.left}
+                  x2={chartWidth - chartPadding.right}
+                  y1={y}
+                  y2={y}
+                  className="hero-live-grid-line"
+                />
+              </g>
+            )
+          })}
           <path d={renderedLine.path} className="hero-live-line-shadow" />
           <path d={renderedLine.path} className="hero-live-line" />
+          {chart.points.map(([x, y], index) => {
+            const isVisible = activeMarkerThreshold >= index - 0.06
+
+            return (
+              <g
+                key={`${x}-${y}`}
+                className={`hero-live-point ${isVisible ? 'is-visible' : ''}`}
+                style={{ opacity: isVisible ? 1 : 0.18 }}
+              >
+                <circle cx={x} cy={y} r="7" className="hero-live-point-halo" />
+                <circle cx={x} cy={y} r="3.2" className="hero-live-point-dot" />
+              </g>
+            )
+          })}
           <circle cx={focusPoint[0]} cy={focusPoint[1]} r="10" className="hero-live-highlight-ring" />
           <circle cx={focusPoint[0]} cy={focusPoint[1]} r="4" className="hero-live-highlight-core" />
         </svg>
         <div
           className="hero-live-tag"
           style={{
-            left: `${(focusPoint[0] / 420) * 100}%`,
-            top: `${(focusPoint[1] / 180) * 100}%`,
+            left: `${(focusPoint[0] / chartWidth) * 100}%`,
+            top: `${(focusPoint[1] / chartHeight) * 100}%`,
           }}
         >
           {tagLabel}
@@ -645,7 +778,7 @@ function HeroSalesFunnelWidget() {
       { top: 'Purchase', metric: '12%', position: 0.756 },
     ],
   }
-  const revenue = useCountUp(funnelState.revenue, 1000)
+  const revenue = useCountUp(funnelState.revenue, { duration: 1160, delay: 420, start: 1200 })
 
   useLayoutEffect(() => {
     const stage = stageRef.current
@@ -750,7 +883,11 @@ function HeroOptimalTimeWidget() {
 }
 
 function HeroRefreshCycleWidget() {
-  const animatedScore = useCountUp(Number.parseInt(refreshCycleCard.data.value, 10), 1100)
+  const animatedScore = useCountUp(Number.parseInt(refreshCycleCard.data.value, 10), {
+    duration: 980,
+    delay: 620,
+    start: 12,
+  })
 
   return (
     <div className="micro-card theme-color">
@@ -774,7 +911,11 @@ function HeroRefreshCycleWidget() {
 }
 
 function HeroTechnicalHealthWidget() {
-  const animatedUptime = useCountUp(Number.parseFloat(technicalHealthCard.data.value), 1200)
+  const animatedUptime = useCountUp(Number.parseFloat(technicalHealthCard.data.value), {
+    duration: 1520,
+    delay: 820,
+    start: 97.2,
+  })
 
   return (
     <div className="micro-card theme-weather">
@@ -797,27 +938,27 @@ function HeroTechnicalHealthWidget() {
 export function HeroMicroWidgets() {
   return (
     <>
-      <div className="hero-card hero-card-sessions">
+      <div className="hero-card hero-card-sessions hero-card-entrance" style={{ '--hero-card-delay': '40ms' }}>
         <HeroCardFrame variant="wide">
           <HeroLiveTrafficWidget />
         </HeroCardFrame>
       </div>
-      <div className="hero-card hero-card-funnel">
+      <div className="hero-card hero-card-funnel hero-card-entrance" style={{ '--hero-card-delay': '180ms' }}>
         <HeroCardFrame variant="wide">
           <HeroSalesFunnelWidget />
         </HeroCardFrame>
       </div>
-      <div className="hero-card hero-card-activity">
+      <div className="hero-card hero-card-activity hero-card-entrance" style={{ '--hero-card-delay': '320ms' }}>
         <HeroCardFrame variant="tall">
           <HeroOptimalTimeWidget />
         </HeroCardFrame>
       </div>
-      <div className="hero-card hero-card-infra">
+      <div className="hero-card hero-card-infra hero-card-entrance" style={{ '--hero-card-delay': '520ms' }}>
         <HeroCardFrame variant="small">
           <HeroRefreshCycleWidget />
         </HeroCardFrame>
       </div>
-      <div className="hero-card hero-card-creative">
+      <div className="hero-card hero-card-creative hero-card-entrance" style={{ '--hero-card-delay': '700ms' }}>
         <HeroCardFrame variant="small">
           <HeroTechnicalHealthWidget />
         </HeroCardFrame>

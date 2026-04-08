@@ -15,11 +15,14 @@
 }
 
 .hero-widget {
+  position: relative;
   width: 100%;
   height: 100%;
   min-height: 0;
   padding: 1.5rem;
   border-radius: 24px;
+  overflow: hidden;
+  isolation: isolate;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   color: #f6f7fb;
 }
@@ -56,31 +59,45 @@
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
-  background: linear-gradient(180deg, #020202 0%, #060606 100%);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background:
+    radial-gradient(circle at 16% 18%, rgba(76, 206, 138, 0.12), transparent 32%),
+    radial-gradient(circle at 74% 36%, rgba(222, 66, 138, 0.14), transparent 34%),
+    linear-gradient(180deg, #020202 0%, #060606 100%);
 }
 
 .hero-live-top {
+  position: relative;
+  z-index: 1;
   display: grid;
-  grid-template-columns: minmax(0, 0.6fr) minmax(0, 1.4fr);
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
   align-items: start;
   gap: 1rem;
 }
 
+.hero-live-title {
+  margin-bottom: 0;
+  font-size: clamp(0.92rem, 1.3vw, 1.08rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.9);
+}
+
 .hero-live-chart-shell {
   position: relative;
+  z-index: 1;
   flex: 1;
   min-height: 9rem;
-  padding-top: 0.35rem;
+  padding-top: 0.45rem;
 }
 
 .hero-live-glow {
   position: absolute;
-  inset: 18% 15% 18% 18%;
+  inset: 14% 9% 14% 14%;
   background:
-    radial-gradient(circle at 18% 62%, rgba(245, 117, 36, 0.26), transparent 26%),
-    radial-gradient(circle at 66% 34%, rgba(213, 49, 132, 0.28), transparent 22%);
-  filter: blur(20px);
+    radial-gradient(circle at 18% 66%, rgba(245, 117, 36, 0.24), transparent 22%),
+    radial-gradient(circle at 54% 38%, rgba(229, 63, 122, 0.26), transparent 18%),
+    radial-gradient(circle at 82% 28%, rgba(213, 79, 202, 0.22), transparent 20%);
+  filter: blur(24px);
   pointer-events: none;
 }
 
@@ -92,34 +109,58 @@
 }
 
 .hero-live-grid-line {
-  stroke: rgba(255, 255, 255, 0.14);
-  stroke-width: 1;
+  stroke: rgba(255, 255, 255, 0.16);
+  stroke-width: 1.1;
+}
+
+.hero-live-axis-label {
+  fill: rgba(255, 255, 255, 0.56);
+  font: 600 10.5px "JetBrains Mono", "SFMono-Regular", monospace;
+  letter-spacing: 0.05em;
 }
 
 .hero-live-line-shadow {
   fill: none;
-  stroke: rgba(242, 94, 120, 0.22);
-  stroke-width: 12;
+  stroke: rgba(242, 94, 120, 0.16);
+  stroke-width: 8;
   stroke-linecap: round;
   stroke-linejoin: round;
+  filter: blur(1px);
 }
 
 .hero-live-line {
   fill: none;
   stroke: url(#hero-live-line);
-  stroke-width: 6;
+  stroke-width: 3.6;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.hero-live-point {
+  transition: opacity 220ms ease;
+}
+
+.hero-live-point-halo {
+  fill: url(#hero-live-point-glow);
+  opacity: 0.5;
+}
+
+.hero-live-point-dot {
+  fill: #08080a;
+  stroke: url(#hero-live-line);
+  stroke-width: 1.8;
 }
 
 .hero-live-highlight-ring {
   fill: #090909;
   stroke: url(#hero-live-line);
-  stroke-width: 7;
+  stroke-width: 5;
 }
 
 .hero-live-highlight-core {
   fill: #090909;
+  stroke: rgba(255, 255, 255, 0.92);
+  stroke-width: 1.4;
 }
 
 .hero-live-tag {
@@ -134,6 +175,7 @@
   letter-spacing: 0.04em;
   white-space: nowrap;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(10px);
 }
 
 .hero-live-metrics {
@@ -142,14 +184,11 @@
   align-content: start;
 }
 
-.hero-live-metrics-top {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
 .hero-live-metric-card {
   display: flex;
   flex-direction: column;
   gap: 0.16rem;
+  align-items: flex-start;
 }
 
 .hero-live-metric-label {
@@ -187,23 +226,27 @@
   grid-template-rows: auto minmax(0, 1fr);
   padding: 0;
   background:
-    radial-gradient(circle at 46% 58%, rgba(26, 83, 188, 0.5), transparent 42%),
-    radial-gradient(circle at 78% 52%, rgba(37, 189, 159, 0.18), transparent 28%),
+    radial-gradient(circle at 16% 16%, rgba(76, 206, 138, 0.12), transparent 32%),
+    radial-gradient(circle at 48% 58%, rgba(26, 83, 188, 0.34), transparent 42%),
+    radial-gradient(circle at 78% 52%, rgba(37, 189, 159, 0.15), transparent 28%),
     linear-gradient(180deg, #020202 0%, #050506 100%);
-  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .hero-funnel-summary {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  padding: 1rem 1.15rem 0;
+  padding: 1rem 1.15rem 0.15rem;
 }
 
 .hero-funnel-kicker {
-  font-size: 0.72rem;
+  font-size: 0.66rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.92);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.52);
 }
 
 .hero-funnel-value-line {
@@ -233,10 +276,16 @@
 
 .hero-funnel-stage {
   position: relative;
+  z-index: 1;
   min-height: 0;
-  margin: 0.2rem 0.3rem 0.4rem;
+  margin: 0.25rem 0.35rem 0.4rem;
   padding: 1.8rem 0.6rem 1.65rem;
   overflow: hidden;
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015)),
+    linear-gradient(180deg, rgba(2, 5, 12, 0.52), rgba(2, 4, 10, 0.14));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .hero-funnel-visual {
@@ -268,9 +317,9 @@
   top: 1.8rem;
   bottom: 1.65rem;
   left: 50%;
-  width: 2px;
+  width: 1.5px;
   transform: translateX(-50%);
-  background: #09090a;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.08));
 }
 
 .hero-funnel-pill {
@@ -281,7 +330,8 @@
   padding: 0 0.72rem;
   border-radius: 999px;
   transform: translateX(-50%);
-  background: #030303;
+  background: rgba(3, 3, 3, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   color: #f7f7fb;
   display: inline-flex;
   align-items: center;
@@ -289,6 +339,49 @@
   font: 700 0.66rem "JetBrains Mono", "SFMono-Regular", monospace;
   letter-spacing: 0.08em;
   white-space: nowrap;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+.hero-widget-live::before,
+.hero-widget-funnel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04) 38%, rgba(255, 255, 255, 0.08));
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+.hero-widget-live::after,
+.hero-widget-funnel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero-widget-live::after {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 26%),
+    radial-gradient(circle at 15% 8%, rgba(126, 255, 188, 0.08), transparent 22%);
+}
+
+.hero-widget-funnel::after {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 24%),
+    radial-gradient(circle at 12% 10%, rgba(126, 255, 188, 0.08), transparent 24%);
 }
 
 .hero-funnel-pill-top {
