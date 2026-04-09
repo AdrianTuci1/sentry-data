@@ -1,5 +1,1 @@
-export {
-    createParrotRuntimeMock,
-    createParrotRuntimeMockPlaybackStep,
-    getParrotRuntimeMockPlaybackStages
-} from './data/parrotRuntimeMockData';
+export { createParrotRuntimeMock } from './data/parrotRuntimeMockData';

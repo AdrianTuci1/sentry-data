@@ -3,8 +3,7 @@ import Editor from '@monaco-editor/react';
 import { useLocation } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../store/StoreProvider';
-import { BrainCircuit, Play, X } from 'lucide-react';
-import { createParrotRuntimeMock, createParrotRuntimeMockPlaybackStep, getParrotRuntimeMockPlaybackStages } from '../../mocks/parrotRuntimeMock';
+import { BrainCircuit, X } from 'lucide-react';
 import FeatureMindMap from './FeatureMindMap';
 import Insights from './Insights';
 import MindMapInspectorPanel from './MindMapInspectorPanel';
@@ -133,10 +132,6 @@ const Workspace = observer(({ viewState = 'engineering' }) => {
     const location = useLocation();
     const { workspaceStore } = useStore();
     const { ui, data, editor } = workspaceStore;
-    const [playbackState, setPlaybackState] = useState({
-        isRunning: false,
-        stageIndex: getParrotRuntimeMockPlaybackStages().length - 1
-    });
 
     // Destructure from sub-stores
     const {
@@ -184,54 +179,6 @@ const Workspace = observer(({ viewState = 'engineering' }) => {
             document.documentElement.style.overflow = previousHtmlOverflow;
         };
     }, [editor.isOpen]);
-
-    useEffect(() => {
-        if (!playbackState.isRunning) {
-            return undefined;
-        }
-
-        const stages = getParrotRuntimeMockPlaybackStages();
-        const currentProjectId = workspaceStore.projectStore.currentProjectId || 'parrot-demo';
-
-        if (playbackState.stageIndex >= stages.length - 1) {
-            setPlaybackState({
-                isRunning: false,
-                stageIndex: stages.length - 1
-            });
-            return undefined;
-        }
-
-        const timeoutId = window.setTimeout(() => {
-            const nextStageIndex = playbackState.stageIndex + 1;
-            workspaceStore.data.setData(createParrotRuntimeMockPlaybackStep(currentProjectId, nextStageIndex));
-            setPlaybackState({
-                isRunning: nextStageIndex < stages.length - 1,
-                stageIndex: nextStageIndex
-            });
-        }, stages[playbackState.stageIndex].durationMs);
-
-        return () => window.clearTimeout(timeoutId);
-    }, [playbackState, workspaceStore]);
-
-    const startDiscoveryPlayback = () => {
-        const currentProjectId = workspaceStore.projectStore.currentProjectId || 'parrot-demo';
-        workspaceStore.data.setData(createParrotRuntimeMockPlaybackStep(currentProjectId, 0));
-        setPlaybackState({
-            isRunning: true,
-            stageIndex: 0
-        });
-    };
-
-    const resetDiscoveryPlayback = () => {
-        const currentProjectId = workspaceStore.projectStore.currentProjectId || 'parrot-demo';
-        workspaceStore.data.setData(createParrotRuntimeMock(currentProjectId));
-        setPlaybackState({
-            isRunning: false,
-            stageIndex: getParrotRuntimeMockPlaybackStages().length - 1
-        });
-    };
-
-
 
     const renderResults = () => {
         return (
@@ -370,34 +317,6 @@ const Workspace = observer(({ viewState = 'engineering' }) => {
 
         return (
             <div className="mindmap-container">
-                <div className="mindmap-controls">
-                    <div className="mindmap-zoom-group">
-                        <button
-                            type="button"
-                            className="mindmap-zoom-btn"
-                            onClick={startDiscoveryPlayback}
-                        >
-                            <Play size={14} />
-                            <span>Simulate Discovery</span>
-                        </button>
-                        <button
-                            type="button"
-                            className="mindmap-zoom-btn"
-                            onClick={resetDiscoveryPlayback}
-                        >
-                            <X size={14} />
-                            <span>Reset Full</span>
-                        </button>
-                    </div>
-                    {data.meta?.discoveryPlayback && (
-                        <div className="mindmap-playback-status">
-                            <span>{data.meta.discoveryPlayback.label}</span>
-                            <span>
-                                {data.meta.discoveryPlayback.stage + 1}/{data.meta.discoveryPlayback.totalStages}
-                            </span>
-                        </div>
-                    )}
-                </div>
                 <div
                     className="mindmap-canvas"
                     onMouseDown={handleMouseDown}

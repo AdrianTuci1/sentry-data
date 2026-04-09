@@ -1,5 +1,1 @@
-export {
-    createParrotRuntimeMock,
-    createParrotRuntimeMockPlaybackStep,
-    getParrotRuntimeMockPlaybackStages
-} from './featureMindMap';
+export { createParrotRuntimeMock } from './featureMindMap';
