@@ -13,13 +13,20 @@ class AuthService {
     }
     /**
      * Verifies the JWT and checks if the Tenant actually exists in the DB.
-     * @returns The tenantId if valid
+     * @returns The auth context if valid
      */
-    async validateTokenAndGetTenant(token) {
+    async validateToken(token) {
         // MOCK BYPASS FOR TESTING PHASE
         if (token === 'mock-tenant-token-123') {
             console.log('[AuthService] Using MOCK bypass for testing.');
-            return 'test_tenant_1';
+            return {
+                tenantId: 'test_tenant_1',
+                userId: 'user_adrian',
+                email: 'adrian.tucicovenco@gmail.com',
+                name: 'Adrian Tuci',
+                role: 'owner',
+                workspaceId: 'ws_test_tenant_1_main'
+            };
         }
         try {
             const decoded = jsonwebtoken_1.default.verify(token, this.jwtSecret);
@@ -31,7 +38,14 @@ class AuthService {
             if (tenant.status !== 'active') {
                 throw new errorHandler_1.AppError('Tenant account is suspended.', 403);
             }
-            return decoded.tenantId;
+            return {
+                tenantId: decoded.tenantId,
+                userId: decoded.userId || decoded.email || `user_${decoded.tenantId}`,
+                email: decoded.email,
+                name: decoded.name,
+                role: decoded.role || 'member',
+                workspaceId: decoded.workspaceId
+            };
         }
         catch (error) {
             if (error.name === 'TokenExpiredError') {
@@ -42,6 +56,10 @@ class AuthService {
             }
             throw new errorHandler_1.AppError('Invalid authentication token', 401);
         }
+    }
+    async validateTokenAndGetTenant(token) {
+        const authContext = await this.validateToken(token);
+        return authContext.tenantId;
     }
 }
 exports.AuthService = AuthService;

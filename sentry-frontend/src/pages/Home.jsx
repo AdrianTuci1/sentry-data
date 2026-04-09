@@ -20,6 +20,21 @@ const Home = observer(() => {
         dockStore.openProjectEditor('edit', project);
     };
 
+    const handleProjectShare = async (project) => {
+        try {
+            const share = await projectStore.createShareLink(project.id, {
+                label: `${project.name} shared view`,
+                expiresInDays: 30
+            });
+
+            if (share?.shareUrl) {
+                await navigator.clipboard.writeText(share.shareUrl);
+            }
+        } catch (error) {
+            console.error('[Home] Failed to create share link:', error);
+        }
+    };
+
     const themes = ['weather', 'natural', 'wind', 'color', 'red', 'light'];
 
     return (
@@ -42,6 +57,7 @@ const Home = observer(() => {
                                     graphicType={theme}
                                     onClick={() => handleProjectClick(project.id)}
                                     onEdit={openEditOverlay}
+                                    onShare={handleProjectShare}
                                 />
                             );
                         })}

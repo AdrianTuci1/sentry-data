@@ -3,18 +3,110 @@ const API_BASE_URL = 'http://localhost:3000/api';
 // Use token from localStorage (set by seed/login) or fallback to mock for dev
 const getHeaders = () => {
     const token = localStorage.getItem('sentry_token') || 'mock-tenant-token-123';
+    const workspaceId = localStorage.getItem('sentry_workspace_id');
     return {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token.replace('Bearer ', '')}`
+        'Authorization': `Bearer ${token.replace('Bearer ', '')}`,
+        ...(workspaceId ? { 'X-Workspace-Id': workspaceId } : {})
     };
+};
+
+export const AccountService = {
+    async getMe() {
+        const res = await fetch(`${API_BASE_URL}/account/me`, {
+            method: 'GET',
+            headers: getHeaders()
+        });
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        return res.json();
+    },
+
+    async previewInvitation(tenantId, workspaceId, inviteToken) {
+        const res = await fetch(`${API_BASE_URL}/public/invitations/${tenantId}/${workspaceId}/${inviteToken}`, {
+            method: 'GET',
+            headers: getHeaders()
+        });
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        return res.json();
+    },
+
+    async acceptInvitation(tenantId, workspaceId, inviteToken) {
+        const res = await fetch(`${API_BASE_URL}/public/invitations/${tenantId}/${workspaceId}/${inviteToken}/accept`, {
+            method: 'POST',
+            headers: getHeaders()
+        });
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        return res.json();
+    },
+
+    async getSharedProject(tenantId, projectId, shareToken) {
+        const res = await fetch(`${API_BASE_URL}/public/projects/${tenantId}/${projectId}/share/${shareToken}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        return res.json();
+    }
+};
+
+export const WorkspaceService = {
+    async getWorkspaces() {
+        const res = await fetch(`${API_BASE_URL}/workspaces`, {
+            method: 'GET',
+            headers: getHeaders()
+        });
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        return res.json();
+    },
+
+    async createWorkspace(name) {
+        const res = await fetch(`${API_BASE_URL}/workspaces`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ name })
+        });
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        return res.json();
+    },
+
+    async getWorkspace(workspaceId) {
+        const res = await fetch(`${API_BASE_URL}/workspaces/${workspaceId}`, {
+            method: 'GET',
+            headers: getHeaders()
+        });
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        return res.json();
+    },
+
+    async createInvitation(workspaceId, payload) {
+        const res = await fetch(`${API_BASE_URL}/workspaces/${workspaceId}/invitations`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        return res.json();
+    },
+
+    async getActivity(workspaceId, limit = 50) {
+        const res = await fetch(`${API_BASE_URL}/workspaces/${workspaceId}/activity?limit=${limit}`, {
+            method: 'GET',
+            headers: getHeaders()
+        });
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        return res.json();
+    }
 };
 
 export const ProjectService = {
     /**
      * Retrieves all projects for the current tenant.
      */
-    async getProjects() {
-        const res = await fetch(`${API_BASE_URL}/projects`, {
+    async getProjects(workspaceId) {
+        const search = workspaceId ? `?workspaceId=${encodeURIComponent(workspaceId)}` : '';
+        const res = await fetch(`${API_BASE_URL}/projects${search}`, {
             method: 'GET',
             headers: getHeaders()
         });
@@ -37,11 +129,40 @@ export const ProjectService = {
     /**
      * Creates a new project workspace.
      */
-    async createProject(name) {
+    async createProject(payload) {
         const res = await fetch(`${API_BASE_URL}/projects`, {
             method: 'POST',
             headers: getHeaders(),
-            body: JSON.stringify({ name })
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        return res.json();
+    },
+
+    async updateProject(projectId, payload) {
+        const res = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
+            method: 'PATCH',
+            headers: getHeaders(),
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        return res.json();
+    },
+
+    async getShareLinks(projectId) {
+        const res = await fetch(`${API_BASE_URL}/projects/${projectId}/share-links`, {
+            method: 'GET',
+            headers: getHeaders()
+        });
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        return res.json();
+    },
+
+    async createShareLink(projectId, payload = {}) {
+        const res = await fetch(`${API_BASE_URL}/projects/${projectId}/share-links`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(payload)
         });
         if (!res.ok) throw new Error(`API Error: ${res.status}`);
         return res.json();

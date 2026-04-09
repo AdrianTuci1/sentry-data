@@ -127,13 +127,22 @@ const Layout = observer(() => {
         dockStore.closeMemberInvite();
     };
 
-    const handleProjectSubmit = (data) => {
+    const handleProjectSubmit = async (data) => {
         const { mode, project } = dockStore.projectEditor;
 
-        if (mode === 'edit' && project) {
-            projectStore.updateProject(project.id, data);
-        } else {
-            projectStore.addProject(data);
+        try {
+            if (mode === 'edit' && project) {
+                await projectStore.updateProject(project.id, data);
+            } else {
+                const createdProject = await projectStore.addProject(data);
+                if (createdProject?.id) {
+                    projectStore.selectProject(createdProject.id);
+                    navigate(`/project/${createdProject.id}?tab=insights`);
+                }
+            }
+        } catch (error) {
+            console.error('[Layout] Failed to save project:', error);
+            return;
         }
 
         dockStore.closeProjectEditor();

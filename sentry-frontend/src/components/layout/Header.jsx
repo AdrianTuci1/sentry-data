@@ -19,10 +19,10 @@ import './Header.css';
 const Header = observer(() => {
     const navigate = useNavigate();
 
-    // Access MobX Stores
     const { organizationStore, projectStore } = useStore();
 
     const currentOrg = organizationStore.currentOrg;
+    const currentUser = organizationStore.currentUser;
     const currentProject = projectStore.currentProject;
     const organizations = organizationStore.organizations;
     const projects = projectStore.projects;
@@ -56,6 +56,21 @@ const Header = observer(() => {
         setIsDropdownOpen(false);
     };
 
+    const handleCreateWorkspace = async () => {
+        const workspaceName = window.prompt('Workspace name');
+        if (!workspaceName?.trim()) {
+            return;
+        }
+
+        try {
+            await organizationStore.createOrganization({ name: workspaceName.trim() });
+            setIsDropdownOpen(false);
+            navigate('/');
+        } catch (error) {
+            console.error('[Header] Failed to create workspace:', error);
+        }
+    };
+
     const handleProjectSelect = (project) => {
         projectStore.selectProject(project.id);
         navigate(`/project/${project.id}`);
@@ -78,7 +93,7 @@ const Header = observer(() => {
                     <div className="workspace-select" onClick={toggleDropdown}>
                         <span>/</span>
                         <span className="workspace-name">
-                            {currentOrg ? currentOrg.name : 'Select Org'}
+                            {currentOrg ? currentOrg.name : 'Select Workspace'}
                             {currentProject && <span className="project-breadcrumb"> / {currentProject.name}</span>}
                         </span>
                         <ChevronsUpDown size={14} style={{ opacity: 0.5 }} />
@@ -89,7 +104,7 @@ const Header = observer(() => {
                         <div className="workspace-dropdown">
                             {/* Organizations Column */}
                             <div className="dropdown-column org-column">
-                                <div className="column-header">Organisations</div>
+                                <div className="column-header">Workspaces</div>
                                 <div className="column-list">
                                     {organizations.map(org => (
                                         <div
@@ -104,9 +119,9 @@ const Header = observer(() => {
                                     ))}
                                 </div>
                                 <div className="column-footer">
-                                    <button className="create-btn" onClick={() => { console.log('Create Org logic here'); setIsDropdownOpen(false); }}>
+                                    <button className="create-btn" onClick={handleCreateWorkspace}>
                                         <Plus size={14} />
-                                        <span>Create Organisation</span>
+                                        <span>Create Workspace</span>
                                     </button>
                                 </div>
                             </div>
@@ -128,7 +143,7 @@ const Header = observer(() => {
                                             </div>
                                         ))
                                     ) : (
-                                        <div className="empty-state">No projects found</div>
+                                        <div className="empty-state">No projects in this workspace</div>
                                     )}
                                 </div>
                                 <div className="column-footer">
@@ -158,29 +173,31 @@ const Header = observer(() => {
 
                 {/* Avatar with Context Menu */}
                 <div className="user-menu-container" ref={userMenuRef}>
-                    <div className="user-avatar" onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}></div>
+                    <div className="user-avatar" onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}>
+                        {(currentUser?.name || currentUser?.email || 'U').slice(0, 1).toUpperCase()}
+                    </div>
 
                     {isUserMenuOpen && (
                         <div className="user-context-menu">
                             <div className="user-menu-header">
-                                <span className="user-email-full">adrian.tucicovenco@gmail....</span>
-                                <span className="user-email-sub">adrian.tucicovenco@gmail.com</span>
+                                <span className="user-email-full">{currentUser?.name || 'Workspace member'}</span>
+                                <span className="user-email-sub">{currentUser?.email || 'No account email available'}</span>
                             </div>
 
                             <div className="user-menu-section">
-                                <button className="user-menu-item" onClick={() => setIsUserMenuOpen(false)}>
+                                <button className="user-menu-item" onClick={() => { navigate('/settings?tab=general'); setIsUserMenuOpen(false); }}>
                                     <Key size={14} />
                                     <span>API Keys</span>
                                 </button>
-                                <button className="user-menu-item" onClick={() => setIsUserMenuOpen(false)}>
+                                <button className="user-menu-item" onClick={() => { navigate('/settings?tab=general'); setIsUserMenuOpen(false); }}>
                                     <Settings size={14} />
                                     <span>Project Settings</span>
                                 </button>
-                                <button className="user-menu-item" onClick={() => setIsUserMenuOpen(false)}>
+                                <button className="user-menu-item" onClick={() => { navigate('/settings?tab=team'); setIsUserMenuOpen(false); }}>
                                     <Users size={14} />
-                                    <span>Organisation Settings</span>
+                                    <span>Workspace Settings</span>
                                 </button>
-                                <button className="user-menu-item" onClick={() => setIsUserMenuOpen(false)}>
+                                <button className="user-menu-item" onClick={() => { navigate('/settings?tab=billing'); setIsUserMenuOpen(false); }}>
                                     <CreditCard size={14} />
                                     <span>Billing</span>
                                 </button>

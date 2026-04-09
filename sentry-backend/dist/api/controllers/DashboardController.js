@@ -5,7 +5,7 @@ const express_1 = require("express");
 const auth_1 = require("../middlewares/auth");
 const errorHandler_1 = require("../middlewares/errorHandler");
 class DashboardController {
-    constructor(analyticsService, authService) {
+    constructor(analyticsService, authService, controlPlaneService) {
         this.path = '/dashboard';
         this.router = (0, express_1.Router)();
         this.getDashboard = async (req, res, next) => {
@@ -14,6 +14,9 @@ class DashboardController {
                 const tenantId = req.tenantId;
                 if (!tenantId)
                     throw new errorHandler_1.AppError('Tenant ID not present', 500);
+                if (!req.authContext)
+                    throw new errorHandler_1.AppError('Auth context not present', 500);
+                await this.controlPlaneService.assertProjectAccess(req.authContext, projectId);
                 const data = await this.analyticsService.getDashboardData(tenantId, projectId);
                 res.status(200).json({ status: 'success', data });
             }
@@ -27,6 +30,9 @@ class DashboardController {
                 const tenantId = req.tenantId;
                 if (!tenantId)
                     throw new errorHandler_1.AppError('Tenant ID not present', 500);
+                if (!req.authContext)
+                    throw new errorHandler_1.AppError('Auth context not present', 500);
+                await this.controlPlaneService.assertProjectAccess(req.authContext, projectId);
                 const data = await this.analyticsService.getDashboardManifest(tenantId, projectId);
                 res.status(200).json({ status: 'success', data });
             }
@@ -40,6 +46,9 @@ class DashboardController {
                 const tenantId = req.tenantId;
                 if (!tenantId)
                     throw new errorHandler_1.AppError('Tenant ID not present', 500);
+                if (!req.authContext)
+                    throw new errorHandler_1.AppError('Auth context not present', 500);
+                await this.controlPlaneService.assertProjectAccess(req.authContext, projectId);
                 const data = await this.analyticsService.getWidgetDataInstance(tenantId, projectId, widgetId);
                 res.status(200).json({ status: 'success', data });
             }
@@ -58,6 +67,7 @@ class DashboardController {
         };
         this.analyticsService = analyticsService;
         this.authService = authService;
+        this.controlPlaneService = controlPlaneService;
         this.initRoutes();
     }
     initRoutes() {

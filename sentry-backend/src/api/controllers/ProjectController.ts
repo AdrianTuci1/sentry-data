@@ -1,48 +1,35 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response, Router } from 'express';
+import { v4 as uuidv4 } from 'uuid';
 import { IController } from './IController';
-import { Router } from 'express';
 import { OrchestrationService } from '../../application/services/OrchestrationService';
 import { AnalyticsService } from '../../application/services/AnalyticsService';
 import { requireAuth } from '../middlewares/auth';
 import { AuthService } from '../../application/services/AuthService';
 import { ProjectRepository } from '../../infrastructure/repositories/ProjectRepository';
 import { SourceRepository } from '../../infrastructure/repositories/SourceRepository';
-import { v4 as uuidv4 } from 'uuid';
 import { ObjectStorageConfig } from '../../types/storage';
 import { ObjectStorageService } from '../../application/services/ObjectStorageService';
 import { SourceUpdateMonitorService } from '../../application/services/SourceUpdateMonitorService';
 import { ConnectorCatalogService } from '../../application/services/ConnectorCatalogService';
+import { ControlPlaneService } from '../../application/services/ControlPlaneService';
+import { AppError } from '../middlewares/errorHandler';
+import { ProjectMemberInput } from '../../types/controlPlane';
 
 export class ProjectController implements IController {
     public path = '/projects';
     public router = Router();
-    private orchestrationService: OrchestrationService;
-    private analyticsService: AnalyticsService;
-    private authService: AuthService;
-    private projectRepo: ProjectRepository;
-    private sourceRepo: SourceRepository;
-    private objectStorageService: ObjectStorageService;
-    private sourceUpdateMonitorService: SourceUpdateMonitorService;
-    private connectorCatalogService: ConnectorCatalogService;
 
     constructor(
-        orchestrationService: OrchestrationService,
-        analyticsService: AnalyticsService,
-        authService: AuthService,
-        projectRepo: ProjectRepository,
-        sourceRepo: SourceRepository,
-        objectStorageService: ObjectStorageService,
-        sourceUpdateMonitorService: SourceUpdateMonitorService,
-        connectorCatalogService: ConnectorCatalogService
+        private readonly orchestrationService: OrchestrationService,
+        private readonly analyticsService: AnalyticsService,
+        private readonly authService: AuthService,
+        private readonly projectRepo: ProjectRepository,
+        private readonly sourceRepo: SourceRepository,
+        private readonly objectStorageService: ObjectStorageService,
+        private readonly sourceUpdateMonitorService: SourceUpdateMonitorService,
+        private readonly connectorCatalogService: ConnectorCatalogService,
+        private readonly controlPlaneService: ControlPlaneService
     ) {
-        this.orchestrationService = orchestrationService;
-        this.analyticsService = analyticsService;
-        this.authService = authService;
-        this.projectRepo = projectRepo;
-        this.sourceRepo = sourceRepo;
-        this.objectStorageService = objectStorageService;
-        this.sourceUpdateMonitorService = sourceUpdateMonitorService;
-        this.connectorCatalogService = connectorCatalogService;
         this.initRoutes();
     }
 
@@ -51,9 +38,11 @@ export class ProjectController implements IController {
 
         this.router.get('/', auth, this.getProjects);
         this.router.post('/', auth, this.createProject);
+        this.router.patch('/:projectId', auth, this.updateProject);
         this.router.get('/connectors/catalog', auth, this.getConnectorCatalog);
+        this.router.get('/:projectId/share-links', auth, this.getShareLinks);
+        this.router.post('/:projectId/share-links', auth, this.createShareLink);
 
-        // Source CRUD
         this.router.post('/:projectId/sources', auth, this.addSource);
         this.router.get('/:projectId/sources', auth, this.getSources);
         this.router.post('/:projectId/sources/discover', auth, this.discoverSources);
@@ -63,16 +52,14 @@ export class ProjectController implements IController {
         this.router.post('/:projectId/runtime/run', auth, this.runRuntime);
         this.router.post('/:projectId/runtime/check-updates', auth, this.checkRuntimeUpdates);
 
-        // Endpoints for Frontend data extraction
         this.router.get('/:projectId/lineage', auth, this.getLineage);
         this.router.get('/:projectId/analytics', auth, this.getAnalytics);
     }
 
     private getProjects = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const tenantId = req.tenantId!;
-
-            const projects = await this.projectRepo.findAllForTenant(tenantId);
+            const authContext = this.getAuthContext(req);
+            const projects = await this.controlPlaneService.listWorkspaceProjects(authContext, this.getRequestedWorkspaceId(req));
 
             res.status(200).json({
                 status: 'success',
@@ -85,19 +72,21 @@ export class ProjectController implements IController {
 
     private getProjectById = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const tenantId = req.tenantId!;
+            const authContext = this.getAuthContext(req);
             const { projectId } = req.params;
-
-            const project = await this.projectRepo.findById(tenantId, projectId);
-
-            if (!project) {
-                res.status(404).json({ error: 'Project not found' });
-                return;
-            }
+            const { project, members } = await this.controlPlaneService.assertProjectAccess(authContext, projectId);
 
             res.status(200).json({
                 status: 'success',
-                data: project
+                data: {
+                    ...project,
+                    members: members.map((member) => ({
+                        userId: member.userId,
+                        account: member.account,
+                        access: member.access
+                    })),
+                    viewLink: project.viewLink || this.buildDefaultViewLink(project.name, project.projectId)
+                }
             });
         } catch (error) {
             next(error);
@@ -106,16 +95,107 @@ export class ProjectController implements IController {
 
     private createProject = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const tenantId = req.tenantId!;
-            const { name } = req.body;
+            const authContext = this.getAuthContext(req);
+            const { name, members, viewLink, workspaceId } = req.body as {
+                name?: string;
+                members?: ProjectMemberInput[];
+                viewLink?: string;
+                workspaceId?: string;
+            };
 
-            // In a real scenario, creates an active record in DynamoDB
+            if (!name?.trim()) {
+                res.status(400).json({ error: 'Project name is required' });
+                return;
+            }
+
+            const { workspace, membership } = await this.controlPlaneService.resolveWorkspace(
+                authContext,
+                workspaceId || this.getRequestedWorkspaceId(req)
+            );
+
+            if (!['owner', 'admin', 'member'].includes(membership.role)) {
+                throw new AppError('Your workspace role cannot create projects.', 403);
+            }
+
             const projectId = `proj_${Date.now()}`;
+            const createdAt = new Date().toISOString();
+
+            await this.projectRepo.createOrUpdate({
+                tenantId: authContext.tenantId,
+                projectId,
+                workspaceId: workspace.workspaceId,
+                name: name.trim(),
+                sourceType: 'custom',
+                status: 'active',
+                createdAt,
+                viewLink: viewLink?.trim() || this.buildDefaultViewLink(name, projectId)
+            });
+
+            const savedMembers = await this.controlPlaneService.syncProjectMembers(authContext, workspace.workspaceId, projectId, members);
+            await this.controlPlaneService.recordProjectEvent(
+                authContext,
+                workspace.workspaceId,
+                projectId,
+                'project.created',
+                `Created project ${name.trim()}`,
+                { memberCount: savedMembers.length }
+            );
+            const project = await this.projectRepo.findById(authContext.tenantId, projectId);
 
             res.status(201).json({
                 status: 'success',
                 message: 'Project created',
-                data: { projectId, name }
+                data: {
+                    ...project,
+                    members: savedMembers.map((member) => ({
+                        userId: member.userId,
+                        account: member.account,
+                        access: member.access
+                    }))
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    private updateProject = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const authContext = this.getAuthContext(req);
+            const { projectId } = req.params;
+            const { name, members, viewLink } = req.body as {
+                name?: string;
+                members?: ProjectMemberInput[];
+                viewLink?: string;
+            };
+
+            const { project, workspace } = await this.controlPlaneService.assertProjectAccess(authContext, projectId);
+            project.name = name?.trim() || project.name;
+            project.viewLink = viewLink?.trim() || project.viewLink || this.buildDefaultViewLink(project.name, project.projectId);
+            project.workspaceId = project.workspaceId || workspace.workspaceId;
+            await this.projectRepo.createOrUpdate(project);
+
+            const savedMembers = await this.controlPlaneService.syncProjectMembers(authContext, workspace.workspaceId, projectId, members);
+            await this.controlPlaneService.recordProjectEvent(
+                authContext,
+                workspace.workspaceId,
+                projectId,
+                'project.updated',
+                `Updated project ${project.name}`,
+                { memberCount: savedMembers.length }
+            );
+
+            res.status(200).json({
+                status: 'success',
+                message: 'Project updated',
+                data: {
+                    ...project,
+                    members: savedMembers.map((member) => ({
+                        userId: member.userId,
+                        account: member.account,
+                        access: member.access
+                    }))
+                }
             });
         } catch (error) {
             next(error);
@@ -133,12 +213,48 @@ export class ProjectController implements IController {
         }
     };
 
-    // ─── Source CRUD ──────────────────────────────────────────────
+    private getShareLinks = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const authContext = this.getAuthContext(req);
+            const { projectId } = req.params;
+            const links = await this.controlPlaneService.listProjectShareLinks(authContext, projectId);
+
+            res.status(200).json({
+                status: 'success',
+                data: links
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    private createShareLink = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const authContext = this.getAuthContext(req);
+            const { projectId } = req.params;
+            const { label, expiresInDays } = req.body as { label?: string; expiresInDays?: number };
+            const shareLink = await this.controlPlaneService.createProjectShareLink(authContext, projectId, {
+                label,
+                expiresInDays,
+                appBaseUrl: process.env.APP_BASE_URL
+            });
+
+            res.status(201).json({
+                status: 'success',
+                data: shareLink
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
 
     private addSource = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const tenantId = req.tenantId!;
+            const authContext = this.getAuthContext(req);
+            const tenantId = authContext.tenantId;
             const { projectId } = req.params;
+            await this.controlPlaneService.assertProjectAccess(authContext, projectId);
+
             const { name, sourceName, uri, sourceUri, type, connectorId, cronSchedule } = req.body;
             const resolvedName = name || sourceName;
             const storageConfig = this.buildStorageConfig(req.body);
@@ -232,8 +348,10 @@ export class ProjectController implements IController {
 
     private getSources = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const tenantId = req.tenantId!;
+            const authContext = this.getAuthContext(req);
+            const tenantId = authContext.tenantId;
             const { projectId } = req.params;
+            await this.controlPlaneService.assertProjectAccess(authContext, projectId);
 
             const sources = await this.sourceRepo.findAllForProject(tenantId, projectId);
 
@@ -248,8 +366,10 @@ export class ProjectController implements IController {
 
     private deleteSource = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const tenantId = req.tenantId!;
+            const authContext = this.getAuthContext(req);
+            const tenantId = authContext.tenantId;
             const { projectId, sourceId } = req.params;
+            await this.controlPlaneService.assertProjectAccess(authContext, projectId);
 
             await this.sourceRepo.deleteSource(tenantId, projectId, sourceId);
 
@@ -262,14 +382,13 @@ export class ProjectController implements IController {
         }
     };
 
-    // ─── Runtime ─────────────────────────────────────────────────
-
     private runRuntime = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const tenantId = req.tenantId!;
+            const authContext = this.getAuthContext(req);
+            const tenantId = authContext.tenantId;
             const { projectId } = req.params;
+            await this.controlPlaneService.assertProjectAccess(authContext, projectId);
 
-            // Read source URIs from persisted sources (no longer ad-hoc from request body)
             const sources = await this.sourceRepo.findAllForProject(tenantId, projectId);
 
             if (sources.length === 0) {
@@ -279,8 +398,8 @@ export class ProjectController implements IController {
                 return;
             }
 
-            const rawSourceUris = sources.map(s => s.uri);
-            const sourceNames = sources.map(s => s.name);
+            const rawSourceUris = sources.map((source) => source.uri);
+            const sourceNames = sources.map((source) => source.name);
             const sourceDescriptors = sources.map((source) => ({
                 sourceId: source.sourceId,
                 sourceName: source.name,
@@ -292,10 +411,9 @@ export class ProjectController implements IController {
                 observedMetrics: source.observedMetrics
             }));
 
-            // Fire and forget. Progress is streamed over SSE by the Parrot runtime.
             this.orchestrationService.runRuntime(tenantId, projectId, rawSourceUris, sourceNames, sourceDescriptors)
-                .catch(err => {
-                    console.error(`[ProjectController] Background Parrot runtime failed for ${projectId}:`, err);
+                .catch((error) => {
+                    console.error(`[ProjectController] Background Parrot runtime failed for ${projectId}:`, error);
                 });
 
             res.status(202).json({
@@ -310,8 +428,11 @@ export class ProjectController implements IController {
 
     private checkRuntimeUpdates = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const tenantId = req.tenantId!;
+            const authContext = this.getAuthContext(req);
+            const tenantId = authContext.tenantId;
             const { projectId } = req.params;
+            await this.controlPlaneService.assertProjectAccess(authContext, projectId);
+
             const result = await this.sourceUpdateMonitorService.scanProjectSources(tenantId, projectId);
 
             res.status(200).json({
@@ -325,11 +446,11 @@ export class ProjectController implements IController {
 
     private getLineage = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const tenantId = req.tenantId!;
+            const authContext = this.getAuthContext(req);
             const { projectId } = req.params;
-            const project = await this.projectRepo.findById(tenantId, projectId);
+            const { project } = await this.controlPlaneService.assertProjectAccess(authContext, projectId);
 
-            if (!project || !project.discoveryMetadata) {
+            if (!project.discoveryMetadata) {
                 res.status(404).json({ error: 'Mindmap data not found' });
                 return;
             }
@@ -345,11 +466,11 @@ export class ProjectController implements IController {
 
     private getAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const tenantId = req.tenantId!;
+            const authContext = this.getAuthContext(req);
             const { projectId } = req.params;
+            await this.controlPlaneService.assertProjectAccess(authContext, projectId);
 
-            // Fetch live data from the analytics worker via the analytics service
-            const data = await this.analyticsService.getDashboardData(tenantId, projectId);
+            const data = await this.analyticsService.getDashboardData(authContext.tenantId, projectId);
 
             res.status(200).json({
                 status: 'success',
@@ -387,5 +508,34 @@ export class ProjectController implements IController {
                 }
                 : undefined,
         };
+    }
+
+    private getRequestedWorkspaceId(req: Request): string | undefined {
+        const headerWorkspaceId = req.headers['x-workspace-id'];
+        const queryWorkspaceId = typeof req.query.workspaceId === 'string' ? req.query.workspaceId : undefined;
+        const bodyWorkspaceId = typeof req.body?.workspaceId === 'string' ? req.body.workspaceId : undefined;
+
+        if (typeof headerWorkspaceId === 'string' && headerWorkspaceId.trim()) {
+            return headerWorkspaceId.trim();
+        }
+
+        return bodyWorkspaceId || queryWorkspaceId || req.workspaceId;
+    }
+
+    private getAuthContext(req: Request) {
+        if (!req.authContext) {
+            throw new AppError('Auth context missing from request.', 500);
+        }
+
+        return req.authContext;
+    }
+
+    private buildDefaultViewLink(projectName: string, projectId: string): string {
+        const slug = projectName
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+        return `https://app.sentry.local/view/${slug || projectId}`;
     }
 }

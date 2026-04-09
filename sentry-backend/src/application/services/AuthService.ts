@@ -1,10 +1,9 @@
 import jwt from 'jsonwebtoken';
 import { TenantRepository } from '../../infrastructure/repositories/TenantRepository';
 import { AppError } from '../../api/middlewares/errorHandler';
+import { AuthContext } from '../../types/controlPlane';
 
-export interface DecodedToken {
-    tenantId: string;
-    role: string;
+export interface DecodedToken extends AuthContext {
     iat: number;
     exp: number;
 }
@@ -20,13 +19,20 @@ export class AuthService {
 
     /**
      * Verifies the JWT and checks if the Tenant actually exists in the DB.
-     * @returns The tenantId if valid
+     * @returns The auth context if valid
      */
-    public async validateTokenAndGetTenant(token: string): Promise<string> {
+    public async validateToken(token: string): Promise<AuthContext> {
         // MOCK BYPASS FOR TESTING PHASE
         if (token === 'mock-tenant-token-123') {
             console.log('[AuthService] Using MOCK bypass for testing.');
-            return 'test_tenant_1';
+            return {
+                tenantId: 'test_tenant_1',
+                userId: 'user_adrian',
+                email: 'adrian.tucicovenco@gmail.com',
+                name: 'Adrian Tuci',
+                role: 'owner',
+                workspaceId: 'ws_test_tenant_1_main'
+            };
         }
 
         try {
@@ -42,7 +48,14 @@ export class AuthService {
                 throw new AppError('Tenant account is suspended.', 403);
             }
 
-            return decoded.tenantId;
+            return {
+                tenantId: decoded.tenantId,
+                userId: decoded.userId || decoded.email || `user_${decoded.tenantId}`,
+                email: decoded.email,
+                name: decoded.name,
+                role: decoded.role || 'member',
+                workspaceId: decoded.workspaceId
+            };
         } catch (error: any) {
             if (error.name === 'TokenExpiredError') {
                 throw new AppError('Authentication token expired', 401);
@@ -52,5 +65,10 @@ export class AuthService {
             }
             throw new AppError('Invalid authentication token', 401);
         }
+    }
+
+    public async validateTokenAndGetTenant(token: string): Promise<string> {
+        const authContext = await this.validateToken(token);
+        return authContext.tenantId;
     }
 }

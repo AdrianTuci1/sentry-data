@@ -176,7 +176,14 @@ async function seed() {
         // ── STEP 4: GENERATE AUTH TOKEN ──────────────────────
 
         const token = jwt.sign(
-            { tenantId, role: 'admin' },
+            {
+                tenantId,
+                userId: 'user_adrian',
+                email: 'adrian.tucicovenco@gmail.com',
+                name: 'Adrian Tuci',
+                role: 'owner',
+                workspaceId: `ws_${tenantId}_main`
+            },
             config.jwt.secret,
             { expiresIn: '24h' }
         );

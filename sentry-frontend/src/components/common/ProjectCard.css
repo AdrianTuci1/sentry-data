@@ -57,6 +57,11 @@
     z-index: 2;
 }
 
+.project-card-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
 .project-card-edit {
     display: inline-flex;
     align-items: center;
