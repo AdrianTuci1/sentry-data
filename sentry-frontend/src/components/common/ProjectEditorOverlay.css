@@ -1,0 +1,230 @@
+.project-editor-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    background: rgba(7, 9, 10, 0.82);
+}
+
+.project-editor-modal {
+    width: min(980px, 100%);
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
+    border-radius: 0;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: #111416;
+    box-shadow: 0 28px 120px rgba(0, 0, 0, 0.45);
+    padding: 36px;
+    color: #f4f7f8;
+}
+
+.project-editor-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.project-editor-eyebrow {
+    margin: 0 0 8px;
+    color: rgba(231, 238, 240, 0.62);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.project-editor-title {
+    margin: 0;
+    font-size: 1.65rem;
+    line-height: 1.1;
+}
+
+.project-editor-close,
+.project-editor-remove,
+.project-editor-add,
+.project-editor-secondary,
+.project-editor-primary {
+    border: none;
+    font: inherit;
+}
+
+.project-editor-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 0;
+    background: rgba(255, 255, 255, 0.08);
+    color: #f4f7f8;
+    cursor: pointer;
+}
+
+.project-editor-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.project-editor-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.project-editor-field,
+.project-editor-members {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.project-editor-inline-field {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+}
+
+.project-editor-field span,
+.project-editor-members-header span {
+    color: rgba(231, 238, 240, 0.78);
+    font-size: 0.92rem;
+}
+
+.project-editor-field input,
+.project-editor-member-row input,
+.project-editor-member-row select {
+    width: 100%;
+    min-height: 48px;
+    border-radius: 0;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.02);
+    color: #f4f7f8;
+    padding: 0 14px;
+    font-size: 0.98rem;
+    box-sizing: border-box;
+}
+
+.project-editor-inline-action {
+    min-height: 48px;
+    padding: 0 16px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 0;
+    background: rgba(255, 255, 255, 0.04);
+    color: #f4f7f8;
+    cursor: pointer;
+}
+
+.project-editor-field input:focus,
+.project-editor-member-row input:focus,
+.project-editor-member-row select:focus {
+    outline: none;
+    border-color: rgba(162, 247, 179, 0.72);
+    box-shadow: 0 0 0 3px rgba(162, 247, 179, 0.12);
+}
+
+.project-editor-members-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.project-editor-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 0;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #f4f7f8;
+    cursor: pointer;
+}
+
+.project-editor-member-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.project-editor-member-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 160px 44px;
+    gap: 10px;
+    align-items: center;
+}
+
+.project-editor-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 0;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.74);
+    cursor: pointer;
+}
+
+.project-editor-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.project-editor-secondary,
+.project-editor-primary {
+    min-height: 46px;
+    padding: 0 18px;
+    border-radius: 0;
+    cursor: pointer;
+}
+
+.project-editor-secondary {
+    background: rgba(255, 255, 255, 0.08);
+    color: #f4f7f8;
+}
+
+.project-editor-primary {
+    background: linear-gradient(135deg, #c7ff72, #74d680);
+    color: #09110c;
+    font-weight: 600;
+}
+
+.project-editor-primary:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+@media (max-width: 640px) {
+    .project-editor-overlay {
+        padding: 12px;
+    }
+
+    .project-editor-modal {
+        max-height: calc(100vh - 24px);
+        padding: 20px 16px;
+    }
+
+    .project-editor-grid,
+    .project-editor-member-row {
+        grid-template-columns: 1fr;
+    }
+
+    .project-editor-inline-field {
+        grid-template-columns: 1fr;
+    }
+
+    .project-editor-remove {
+        width: 100%;
+    }
+
+    .project-editor-actions {
+        flex-direction: column-reverse;
+    }
+}

@@ -1,18 +1,142 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Editor from '@monaco-editor/react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../store/StoreProvider';
 import { BrainCircuit, Play, X } from 'lucide-react';
+import { createParrotRuntimeMock, createParrotRuntimeMockPlaybackStep, getParrotRuntimeMockPlaybackStages } from '../../mocks/parrotRuntimeMock';
 import FeatureMindMap from './FeatureMindMap';
 import Insights from './Insights';
 import MindMapInspectorPanel from './MindMapInspectorPanel';
 import './Workspace.css';
 
+const normalizeEditorLanguage = (language) => {
+    if (language === 'pandas') {
+        return 'python';
+    }
+
+    if (language === 'text') {
+        return 'plaintext';
+    }
+
+    return language || 'plaintext';
+};
+
+const getEditorHeight = (code = '', minLines = 10, maxLines = 24) => {
+    const lineCount = String(code).split('\n').length;
+    const visibleLines = Math.min(Math.max(lineCount, minLines), maxLines);
+    return `${(visibleLines * 22) + 24}px`;
+};
+
+const getCodeBlockPath = (block, language) => {
+    const normalizedId = (block.id || block.title || block.label || 'artifact')
+        .replace(/[^a-z0-9-_]+/gi, '-')
+        .toLowerCase();
+
+    const extensionByLanguage = {
+        python: 'py',
+        sql: 'sql',
+        yaml: 'yaml',
+        json: 'json',
+        plaintext: 'txt'
+    };
+
+    return `mindmap/code/${normalizedId}.${extensionByLanguage[language] || 'txt'}`;
+};
+
+const CodeBlockEditor = ({ block }) => {
+    const language = normalizeEditorLanguage(block.language);
+    const [draftCode, setDraftCode] = useState(() => block.code || '');
+
+    return (
+        <div className="overflow-hidden border border-[#31343A] bg-[#141619]">
+            <div className="flex items-center justify-between border-b border-[#2A2D31] px-4 py-2 text-[11px] uppercase tracking-[0.14em] text-[#8E918F]">
+                <span>{block.title || block.label}</span>
+                <span>{block.language || 'code'}</span>
+            </div>
+            <Editor
+                path={getCodeBlockPath(block, language)}
+                height={getEditorHeight(draftCode)}
+                language={language}
+                value={draftCode}
+                theme="vs-dark"
+                onMount={(editorInstance) => {
+                    const formatAction = editorInstance.getAction('editor.action.formatDocument');
+                    if (formatAction) {
+                        formatAction.run().catch(() => {});
+                    }
+                }}
+                onChange={(value) => setDraftCode(value || '')}
+                options={{
+                    readOnly: false,
+                    minimap: { enabled: false },
+                    automaticLayout: true,
+                    scrollBeyondLastLine: false,
+                    wordWrap: 'on',
+                    lineNumbers: 'on',
+                    glyphMargin: false,
+                    folding: false,
+                    lineDecorationsWidth: 10,
+                    overviewRulerBorder: false,
+                    overviewRulerLanes: 0,
+                    renderLineHighlight: 'none',
+                    padding: { top: 10, bottom: 10 },
+                    fontSize: 12,
+                    fontFamily: 'JetBrains Mono, monospace'
+                }}
+            />
+        </div>
+    );
+};
+
+const CodeDocumentPanel = ({ editor }) => {
+    const payload = editor.payload || {};
+    const codeArtifacts = payload.codeArtifacts || [];
+
+    if (payload.subjectType === 'Virtual Layer' && codeArtifacts.length > 0) {
+        return (
+            <div className="h-full overflow-auto bg-[#141619] px-6 py-6">
+                <div className="mx-auto flex max-w-5xl flex-col gap-5">
+                    {codeArtifacts.map((block, index) => (
+                        <CodeBlockEditor
+                            key={`${block.id || index}-${block.language || 'text'}-${block.code || ''}`}
+                            block={block}
+                        />
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <Editor
+            height="100%"
+            language={normalizeEditorLanguage(editor.type)}
+            value={editor.code}
+            theme="vs-dark"
+            options={{
+                readOnly: false,
+                minimap: { enabled: false },
+                automaticLayout: true,
+                fontSize: 14,
+                fontFamily: 'JetBrains Mono, monospace',
+                scrollBeyondLastLine: false,
+                wordWrap: 'on',
+                padding: { top: 16, bottom: 16 }
+            }}
+            onChange={(val) => editor.setCode(val)}
+        />
+    );
+};
+
 const Workspace = observer(({ viewState = 'engineering' }) => {
     const location = useLocation();
     const { workspaceStore } = useStore();
     const { ui, data, editor } = workspaceStore;
+    const [playbackState, setPlaybackState] = useState({
+        isRunning: false,
+        stageIndex: getParrotRuntimeMockPlaybackStages().length - 1
+    });
 
     // Destructure from sub-stores
     const {
@@ -26,18 +150,6 @@ const Workspace = observer(({ viewState = 'engineering' }) => {
         metrics,
         features
     } = data;
-
-    const openCodeDocument = ({ title, code, type = 'python', recurrence = 'manual', payload = null }) => {
-        editor.openCode({
-            isOpen: true,
-            nodeId: title,
-            title,
-            code,
-            type,
-            recurrence,
-            payload
-        });
-    };
 
     // Sync tab from URL
     useEffect(() => {
@@ -54,6 +166,70 @@ const Workspace = observer(({ viewState = 'engineering' }) => {
     useEffect(() => {
         if (viewState === 'results') ui.setActiveTab('results');
     }, [viewState, ui]);
+
+    useEffect(() => {
+        const previousBodyOverflow = document.body.style.overflow;
+        const previousHtmlOverflow = document.documentElement.style.overflow;
+
+        if (editor.isOpen) {
+            document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = previousBodyOverflow;
+            document.documentElement.style.overflow = previousHtmlOverflow;
+        }
+
+        return () => {
+            document.body.style.overflow = previousBodyOverflow;
+            document.documentElement.style.overflow = previousHtmlOverflow;
+        };
+    }, [editor.isOpen]);
+
+    useEffect(() => {
+        if (!playbackState.isRunning) {
+            return undefined;
+        }
+
+        const stages = getParrotRuntimeMockPlaybackStages();
+        const currentProjectId = workspaceStore.projectStore.currentProjectId || 'parrot-demo';
+
+        if (playbackState.stageIndex >= stages.length - 1) {
+            setPlaybackState({
+                isRunning: false,
+                stageIndex: stages.length - 1
+            });
+            return undefined;
+        }
+
+        const timeoutId = window.setTimeout(() => {
+            const nextStageIndex = playbackState.stageIndex + 1;
+            workspaceStore.data.setData(createParrotRuntimeMockPlaybackStep(currentProjectId, nextStageIndex));
+            setPlaybackState({
+                isRunning: nextStageIndex < stages.length - 1,
+                stageIndex: nextStageIndex
+            });
+        }, stages[playbackState.stageIndex].durationMs);
+
+        return () => window.clearTimeout(timeoutId);
+    }, [playbackState, workspaceStore]);
+
+    const startDiscoveryPlayback = () => {
+        const currentProjectId = workspaceStore.projectStore.currentProjectId || 'parrot-demo';
+        workspaceStore.data.setData(createParrotRuntimeMockPlaybackStep(currentProjectId, 0));
+        setPlaybackState({
+            isRunning: true,
+            stageIndex: 0
+        });
+    };
+
+    const resetDiscoveryPlayback = () => {
+        const currentProjectId = workspaceStore.projectStore.currentProjectId || 'parrot-demo';
+        workspaceStore.data.setData(createParrotRuntimeMock(currentProjectId));
+        setPlaybackState({
+            isRunning: false,
+            stageIndex: getParrotRuntimeMockPlaybackStages().length - 1
+        });
+    };
 
 
 
@@ -95,34 +271,6 @@ const Workspace = observer(({ viewState = 'engineering' }) => {
         );
     };
 
-    const handleNodeClick = (node) => {
-        if (node.type === 'action') {
-            const code = [
-                `# PNE transform draft for ${node.label}`,
-                '',
-                'def compile_virtual_transform(bronze_frame):',
-                '    harmonized = harmonize_schema(bronze_frame)',
-                '    aligned = normalize_timestamps(harmonized)',
-                '    checked = apply_quality_guards(aligned)',
-                '    return checked'
-            ].join('\n');
-
-            openCodeDocument({
-                title: node.label,
-                code,
-                type: 'python',
-                recurrence: 'daily'
-            });
-        } else if (node.type === 'card' && (node.data?.logic?.compiled_code || node.data?.logic?.code || node.data?.sqlString || node.data?.sql)) {
-            openCodeDocument({
-                title: `Logic: ${node.label}`,
-                code: node.data?.logic?.compiled_code || node.data?.logic?.code || node.data?.sqlString || node.data?.sql,
-                type: (node.data?.logic?.compiled_code || node.data?.logic?.code || '').trim().startsWith('{') ? 'json' : 'sql',
-                recurrence: node.data?.activationMode === 'manual' ? 'manual' : 'realtime'
-            });
-        }
-    };
-
     const renderEditorModal = () => {
         if (!editor.isOpen) return null;
 
@@ -146,7 +294,7 @@ const Workspace = observer(({ viewState = 'engineering' }) => {
                         <div className="editor-title-group">
                             <BrainCircuit size={18} color="#A8C7FA" />
                             <span className="editor-title">{editor.title}</span>
-                            <span className="editor-lang-badge">{isInspector ? 'agent' : editor.type}</span>
+                            <span className="editor-lang-badge">{isInspector ? 'agent' : normalizeEditorLanguage(editor.type)}</span>
                         </div>
                         <button onClick={() => editor.close()} className="editor-close-btn">
                             <X size={18} />
@@ -188,29 +336,9 @@ const Workspace = observer(({ viewState = 'engineering' }) => {
                             <MindMapInspectorPanel
                                 editor={editor}
                                 ui={ui}
-                                onOpenCode={(artifact) => openCodeDocument({
-                                    title: artifact.title,
-                                    code: artifact.code,
-                                    type: artifact.language,
-                                    recurrence: 'manual',
-                                    payload: editor.payload
-                                })}
                             />
                         ) : (
-                            <Editor
-                                height="100%"
-                                defaultLanguage={editor.type}
-                                value={editor.code}
-                                theme="vs-dark"
-                                options={{
-                                    minimap: { enabled: false },
-                                    fontSize: 14,
-                                    fontFamily: 'JetBrains Mono, monospace',
-                                    scrollBeyondLastLine: false,
-                                    padding: { top: 16, bottom: 16 }
-                                }}
-                                onChange={(val) => editor.setCode(val)}
-                            />
+                            <CodeDocumentPanel editor={editor} />
                         )}
                     </div>
                 </div>
@@ -242,6 +370,34 @@ const Workspace = observer(({ viewState = 'engineering' }) => {
 
         return (
             <div className="mindmap-container">
+                <div className="mindmap-controls">
+                    <div className="mindmap-zoom-group">
+                        <button
+                            type="button"
+                            className="mindmap-zoom-btn"
+                            onClick={startDiscoveryPlayback}
+                        >
+                            <Play size={14} />
+                            <span>Simulate Discovery</span>
+                        </button>
+                        <button
+                            type="button"
+                            className="mindmap-zoom-btn"
+                            onClick={resetDiscoveryPlayback}
+                        >
+                            <X size={14} />
+                            <span>Reset Full</span>
+                        </button>
+                    </div>
+                    {data.meta?.discoveryPlayback && (
+                        <div className="mindmap-playback-status">
+                            <span>{data.meta.discoveryPlayback.label}</span>
+                            <span>
+                                {data.meta.discoveryPlayback.stage + 1}/{data.meta.discoveryPlayback.totalStages}
+                            </span>
+                        </div>
+                    )}
+                </div>
                 <div
                     className="mindmap-canvas"
                     onMouseDown={handleMouseDown}
@@ -252,7 +408,6 @@ const Workspace = observer(({ viewState = 'engineering' }) => {
                     onWheel={handleWheel}
                 >
                     <FeatureMindMap
-                        onNodeClick={handleNodeClick}
                         showCosts={true}
                     />
                     {renderEditorModal()}

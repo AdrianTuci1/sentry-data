@@ -7,6 +7,8 @@ export class Project {
     lastActive = 'Just now';
     connectors = 0;
     models = 0;
+    members = [];
+    viewLink = '';
 
     constructor(data) {
         makeAutoObservable(this);
@@ -21,6 +23,14 @@ export class Project {
         this.lastActive = data.lastActive || this.lastActive;
         this.connectors = data.connectors || this.connectors;
         this.models = data.models || this.models;
+        this.members = Array.isArray(data.members)
+            ? data.members.map((member, index) => ({
+                id: member.id || `member_${index}_${Date.now()}`,
+                account: member.account || '',
+                access: member.access || 'viewer',
+            }))
+            : this.members;
+        this.viewLink = data.viewLink || this.viewLink;
     }
 }
 

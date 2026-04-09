@@ -1,16 +1,17 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
+import Editor from '@monaco-editor/react';
 import { observer } from 'mobx-react-lite';
 import {
     AlertTriangle,
     CheckCircle2,
     Clock3,
-    Code2,
     Sparkles
 } from 'lucide-react';
 
 const buildResponse = (payload, ui) => {
     const subject = payload?.subjectName || 'this layer';
     const summary = payload?.summary || `Parrot is reviewing ${subject}.`;
+    const description = payload?.description || '';
     const suggestions = payload?.suggestions || [];
     const findings = payload?.sentinelFindings || [];
     const openFindings = findings.filter((finding) => finding.status !== 'resolved');
@@ -20,8 +21,8 @@ const buildResponse = (payload, ui) => {
 
     const sections = [
         {
-            title: null,
-            paragraphs: [summary]
+            title: 'Description',
+            paragraphs: [description, summary].filter(Boolean)
         }
     ];
 
@@ -45,10 +46,27 @@ const buildResponse = (payload, ui) => {
     }
 
     if (payload?.codeArtifacts?.length > 0) {
-        const artifact = payload.codeArtifacts[0];
+        const artifacts = payload.codeArtifacts.slice(0, 3);
         sections.push({
             title: 'Logic',
-            paragraphs: [`The active logic is available as ${artifact.language?.toUpperCase() || 'code'}. Open code if you want to inspect the compiled path directly.`]
+            paragraphs: [`The active logic is available below as ${artifacts[0]?.language?.toUpperCase() || 'code'}.`],
+            codeBlocks: artifacts.map((artifact) => ({
+                label: artifact.title,
+                language: artifact.language,
+                code: artifact.code
+            }))
+        });
+    }
+
+    if (payload?.processSteps?.length > 0) {
+        sections.push({
+            title: 'Process',
+            bullets: payload.processSteps.map((step) => `${step.title}: ${step.detail}`),
+            codeBlocks: payload.processSteps.map((step) => ({
+                label: `${step.title} · ${step.language?.toUpperCase() || 'CODE'}`,
+                language: step.language,
+                code: step.code
+            }))
         });
     }
 
@@ -95,15 +113,93 @@ const buildResponse = (payload, ui) => {
     };
 };
 
-const MindMapInspectorPanel = observer(({ editor, ui, onOpenCode }) => {
-    const payload = editor.payload || {};
+const normalizeEditorLanguage = (language) => {
+    if (language === 'pandas') {
+        return 'python';
+    }
+
+    if (language === 'text') {
+        return 'plaintext';
+    }
+
+    return language || 'plaintext';
+};
+
+const getEditorHeight = (code = '') => {
+    const lineCount = String(code).split('\n').length;
+    const visibleLines = Math.min(Math.max(lineCount, 4), 18);
+    return `${(visibleLines * 22) + 20}px`;
+};
+
+const getCodeBlockPath = (block, language) => {
+    const normalizedId = (block.id || block.label || 'artifact')
+        .replace(/[^a-z0-9-_]+/gi, '-')
+        .toLowerCase();
+
+    const extensionByLanguage = {
+        python: 'py',
+        sql: 'sql',
+        yaml: 'yaml',
+        json: 'json',
+        plaintext: 'txt'
+    };
+
+    const extension = extensionByLanguage[language] || 'txt';
+    return `mindmap/${normalizedId}.${extension}`;
+};
+
+const InspectorCodeBlock = ({ block }) => {
+    const language = normalizeEditorLanguage(block.language);
+    const [draftCode, setDraftCode] = useState(() => block.code || '');
+
+    return (
+        <div className="overflow-hidden rounded-2xl border border-[#31343A] bg-[#141619]">
+            <div className="flex items-center justify-between border-b border-[#2A2D31] px-4 py-2 text-[11px] uppercase tracking-[0.14em] text-[#8E918F]">
+                <span>{block.label}</span>
+                <span>{block.language || 'code'}</span>
+            </div>
+            <Editor
+                path={getCodeBlockPath(block, language)}
+                height={getEditorHeight(draftCode)}
+                language={language}
+                value={draftCode}
+                theme="vs-dark"
+                onMount={(editorInstance) => {
+                    const formatAction = editorInstance.getAction('editor.action.formatDocument');
+                    if (formatAction) {
+                        formatAction.run().catch(() => {});
+                    }
+                }}
+                onChange={(value) => setDraftCode(value || '')}
+                options={{
+                    readOnly: false,
+                    minimap: { enabled: false },
+                    automaticLayout: true,
+                    scrollBeyondLastLine: false,
+                    wordWrap: 'on',
+                    lineNumbers: 'on',
+                    glyphMargin: false,
+                    folding: false,
+                    lineDecorationsWidth: 10,
+                    overviewRulerBorder: false,
+                    overviewRulerLanes: 0,
+                    renderLineHighlight: 'none',
+                    padding: { top: 10, bottom: 10 },
+                    fontSize: 12,
+                    fontFamily: 'SFMono-Regular, Menlo, Monaco, Consolas, monospace'
+                }}
+            />
+        </div>
+    );
+};
+
+const MindMapInspectorPanel = observer(({ editor, ui }) => {
+    const payload = useMemo(() => editor.payload || {}, [editor.payload]);
 
     const response = useMemo(
         () => buildResponse(payload, ui),
         [payload, ui]
     );
-
-    const firstCodeArtifact = payload?.codeArtifacts?.[0] || null;
 
     return (
         <div className="h-full overflow-auto bg-[#1E1F20] text-[#E3E3E3]">
@@ -116,18 +212,6 @@ const MindMapInspectorPanel = observer(({ editor, ui, onOpenCode }) => {
                         </div>
                         <h2 className="mt-3 text-2xl font-medium text-white">{payload.subjectName || editor.title}</h2>
                     </div>
-
-                    {firstCodeArtifact && (
-                        <button
-                            className="shrink-0 rounded-full border border-[#3C4043] px-3 py-2 text-xs text-[#C4C7C5] hover:border-[#A8C7FA] hover:text-white"
-                            onClick={() => onOpenCode(firstCodeArtifact)}
-                        >
-                            <span className="inline-flex items-center gap-2">
-                                <Code2 size={13} />
-                                Open code
-                            </span>
-                        </button>
-                    )}
                 </div>
 
                 <div className="space-y-8 text-[15px] leading-8 text-[#D6DADE]">
@@ -154,6 +238,17 @@ const MindMapInspectorPanel = observer(({ editor, ui, onOpenCode }) => {
                                         </li>
                                     ))}
                                 </ul>
+                            )}
+
+                            {section.codeBlocks?.length > 0 && (
+                                <div className="mt-4 space-y-4">
+                                    {section.codeBlocks.map((block, blockIndex) => (
+                                        <InspectorCodeBlock
+                                            key={`${index}-code-${block.id || blockIndex}-${block.language || 'text'}-${block.code || ''}`}
+                                            block={block}
+                                        />
+                                    ))}
+                                </div>
                             )}
                         </section>
                     ))}

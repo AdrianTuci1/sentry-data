@@ -1,265 +1,270 @@
+const average = (items, selector = (item) => item) => {
+    if (!items.length) {
+        return 0;
+    }
 
-import { useMemo } from 'react';
+    return items.reduce((total, item) => total + selector(item), 0) / items.length;
+};
 
-export const useMindMapLayout = ({ 
-    connector = [], 
-    actionType = [], 
-    origin = [],
-    adjustedData = [], 
-    group = [], 
-    insight = [],
-    title = "Data Pipeline" 
+const COLUMN_WIDTHS = {
+    source: 272,
+    category: 260,
+    group: 250,
+    card: 268
+};
+
+const COLUMN_GAPS = {
+    sourceToCategory: 128,
+    categoryToGroup: 156,
+    groupToCard: 110
+};
+
+export const calculateMindMapStats = ({
+    connector = [],
+    actionType = [],
+    adjustedData = [],
+    insight = []
 }) => {
-    // Stats Calculation
-    const stats = useMemo(() => {
-        let errors = 0;
-        let warnings = 0;
-        
-        const checkStatus = (list) => list.forEach(item => {
-            if (item.status === 'error') errors++;
-            if (item.status === 'warning') warnings++;
-        });
+    let errors = 0;
+    let warnings = 0;
 
-        checkStatus(connector);
-        checkStatus(actionType);
-        adjustedData.forEach(adj => (adj.columns || []).forEach(c => {
-            if (c.status === 'error') errors++;
-            if (c.status === 'warning') warnings++;
-        }));
-        checkStatus(insight);
+    const checkStatus = (list) => list.forEach((item) => {
+        if (item.status === 'error') errors += 1;
+        if (item.status === 'warning') warnings += 1;
+    });
 
-        return { errors, warnings };
-    }, [connector, actionType, origin, adjustedData, group, insight]);
+    checkStatus(connector);
+    checkStatus(actionType);
+    adjustedData.forEach((adjustedEntry) => (adjustedEntry.columns || []).forEach((column) => {
+        if (column.status === 'error') errors += 1;
+        if (column.status === 'warning') warnings += 1;
+    }));
+    checkStatus(insight);
 
-    // Layout Calculation
-    const layout = useMemo(() => {
-        const nodes = [];
-        const edges = [];
-        const seenNodeIds = new Set();
-        const seenEdgeIds = new Set();
+    return { errors, warnings };
+};
 
-        const pushNode = (node) => {
-            if (!node?.id || seenNodeIds.has(node.id)) {
-                return;
-            }
+export const buildMindMapLayout = ({
+    connector = [],
+    actionType = [],
+    adjustedData = [],
+    group = [],
+    insight = []
+}) => {
+    const nodes = [];
+    const edges = [];
+    const seenNodeIds = new Set();
+    const seenEdgeIds = new Set();
 
-            seenNodeIds.add(node.id);
-            nodes.push(node);
+    const pushNode = (node) => {
+        if (!node?.id || seenNodeIds.has(node.id)) {
+            return;
+        }
+
+        seenNodeIds.add(node.id);
+        nodes.push(node);
+    };
+
+    const pushEdge = (edge) => {
+        if (!edge?.id || seenEdgeIds.has(edge.id)) {
+            return;
+        }
+
+        seenEdgeIds.add(edge.id);
+        edges.push(edge);
+    };
+
+    const X_ORIGIN = -325;
+    const totalLayoutWidth = COLUMN_WIDTHS.source
+        + COLUMN_GAPS.sourceToCategory
+        + COLUMN_WIDTHS.category
+        + COLUMN_GAPS.categoryToGroup
+        + COLUMN_WIDTHS.group
+        + COLUMN_GAPS.groupToCard
+        + COLUMN_WIDTHS.card;
+    const layoutLeftEdge = -(totalLayoutWidth / 2);
+    const X_SOURCE = layoutLeftEdge + COLUMN_WIDTHS.source;
+    const X_ADJUSTED = X_SOURCE + COLUMN_GAPS.sourceToCategory;
+    const X_GROUP = X_ADJUSTED + COLUMN_WIDTHS.category + COLUMN_GAPS.categoryToGroup;
+    const X_INSIGHT = X_GROUP + COLUMN_WIDTHS.group + COLUMN_GAPS.groupToCard;
+
+    const ITEM_HEIGHT = 55;
+    const GROUP_GAP = 90;
+    const ORPHAN_GAP = 78;
+    const CATEGORY_BASE_HEIGHT = 82;
+    const CATEGORY_FIELD_STEP = 12;
+    const CATEGORY_GROUP_GAP = 42;
+
+    const getCategoryBlockHeight = (columns = []) => {
+        const extraFields = Math.max((columns.length || 0) - 1, 0);
+        return CATEGORY_BASE_HEIGHT + (extraFields * CATEGORY_FIELD_STEP);
+    };
+
+    const adjustedNodesBySourceId = new Map();
+    const categoryNodesById = new Map();
+    let transformedLayerBottomY = null;
+
+    const totalAdjustedHeight = adjustedData.length > 0
+        ? adjustedData.reduce((acc, adjustedEntry) => acc + getCategoryBlockHeight(adjustedEntry.columns || []), 0) + ((adjustedData.length - 1) * CATEGORY_GROUP_GAP)
+        : 0;
+
+    let startY = -(totalAdjustedHeight / 2);
+
+    adjustedData.forEach((adjustedEntry) => {
+        const columns = adjustedEntry.columns || [];
+        const adjustedStartY = startY;
+        const categoryBlockHeight = getCategoryBlockHeight(columns);
+        const adjustedY = adjustedStartY + (categoryBlockHeight / 2);
+
+        const adjustedNode = {
+            id: `adj-${adjustedEntry.id}`,
+            type: 'category',
+            label: adjustedEntry.title || adjustedEntry.name,
+            x: X_ADJUSTED,
+            y: adjustedY,
+            parentId: `org-${adjustedEntry.origin_id || 'root'}`,
+            data: { childIds: columns.map((column) => column.id), ...adjustedEntry }
         };
 
-        const pushEdge = (edge) => {
-            if (!edge?.id || seenEdgeIds.has(edge.id)) {
-                return;
+        pushNode(adjustedNode);
+        categoryNodesById.set(adjustedEntry.id, adjustedNode);
+
+        const sourceId = adjustedEntry.origin_id || adjustedEntry.action_type_id?.replace(/^action-/, '');
+        if (sourceId) {
+            if (!adjustedNodesBySourceId.has(sourceId)) {
+                adjustedNodesBySourceId.set(sourceId, []);
             }
 
-            seenEdgeIds.add(edge.id);
-            edges.push(edge);
+            adjustedNodesBySourceId.get(sourceId).push(adjustedNode);
+        }
+
+        const adjustedBottomY = adjustedStartY + categoryBlockHeight;
+        transformedLayerBottomY = transformedLayerBottomY == null
+            ? adjustedBottomY
+            : Math.max(transformedLayerBottomY, adjustedBottomY);
+
+        startY = adjustedStartY + categoryBlockHeight + CATEGORY_GROUP_GAP;
+    });
+
+    void actionType;
+
+    const leftNodeCount = Math.max(connector.length, 1);
+    const fallbackStartY = -(((leftNodeCount - 1) * ORPHAN_GAP) / 2);
+    let orphanIndex = 0;
+    const orphanYByKey = new Map();
+
+    const getLineageBottomY = () => {
+        if (transformedLayerBottomY != null) {
+            return transformedLayerBottomY + GROUP_GAP;
+        }
+
+        return fallbackStartY;
+    };
+
+    const getOrphanY = (key) => {
+        if (!orphanYByKey.has(key)) {
+            orphanYByKey.set(key, getLineageBottomY() + (orphanIndex * ORPHAN_GAP));
+            orphanIndex += 1;
+        }
+
+        return orphanYByKey.get(key);
+    };
+
+    connector.forEach((source) => {
+        const relatedAdjustedNodes = adjustedNodesBySourceId.get(source.id) || [];
+        const sourceY = relatedAdjustedNodes.length > 0
+            ? average(relatedAdjustedNodes, (node) => node.y)
+            : getOrphanY(`orphan-chain:${source.id}`);
+
+        const sourceNode = {
+            id: `conn-${source.id}`,
+            type: 'source',
+            label: source.name,
+            iconType: source.type,
+            x: X_SOURCE,
+            y: sourceY,
+            data: source
         };
 
-        // X-Coordinates for Layers
-        const X_CONNECTOR  = -800;
-        const X_ACTION     = -550;
-        const X_ORIGIN     = -325;
-        const X_ADJUSTED   = -100;
-        const X_COLUMNS    = 250;
-        const X_GROUP      = 650;
-        const X_INSIGHT    = 1000;
+        pushNode(sourceNode);
 
-        const ITEM_HEIGHT = 55;
-        const GROUP_GAP = 90;
-
-        // 1. DATA (CENTER BRANCH) - Centered around Y=0
-        let startY = 0;
-        
-        // We'll calculate total height of adjustedData to center it
-        const totalAdjHeight = adjustedData.reduce((acc, adj) => acc + (adj.columns?.length || 1) * ITEM_HEIGHT, 0) + (adjustedData.length - 1) * GROUP_GAP;
-        startY = -(totalAdjHeight / 2);
-
-        adjustedData.forEach((adj) => {
-            const columns = adj.columns || [];
-            const adjStartY = startY;
-            
-            columns.forEach((col) => {
-                const uniqueColId = `${adj.id}-${col.id}`;
-                const colNode = {
-                    id: uniqueColId,
-                    type: 'idea',
-                    label: col.title || col.name,
-                    data: col,
-                    x: X_COLUMNS,
-                    y: startY,
-                    parentId: `adj-${adj.id}`
-                };
-                pushNode(colNode);
-                startY += ITEM_HEIGHT;
+        relatedAdjustedNodes.forEach((adjustedNode) => {
+            pushEdge({
+                id: `edge-conn-${source.id}-${adjustedNode.id}`,
+                sourceId: `conn-${source.id}`,
+                targetId: adjustedNode.id,
+                source: { x: X_SOURCE, y: sourceY },
+                target: { x: X_ADJUSTED, y: adjustedNode.y }
             });
+        });
+    });
 
-            const adjEndY = startY - ITEM_HEIGHT;
-            const adjY = (adjStartY + adjEndY) / 2;
+    const totalInsightHeight = (insight.length * ITEM_HEIGHT) + (group.length * GROUP_GAP);
+    let groupStartY = -(totalInsightHeight / 2);
 
-            const adjNode = {
-                id: `adj-${adj.id}`,
-                type: 'category',
-                label: adj.title || adj.name,
-                x: X_ADJUSTED,
-                y: adjY,
-                parentId: `org-${adj.origin_id || 'root'}`,
-                data: { childIds: columns.map(c => c.id), ...adj }
+    group.forEach((groupEntry) => {
+        const groupInsights = insight.filter((insightEntry) => insightEntry.group_id === groupEntry.id);
+        const groupY = groupStartY + ((groupInsights.length * ITEM_HEIGHT) / 2);
+
+        const groupNode = {
+            id: `grp-${groupEntry.id}`,
+            type: 'group',
+            label: groupEntry.title || groupEntry.name,
+            x: X_GROUP,
+            y: groupY,
+            data: groupEntry
+        };
+
+        pushNode(groupNode);
+
+        groupInsights.forEach((insightEntry) => {
+            const insightNode = {
+                id: insightEntry.id,
+                type: 'card',
+                label: insightEntry.title || insightEntry.name,
+                data: insightEntry,
+                x: X_INSIGHT,
+                y: groupStartY + (ITEM_HEIGHT / 2),
+                parentId: `grp-${groupEntry.id}`
             };
-            pushNode(adjNode);
 
-            columns.forEach(col => {
-                const uniqueColId = `${adj.id}-${col.id}`;
-                pushEdge({
-                    id: `edge-adj-${adj.id}-${col.id}`,
-                    sourceId: `adj-${adj.id}`,
-                    targetId: uniqueColId,
-                    source: { x: X_ADJUSTED, y: adjY },
-                    target: { x: X_COLUMNS, y: nodes.find(n => n.id === uniqueColId).y }
-                });
+            pushNode(insightNode);
+
+            pushEdge({
+                id: `edge-grp-${groupEntry.id}-ins-${insightEntry.id}`,
+                sourceId: `grp-${groupEntry.id}`,
+                targetId: insightEntry.id,
+                source: { x: X_GROUP, y: groupY },
+                target: { x: X_INSIGHT, y: insightNode.y }
             });
 
-            startY += GROUP_GAP;
-        });
+            (insightEntry.adjusted_data_columns || []).forEach((adjustedColumnName) => {
+                const categoryNode = nodes.find((node) => (
+                    node.type === 'category'
+                    && (insightEntry.lineage?.source_keys || []).some((sourceId) => node.id === `adj-${sourceId}`)
+                    && (node.data?.columns || []).some((column) => column.name === adjustedColumnName)
+                ));
 
-        // 2. LINEAGE (LEFT SIDE: Origin > ActionType > Connector)
-        // Position based on the adjustedData Y positions
-        adjustedData.forEach(adj => {
-            const adjNode = nodes.find(n => n.id === `adj-${adj.id}`);
-            if (!adjNode) return;
-
-            // 1. ActionType
-            const act = actionType.find(a => a.id === adj.action_type_id) || actionType.find(a => origin.find(o => o.id === adj.origin_id)?.action_type_id === a.id);
-            if (act) {
-                let actNode = nodes.find(n => n.id === `act-${act.id}`);
-                if (!actNode) {
-                    actNode = {
-                        id: `act-${act.id}`,
-                        type: 'action',
-                        label: act.name,
-                        x: X_ACTION,
-                        y: adjNode.y,
-                        data: act
-                    };
-                    pushNode(actNode);
+                if (!categoryNode) {
+                    return;
                 }
 
                 pushEdge({
-                    id: `edge-act-${act.id}-adj-${adj.id}`,
-                    sourceId: `act-${act.id}`,
-                    targetId: `adj-${adj.id}`,
-                    source: { x: X_ACTION, y: actNode.y },
-                    target: { x: X_ADJUSTED, y: adjNode.y }
+                    id: `edge-lin-${categoryNode.id}-grp-${groupEntry.id}`,
+                    sourceId: categoryNode.id,
+                    targetId: `grp-${groupEntry.id}`,
+                    source: { x: X_ADJUSTED, y: categoryNode.y },
+                    target: { x: X_GROUP, y: groupY },
+                    isDashboardConnection: true,
+                    isTracingOnly: true
                 });
-
-                // 2. Connector
-                const conn = connector.find(c => c.id === act.connector_id) || connector[0];
-                if (conn) {
-                    let connNode = nodes.find(n => n.id === `conn-${conn.id}`);
-                    if (!connNode) {
-                        connNode = {
-                            id: `conn-${conn.id}`,
-                            type: 'source',
-                            label: conn.name,
-                            iconType: conn.type,
-                            x: X_CONNECTOR,
-                        y: actNode.y,
-                        data: conn
-                    };
-                        pushNode(connNode);
-                    }
-
-                    pushEdge({
-                        id: `edge-conn-${conn.id}-act-${act.id}`,
-                        sourceId: `conn-${conn.id}`,
-                        targetId: `act-${act.id}`,
-                        source: { x: X_CONNECTOR, y: connNode.y },
-                        target: { x: X_ACTION, y: actNode.y }
-                    });
-                }
-            }
-        });
-
-        // 3. INSIGHTS (RIGHT BRANCH: Group > Insight)
-        // Groups connect to adjustedData via adjusted_data_ids
-        const totalInsightHeight = insight.length * ITEM_HEIGHT + (group.length * GROUP_GAP);
-        let groupStartY = -(totalInsightHeight / 2);
-
-        group.forEach(grp => {
-            const grpInsights = insight.filter(ins => ins.group_id === grp.id);
-            const grpY = groupStartY + (grpInsights.length * ITEM_HEIGHT) / 2;
-
-            const grpNode = {
-                id: `grp-${grp.id}`,
-                type: 'group',
-                label: grp.title || grp.name,
-                x: X_GROUP,
-                y: grpY,
-                data: grp
-            };
-            pushNode(grpNode);
-
-            /* 
-            // Connect group to its source adjustedData nodes
-            (grp.adjusted_data_ids || []).forEach(adjId => {
-                const adjNode = nodes.find(n => n.id === `adj-${adjId}`);
-                if (adjNode) {
-                    edges.push({
-                        id: `edge-adj-${adjId}-grp-${grp.id}`,
-                        sourceId: `adj-${adjId}`,
-                        targetId: `grp-${grp.id}`,
-                        source: { x: X_ADJUSTED, y: adjNode.y },
-                        target: { x: X_GROUP, y: grpY },
-                        isDashboardConnection: true
-                    });
-                }
-            });
-            */
-
-            grpInsights.forEach(ins => {
-                const insNode = {
-                    id: ins.id,
-                    type: 'card',
-                    label: ins.title || ins.name,
-                    data: ins,
-                    x: X_INSIGHT,
-                    y: groupStartY + (ITEM_HEIGHT / 2),
-                    parentId: `grp-${grp.id}`
-                };
-                pushNode(insNode);
-
-                pushEdge({
-                    id: `edge-grp-${grp.id}-ins-${ins.id}`,
-                    sourceId: `grp-${grp.id}`,
-                    targetId: ins.id,
-                    source: { x: X_GROUP, y: grpY },
-                    target: { x: X_INSIGHT, y: insNode.y }
-                });
-
-                // Lineage: columns -> Group (tracing lines)
-                (ins.adjusted_data_columns || []).forEach(adjColName => {
-                    const colNode = nodes.find(n => n.data?.name === adjColName && n.type === 'idea' && (ins.lineage?.source_keys || []).some(srcId => n.parentId === `adj-${srcId}`));
-                    if (colNode) {
-                        pushEdge({
-                            id: `edge-lin-${colNode.id}-grp-${grp.id}`,
-                            sourceId: colNode.id,
-                            targetId: `grp-${grp.id}`,
-                            source: { x: colNode.x, y: colNode.y },
-                            target: { x: X_GROUP, y: grpY },
-                            isDashboardConnection: true,
-                            isTracingOnly: true
-                        });
-                    }
-                });
-
-                groupStartY += ITEM_HEIGHT;
             });
 
-            groupStartY += GROUP_GAP;
+            groupStartY += ITEM_HEIGHT;
         });
 
-        return { nodes, edges };
-    }, [connector, actionType, adjustedData, group, insight, title]);
+        groupStartY += GROUP_GAP;
+    });
 
-    return { stats, layout };
+    return { nodes, edges, X_ORIGIN, X_ADJUSTED };
 };

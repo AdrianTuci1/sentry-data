@@ -110,9 +110,44 @@ export class ProjectStore {
 
     _loadMockProjects() {
         const mockDbProjects = [
-            { id: 'parrot-commerce-demo', name: 'Parrot Commerce Demo', status: 'active', lastActive: '2 min ago', connectors: 2, models: 1 },
-            { id: 'parrot-growth-studio', name: 'Parrot Growth Studio', status: 'active', lastActive: '2h ago', connectors: 3, models: 2 },
-            { id: 'parrot-risk-lab', name: 'Parrot Risk Lab', status: 'archived', lastActive: '5d ago', connectors: 2, models: 1 }
+            {
+                id: 'parrot-commerce-demo',
+                name: 'Parrot Commerce Demo',
+                status: 'active',
+                lastActive: '2 min ago',
+                connectors: 2,
+                models: 1,
+                viewLink: 'https://app.sentry.local/view/parrot-commerce-demo',
+                members: [
+                    { id: 'm_1', account: 'ops@sentry.local', access: 'admin' },
+                    { id: 'm_2', account: 'growth@sentry.local', access: 'contributor' },
+                ]
+            },
+            {
+                id: 'parrot-growth-studio',
+                name: 'Parrot Growth Studio',
+                status: 'active',
+                lastActive: '2h ago',
+                connectors: 3,
+                models: 2,
+                viewLink: 'https://app.sentry.local/view/parrot-growth-studio',
+                members: [
+                    { id: 'm_3', account: 'brand@sentry.local', access: 'admin' },
+                    { id: 'm_4', account: 'sales@sentry.local', access: 'viewer' },
+                ]
+            },
+            {
+                id: 'parrot-risk-lab',
+                name: 'Parrot Risk Lab',
+                status: 'archived',
+                lastActive: '5d ago',
+                connectors: 2,
+                models: 1,
+                viewLink: 'https://app.sentry.local/view/parrot-risk-lab',
+                members: [
+                    { id: 'm_5', account: 'security@sentry.local', access: 'admin' },
+                ]
+            }
         ];
 
         runInAction(() => {
@@ -127,9 +162,23 @@ export class ProjectStore {
             lastActive: 'Just now',
             connectors: 0,
             models: 0,
+            members: [],
+            viewLink: `https://app.sentry.local/view/proj_${Date.now()}`,
             ...data
         });
         this.projects.push(project);
+        return project;
+    }
+
+    updateProject(projectId, data) {
+        const project = this.projects.find((entry) => entry.id === projectId);
+        if (!project) return null;
+
+        project.update({
+            ...data,
+            lastActive: 'Just now',
+        });
+
         return project;
     }
 }

@@ -1,1264 +1,846 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { useStore } from '../../store/StoreProvider';
 import { clsx } from 'clsx';
 import {
-    AlertTriangle,
-    Info,
-    LayoutDashboard,
-    FolderKanban,
-    Globe,
     Activity,
     Box,
-    Database,
     Code2,
-    Sparkles,
-    Shield,
-    Check,
-    CheckCircle2,
-    Clock3
+    Database,
+    Eye,
+    EyeOff,
+    FolderKanban,
+    Globe,
+    LayoutDashboard,
+    Pencil,
+    RefreshCw,
+    Trash2,
+    Plus,
+    Play,
+    Sparkles
 } from 'lucide-react';
-import { useMindMapLayout } from './useMindMapLayout';
+import { useStore } from '../../store/StoreProvider';
+import { FeatureMindMapStore } from './FeatureMindMapStore';
 
-const SentinelFindingBadges = ({ summary, compact = false, align = 'left' }) => {
-    if (!summary || (!summary.openErrors && !summary.openWarnings && !summary.openInfos && !summary.resolved)) {
+const NODE_LAYOUT = {
+    source: { width: 272, anchor: 'right' },
+    action: { width: 220, anchor: 'center' },
+    category: { width: 260, anchor: 'left' },
+    group: { width: 250, anchor: 'left' },
+    card: { width: 268, anchor: 'left' },
+    idea: { width: 220, anchor: 'left' }
+};
+
+const SOURCE_ICON_BY_TYPE = {
+    db: Database,
+    database: Database,
+    warehouse: Database,
+    sql: Database,
+    api: Globe,
+    http: Globe,
+    crm: Globe,
+    stream: Activity,
+    kafka: Activity,
+    events: Activity
+};
+
+const COLUMN_STATUS_TEXT_TONES = {
+    ok: 'text-[#B8C4D1]',
+    active: 'text-[#B8C4D1]',
+    warning: 'text-amber-200',
+    error: 'text-rose-200'
+};
+
+const CARD_SURFACE_CLASS = 'border-white/10 bg-[#1A1C20]/96 shadow-[0_12px_28px_rgba(0,0,0,0.24)]';
+const CARD_ICON_SURFACE_CLASS = 'border-white/10 bg-[#23262B]';
+
+const getNodeFrame = (node) => {
+    const config = NODE_LAYOUT[node?.type] || NODE_LAYOUT.idea;
+
+    if (config.anchor === 'right') {
+        return {
+            left: node.x - config.width,
+            right: node.x,
+            centerY: node.y,
+            width: config.width
+        };
+    }
+
+    if (config.anchor === 'left') {
+        return {
+            left: node.x,
+            right: node.x + config.width,
+            centerY: node.y,
+            width: config.width
+        };
+    }
+
+    return {
+        left: node.x - (config.width / 2),
+        right: node.x + (config.width / 2),
+        centerY: node.y,
+        width: config.width
+    };
+};
+
+const getPortPosition = (node, side) => {
+    const frame = getNodeFrame(node);
+
+    return {
+        x: side === 'left' ? frame.left : frame.right,
+        y: frame.centerY
+    };
+};
+
+const buildEdgePath = (store, edge) => {
+    const sourceNode = store.ui.positionedNodeMap.get(edge.sourceId) || store.data.nodeMap.get(edge.sourceId);
+    const targetNode = store.ui.positionedNodeMap.get(edge.targetId) || store.data.nodeMap.get(edge.targetId);
+    const source = sourceNode ? getPortPosition(sourceNode, 'right') : edge.source;
+    const target = targetNode ? getPortPosition(targetNode, 'left') : edge.target;
+    const controlOffset = Math.max(56, Math.abs(target.x - source.x) * 0.32);
+
+    return `M ${source.x} ${source.y}
+        C ${source.x + controlOffset} ${source.y},
+          ${target.x - controlOffset} ${target.y},
+          ${target.x} ${target.y}`;
+};
+
+const buildPreviewEdgePath = (sourceNode, ghostNode) => {
+    const source = getPortPosition(sourceNode, 'right');
+    const target = getPortPosition(ghostNode, 'left');
+    const controlOffset = Math.max(56, Math.abs(target.x - source.x) * 0.32);
+
+    return `M ${source.x} ${source.y}
+        C ${source.x + controlOffset} ${source.y},
+          ${target.x - controlOffset} ${target.y},
+          ${target.x} ${target.y}`;
+};
+
+const NodePorts = ({ showInput = true, showOutput = true }) => (
+    <>
+        {showInput && (
+            <div className="pointer-events-none absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                <div className="flex h-3.5 w-3.5 items-center justify-center rounded-full border border-white/18 bg-[#0D1116] shadow-[0_0_0_2px_rgba(10,13,18,0.9)]">
+                    <div className="h-1.5 w-1.5 rounded-full bg-[#8B98A6]" />
+                </div>
+            </div>
+        )}
+        {showOutput && (
+            <div className="pointer-events-none absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2">
+                <div className="flex h-3.5 w-3.5 items-center justify-center rounded-full border border-sky-300/24 bg-[#0D1116] shadow-[0_0_0_2px_rgba(10,13,18,0.9)]">
+                    <div className="h-1.5 w-1.5 rounded-full bg-sky-300/80" />
+                </div>
+            </div>
+        )}
+    </>
+);
+
+const renderSourceIcon = (iconType, className) => {
+    const sourceType = String(iconType || '').toLowerCase();
+
+    if (SOURCE_ICON_BY_TYPE[sourceType] === Database) {
+        return <Database size={19} className={className} />;
+    }
+
+    if (SOURCE_ICON_BY_TYPE[sourceType] === Globe) {
+        return <Globe size={19} className={className} />;
+    }
+
+    if (SOURCE_ICON_BY_TYPE[sourceType] === Activity) {
+        return <Activity size={19} className={className} />;
+    }
+
+    return <Box size={19} className={className} />;
+};
+
+const getNodeStateClasses = (viewModel) => clsx(
+    'pointer-events-auto transition-all duration-300 ease-out',
+    viewModel.isDimmed ? 'opacity-10 blur-[1px] saturate-50' : 'opacity-100',
+    viewModel.isTraceActive && !viewModel.isDimmed && 'scale-[1.015]'
+);
+
+const ContextMenu = ({ store }) => {
+    const activeMenu = store.ui.activeMenu;
+
+    if (!activeMenu) {
         return null;
     }
 
-    const alertCount = summary.openWarnings + summary.openInfos;
-
     return (
-        <div className={clsx('flex flex-wrap items-center gap-1.5', align === 'right' && 'justify-end')}>
-            {summary.openErrors > 0 && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/15 px-2 py-1 text-[10px] font-medium text-rose-300">
-                    <AlertTriangle size={11} />
-                    {compact ? summary.openErrors : `${summary.openErrors} error${summary.openErrors === 1 ? '' : 's'}`}
-                </span>
-            )}
-            {alertCount > 0 && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-1 text-[10px] font-medium text-amber-300">
-                    <Shield size={11} />
-                    {compact ? alertCount : `${alertCount} alert${alertCount === 1 ? '' : 's'}`}
-                </span>
-            )}
-            {summary.resolved > 0 && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-1 text-[10px] font-medium text-emerald-300">
-                    <CheckCircle2 size={11} />
-                    {compact ? summary.resolved : `${summary.resolved} resolved`}
-                </span>
-            )}
+        <div
+            data-mindmap-interactive="true"
+            className="absolute z-[140] min-w-[180px] rounded-2xl border border-white/10 bg-[#111317]/96 p-1.5 shadow-[0_24px_60px_rgba(0,0,0,0.45)] backdrop-blur-xl"
+            style={store.ui.getViewportStyle(activeMenu.x, activeMenu.y, activeMenu.transform)}
+            onMouseDown={(event) => event.stopPropagation()}
+            onClick={(event) => event.stopPropagation()}
+        >
+            {activeMenu.actions.map((action) => {
+                const Icon = action.icon;
+
+                return (
+                    <button
+                        key={action.id}
+                        type="button"
+                        className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-[11px] font-medium text-[#DCE4EB] transition-colors hover:bg-white/[0.06]"
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            store.ui.clearActiveMenu();
+                            action.onSelect();
+                        }}
+                    >
+                        {Icon && <Icon size={13} className="text-[#92A2B3]" />}
+                        <span>{action.label}</span>
+                    </button>
+                );
+            })}
         </div>
     );
 };
 
-const FeatureMindMap = observer(({ onNodeClick, showCosts = false }) => {
-    const { workspaceStore } = useStore();
-    const { ui, data, editor } = workspaceStore;
-
-    const { scale, pan, selectedItems: selectedColumns } = ui;
-    const {
-        connector,
-        actionType,
-        origin,
-        adjustedData,
-        group,
-        insight,
-        mindmapManifest,
-        mindmapYaml,
-        sourceMetadata
-    } = data;
-
-    const { layout } = useMindMapLayout({
-        connector,
-        actionType,
-        origin,
-        adjustedData,
-        group,
-        insight
-    });
-
-    const [hoveredNodeId, setHoveredNodeId] = useState(null);
-    const [focusedSectionId, setFocusedSectionId] = useState(null);
-    const [activeMenu, setActiveMenu] = useState(null);
-
-    useEffect(() => {
-        const handlePointerDown = (event) => {
-            if (!event.target.closest('[data-mindmap-interactive="true"]')) {
-                setActiveMenu(null);
-            }
-        };
-
-        const handleEscape = (event) => {
-            if (event.key === 'Escape') {
-                setActiveMenu(null);
-                setFocusedSectionId(null);
-            }
-        };
-
-        window.addEventListener('mousedown', handlePointerDown);
-        window.addEventListener('keydown', handleEscape);
-
-        return () => {
-            window.removeEventListener('mousedown', handlePointerDown);
-            window.removeEventListener('keydown', handleEscape);
-        };
-    }, []);
-
-    const nodeMap = useMemo(() => new Map(layout.nodes.map((node) => [node.id, node])), [layout.nodes]);
-
-    const manifestSources = mindmapManifest?.layers?.sources || [];
-    const manifestGroups = mindmapManifest?.layers?.groups || [];
-    const manifestInsights = mindmapManifest?.layers?.insights || [];
-    const manifestTransformations = mindmapManifest?.layers?.transformations || {};
-    const manifestGold = mindmapManifest?.layers?.gold || {};
-
-    const sourceLayerMap = useMemo(
-        () => new Map(manifestSources.map((item) => [item.id, item])),
-        [manifestSources]
-    );
-
-    const sourceProfileMap = useMemo(
-        () => new Map((sourceMetadata || []).map((item) => [item.sourceId, item])),
-        [sourceMetadata]
-    );
-
-    const groupMap = useMemo(
-        () => new Map(manifestGroups.map((item) => [item.id, item])),
-        [manifestGroups]
-    );
-
-    const insightMap = useMemo(
-        () => new Map(manifestInsights.map((item) => [item.id, item])),
-        [manifestInsights]
-    );
-
-    const goldMap = useMemo(() => {
-        const flatViews = Object.values(manifestGold).flat();
-        return new Map(flatViews.map((item) => [item.id, item]));
-    }, [manifestGold]);
-
-    const sectionModels = useMemo(() => ({
-        sources: {
-            id: 'sources',
-            label: 'Sources',
-            description: 'Discovery, schema profiling, and source-level metadata.',
-            items: (sourceMetadata || []).map((profile) => ({
-                source: sourceLayerMap.get(profile.sourceId) || null,
-                profile,
-                transformations: manifestTransformations[profile.sourceId] || [],
-                gold: manifestGold[profile.sourceId] || []
-            })),
-            layerPolicy: mindmapManifest?.editing?.layerPolicies?.sources || null
-        },
-        transformations: {
-            id: 'transformations',
-            label: 'Transforms',
-            description: 'Intent-first transformation rules compiled from Bronze.',
-            items: Object.entries(manifestTransformations).flatMap(([sourceId, items]) => items.map((item) => ({
-                sourceId,
-                ...item
-            }))),
-            layerPolicy: mindmapManifest?.editing?.layerPolicies?.transformations || null
-        },
-        gold: {
-            id: 'gold',
-            label: 'Gold Views',
-            description: 'Virtual gold views and contracts used for groups and widgets.',
-            items: Object.entries(manifestGold).flatMap(([sourceId, items]) => items.map((item) => ({
-                sourceId,
-                ...item
-            }))),
-            layerPolicy: mindmapManifest?.editing?.layerPolicies?.gold || null
-        },
-        groups: {
-            id: 'groups',
-            label: 'Groups',
-            description: 'Activation groups that bundle downstream business outputs.',
-            items: manifestGroups,
-            layerPolicy: mindmapManifest?.editing?.layerPolicies?.groups || null
-        },
-        insights: {
-            id: 'insights',
-            label: 'Insights',
-            description: 'Insight nodes, widget contracts, and executable logic.',
-            items: manifestInsights,
-            layerPolicy: mindmapManifest?.editing?.layerPolicies?.insights || null
-        }
-    }), [sourceMetadata, sourceLayerMap, manifestTransformations, manifestGold, manifestGroups, manifestInsights, mindmapManifest]);
-
-    const onToggleSelection = (id) => ui.toggleSelection(id);
-    const onToggleGroup = (ids) => ui.toggleGroup(ids);
-
-    const getSectionIdForNode = (node) => {
-        if (!node) return null;
-        if (node.type === 'source') return 'sources';
-        if (node.type === 'action') return 'transformations';
-        if (node.type === 'category' || node.type === 'idea') return 'gold';
-        if (node.type === 'group') return 'groups';
-        if (node.type === 'card') return 'insights';
-        return null;
-    };
-
-    const getViewportStyle = (x, y, transform = 'translate(-50%, -100%)') => ({
-        left: `calc(50% + ${pan.x + (x * scale)}px)`,
-        top: `calc(50% + ${pan.y + (y * scale)}px)`,
-        transform
-    });
-
-    const openCodeDocument = (title, code, type = 'python', recurrence = 'manual', payload = null) => {
-        editor.openCode({
-            isOpen: true,
-            nodeId: title,
-            title,
-            code,
-            type,
-            recurrence,
-            payload
-        });
-        setActiveMenu(null);
-    };
-
-    const openInspectorDocument = (title, payload, initialTab = 'overview') => {
-        editor.openInspector({
-            isOpen: true,
-            nodeId: title,
-            title,
-            payload,
-            initialTab,
-            type: 'python'
-        });
-        setActiveMenu(null);
-    };
-
-    const formatStageTitle = (value) => value.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
-
-    const normalizeSentinelFinding = (finding, prefix, index, fallbackTitle = 'Sentinel finding') => ({
-        id: finding?.id || `${prefix}-${index}`,
-        severity: finding?.severity || (finding?.status === 'resolved' ? 'info' : 'warning'),
-        status: finding?.status === 'resolved' ? 'resolved' : 'open',
-        title: finding?.title || fallbackTitle,
-        detail: finding?.detail || finding?.message || '',
-        resolution: finding?.resolution || '',
-        source: finding?.source || 'sentinel'
-    });
-
-    const deriveFindingsFromChecks = (checks = [], prefix, label) => (
-        checks.flatMap((check, index) => {
-            if (check.status === 'failed') {
-                return [normalizeSentinelFinding({
-                    severity: 'error',
-                    status: 'open',
-                    title: `${formatStageTitle(check.name || 'validation')} failed`,
-                    detail: check.message || `${label} failed a Sentinel validation check.`
-                }, prefix, index, label)];
-            }
-
-            if (check.status === 'pending') {
-                return [normalizeSentinelFinding({
-                    severity: 'warning',
-                    status: 'open',
-                    title: `${formatStageTitle(check.name || 'validation')} needs review`,
-                    detail: check.message || `${label} is waiting for Sentinel review.`
-                }, prefix, index, label)];
-            }
-
-            return [];
-        })
-    );
-
-    const dedupeSentinelFindings = (findings) => {
-        const deduped = new Map();
-        findings.forEach((finding) => {
-            if (finding?.id && !deduped.has(finding.id)) {
-                deduped.set(finding.id, finding);
-            }
-        });
-        return Array.from(deduped.values());
-    };
-
-    const collectEntrySentinelFindings = (entry, prefix, label) => {
-        if (!entry) return [];
-
-        const explicitFindings = Array.isArray(entry.sentinelFindings)
-            ? entry.sentinelFindings.map((finding, index) => normalizeSentinelFinding(
-                finding,
-                `${prefix}-explicit`,
-                index,
-                label || entry.title || entry.sourceName || 'Sentinel finding'
-            ))
-            : [];
-
-        if (explicitFindings.length > 0) {
-            return explicitFindings;
-        }
-
-        return deriveFindingsFromChecks(
-            entry.validation?.checks || [],
-            `${prefix}-derived`,
-            label || entry.title || entry.sourceName || 'Sentinel finding'
-        );
-    };
-
-    const summarizeSentinelFindings = (findings = []) => findings.reduce((summary, finding) => {
-        if (finding.status === 'resolved') {
-            summary.resolved += 1;
-            return summary;
-        }
-
-        if (finding.severity === 'error') {
-            summary.openErrors += 1;
-        } else if (finding.severity === 'warning') {
-            summary.openWarnings += 1;
-        } else {
-            summary.openInfos += 1;
-        }
-
-        return summary;
-    }, {
-        openErrors: 0,
-        openWarnings: 0,
-        openInfos: 0,
-        resolved: 0
-    });
-
-    const getStatusTone = (summary, fallback = {}) => {
-        if (summary.openErrors > 0) {
-            return {
-                tone: 'error',
-                label: `${summary.openErrors} error${summary.openErrors === 1 ? '' : 's'}`
-            };
-        }
-
-        const openAlerts = summary.openWarnings + summary.openInfos;
-        if (openAlerts > 0) {
-            return {
-                tone: 'warning',
-                label: `${openAlerts} alert${openAlerts === 1 ? '' : 's'}`
-            };
-        }
-
-        if (summary.resolved > 0) {
-            return {
-                tone: 'resolved',
-                label: `${summary.resolved} resolved`
-            };
-        }
-
-        if (fallback.accepted) {
-            return {
-                tone: 'accepted',
-                label: 'Accepted'
-            };
-        }
-
-        if (fallback.recommended) {
-            return {
-                tone: 'recommended',
-                label: 'Pending review'
-            };
-        }
-
-        return {
-            tone: 'active',
-            label: fallback.activeLabel || 'Active'
-        };
-    };
-
-    const collectSectionSuggestions = (sectionId) => {
-        const section = sectionModels[sectionId];
-        const items = section?.items || [];
-
-        return sectionId === 'sources'
-            ? items.flatMap((item) => {
-                const transformSuggestions = (item?.transformations || []).flatMap((entry) => (entry?.suggestions || []).map((suggestion) => ({
-                    item_id: entry?.id || item?.profile?.sourceId || 'unknown',
-                    item_title: entry?.title || item?.profile?.sourceName || 'Untitled',
-                    ...suggestion
-                })));
-
-                const goldSuggestions = (item?.gold || []).flatMap((entry) => (entry?.suggestions || []).map((suggestion) => ({
-                    item_id: entry?.id || item?.profile?.sourceId || 'unknown',
-                    item_title: entry?.title || item?.profile?.sourceName || 'Untitled',
-                    ...suggestion
-                })));
-
-                return transformSuggestions.concat(goldSuggestions);
-            })
-            : items.flatMap((item) => (item?.suggestions || []).map((suggestion) => ({
-                item_id: item?.id || item?.profile?.sourceId || item?.sourceId || 'unknown',
-                item_title: item?.title || item?.profile?.sourceName || item?.label || item?.sourceId || 'Untitled',
-                ...suggestion
-            })));
-    };
-
-    const buildSectionCodeArtifacts = (sectionId) => {
-        const section = sectionModels[sectionId];
-        const items = section?.items || [];
-
-        if (sectionId === 'groups') {
-            return items.map((item) => ({
-                id: item.id,
-                title: item.title || item.name,
-                language: 'python',
-                caption: 'Group activation logic and next-step summary.',
-                code: [
-                    `# Group control plan for ${item.title || item.name}`,
-                    `group_id = "${item.id}"`,
-                    `activation_mode = "${item.activationMode || item.activation_mode || 'manual'}"`,
-                    `status = "${item.status}"`,
-                    `intent = "${item.logic?.intent || 'No intent attached yet.'}"`,
-                    '',
-                    '# Next step',
-                    'if sentinel_validate(group_id):',
-                    '    activate_group(group_id)',
-                    'else:',
-                    '    keep_pending(group_id)'
-                ].join('\n')
-            }));
-        }
-
-        if (sectionId === 'insights') {
-            return items.map((item) => ({
-                id: item.id,
-                title: item.title,
-                language: (item.logic?.effective_query || item.logic?.code || '').toLowerCase().includes('select') ? 'sql' : 'python',
-                caption: 'PNE-compiled logic for the active or proposed insight.',
-                code: item.logic?.effective_query || item.logic?.compiled_code || item.logic?.code || '# No compiled logic yet'
-            }));
-        }
-
-        if (sectionId === 'gold') {
-            return items.map((item) => ({
-                id: item.id,
-                title: item.title,
-                language: 'sql',
-                caption: `Virtual gold path with ${item.columns?.length || 0} fields.`,
-                code: item.logic?.compiled_code || item.logic?.code || 'SELECT * FROM bronze.source'
-            }));
-        }
-
-        if (sectionId === 'transformations') {
-            return items.map((item) => ({
-                id: item.id,
-                title: item.title,
-                language: 'python',
-                caption: 'Compiled transformation step generated or aligned by PNE.',
-                code: item.compiledCode || item.code || 'apply_transform(bronze_frame)'
-            }));
-        }
-
-        return items.flatMap((item) => {
-            const sourceName = item?.profile?.sourceName || item?.source?.name || item?.profile?.sourceId || 'source';
-            return (item?.transformations || []).map((transform) => ({
-                id: transform.id,
-                title: `${sourceName} · ${transform.title}`,
-                language: 'python',
-                caption: 'Source-level transformation draft derived from discovery metadata.',
-                code: transform.compiledCode || transform.code || 'apply_transform(bronze_frame)'
-            }));
-        });
-    };
-
-    const buildSectionInspectorPayload = (sectionId) => {
-        const section = sectionModels[sectionId];
-        const suggestions = collectSectionSuggestions(sectionId);
-        const lifecycleStages = mindmapManifest?.editing?.lifecycle || ['draft', 'compile', 'dry_run', 'sentinel_validate', 'activate'];
-        const codeArtifacts = buildSectionCodeArtifacts(sectionId);
-        const sentinelFindings = collectSectionSentinelFindings(sectionId);
-        const sentinelSummary = summarizeSentinelFindings(sentinelFindings);
-        const status = getStatusTone(sentinelSummary, {
-            recommended: sectionId !== 'groups' && sectionId !== 'insights',
-            activeLabel: `${section?.items?.length || 0} items`
-        });
-
-        return {
-            subjectType: 'Lane',
-            subjectName: section?.label,
-            summary: section?.description,
-            statusTone: status.tone,
-            statusLabel: status.label,
-            audience: ['End user', 'Data engineer'],
-            metrics: [
-                { label: 'Items', value: `${section?.items?.length || 0}` },
-                { label: 'Suggestions', value: `${suggestions.length}` },
-                { label: 'Open alerts', value: `${sentinelSummary.openErrors + sentinelSummary.openWarnings + sentinelSummary.openInfos}` },
-                { label: 'Resolved', value: `${sentinelSummary.resolved}` }
-            ],
-            lifecycle: lifecycleStages.map((stage, index) => ({
-                title: formatStageTitle(stage),
-                status: index < 2 ? 'passed' : 'pending',
-                detail: `${section?.label} changes should pass through ${formatStageTitle(stage)} before activation.`
-            })),
-            sentinelFindings,
-            suggestions,
-            validation: {
-                checks: [
-                    {
-                        name: 'widget_contract',
-                        status: sectionId === 'insights' ? 'passed' : 'pending',
-                        message: sectionId === 'insights'
-                            ? 'Insight lane should match widget contracts before activation.'
-                            : 'This lane is checked when it feeds widget-facing logic.'
-                    },
-                    {
-                        name: 'safety',
-                        status: 'passed',
-                        message: 'All edits remain draft-first until Sentinel approves activation.'
-                    }
-                ]
-            },
-            recommendationSummary: suggestions.slice(0, 4).map((suggestion) => ({
-                id: suggestion.id,
-                title: suggestion.title,
-                subtitle: suggestion.item_title || suggestion.item_id
-            })),
-            codeArtifacts,
-            chatSeed: [
-                {
-                    role: 'assistant',
-                    content: `This is the ${section?.label} lane. You can review suggestions, inspect generated code, or ask Parrot how to reshape this part of the flow.`
-                }
-            ]
-        };
-    };
-
-    const openSectionMenu = (sectionId) => {
-        const control = sectionControls.find((item) => item.id === sectionId);
-        const section = sectionModels[sectionId];
-        if (!control || !section) return;
-
-        const actions = [
-            {
-                id: `${sectionId}-workspace`,
-                icon: Info,
-                label: 'Open lane',
-                onSelect: () => openInspectorDocument(`${section.label} Control Room`, buildSectionInspectorPayload(sectionId), 'overview')
-            },
-            {
-                id: `${sectionId}-draft`,
-                icon: Plus,
-                label: 'Create draft',
-                onSelect: () => openCodeDocument(`${section.label} Draft`, buildSectionDraft(sectionId), 'yaml')
-            },
-            {
-                id: `${sectionId}-code`,
-                icon: Code2,
-                label: 'Open code',
-                onSelect: () => {
-                    const firstArtifact = buildSectionCodeArtifacts(sectionId)[0];
-                    if (firstArtifact) {
-                        openCodeDocument(firstArtifact.title, firstArtifact.code, firstArtifact.language, 'manual', buildSectionInspectorPayload(sectionId));
-                    } else {
-                        openCodeDocument('Mindmap YAML', mindmapYaml || '# mindmap yaml unavailable', 'yaml');
-                    }
-                }
-            }
-        ];
-
-        setActiveMenu({
-            kind: 'section',
-            title: `${section.label}`,
-            subtitle: `${section.count || control.count} items`,
-            x: control.x,
-            y: control.y + 20,
-            transform: 'translate(-50%, 0)',
-            actions
-        });
-    };
-
-    const toggleSectionFocus = (sectionId) => {
-        setFocusedSectionId((current) => current === sectionId ? null : sectionId);
-    };
-
-    const buildNodeContext = (node) => {
-        if (node.type === 'source') {
-            const sourceId = node.data?.id || node.id.replace(/^conn-/, '');
-            return {
-                label: 'Source',
-                details: {
-                    source: sourceLayerMap.get(sourceId) || null,
-                    profile: sourceProfileMap.get(sourceId) || null,
-                    transformations: manifestTransformations[sourceId] || [],
-                    gold: manifestGold[sourceId] || []
-                }
-            };
-        }
-
-        if (node.type === 'action') {
-            const sourceId = node.data?.connector_id;
-            return {
-                label: 'Transformations',
-                details: {
-                    sourceId,
-                    transformations: manifestTransformations[sourceId] || []
-                }
-            };
-        }
-
-        if (node.type === 'category') {
-            const goldId = node.data?.id;
-            return {
-                label: 'Gold View',
-                details: goldMap.get(goldId) || node.data
-            };
-        }
-
-        if (node.type === 'group') {
-            const groupId = node.data?.id;
-            return {
-                label: 'Group',
-                details: groupMap.get(groupId) || node.data
-            };
-        }
-
-        if (node.type === 'card') {
-            return {
-                label: 'Insight',
-                details: insightMap.get(node.id) || node.data
-            };
-        }
-
-        if (node.type === 'idea') {
-            const goldId = (node.parentId || '').replace(/^adj-/, '');
-            return {
-                label: 'Field',
-                details: {
-                    column: node.data,
-                    gold: goldMap.get(goldId) || null
-                }
-            };
-        }
-
-        return {
-            label: 'Node',
-            details: node.data || node
-        };
-    };
-
-    const buildNodeSuggestions = (nodeContext) => {
-        const details = nodeContext?.details;
-
-        if (Array.isArray(details?.transformations) && details.transformations.length > 0) {
-            return details.transformations.flatMap((item) => item?.suggestions || []);
-        }
-
-        if (details?.suggestions && details.suggestions.length > 0) {
-            return details.suggestions;
-        }
-
-        return [];
-    };
-
-    const buildNodeValidation = (nodeContext) => {
-        const details = nodeContext?.details;
-
-        if (Array.isArray(details?.transformations)) {
-            return {
-                checks: details.transformations.flatMap((item) => (item?.validation?.checks || []).map((check) => ({
-                    ...check,
-                    name: check.name,
-                    message: `${item.title}: ${check.message}`
-                })))
-            };
-        }
-
-        if (details?.validation) {
-            return details.validation;
-        }
-
-        return { checks: [] };
-    };
-
-    const buildNodeSentinelFindings = (node, nodeContext) => {
-        const details = nodeContext?.details;
-
-        if (node.type === 'source') {
-            return dedupeSentinelFindings([
-                ...collectEntrySentinelFindings(details?.profile, `${node.id}-profile`, node.label),
-                ...(details?.transformations || []).flatMap((item) => collectEntrySentinelFindings(item, `${node.id}-${item.id}`, item.title || node.label)),
-                ...(details?.gold || []).flatMap((item) => collectEntrySentinelFindings(item, `${node.id}-${item.id}`, item.title || node.label))
-            ]);
-        }
-
-        if (Array.isArray(details?.transformations)) {
-            return dedupeSentinelFindings(
-                details.transformations.flatMap((item) => collectEntrySentinelFindings(item, `${node.id}-${item.id}`, item.title || node.label))
-            );
-        }
-
-        if (details?.gold || details?.column) {
-            return dedupeSentinelFindings([
-                ...collectEntrySentinelFindings(details?.column, `${node.id}-column`, details?.column?.name || node.label),
-                ...collectEntrySentinelFindings(details?.gold, `${node.id}-gold`, details?.gold?.title || node.label)
-            ]);
-        }
-
-        return dedupeSentinelFindings(collectEntrySentinelFindings(details, node.id, node.label));
-    };
-
-    const collectSectionSentinelFindings = (sectionId) => {
-        const section = sectionModels[sectionId];
-        const items = section?.items || [];
-
-        if (sectionId === 'sources') {
-            return dedupeSentinelFindings(items.flatMap((item) => ([
-                ...collectEntrySentinelFindings(item?.profile, `${sectionId}-${item?.profile?.sourceId || 'source'}`, item?.profile?.sourceName || 'Source'),
-                ...(item?.transformations || []).flatMap((entry) => collectEntrySentinelFindings(entry, `${sectionId}-${entry.id}`, entry.title || 'Transformation')),
-                ...(item?.gold || []).flatMap((entry) => collectEntrySentinelFindings(entry, `${sectionId}-${entry.id}`, entry.title || 'Gold view'))
-            ])));
-        }
-
-        return dedupeSentinelFindings(items.flatMap((item) => collectEntrySentinelFindings(
-            item,
-            `${sectionId}-${item?.id || item?.sourceId || 'item'}`,
-            item?.title || item?.name || item?.sourceName || section?.label || 'Mindmap item'
-        )));
-    };
-
-    const sectionFindingSummaries = useMemo(() => Object.fromEntries(
-        Object.keys(sectionModels).map((sectionId) => {
-            const findings = collectSectionSentinelFindings(sectionId);
-            return [sectionId, summarizeSentinelFindings(findings)];
-        })
-    ), [sectionModels]);
-
-    const buildNodeCodeArtifacts = (node, nodeContext) => {
-        const details = nodeContext?.details;
-
-        if (Array.isArray(details?.transformations)) {
-            return details.transformations.map((item) => ({
-                id: item.id,
-                title: item.title,
-                language: 'python',
-                caption: 'Compiled transformation path generated from intent.',
-                code: item.compiledCode || item.code || 'apply_transform(bronze_frame)'
-            }));
-        }
-
-        if (details?.logic) {
-            const artifacts = [];
-            if (details.logic.code) {
-                artifacts.push({
-                    id: `${node.id}-editable`,
-                    title: 'Editable Logic',
-                    language: (details.logic.code || '').toLowerCase().includes('select') ? 'sql' : 'python',
-                    caption: 'The logic the user can review or override.',
-                    code: details.logic.code
-                });
-            }
-
-            if (details.logic.compiled_code) {
-                artifacts.push({
-                    id: `${node.id}-compiled`,
-                    title: 'PNE Compiled Logic',
-                    language: (details.logic.compiled_code || '').toLowerCase().includes('select') ? 'sql' : 'python',
-                    caption: 'The current compiled path prepared by PNE.',
-                    code: details.logic.compiled_code
-                });
-            }
-
-            if (details.logic.effective_query) {
-                artifacts.push({
-                    id: `${node.id}-effective`,
-                    title: 'Effective Query',
-                    language: 'sql',
-                    caption: 'The query currently used to drive the output.',
-                    code: details.logic.effective_query
-                });
-            }
-
-            return artifacts;
-        }
-
-        if (details?.gold) {
-            return [{
-                id: `${node.id}-field-context`,
-                title: 'Field Context',
-                language: 'python',
-                caption: 'How this field participates in the current gold contract.',
-                code: [
-                    `field_name = "${details.column?.name || node.label}"`,
-                    `gold_view = "${details.gold?.title || 'unknown'}"`,
-                    `field_type = "${details.column?.type || 'unknown'}"`,
-                    '',
-                    '# Next step',
-                    'sentinel_validate_field(field_name, gold_view)'
-                ].join('\n')
-            }];
-        }
-
-        return [];
-    };
-
-    const buildNodeSummary = (node, nodeContext, suggestions, sentinelSummary) => {
-        const openAlerts = sentinelSummary.openErrors + sentinelSummary.openWarnings + sentinelSummary.openInfos;
-        const sentinelSummaryText = openAlerts > 0
-            ? ` Sentinel currently has ${openAlerts} open alert${openAlerts === 1 ? '' : 's'} on this layer.`
-            : sentinelSummary.resolved > 0
-                ? ` Sentinel has already resolved ${sentinelSummary.resolved} issue${sentinelSummary.resolved === 1 ? '' : 's'} here.`
-                : '';
-
-        if (node.type === 'source') {
-            return `This source is profiled from metadata only. PNE uses its schema, semantic candidates, and sampling hints to decide the next transformation path.${sentinelSummaryText}`;
-        }
-        if (node.type === 'action') {
-            return `This transformation lane compiles intent into executable Python-like steps before Daft or SQL execution is generated.${sentinelSummaryText}`;
-        }
-        if (node.type === 'category') {
-            return `This gold view exposes a virtual contract with ${node.data?.columns?.length || 0} fields. It is the place where widgets, insights, and ML recommendations attach to stable semantics.${sentinelSummaryText}`;
-        }
-        if (node.type === 'group') {
-            return `This group anchors a cluster of downstream outputs and keeps the flow organized around a shared business outcome.${sentinelSummaryText}`;
-        }
-        if (node.type === 'card') {
-            return `This insight packages business logic, widget contract expectations, and the generated query path for review.${sentinelSummaryText}`;
-        }
-        return suggestions.length > 0
-            ? `This node currently has ${suggestions.length} recommendations attached.${sentinelSummaryText}`
-            : `This node can be inspected, discussed with Parrot, and promoted through Sentinel validation.${sentinelSummaryText}`;
-    };
-
-    const buildNodeInspectorPayload = (node, nodeContext) => {
-        const suggestions = buildNodeSuggestions(nodeContext);
-        const validation = buildNodeValidation(nodeContext);
-        const codeArtifacts = buildNodeCodeArtifacts(node, nodeContext);
-        const sentinelFindings = buildNodeSentinelFindings(node, nodeContext);
-        const sentinelSummary = summarizeSentinelFindings(sentinelFindings);
-        const lifecycleStages = mindmapManifest?.editing?.lifecycle || ['draft', 'compile', 'dry_run', 'sentinel_validate', 'activate'];
-        const isRecommended = node.type === 'card' && (node.data?.status === 'warning' || node.data?.activationMode === 'manual' || node.data?.activation_mode === 'manual');
-        const isAccepted = ui.isRecommendationAccepted(node.id);
-        const status = getStatusTone(sentinelSummary, {
-            accepted: isAccepted,
-            recommended: isRecommended
-        });
-
-        return {
-            subjectType: nodeContext.label,
-            subjectName: node.label,
-            summary: buildNodeSummary(node, nodeContext, suggestions, sentinelSummary),
-            statusTone: status.tone,
-            statusLabel: status.label,
-            audience: ['End user', 'Data engineer'],
-            metrics: [
-                { label: 'Suggestions', value: `${suggestions.length}` },
-                { label: 'Open alerts', value: `${sentinelSummary.openErrors + sentinelSummary.openWarnings + sentinelSummary.openInfos}` },
-                { label: 'Resolved', value: `${sentinelSummary.resolved}` },
-                { label: 'Code paths', value: `${codeArtifacts.length}` },
-                { label: 'Fields', value: `${node.data?.columns?.length || nodeContext?.details?.columns?.length || 0}` }
-            ],
-            lifecycle: lifecycleStages.map((stage, index) => ({
-                title: formatStageTitle(stage),
-                status: index < 2 ? 'passed' : 'pending',
-                detail: `${node.label} moves through ${formatStageTitle(stage)} before it can become the next active version.`
-            })),
-            sentinelFindings,
-            suggestions,
-            validation,
-            recommendationSummary: (
-                isRecommended
-                    ? [{
-                        id: node.id,
-                        title: node.label,
-                        subtitle: isAccepted ? 'Accepted recommendation' : 'Pending recommendation'
-                    }]
-                    : []
-            ).concat(suggestions.slice(0, 3).map((suggestion) => ({
-                id: suggestion.id,
-                title: suggestion.title,
-                subtitle: suggestion.source
-            }))),
-            codeArtifacts,
-            chatSeed: [
-                {
-                    role: 'assistant',
-                    content: `You are looking at ${node.label}. Ask Parrot what should change, what PNE planned here, or what Sentinel would reject.`
-                }
-            ]
-        };
-    };
-
-    const openNodeMenu = (event, node) => {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const nodeContext = buildNodeContext(node);
-        const inspectorPayload = buildNodeInspectorPayload(node, nodeContext);
-        const firstCodeArtifact = inspectorPayload.codeArtifacts?.[0] || null;
-
-        const actions = [
-            {
-                id: `${node.id}-workspace`,
-                icon: Info,
-                label: 'Open details',
-                onSelect: () => openInspectorDocument(`${node.label} Workspace`, inspectorPayload, 'overview')
-            }
-        ];
-
-        if (firstCodeArtifact) {
-            actions.push({
-                id: `${node.id}-logic`,
-                icon: Code2,
-                label: 'Open code',
-                onSelect: () => openCodeDocument(firstCodeArtifact.title, firstCodeArtifact.code, firstCodeArtifact.language, 'manual', inspectorPayload)
-            });
-        }
-
-        if (!firstCodeArtifact && inspectorPayload.suggestions?.length > 0) {
-            actions.push({
-                id: `${node.id}-suggestions`,
-                icon: Sparkles,
-                label: 'Open suggestions',
-                onSelect: () => openInspectorDocument(`${node.label} Suggestions`, inspectorPayload, 'suggestions')
-            });
-        }
-
-        if (node.type === 'card' && (node.data?.status === 'warning' || node.data?.activationMode === 'manual' || node.data?.activation_mode === 'manual')) {
-            actions.push({
-                id: `${node.id}-toggle-recommendation`,
-                icon: ui.isRecommendationAccepted(node.id) ? CheckCircle2 : Clock3,
-                label: ui.isRecommendationAccepted(node.id) ? 'Mark pending' : 'Approve',
-                onSelect: () => {
-                    ui.toggleRecommendation(node.id);
-                    setActiveMenu(null);
-                }
-            });
-        }
-
-        setActiveMenu({
-            kind: 'node',
-            title: node.label,
-            subtitle: nodeContext.label,
-            x: node.x + (node.type === 'source' ? 120 : 26),
-            y: node.y - 12,
-            transform: 'translate(0, -10%)',
-            actions
-        });
-    };
-
-    const activeTrace = useMemo(() => {
-        if (!hoveredNodeId) return null;
-
-        const visitedNodes = new Set([hoveredNodeId]);
-        const visitedEdges = new Set();
-        const queue = [hoveredNodeId];
-
-        while (queue.length > 0) {
-            const currentId = queue.shift();
-            const currentNode = nodeMap.get(currentId);
-
-            if (!currentNode) continue;
-
-            layout.edges.forEach((edge) => {
-                if (edge.targetId === currentId) {
-                    visitedEdges.add(edge.id);
-                    const sourceId = edge.sourceId;
-                    if (sourceId && !visitedNodes.has(sourceId)) {
-                        const sourceNode = nodeMap.get(sourceId);
-
-                        visitedNodes.add(sourceId);
-
-                        const isStopType = sourceNode?.type === 'idea' || sourceNode?.type === 'category';
-
-                        if (!isStopType) {
-                            queue.push(sourceId);
-                        }
-                    }
-                }
-            });
-        }
-
-        return { nodes: visitedNodes, edges: visitedEdges };
-    }, [hoveredNodeId, layout.edges, nodeMap]);
-
-    const isEdgeDimmed = (edge) => {
-        const traceMismatch = activeTrace && !activeTrace.edges.has(edge.id);
-        if (traceMismatch) return true;
-
-        if (!focusedSectionId) return false;
-
-        const sourceSection = getSectionIdForNode(nodeMap.get(edge.sourceId));
-        const targetSection = getSectionIdForNode(nodeMap.get(edge.targetId));
-        return sourceSection !== focusedSectionId && targetSection !== focusedSectionId;
-    };
-
-    const isNodeDimmed = (node) => {
-        const traceMismatch = activeTrace && !activeTrace.nodes.has(node.id);
-        if (traceMismatch) return true;
-
-        if (!focusedSectionId) return false;
-        return getSectionIdForNode(node) !== focusedSectionId;
-    };
-
-    const renderMenu = () => {
-        if (!activeMenu) return null;
-
-        return (
-            <div
-                data-mindmap-interactive="true"
-                className="absolute z-[140] pointer-events-auto min-w-[140px] rounded-lg border border-[#34363A] bg-[#18191B]/98 px-1.5 py-1 shadow-2xl backdrop-blur-md"
-                style={getViewportStyle(activeMenu.x, activeMenu.y, activeMenu.transform)}
-                onMouseDown={(event) => event.stopPropagation()}
-                onClick={(event) => event.stopPropagation()}
-            >
-                {activeMenu.actions.map((action) => (
-                    <button
-                        key={action.id}
-                        className="block w-full rounded-md px-2 py-1.5 text-left text-[11px] text-[#E3E3E3] hover:bg-[#232426]"
-                        onClick={action.onSelect}
-                    >
-                        {action.label}
-                    </button>
-                ))}
+const EmptyState = () => (
+    <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#0B0D0E]/50 backdrop-blur-[2px]">
+        <div className="flex max-w-md flex-col items-center rounded-[28px] border border-white/10 bg-[#15181D] px-10 py-10 text-center shadow-[0_30px_80px_rgba(0,0,0,0.42)]">
+            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04]">
+                <Database size={32} className="text-sky-200/60" />
             </div>
-        );
+            <h3 className="mb-2 text-xl font-semibold text-white">No Data Discovered Yet</h3>
+            <p className="text-sm leading-relaxed text-[#93A0AD]">
+                Connect a source and the map will populate as layers become available.
+            </p>
+        </div>
+    </div>
+);
+
+const PendingPreview = ({ store }) => {
+    const preview = store.ui.pendingPreview;
+
+    if (!preview) {
+        return null;
+    }
+
+    return (
+        <div
+            className="absolute -translate-y-1/2"
+            style={{ left: preview.ghostNode.x, top: preview.ghostNode.y, width: 260 }}
+        >
+            <div
+                className="relative rounded-[20px] border border-emerald-300/30 bg-emerald-500/[0.06] p-4 shadow-[0_12px_28px_rgba(0,0,0,0.20)] backdrop-blur-xl"
+            >
+                <NodePorts showInput={true} showOutput={true} />
+                <div className="flex items-start gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-emerald-300/30 bg-[#1E2A24]">
+                        <Sparkles size={17} className="text-emerald-200" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                        <div className="truncate text-[14px] font-semibold text-white">{preview.ghostNode.label}</div>
+                        <div className="mt-1 text-[11px] leading-relaxed text-emerald-100/80">
+                            Preparing virtual flow...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const INSIGHT_NODE_WIDTH = 236;
+
+const InsightDock = observer(({ store }) => {
+    const dockGroups = store.ui.insightDockGroups;
+    const insightNodes = store.data.layout.nodes
+        .filter((node) => node.type === 'card')
+        .map((node) => store.ui.positionedNodeMap.get(node.id) || node);
+    const [editingGroupId, setEditingGroupId] = useState(null);
+    const [draftGroupName, setDraftGroupName] = useState('');
+
+    if (insightNodes.length === 0) {
+        return null;
+    }
+
+    const minY = Math.min(...insightNodes.map((node) => node.y));
+    const insightColumnCenterX = (
+        insightNodes.reduce((total, node) => total + node.x + (INSIGHT_NODE_WIDTH / 2), 0) / insightNodes.length
+    );
+    const activeDock = store.ui.activeInsightDock;
+    const isEditing = store.ui.isInsightDockEditing;
+    const commitRename = () => {
+        if (editingGroupId) {
+            store.ui.renameInsightDock(editingGroupId, draftGroupName);
+        }
+
+        setEditingGroupId(null);
+        setDraftGroupName('');
     };
 
     return (
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <div
-                className="w-full h-full relative flex items-center justify-center transition-transform duration-75 ease-out will-change-transform"
-                style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})` }}
-            >
-                <div className="relative w-0 h-0">
-                    <svg className="absolute top-0 left-0 overflow-visible" style={{ zIndex: -1 }}>
-                        {layout.edges.map((edge) => {
-                            const isTrace = activeTrace ? activeTrace.edges.has(edge.id) : false;
-                            const isDimmed = isEdgeDimmed(edge);
-
-                            return (
-                                <path
-                                    key={edge.id}
-                                    d={
-                                        `M ${edge.source.x} ${edge.source.y}
-                                         C ${edge.source.x + 100} ${edge.source.y},
-                                           ${edge.target.x - 100} ${edge.target.y},
-                                           ${edge.target.x} ${edge.target.y}`
-                                    }
-                                    fill="none"
-                                    stroke={isTrace ? '#A8C7FA' : '#505357'}
-                                    strokeWidth={isTrace ? 2 : 1.5}
-                                    className={clsx('transition-all duration-300', isDimmed ? 'opacity-5' : (isTrace ? 'opacity-100' : 'opacity-30'))}
-                                />
-                            );
-                        })}
-                    </svg>
-
-                    {layout.nodes.map((node) => {
-                        const isDimmedNode = isNodeDimmed(node);
-                        const baseOpacity = isDimmedNode ? 'opacity-5 blur-[2px]' : 'opacity-100';
-                        const baseTransition = 'transition-all duration-300';
-                        const nodeContext = buildNodeContext(node);
-                        const sentinelFindings = buildNodeSentinelFindings(node, nodeContext);
-                        const sentinelSummary = summarizeSentinelFindings(sentinelFindings);
-
-                        if (node.type === 'source') {
-                            const Icon = node.iconType === 'db' ? Database :
-                                node.iconType === 'api' ? Globe :
-                                    node.iconType === 'stream' ? Activity : Box;
-
-                            return (
-                                <div
-                                    key={node.id}
-                                    data-mindmap-interactive="true"
-                                    className={clsx('absolute transform -translate-x-full -translate-y-1/2 pointer-events-auto flex items-center justify-end pr-2 gap-3 cursor-pointer hover:scale-105 transition-transform', baseOpacity, baseTransition)}
-                                    style={{ left: node.x, top: node.y, maxWidth: 220 }}
-                                    onClick={() => onNodeClick && onNodeClick(node)}
-                                    onContextMenu={(event) => openNodeMenu(event, node)}
-                                >
-                                    <div className="flex flex-col items-end">
-                                        <span className="text-[#E3E3E3] font-bold text-sm text-right leading-tight">{node.label}</span>
-                                        <span className="text-[#777] text-[10px] uppercase tracking-wider">{node.iconType}</span>
-                                    </div>
-                                    <div className="w-10 h-10 rounded-xl bg-[#212123] border border-[#444746] flex items-center justify-center shadow-lg z-10 shrink-0">
-                                        <Icon size={20} className="text-[#A8C7FA]" />
-                                    </div>
-                                </div>
-                            );
-                        }
-
-                        if (node.type === 'action') {
-                            return (
-                                <div
-                                    key={node.id}
-                                    data-mindmap-interactive="true"
-                                    className={clsx('absolute transform -translate-x-1/2 -translate-y-1/2 pointer-events-auto flex flex-col items-center justify-center p-2 rounded-lg bg-[#1E1F20] border border-[#444746]/50 shadow-sm z-10 cursor-pointer hover:border-[#A8C7FA] hover:bg-[#333537] transition-all', baseOpacity, baseTransition)}
-                                    style={{ left: node.x, top: node.y }}
-                                    onClick={() => onNodeClick && onNodeClick(node)}
-                                    onContextMenu={(event) => openNodeMenu(event, node)}
-                                >
-                                    <span className="text-[#C4C7C5] text-[10px] font-mono uppercase tracking-wide px-1">{node.label}</span>
-                                </div>
-                            );
-                        }
-
-                        if (node.type === 'category') {
-                            const childIds = node.data?.childIds || [];
-                            const isClickable = childIds.length > 0;
-                            const descriptionChip = (node.data?.description || '').trim();
-
-                            return (
-                                <div
-                                    key={node.id}
-                                    data-mindmap-interactive="true"
-                                    className={clsx(
-                                        'absolute transform -translate-y-1/2 pointer-events-auto flex items-center group/cat',
-                                        isClickable && 'cursor-pointer',
-                                        baseOpacity,
-                                        baseTransition
-                                    )}
-                                    style={{ left: node.x, top: node.y }}
-                                    onClick={() => isClickable && onToggleGroup(childIds)}
-                                    onContextMenu={(event) => openNodeMenu(event, node)}
-                                >
-                                    <div className={clsx(
-                                        'w-3 h-3 rounded-full border z-10 shrink-0 mr-3 transition-colors',
-                                        isClickable ? 'bg-[#A8C7FA]/50 border-[#A8C7FA]/80 group-hover/cat:bg-[#A8C7FA] group-hover/cat:border-white' : 'bg-[#444746] border-[#555]'
-                                    )} />
-                                    <span className={clsx(
-                                        'text-[#E3E3E3] font-semibold text-sm transition-colors',
-                                        isClickable && 'group-hover/cat:text-white'
-                                    )}>{node.label}</span>
-                                    {descriptionChip && (
-                                        <span className="ml-3 max-w-[220px] truncate rounded-full border border-[#3C4043] bg-[#1E1F20]/92 px-2 py-1 text-[10px] text-[#A9AFB5]">
-                                            {descriptionChip}
-                                        </span>
-                                    )}
-                                </div>
-                            );
-                        }
-
-                        if (node.type === 'group') {
-                            return (
-                                <div
-                                    key={node.id}
-                                    data-mindmap-interactive="true"
-                                    className={clsx('absolute transform -translate-y-1/2 pointer-events-auto flex items-center gap-3 p-2 px-4 rounded-full shadow-lg z-10 cursor-pointer border border-emerald-400/30 bg-emerald-500/12', baseOpacity, baseTransition)}
-                                    style={{ left: node.x, top: node.y }}
-                                    onContextMenu={(event) => openNodeMenu(event, node)}
-                                >
-                                    <FolderKanban size={16} className="text-emerald-300" />
-                                    <span className="text-emerald-100 text-sm font-medium whitespace-nowrap">{node.label}</span>
-                                </div>
-                            );
-                        }
-
-                        if (node.type === 'card') {
-                            const isRecommended = node.data?.status === 'warning' || node.data?.activationMode === 'manual';
-                            const accepted = ui.isRecommendationAccepted(node.id);
-                            const cardOpacity = isDimmedNode ? 0.05 : (isRecommended && !accepted ? 0.68 : 1);
-                            const hasOpenError = sentinelSummary.openErrors > 0;
-                            const hasOpenAlert = sentinelSummary.openWarnings + sentinelSummary.openInfos > 0;
-                            const hasResolved = sentinelSummary.resolved > 0;
-                            const InsightStatusIcon = accepted ? CheckCircle2 : (isRecommended ? Clock3 : (hasOpenError || hasOpenAlert ? AlertTriangle : null));
-                            const insightIconClasses = hasOpenError
-                                ? 'bg-rose-500/12 text-rose-300 ring-1 ring-rose-400/25'
-                                : (hasOpenAlert || (isRecommended && !accepted))
-                                    ? 'bg-amber-500/12 text-amber-200 ring-1 ring-amber-400/20'
-                                    : (accepted || hasResolved)
-                                        ? 'bg-emerald-500/12 text-emerald-300 ring-1 ring-emerald-400/25'
-                                        : 'bg-[#333537] text-[#A8C7FA]';
-                            const statusIconClasses = accepted
-                                ? 'text-emerald-300'
-                                : (isRecommended || hasOpenAlert)
-                                    ? 'text-amber-300'
-                                    : hasOpenError
-                                        ? 'text-rose-300'
-                                        : 'text-[#7D838B]';
-
-                            return (
-                                <div
-                                    key={node.id}
-                                    data-mindmap-interactive="true"
-                                    className={clsx('absolute transform -translate-y-1/2 pointer-events-auto flex items-center gap-3 cursor-pointer', baseOpacity, baseTransition)}
-                                    style={{ left: node.x, top: node.y, width: 220, opacity: cardOpacity }}
-                                    onMouseEnter={() => setHoveredNodeId(node.id)}
-                                    onMouseLeave={() => setHoveredNodeId(null)}
-                                    onClick={() => onNodeClick && onNodeClick(node)}
-                                    onContextMenu={(event) => openNodeMenu(event, node)}
-                                >
-                                    <div className={clsx('p-2 rounded-lg', insightIconClasses)}>
-                                        <LayoutDashboard size={18} />
-                                    </div>
-                                    <div className="flex flex-col min-w-0">
-                                        <span className="text-[#E3E3E3] text-sm font-medium leading-tight">{node.label}</span>
-                                        <div className="mt-1 h-1.5 w-10 rounded-full bg-white/6 overflow-hidden">
-                                            <div className={clsx(
-                                                'h-full rounded-full',
-                                                hasOpenError
-                                                    ? 'bg-rose-300'
-                                                    : (hasOpenAlert || (isRecommended && !accepted))
-                                                        ? 'bg-amber-300'
-                                                        : (accepted || hasResolved)
-                                                            ? 'bg-emerald-300'
-                                                            : 'bg-[#A8C7FA]'
-                                            )} />
-                                        </div>
-                                    </div>
-                                    {InsightStatusIcon && (
-                                        <button
-                                            className={clsx(
-                                                'ml-auto w-7 h-7 rounded-full flex items-center justify-center bg-[#2B2C2F]/85',
-                                                statusIconClasses
-                                            )}
-                                            onClick={(event) => {
-                                                event.preventDefault();
-                                                event.stopPropagation();
-                                                if (isRecommended) {
-                                                    ui.toggleRecommendation(node.id);
-                                                }
-                                            }}
-                                        >
-                                            <InsightStatusIcon size={14} />
-                                        </button>
-                                    )}
-                                </div>
-                            );
-                        }
+        <div
+            data-mindmap-interactive="true"
+            className="absolute z-20 -translate-x-1/2"
+            style={{ left: insightColumnCenterX, top: minY - 128, width: 420 }}
+            onMouseDown={(event) => event.stopPropagation()}
+            onClick={(event) => event.stopPropagation()}
+        >
+            <div className="rounded-[18px] border border-white/10 bg-[#14171B]/96 p-3 shadow-[0_14px_34px_rgba(0,0,0,0.28)] backdrop-blur-xl">
+                <div className="flex items-center gap-2">
+                    {dockGroups.map((group) => {
+                        const isActive = store.ui.activeInsightDockId === group.id;
+                        const isEditing = editingGroupId === group.id;
+                        const canRename = group.id !== 'overview';
 
                         return (
-                            <div
-                                key={node.id}
-                                data-mindmap-interactive="true"
-                                className={clsx('absolute transform -translate-y-1/2 pointer-events-auto group flex items-center', baseOpacity, baseTransition)}
-                                style={{ left: node.x, top: node.y }}
-                                onContextMenu={node.type === 'idea' ? undefined : (event) => openNodeMenu(event, node)}
-                            >
-                                <div
-                                    className={clsx(
-                                        'w-3 h-3 rounded-full z-10 shrink-0 mr-3 transition-all duration-200 cursor-pointer',
-                                        selectedColumns.has(node.id) ? 'bg-blue-500 scale-110' : 'bg-[#444746]'
-                                    )}
-                                    onClick={() => onToggleSelection(node.id)}
-                                />
+                            <div key={group.id}>
+                                {isEditing ? (
+                                    <input
+                                        autoFocus
+                                        value={draftGroupName}
+                                        className="w-[112px] rounded-full border border-sky-300/30 bg-sky-500/[0.14] px-3 py-1.5 text-[11px] font-medium text-sky-100 outline-none"
+                                        onChange={(event) => setDraftGroupName(event.target.value)}
+                                        onBlur={commitRename}
+                                        onKeyDown={(event) => {
+                                            if (event.key === 'Enter') {
+                                                commitRename();
+                                            }
 
-                                <span className={clsx(
-                                    'text-sm transition-colors whitespace-nowrap text-[#80868B]',
-                                    'group-hover:text-[#C4C7C5]',
-                                    selectedColumns.has(node.id) && 'text-[#E3E3E3] font-medium'
-                                )}>
-                                    {node.label}
-                                </span>
+                                            if (event.key === 'Escape') {
+                                                setEditingGroupId(null);
+                                                setDraftGroupName('');
+                                            }
+                                        }}
+                                    />
+                                ) : (
+                                    <button
+                                        type="button"
+                                        className={clsx(
+                                            'rounded-full border px-3 py-1.5 text-[11px] font-medium transition-colors',
+                                            isActive
+                                                ? 'border-sky-300/30 bg-sky-500/[0.14] text-sky-100'
+                                                : 'border-white/10 bg-white/[0.04] text-[#AEB8C3] hover:border-white/18 hover:text-white'
+                                        )}
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            store.ui.setActiveInsightDock(group.id);
+                                        }}
+                                        onDoubleClick={(event) => {
+                                            event.stopPropagation();
+                                            if (!canRename) {
+                                                return;
+                                            }
+
+                                            setEditingGroupId(group.id);
+                                            setDraftGroupName(group.name);
+                                        }}
+                                        title={canRename ? 'Click to select, double click to rename' : group.name}
+                                    >
+                                        {group.name}
+                                    </button>
+                                )}
                             </div>
                         );
                     })}
+
+                    <button
+                        type="button"
+                        className={clsx(
+                            'ml-auto inline-flex h-8 w-8 items-center justify-center rounded-full border',
+                            isEditing
+                                ? 'border-sky-300/30 bg-sky-500/[0.14] text-sky-100'
+                                : 'border-white/10 bg-white/[0.04] text-[#C8D1DB] hover:border-white/18 hover:text-white'
+                        )}
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            store.ui.toggleInsightDockEditing();
+                        }}
+                        aria-label="Toggle edit mode"
+                        title="Toggle edit mode"
+                    >
+                        <Pencil size={13} />
+                    </button>
+
+                    {isEditing && (
+                        <button
+                            type="button"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-[#C8D1DB] hover:border-white/18 hover:text-white"
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                store.ui.createInsightDockGroup();
+                            }}
+                            aria-label="Create group"
+                            title="Create group"
+                        >
+                            <Plus size={15} />
+                        </button>
+                    )}
+
+                    {activeDock.id !== 'overview' && isEditing && (
+                        <button
+                            type="button"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-rose-300/20 bg-rose-500/[0.08] text-rose-100 hover:border-rose-300/30"
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                store.ui.deleteInsightDock(activeDock.id);
+                            }}
+                            aria-label="Delete group"
+                            title="Delete group"
+                        >
+                            <Trash2 size={13} />
+                        </button>
+                    )}
+                </div>
+
+            </div>
+        </div>
+    );
+});
+
+const SourceNode = ({ store, viewModel }) => {
+    const { node, sourceLoadState, hasIncoming, hasOutgoing } = viewModel;
+    const isPendingPreview = store.ui.pendingPreviewSourceId === node.id;
+
+    return (
+        <div
+            data-mindmap-interactive="true"
+            className={clsx(
+                'absolute z-10 overflow-visible -translate-x-full -translate-y-1/2 cursor-pointer',
+                getNodeStateClasses(viewModel)
+            )}
+            style={{ left: node.x, top: node.y, width: 272 }}
+            onMouseEnter={() => store.ui.setHoveredNodeId(node.id)}
+            onMouseLeave={store.ui.clearHoveredNode}
+        >
+            <div className="relative">
+                <div
+                    ref={(element) => store.ui.measureNode(node.id, element)}
+                    className={clsx('relative rounded-[20px] border p-4 backdrop-blur-xl', CARD_SURFACE_CLASS)}
+                    onClick={() => store.handleNodeClick(node)}
+                    onContextMenu={(event) => store.openNodeMenu(event, node)}
+                >
+                    <NodePorts showInput={hasIncoming} showOutput={hasOutgoing || isPendingPreview} />
+                    <div className="flex items-start gap-3">
+                        <div className={clsx('flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border', CARD_ICON_SURFACE_CLASS)}>
+                            {renderSourceIcon(node.iconType, 'text-sky-200')}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                            <div className="min-w-0 flex-1">
+                                <div className="truncate text-[14px] font-semibold tracking-[0.01em] text-white">{node.label}</div>
+                                <div className="mt-1 text-[11px] text-[#8FA0B1]">{String(node.iconType || '').toUpperCase()}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {!sourceLoadState?.isLoaded && !isPendingPreview && (
+                    <button
+                        type="button"
+                        className="absolute top-1/2 z-20 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-emerald-300/30 bg-emerald-500/[0.14] text-emerald-100 shadow-[0_10px_25px_rgba(0,0,0,0.28)]"
+                        style={{ left: 'calc(100% + 16px)' }}
+                        onClick={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            store.handlePendingLayerAction(event, node);
+                        }}
+                        aria-label={sourceLoadState.buttonLabel}
+                        title={sourceLoadState.buttonLabel}
+                    >
+                        <Play size={18} fill="currentColor" />
+                    </button>
+                )}
+            </div>
+        </div>
+    );
+};
+
+const ActionNode = ({ store, viewModel }) => {
+    const { node, hasIncoming, hasOutgoing } = viewModel;
+
+    return (
+        <div
+            data-mindmap-interactive="true"
+            className={clsx(
+                'absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer',
+                getNodeStateClasses(viewModel)
+            )}
+            style={{ left: node.x, top: node.y, width: 220 }}
+            onClick={() => store.handleNodeClick(node)}
+            onContextMenu={(event) => store.openNodeMenu(event, node)}
+            onMouseEnter={() => store.ui.setHoveredNodeId(node.id)}
+            onMouseLeave={store.ui.clearHoveredNode}
+        >
+            <div
+                ref={(element) => store.ui.measureNode(node.id, element)}
+                className={clsx('relative rounded-[18px] border p-3.5 backdrop-blur-xl', CARD_SURFACE_CLASS)}
+            >
+                <NodePorts showInput={hasIncoming} showOutput={hasOutgoing} />
+                <div className="flex items-center gap-3">
+                    <div className={clsx('flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border', CARD_ICON_SURFACE_CLASS)}>
+                        <Code2 size={18} className="text-sky-200" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                        <div className="truncate text-[13px] font-semibold uppercase tracking-[0.12em] text-[#E5EDF5]">{node.label}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const GoldNode = ({ store, viewModel }) => {
+    const { node, description, childIds, isClickableCategory, hasIncoming, hasOutgoing } = viewModel;
+    const columns = node.data?.columns || [];
+
+    return (
+        <div
+            data-mindmap-interactive="true"
+            className={clsx(
+                'absolute -translate-y-1/2',
+                isClickableCategory && 'cursor-pointer',
+                getNodeStateClasses(viewModel)
+            )}
+            style={{ left: node.x, top: node.y, width: 260 }}
+            onClick={() => (isClickableCategory ? store.toggleGroup(childIds) : store.handleNodeClick(node))}
+            onContextMenu={(event) => store.openNodeMenu(event, node)}
+            onMouseEnter={() => store.ui.setHoveredNodeId(node.id)}
+            onMouseLeave={store.ui.clearHoveredNode}
+        >
+            <div className={clsx(
+                'relative rounded-[20px] border p-4 backdrop-blur-xl',
+                CARD_SURFACE_CLASS,
+                isClickableCategory && 'hover:border-white/15'
+            )}
+            ref={(element) => store.ui.measureNode(node.id, element)}
+            >
+                <NodePorts showInput={hasIncoming} showOutput={hasOutgoing} />
+                <div className="flex items-start gap-3">
+                    <div className={clsx('flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border', CARD_ICON_SURFACE_CLASS)}>
+                        <Sparkles size={17} className="text-fuchsia-200" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                        <div className="truncate text-[14px] font-semibold text-white">{node.label}</div>
+                        {description && (
+                            <div className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-[#9EA9B5]">
+                                {description}
+                            </div>
+                        )}
+                        {columns.length > 0 && (
+                            <div className="mt-2 text-[11px] leading-relaxed">
+                                {columns.map((column, index) => (
+                                    <React.Fragment key={`${node.id}-${column.id || column.name}-${index}`}>
+                                        <span className={COLUMN_STATUS_TEXT_TONES[column.status] || COLUMN_STATUS_TEXT_TONES.ok}>
+                                            {column.title || column.name}
+                                        </span>
+                                        {index < columns.length - 1 && <span className="text-[#6F7A86]">, </span>}
+                                    </React.Fragment>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const GroupNode = ({ store, viewModel }) => {
+    const { node, hasIncoming, hasOutgoing } = viewModel;
+
+    return (
+        <div
+            data-mindmap-interactive="true"
+            className={clsx('absolute -translate-y-1/2 cursor-pointer', getNodeStateClasses(viewModel))}
+            style={{ left: node.x, top: node.y, width: 250 }}
+            onClick={() => store.handleNodeClick(node)}
+            onContextMenu={(event) => store.openNodeMenu(event, node)}
+            onMouseEnter={() => store.ui.setHoveredNodeId(node.id)}
+            onMouseLeave={store.ui.clearHoveredNode}
+        >
+            <div
+                ref={(element) => store.ui.measureNode(node.id, element)}
+                className={clsx('relative rounded-full border px-4 py-3 backdrop-blur-xl', CARD_SURFACE_CLASS)}
+            >
+                <NodePorts showInput={hasIncoming} showOutput={hasOutgoing} />
+                <div className="flex items-center gap-3">
+                    <div className={clsx('flex h-10 w-10 shrink-0 items-center justify-center rounded-full border', CARD_ICON_SURFACE_CLASS)}>
+                        <FolderKanban size={17} className="text-emerald-200" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                        <div className="truncate text-[14px] font-semibold text-emerald-50">{node.label}</div>
+                        <div className="mt-1 text-[11px] text-emerald-100/70">
+                            {node.data?.activationMode || node.data?.activation_mode || ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const InsightNode = observer(({ store, viewModel }) => {
+    const { node, hasIncoming, hasOutgoing } = viewModel;
+    const isVisible = store.ui.isInsightVisible(node.id);
+    const VisibilityIcon = isVisible ? Eye : EyeOff;
+    const isEditing = store.ui.isInsightDockEditing;
+    const RecommendationIcon = viewModel.isRecommended ? Sparkles : null;
+    const isPendingCreation = viewModel.isPendingCreation;
+    const isCreating = store.ui.isInsightCreating(node.id);
+
+    return (
+        <div
+            data-mindmap-interactive="true"
+            className={clsx(
+                'absolute -translate-y-1/2 cursor-pointer',
+                getNodeStateClasses(viewModel),
+                !isVisible && 'opacity-55 saturate-50'
+            )}
+            style={{ left: node.x, top: node.y, width: INSIGHT_NODE_WIDTH }}
+            onClick={() => store.handleNodeClick(node)}
+            onContextMenu={(event) => store.openNodeMenu(event, node)}
+            onMouseEnter={() => store.ui.setHoveredNodeId(node.id)}
+            onMouseLeave={store.ui.clearHoveredNode}
+        >
+            <div
+                ref={(element) => store.ui.measureNode(node.id, element)}
+                className={clsx(
+                    'relative rounded-[18px] border px-3.5 py-3 backdrop-blur-xl',
+                    CARD_SURFACE_CLASS,
+                    !isVisible && 'border-white/6 bg-[#171A1E]/80',
+                    isPendingCreation && 'border-dashed border-sky-300/18 bg-[#14181D]/74 shadow-none'
+                )}
+            >
+                <NodePorts showInput={hasIncoming} showOutput={hasOutgoing} />
+                <div className="flex items-center gap-3">
+                    <div className={clsx(
+                        'flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border',
+                        isPendingCreation ? 'border-sky-300/16 bg-[#1A2128]' : CARD_ICON_SURFACE_CLASS
+                    )}>
+                        <LayoutDashboard size={17} className={isPendingCreation ? 'text-[#6F7C88]' : 'text-sky-200'} />
+                    </div>
+                    <div className="min-w-0 flex-1 self-center">
+                        <div className={clsx(
+                            'truncate text-[13px] font-semibold leading-tight',
+                            isPendingCreation ? 'text-[#94A0AC]' : 'text-white'
+                        )}>
+                            {node.label}
+                        </div>
+                        {isPendingCreation && (
+                            <div className="mt-1 flex items-center gap-2">
+                                <div className="h-1.5 w-14 rounded-full bg-white/10" />
+                                <div className="h-1.5 w-9 rounded-full bg-white/6" />
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {RecommendationIcon && (
+                    <div
+                        className={clsx(
+                            'absolute top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border shadow-[0_10px_25px_rgba(0,0,0,0.28)]',
+                            'border-amber-300/30 bg-amber-400/[0.16] text-amber-100'
+                        )}
+                        style={{ left: 'calc(100% + 16px)' }}
+                        title="AI recommendation"
+                    >
+                        <RecommendationIcon size={17} />
+                    </div>
+                )}
+
+                {isPendingCreation && (
+                    <button
+                        type="button"
+                        className={clsx(
+                            'absolute top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border shadow-[0_10px_25px_rgba(0,0,0,0.28)]',
+                            isCreating
+                                ? 'border-sky-300/30 bg-sky-500/[0.16] text-sky-100'
+                                : 'border-emerald-300/30 bg-emerald-500/[0.14] text-emerald-100'
+                        )}
+                        style={{ left: RecommendationIcon ? 'calc(100% + 64px)' : 'calc(100% + 16px)' }}
+                        onClick={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            store.createRecommendedInsight(node.id);
+                        }}
+                        aria-label="Create insight"
+                        title="Create insight"
+                    >
+                        {isCreating ? (
+                            <RefreshCw size={17} className="animate-spin" />
+                        ) : (
+                            <Play size={17} fill="currentColor" />
+                        )}
+                    </button>
+                )}
+
+                {isEditing && !isPendingCreation && (
+                    <button
+                        type="button"
+                        className={clsx(
+                            'absolute top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border shadow-[0_10px_25px_rgba(0,0,0,0.28)]',
+                            isVisible
+                                ? 'border-sky-300/30 bg-sky-500/[0.14] text-sky-100'
+                                : 'border-white/12 bg-[#1C2025] text-[#96A2AF]'
+                        )}
+                        style={{ left: RecommendationIcon ? 'calc(100% + 64px)' : 'calc(100% + 16px)' }}
+                        onClick={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            store.ui.toggleInsightVisibility(node.id);
+                        }}
+                        aria-label={isVisible ? 'Hide insight' : 'Show insight'}
+                        title={isVisible ? 'Hide insight' : 'Show insight'}
+                    >
+                        <VisibilityIcon size={17} />
+                    </button>
+                )}
+            </div>
+        </div>
+    );
+});
+
+const FieldNode = ({ store, viewModel }) => {
+    const { node, isSelected, hasIncoming, hasOutgoing } = viewModel;
+
+    return (
+        <div
+            data-mindmap-interactive="true"
+            className={clsx('absolute -translate-y-1/2 cursor-pointer', getNodeStateClasses(viewModel))}
+            style={{ left: node.x, top: node.y, width: 220 }}
+            onClick={() => store.toggleSelection(node.id)}
+            onContextMenu={(event) => store.openNodeMenu(event, node)}
+            onMouseEnter={() => store.ui.setHoveredNodeId(node.id)}
+            onMouseLeave={store.ui.clearHoveredNode}
+        >
+            <div className={clsx(
+                'relative rounded-[16px] border px-3.5 py-3 backdrop-blur-xl',
+                CARD_SURFACE_CLASS,
+                isSelected ? 'border-sky-400/24' : 'border-white/8'
+            )}
+            ref={(element) => store.ui.measureNode(node.id, element)}
+            >
+                <NodePorts showInput={hasIncoming} showOutput={hasOutgoing} />
+                <div className="flex items-center gap-3">
+                    <div className={clsx(
+                        'h-3.5 w-3.5 shrink-0 rounded-full border',
+                        isSelected ? 'border-sky-300/80 bg-sky-300 shadow-[0_0_18px_rgba(125,211,252,0.7)]' : 'border-white/18 bg-white/8'
+                    )} />
+                    <div className="min-w-0 flex-1">
+                        <div className={clsx(
+                            'truncate text-[13px] font-medium',
+                            isSelected ? 'text-white' : 'text-[#CDD7E1]'
+                        )}>
+                            {node.label}
+                        </div>
+                        {node.data?.type && (
+                            <div className="mt-1 text-[11px] text-[#8C98A4]">{node.data.type}</div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const MindMapNode = ({ store, viewModel }) => {
+    switch (viewModel.node.type) {
+        case 'source':
+            return <SourceNode store={store} viewModel={viewModel} />;
+        case 'action':
+            return <ActionNode store={store} viewModel={viewModel} />;
+        case 'category':
+            return <GoldNode store={store} viewModel={viewModel} />;
+        case 'group':
+            return <GroupNode store={store} viewModel={viewModel} />;
+        case 'card':
+            return <InsightNode store={store} viewModel={viewModel} />;
+        default:
+            return <FieldNode store={store} viewModel={viewModel} />;
+    }
+};
+
+const FeatureMindMap = observer(({ onNodeClick, showCosts = false }) => {
+    const { workspaceStore } = useStore();
+    const [mindMapStore] = useState(() => new FeatureMindMapStore(workspaceStore, onNodeClick));
+    const isEditorOpen = workspaceStore.editor.isOpen;
+    const insightDockSignature = mindMapStore.data.layout.nodes
+        .filter((node) => node.type === 'card')
+        .map((node) => node.id)
+        .join('|');
+    void showCosts;
+
+    useEffect(() => {
+        mindMapStore.setOnNodeClick(onNodeClick);
+    }, [mindMapStore, onNodeClick]);
+
+    useEffect(() => {
+        const handlePointerDown = (event) => mindMapStore.ui.handleWindowPointerDown(event);
+        const handleKeyDown = (event) => mindMapStore.ui.handleWindowKeyDown(event);
+
+        window.addEventListener('mousedown', handlePointerDown);
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            window.removeEventListener('mousedown', handlePointerDown);
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [mindMapStore]);
+
+    useEffect(() => {
+        if (isEditorOpen) {
+            mindMapStore.ui.clearActiveMenu();
+        }
+    }, [isEditorOpen, mindMapStore]);
+
+    useEffect(() => {
+        const insightIds = mindMapStore.data.layout.nodes
+            .filter((node) => node.type === 'card')
+            .map((node) => node.id);
+
+        mindMapStore.ui.syncInsightDock(insightIds);
+    }, [mindMapStore, insightDockSignature]);
+
+    return (
+        <div className="absolute inset-0 overflow-hidden">
+            <div
+                className="relative flex h-full w-full items-center justify-center transition-transform duration-75 ease-out will-change-transform"
+                style={{ transform: `translate(${mindMapStore.ui.pan.x}px, ${mindMapStore.ui.pan.y}px) scale(${mindMapStore.ui.scale})` }}
+            >
+                <div className="relative h-0 w-0">
+                    <svg className="absolute left-0 top-0 overflow-visible" style={{ zIndex: -1 }}>
+                        {mindMapStore.ui.edgeViewModels.map(({ edge, isTrace, isDimmed }) => (
+                            <path
+                                key={edge.id}
+                                d={buildEdgePath(mindMapStore, edge)}
+                                fill="none"
+                                stroke={isTrace ? '#7DD3FC' : '#53606F'}
+                                strokeWidth={isTrace ? 2.1 : 1.35}
+                                className={clsx(
+                                    'transition-all duration-300',
+                                    isDimmed ? 'opacity-[0.08]' : isTrace ? 'opacity-100' : 'opacity-35'
+                                )}
+                            />
+                        ))}
+
+                        {mindMapStore.ui.pendingPreview && (
+                            <path
+                                d={buildPreviewEdgePath(mindMapStore.ui.pendingPreview.sourceNode, mindMapStore.ui.pendingPreview.ghostNode)}
+                                fill="none"
+                                stroke="#6EE7B7"
+                                strokeWidth={2}
+                                strokeDasharray="8 8"
+                                strokeLinecap="round"
+                                opacity="0.9"
+                            />
+                        )}
+                    </svg>
+
+                    {mindMapStore.ui.nodeViewModels.map((viewModel) => (
+                        <MindMapNode key={viewModel.node.id} store={mindMapStore} viewModel={viewModel} />
+                    ))}
+
+                    <PendingPreview store={mindMapStore} />
+                    <InsightDock store={mindMapStore} />
                 </div>
             </div>
 
-            {renderMenu()}
+            <ContextMenu store={mindMapStore} />
 
-            {layout.nodes.length === 0 && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0B0D0E]/50 backdrop-blur-[2px] z-50 pointer-events-auto">
-                    <div className="flex flex-col items-center bg-[#1E1F20] border border-[#444746] p-10 rounded-3xl shadow-2xl max-w-md text-center">
-                        <div className="w-16 h-16 bg-[#2D2E30] rounded-2xl flex items-center justify-center mb-6 border border-[#444746]">
-                            <Database size={32} className="text-[#A8C7FA] opacity-50" />
-                        </div>
-                        <h3 className="text-[#E3E3E3] text-xl font-semibold mb-2">No Data Discovered Yet</h3>
-                        <p className="text-[#8E918F] text-sm leading-relaxed">
-                            Please connect a source and you will see data as we find it.
-                        </p>
-                    </div>
-                </div>
-            )}
+            {mindMapStore.data.layout.nodes.length === 0 && <EmptyState />}
         </div>
     );
 });

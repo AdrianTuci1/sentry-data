@@ -842,8 +842,16 @@
     height: var(--home-feature-visual-height);
   }
 
+  .home-actions {
+    flex-wrap: nowrap;
+    gap: 0.6rem;
+  }
+
   .home-action {
-    width: 100%;
+    min-width: 0;
+    flex: 1 1 0;
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
   }
 }
 

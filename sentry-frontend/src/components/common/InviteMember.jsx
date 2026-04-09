@@ -1,5 +1,6 @@
 /* src/components/InviteMember.jsx */
 import React, { useState } from 'react';
+import { X } from 'lucide-react';
 import './InviteMember.css';
 
 const InviteMember = ({ isOpen, onClose }) => {
@@ -20,20 +21,25 @@ const InviteMember = ({ isOpen, onClose }) => {
         <div className="invite-modal-overlay" onClick={onClose}>
             <div className="invite-modal-content" onClick={e => e.stopPropagation()}>
                 <div className="invite-modal-header">
-                    <h2 className="invite-modal-title">Invite Team Members</h2>
-                    <p className="invite-modal-subtitle">
-                        Invite new members to your organization by email or create a public invite link.
-                    </p>
+                    <div>
+                        <h2 className="invite-modal-title">Add member</h2>
+                        <p className="invite-modal-subtitle">
+                            Add a collaborator directly or share a controlled access link.
+                        </p>
+                    </div>
+                    <button className="invite-close-btn" type="button" onClick={onClose} aria-label="Close invite overlay">
+                        <X size={18} />
+                    </button>
                 </div>
 
-                <form onSubmit={handleInvite}>
+                <form onSubmit={handleInvite} className="invite-member-form">
                     <div className="invite-form-row">
                         <div className="invite-field-group email">
-                            <label className="invite-label">Email Address</label>
+                            <label className="invite-label">Email</label>
                             <input
                                 type="email"
                                 className="invite-input"
-                                placeholder="Enter email address"
+                                placeholder="name@company.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                             />
@@ -57,25 +63,9 @@ const InviteMember = ({ isOpen, onClose }) => {
                         className={`send-invite-btn ${email ? 'active' : ''}`}
                         disabled={!email}
                     >
-                        Send Email Invite
+                        Send invite
                     </button>
                 </form>
-
-                <div className="invite-divider">
-                    <span>or</span>
-                </div>
-
-                <div className="public-invite-section">
-                    <h3 className="public-invite-header">Public Invite Link</h3>
-                    <div className="public-invite-card">
-                        <p>Create a public invite link that anyone can use to join your organization</p>
-                        <button className="create-link-btn">Create Public Link</button>
-                    </div>
-                </div>
-
-                <div className="invite-modal-footer">
-                    <button className="close-btn" onClick={onClose}>Close</button>
-                </div>
             </div>
         </div>
     );

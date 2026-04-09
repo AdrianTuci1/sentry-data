@@ -7,14 +7,17 @@ import './Home.css';
 
 const Home = observer(() => {
     const navigate = useNavigate();
-    const { projectStore } = useStore();
+    const { projectStore, dockStore } = useStore();
 
-    // Get projects from MobX
     const projects = projectStore.projects;
 
     const handleProjectClick = (projectId) => {
         projectStore.selectProject(projectId);
         navigate(`/project/${projectId}?tab=insights`);
+    };
+
+    const openEditOverlay = (project) => {
+        dockStore.openProjectEditor('edit', project);
     };
 
     const themes = ['weather', 'natural', 'wind', 'color', 'red', 'light'];
@@ -38,6 +41,7 @@ const Home = observer(() => {
                                     project={project}
                                     graphicType={theme}
                                     onClick={() => handleProjectClick(project.id)}
+                                    onEdit={openEditOverlay}
                                 />
                             );
                         })}

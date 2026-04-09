@@ -5,6 +5,8 @@ import { observer } from 'mobx-react-lite';
 import { useStore } from '../../store/StoreProvider';
 import GlobalNav from './GlobalNav';
 import RecommendationsMenu from './RecommendationsMenu';
+import ProjectEditorOverlay from '../common/ProjectEditorOverlay';
+import InviteMember from '../common/InviteMember';
 import './FloatingNav.css';
 
 const initialChatMessages = [
@@ -58,7 +60,7 @@ const buildAiResponse = (prompt) => {
 const Layout = observer(() => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { dockStore } = useStore();
+    const { dockStore, projectStore } = useStore();
     const [isHubOpen, setIsHubOpen] = useState(false);
     const [hubSection, setHubSection] = useState('nav');
     const [isAiChatOpen, setIsAiChatOpen] = useState(false);
@@ -69,6 +71,7 @@ const Layout = observer(() => {
 
     // Determine if we are inside a project (Workspace)
     const isProjectView = location.pathname.startsWith('/project/');
+    const isSettingsView = location.pathname.startsWith('/settings');
     const projectId = isProjectView ? location.pathname.split('/')[2] : null;
 
     // Check query params to establish active tab context
@@ -78,6 +81,7 @@ const Layout = observer(() => {
     // Engineering is the default when opening a project, Insights is the charts
     const isEngineering = isProjectView && (!specificTab || specificTab === 'engineering');
     const isInsights = isProjectView && specificTab === 'insights';
+    const isSettingsTeam = isSettingsView && (!specificTab || specificTab === 'team');
 
     const handleTopRightClick = () => {
         if (isProjectView) {
@@ -105,6 +109,34 @@ const Layout = observer(() => {
 
     const toggleRecommendations = () => {
         dockStore.toggleRecommendations();
+    };
+
+    const openCreateProject = () => {
+        dockStore.openProjectEditor('create');
+    };
+
+    const openMemberInvite = () => {
+        dockStore.openMemberInvite();
+    };
+
+    const closeProjectEditor = () => {
+        dockStore.closeProjectEditor();
+    };
+
+    const closeMemberInvite = () => {
+        dockStore.closeMemberInvite();
+    };
+
+    const handleProjectSubmit = (data) => {
+        const { mode, project } = dockStore.projectEditor;
+
+        if (mode === 'edit' && project) {
+            projectStore.updateProject(project.id, data);
+        } else {
+            projectStore.addProject(data);
+        }
+
+        dockStore.closeProjectEditor();
     };
 
     const closeAiChat = () => {
@@ -216,6 +248,19 @@ const Layout = observer(() => {
                 onClose={() => dockStore.setRecommendationsOpen(false)}
             />
 
+            <ProjectEditorOverlay
+                isOpen={dockStore.projectEditor.isOpen}
+                mode={dockStore.projectEditor.mode}
+                project={dockStore.projectEditor.project}
+                onClose={closeProjectEditor}
+                onSubmit={handleProjectSubmit}
+            />
+
+            <InviteMember
+                isOpen={dockStore.memberInvite.isOpen}
+                onClose={closeMemberInvite}
+            />
+
             {/* Dynamic Content Area */}
             <main className="layout-content">
                 <Outlet />
@@ -303,7 +348,12 @@ const Layout = observer(() => {
 
                     {/* Create Project Button - Only in Home view */}
                     {!isProjectView && (
-                        <button className={`dock-create-btn ${isAiChatOpen ? 'dock-side-hidden' : ''}`} aria-label="Create Project">
+                        <button
+                            className={`dock-create-btn ${isAiChatOpen ? 'dock-side-hidden' : ''}`}
+                            aria-label={isSettingsTeam ? 'Add Member' : 'Create Project'}
+                            onClick={isSettingsTeam ? openMemberInvite : openCreateProject}
+                            type="button"
+                        >
                             <Plus size={20} />
                         </button>
                     )}
