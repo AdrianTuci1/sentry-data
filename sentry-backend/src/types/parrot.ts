@@ -44,8 +44,10 @@ export interface ParrotRuntimeMetadata {
     reverseEtl?: ReverseEtlStreamPlan;
     sourceMetadataUris?: string[];
     mindmapYamlUri?: string;
+    mindmapManifestUri?: string;
     executionPlanUri?: string;
     executionSubmissionUri?: string;
+    projectionRegistryUri?: string;
     executionEngine?: ParrotExecutionEngine;
     executionStatus?: ParrotExecutionSubmissionStatus;
 }
@@ -114,12 +116,17 @@ export interface ParrotGoldView {
     logic?: ParrotEditableLogic;
     suggestions?: ParrotMindMapSuggestion[];
     validation?: ParrotValidationState;
+    projectionVersion?: string;
+    projectionUri?: string;
 }
 
 export interface ParrotSourceProfile {
     sourceId: string;
     sourceName: string;
     sourceType: string;
+    connectorId?: string;
+    connectorName?: string;
+    iconPath?: string;
     uri: string;
     fingerprint: string;
     schema: ParrotSchemaColumn[];
@@ -130,6 +137,15 @@ export interface ParrotSourceProfile {
     transformations: ParrotSourceTransformation[];
     goldViews: ParrotGoldView[];
     metadataUri?: string;
+    storageMetrics?: {
+        objectCount: number;
+        totalBytes: number;
+        latestModifiedAt?: string;
+        rowCountEstimate?: number;
+        distinctEntityCountEstimate?: number;
+        sourcePrefix?: string;
+        scannedAt: string;
+    };
 }
 
 export interface ParrotMindMapGroup {
@@ -217,6 +233,8 @@ export interface ParrotMindMapManifest {
             id: string;
             name: string;
             type: string;
+            connector_id?: string;
+            icon_path?: string;
             uri: string;
             metadata_uri?: string;
         }>;
@@ -340,6 +358,8 @@ export interface ParrotArtifactUris {
     reverseEtlReceiptsUri: string;
     executionPlanUri: string;
     executionSubmissionUri: string;
+    mindmapManifestUri?: string;
+    projectionRegistryUri?: string;
 }
 
 export interface ParrotProgressFile {

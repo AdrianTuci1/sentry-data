@@ -4,7 +4,7 @@
 
 ## Runtime Flow
 
-1. `sentry-meltano` lands Bronze data.
+1. `sentry-meltano` or a customer-owned object store lands raw source data.
 2. `OrchestrationService` starts a Parrot runtime request.
 3. `ParrotNeuralEngineService` builds the execution score.
 4. `SentinelClient` aligns and validates the score.
@@ -20,7 +20,7 @@
 - `ParrotRuntimeService`: request lifecycle, progress, artifacts, and project runtime state.
 - `ParrotNeuralEngineService`: translator/compiler for Bronze-first execution logic.
 - `SentinelClient`: alignment and safety validation.
-- `BronzeDiscoveryService`: schema, semantic typing, and source metadata discovery.
+- `BronzeDiscoveryService`: schema, semantic typing, and zero-ETL source metadata discovery.
 - `WorkloadPlannerService`: execution sizing and provider selection.
 - `ExecutionPlaneService`: submission to Modal or Ray/Daft control planes.
 - `MindMapManifestService`: frontend-facing mindmap structure, YAML, and editable logic.
@@ -28,8 +28,9 @@
 
 ## Persistence
 
-- Client/project runtime artifacts are stored in object storage under `metadata/...`.
+- Client/project runtime artifacts are stored in object storage under `runtime/...`.
 - DynamoDB keeps higher-level project state, runtime pointers, and commercial metadata.
+- Queryable zero-ETL projections should live under `projections/...` rather than materialized `silver/gold` copies.
 - Reverse ETL stays guarded by DNS TXT ownership checks, VM limits, and stop conditions.
 
 ## Execution Plane

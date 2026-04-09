@@ -9,10 +9,29 @@ export class WorkloadPlannerService {
         const estimatedColumns = sourceProfiles.reduce((sum, profile) => sum + profile.schema.length, 0);
         const estimatedMetricColumns = sourceProfiles.reduce((sum, profile) => sum + profile.metricCandidates.length, 0);
         const estimatedGoldViews = sourceProfiles.reduce((sum, profile) => sum + profile.goldViews.length, 0);
-        const complexityScore = sourceCount * 20 + estimatedColumns + estimatedMetricColumns * 2 + estimatedGoldViews * 5;
+        const estimatedObjects = sourceProfiles.reduce((sum, profile) => sum + (profile.storageMetrics?.objectCount || 0), 0);
+        const estimatedBytes = sourceProfiles.reduce((sum, profile) => sum + (profile.storageMetrics?.totalBytes || 0), 0);
+        const estimatedRows = sourceProfiles.reduce((sum, profile) => sum + (profile.storageMetrics?.rowCountEstimate || 0), 0);
+        const estimatedDistinctEntities = sourceProfiles.reduce((sum, profile) => sum + (profile.storageMetrics?.distinctEntityCountEstimate || 0), 0);
+        const byteScore = Math.min(60, Math.round(estimatedBytes / 100_000_000));
+        const objectScore = Math.min(40, estimatedObjects);
+        const rowScore = Math.min(80, Math.round(estimatedRows / 250_000));
+        const cardinalityScore = Math.min(40, Math.round(estimatedDistinctEntities / 100_000));
+        const complexityScore = sourceCount * 20 + estimatedColumns + estimatedMetricColumns * 2 + estimatedGoldViews * 5 + byteScore + objectScore + rowScore + cardinalityScore;
         const workloadClass = complexityScore >= 120 ? 'large' : complexityScore >= 60 ? 'medium' : 'small';
         const engine = this.chooseEngine(workloadClass, sourceCount, estimatedColumns);
-        const reasons = this.buildReasons(workloadClass, sourceCount, estimatedColumns, estimatedMetricColumns, estimatedGoldViews, engine);
+        const reasons = this.buildReasons(
+            workloadClass,
+            sourceCount,
+            estimatedColumns,
+            estimatedMetricColumns,
+            estimatedGoldViews,
+            estimatedObjects,
+            estimatedBytes,
+            estimatedRows,
+            estimatedDistinctEntities,
+            engine
+        );
 
         if (engine === 'ray_daft') {
             return {
@@ -35,10 +54,10 @@ export class WorkloadPlannerService {
                     autoscaling: true
                 },
                 resources: {
-                    driver_cpu: workloadClass === 'large' ? 4 : 2,
-                    driver_memory_gb: workloadClass === 'large' ? 16 : 8,
+                    driver_cpu: workloadClass === 'large' ? 6 : 3,
+                    driver_memory_gb: workloadClass === 'large' ? 24 : 12,
                     worker_cpu: workloadClass === 'large' ? 4 : 2,
-                    worker_memory_gb: workloadClass === 'large' ? 12 : 8,
+                    worker_memory_gb: workloadClass === 'large' ? 16 : 8,
                     min_workers: workloadClass === 'large' ? 6 : 3,
                     max_workers: workloadClass === 'large' ? 48 : 16
                 },
@@ -68,12 +87,12 @@ export class WorkloadPlannerService {
                 autoscaling: true
             },
             resources: {
-                driver_cpu: 2,
-                driver_memory_gb: workloadClass === 'medium' ? 8 : 4,
+                driver_cpu: workloadClass === 'medium' ? 3 : 2,
+                driver_memory_gb: workloadClass === 'medium' ? 10 : 4,
                 worker_cpu: workloadClass === 'medium' ? 2 : 1,
-                worker_memory_gb: workloadClass === 'medium' ? 6 : 4,
+                worker_memory_gb: workloadClass === 'medium' ? 8 : 4,
                 min_workers: 1,
-                max_workers: workloadClass === 'medium' ? 6 : 3
+                max_workers: workloadClass === 'medium' ? 8 : 3
             },
             routing: {
                 preferred_provider: 'modal',
@@ -98,6 +117,10 @@ export class WorkloadPlannerService {
         estimatedColumns: number,
         estimatedMetricColumns: number,
         estimatedGoldViews: number,
+        estimatedObjects: number,
+        estimatedBytes: number,
+        estimatedRows: number,
+        estimatedDistinctEntities: number,
         engine: ParrotExecutionEngine
     ): string[] {
         return [
@@ -106,6 +129,10 @@ export class WorkloadPlannerService {
             `estimated_columns=${estimatedColumns}`,
             `estimated_metric_columns=${estimatedMetricColumns}`,
             `estimated_gold_views=${estimatedGoldViews}`,
+            `estimated_objects=${estimatedObjects}`,
+            `estimated_bytes=${estimatedBytes}`,
+            `estimated_rows=${estimatedRows}`,
+            `estimated_distinct_entities=${estimatedDistinctEntities}`,
             `selected_engine=${engine}`,
             engine === 'ray_daft'
                 ? 'distributed execution selected because metadata indicates multi-source or high-complexity workload'

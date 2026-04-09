@@ -15,41 +15,10 @@ R2_ENDPOINT = os.getenv("R2_ENDPOINT", "")
 R2_ACCESS_KEY = os.getenv("R2_ACCESS_KEY_ID", "")
 R2_SECRET_KEY = os.getenv("R2_SECRET_ACCESS_KEY", "")
 R2_REGION = os.getenv("R2_REGION", "auto")
+WIDGETS_DIR = os.getenv("STATS_PARROT_WIDGETS_DIR", "")
+WIDGET_ARTIFACT_SCRIPT = os.getenv("STATS_PARROT_WIDGET_ARTIFACT_SCRIPT", "")
 
-# -------------------------------------------------------------
-# Global DuckDB Connection Setup
-# -------------------------------------------------------------
-print("[DuckDB] Initializing new native In-Memory Database...")
-con = duckdb.connect(':memory:')
 execution_submissions: Dict[str, Dict[str, Any]] = {}
-
-def setup_duckdb():
-    print("[DuckDB] Loading HTTPFS extension...")
-    try:
-        con.execute("INSTALL httpfs;")
-    except Exception:
-        pass  # Already installed
-    con.execute("LOAD httpfs;")
-    
-    # Clean the endpoint domain if necessary (e.g. remove https://)
-    clean_endpoint = R2_ENDPOINT.replace("https://", "")
-    
-    print(f"[DuckDB] Configuring R2 Credentials...")
-    print(f"         Endpoint: {clean_endpoint}")
-    mask = lambda s: f"{s[:4]}...{s[-4:]}" if len(s) > 8 else "****"
-    print(f"         Access Key: {mask(R2_ACCESS_KEY)}")
-    
-    con.execute("SET s3_use_ssl=true;")
-    con.execute("SET s3_region='auto';")
-    con.execute(f"SET s3_endpoint='{clean_endpoint}';")
-    con.execute(f"SET s3_access_key_id='{R2_ACCESS_KEY}';")
-    con.execute(f"SET s3_secret_access_key='{R2_SECRET_KEY}';")
-    con.execute("SET s3_url_style='path';")
-    # con.execute("SET s3_use_v2_auth=true;") # R2 supports both, path style often needs true
-    
-    print("[DuckDB] Setup Complete.")
-
-setup_duckdb()
 
 # -------------------------------------------------------------
 # Types & Validation Models
@@ -58,10 +27,31 @@ class QueryItem(BaseModel):
     widgetId: str
     sqlString: str
 
+
+class StorageCredentialsPayload(BaseModel):
+    accessKeyId: str
+    secretAccessKey: str
+    sessionToken: Optional[str] = None
+
+
+class StorageConfigPayload(BaseModel):
+    provider: Optional[str] = None
+    endpoint: Optional[str] = None
+    bucket: str
+    prefix: Optional[str] = None
+    region: Optional[str] = None
+    useSsl: Optional[bool] = True
+    urlStyle: Optional[str] = "path"
+    fileFormat: Optional[str] = "parquet"
+    globPattern: Optional[str] = None
+    credentials: Optional[StorageCredentialsPayload] = None
+
+
 class ExecutePayload(BaseModel):
     tenantId: str
     projectId: str
     queries: List[QueryItem]
+    storageConfig: Optional[StorageConfigPayload] = None
 
 
 class ExecutionSubmitPayload(BaseModel):
@@ -92,6 +82,41 @@ def sanitize_job_name(value: str) -> str:
     safe = ''.join(ch if ch.isalnum() else '-' for ch in value.lower())
     collapsed = '-'.join(part for part in safe.split('-') if part)
     return collapsed[:48] or 'parrot-job'
+
+
+def create_connection(storage_config: Optional[StorageConfigPayload] = None):
+    print("[DuckDB] Initializing new native In-Memory Database...")
+    con = duckdb.connect(':memory:')
+    print("[DuckDB] Loading HTTPFS extension...")
+    try:
+        con.execute("INSTALL httpfs;")
+    except Exception:
+        pass
+    con.execute("LOAD httpfs;")
+
+    endpoint = (storage_config.endpoint if storage_config and storage_config.endpoint else R2_ENDPOINT).replace("https://", "").replace("http://", "")
+    region = storage_config.region if storage_config and storage_config.region else R2_REGION
+    use_ssl = storage_config.useSsl if storage_config and storage_config.useSsl is not None else True
+    url_style = storage_config.urlStyle if storage_config and storage_config.urlStyle else "path"
+    access_key = storage_config.credentials.accessKeyId if storage_config and storage_config.credentials else R2_ACCESS_KEY
+    secret_key = storage_config.credentials.secretAccessKey if storage_config and storage_config.credentials else R2_SECRET_KEY
+
+    mask = lambda s: f"{s[:4]}...{s[-4:]}" if len(s) > 8 else "****"
+    print(f"[DuckDB] Configuring object storage...")
+    print(f"         Endpoint: {endpoint}")
+    print(f"         Access Key: {mask(access_key)}")
+
+    con.execute(f"SET s3_use_ssl={'true' if use_ssl else 'false'};")
+    con.execute(f"SET s3_region='{region or 'auto'}';")
+    if endpoint:
+        con.execute(f"SET s3_endpoint='{endpoint}';")
+    if access_key:
+        con.execute(f"SET s3_access_key_id='{access_key}';")
+    if secret_key:
+        con.execute(f"SET s3_secret_access_key='{secret_key}';")
+    con.execute(f"SET s3_url_style='{url_style}';")
+
+    return con
 
 
 def build_ray_manifest(payload: ExecutionSubmitPayload) -> Dict[str, Any]:
@@ -271,8 +296,10 @@ def build_execution_submission(payload: ExecutionSubmitPayload) -> Dict[str, Any
 # -------------------------------------------------------------
 @app.get("/health")
 def health_check():
+    con = None
     try:
         # Simple test query
+        con = create_connection()
         res = con.execute("SELECT 1 as is_alive").fetchall()
         
         # Check R2 config (masking keys)
@@ -281,7 +308,10 @@ def health_check():
             "endpoint": R2_ENDPOINT,
             "access_key": mask(R2_ACCESS_KEY),
             "region": R2_REGION,
-            "duckdb_version": duckdb.__version__
+            "duckdb_version": duckdb.__version__,
+            "widgets_dir": WIDGETS_DIR,
+            "artifact_script": WIDGET_ARTIFACT_SCRIPT,
+            "artifact_script_accessible": bool(WIDGET_ARTIFACT_SCRIPT and os.path.exists(WIDGET_ARTIFACT_SCRIPT))
         }
         
         return {
@@ -292,13 +322,17 @@ def health_check():
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if con is not None:
+            con.close()
 
 @app.post("/execute", dependencies=[Depends(verify_internal_secret)])
 def execute_queries(payload: ExecutePayload):
     print(f"[QueryController] Received execution request for Project: {payload.projectId}")
-    
+
+    con = create_connection(payload.storageConfig)
     results = []
-    
+
     import time
     for q in payload.queries:
         try:
@@ -328,12 +362,15 @@ def execute_queries(payload: ExecutePayload):
                 "data": None,
                 "error": str(e)
             })
-            
-    return {
-        "tenantId": payload.tenantId,
-        "projectId": payload.projectId,
-        "results": results
-    }
+
+    try:
+        return {
+            "tenantId": payload.tenantId,
+            "projectId": payload.projectId,
+            "results": results
+        }
+    finally:
+        con.close()
 
 
 @app.post("/execution/submit", dependencies=[Depends(verify_internal_secret)])

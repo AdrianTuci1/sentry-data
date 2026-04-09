@@ -1,5 +1,6 @@
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import { BaseRepository, Entity } from './BaseRepository';
+import { ObjectStorageConfig, SourceDataCursor, SourceStorageMetrics } from '../../types/storage';
 
 /**
  * Represents a data source (connector) attached to a Project.
@@ -12,9 +13,14 @@ export interface SourceEntity extends Entity {
     name: string;           // Human-readable label (e.g. "Shopify Orders CSV")
     uri: string;            // S3/R2 URI pointing to the raw data
     type: string;           // e.g. 'csv', 'parquet', 'shopify', 'meta', 'postgres'
+    connectorId?: string;
     cronSchedule?: string;  // Optional cron expression for automatic refresh
     lastRunAt?: string;     // ISO timestamp of the last successful runtime execution
     schemaFingerprint?: string; // Hash of column names — used for cache invalidation
+    storageConfig?: ObjectStorageConfig;
+    dataCursor?: SourceDataCursor;
+    observedMetrics?: SourceStorageMetrics;
+    lastObservedAt?: string;
     createdAt: string;
 }
 
@@ -61,9 +67,14 @@ export class SourceRepository extends BaseRepository<SourceEntity> {
             name: source.name,
             uri: source.uri,
             type: source.type,
+            connectorId: source.connectorId,
             cronSchedule: source.cronSchedule,
             lastRunAt: source.lastRunAt,
             schemaFingerprint: source.schemaFingerprint,
+            storageConfig: source.storageConfig,
+            dataCursor: source.dataCursor,
+            observedMetrics: source.observedMetrics,
+            lastObservedAt: source.lastObservedAt,
             createdAt: source.createdAt,
             PK: this.getPartitionKey(source.tenantId),
             SK: this.getSortKey(`${source.projectId}#${source.sourceId}`),

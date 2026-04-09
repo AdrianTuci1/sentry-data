@@ -32,9 +32,19 @@ export class RuntimeOrchestratorService {
         }
 
         const rawSourceUris = sources.map(s => s.uri);
+        const sourceDescriptors = sources.map((source) => ({
+            sourceId: source.sourceId,
+            sourceName: source.name,
+            uri: source.uri,
+            type: source.type,
+            connectorId: source.connectorId,
+            storageConfig: source.storageConfig,
+            dataCursor: source.dataCursor,
+            observedMetrics: source.observedMetrics
+        }));
         console.log(`[ParrotRuntime] Loaded ${rawSourceUris.length} persisted source(s) for ${projectId}`);
 
-        this.orchestrationService.runRuntime(tenantId, projectId, rawSourceUris, sources.map(s => s.name))
+        this.orchestrationService.runRuntime(tenantId, projectId, rawSourceUris, sources.map(s => s.name), sourceDescriptors, true)
             .catch(err => {
                 console.error(`[ParrotRuntime] Fatal error running runtime for ${projectId}:`, err);
             });

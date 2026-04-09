@@ -7,6 +7,7 @@ import { MindMapManifestService } from './MindMapManifestService';
 import { ParrotProgressService } from './ParrotProgressService';
 import { WorkloadPlannerService } from './WorkloadPlannerService';
 import { ExecutionPlaneService } from './ExecutionPlaneService';
+import { ProjectionRegistryService } from './ProjectionRegistryService';
 
 /**
  * OrchestrationService is the entrypoint for the Parrot OS runtime.
@@ -21,6 +22,7 @@ export class OrchestrationService {
     private parrotProgressService: ParrotProgressService;
     private workloadPlannerService: WorkloadPlannerService;
     private executionPlaneService: ExecutionPlaneService;
+    private projectionRegistryService: ProjectionRegistryService;
 
     constructor(
         projectRepo: ProjectRepository,
@@ -30,7 +32,8 @@ export class OrchestrationService {
         mindMapManifestService: MindMapManifestService,
         parrotProgressService: ParrotProgressService,
         workloadPlannerService: WorkloadPlannerService,
-        executionPlaneService: ExecutionPlaneService
+        executionPlaneService: ExecutionPlaneService,
+        projectionRegistryService: ProjectionRegistryService
     ) {
         this.projectRepo = projectRepo;
         this.sseManager = sseManager;
@@ -40,6 +43,7 @@ export class OrchestrationService {
         this.parrotProgressService = parrotProgressService;
         this.workloadPlannerService = workloadPlannerService;
         this.executionPlaneService = executionPlaneService;
+        this.projectionRegistryService = projectionRegistryService;
     }
 
     /**
@@ -47,7 +51,15 @@ export class OrchestrationService {
      * @param sourceNames Optional array of source identifiers (e.g. ['ga4', 'shopify']) matching rawSourceUris order.
      *                    When provided, bronze/silver paths are partitioned by source name and date.
      */
-    public async runRuntime(tenantId: string, projectId: string, rawSourceUris: string[], sourceNames?: string[], forceRediscover: boolean = false): Promise<void> {
+    public async runRuntime(
+        tenantId: string,
+        projectId: string,
+        rawSourceUris: string[],
+        sourceNames?: string[],
+        sourceDescriptors?: RuntimeContext['sourceDescriptors'],
+        forceRediscover: boolean = false,
+        invalidatedSources: string[] = []
+    ): Promise<void> {
         console.log(`[Orchestrator] Starting Parrot runtime for Project ${projectId}`);
         const startTime = Date.now();
 
@@ -56,8 +68,10 @@ export class OrchestrationService {
             projectId,
             rawSourceUris,
             sourceNames: sourceNames || [],
+            sourceDescriptors,
             runtimeMode: 'parrot_os',
-            forceRediscover
+            forceRediscover,
+            invalidatedSources
         };
 
         const project = await this.projectRepo.findById(tenantId, projectId);
@@ -87,6 +101,12 @@ export class OrchestrationService {
             });
 
             const sourceProfiles = await this.bronzeDiscoveryService.discoverSources(ctx);
+            const projectionRegistry = await this.projectionRegistryService.registerSourceProfiles(
+                tenantId,
+                projectId,
+                parrotBootstrap.requestId,
+                sourceProfiles
+            );
 
             this.sseManager.broadcastToTenant(tenantId, 'runtime_progress', {
                 step: 'Workload Planning',
@@ -128,12 +148,19 @@ export class OrchestrationService {
                 parrotBootstrap.requestId,
                 mindMapPackage.yaml
             );
+            const { uri: mindmapManifestUri } = await this.parrotProgressService.saveMindMapManifest(
+                tenantId,
+                projectId,
+                parrotBootstrap.requestId,
+                mindMapPackage.manifest
+            );
 
             finalDiscovery = {
                 ...mindMapPackage.projection,
                 mindmapManifest: mindMapPackage.manifest,
                 mindmapYaml: mindMapPackage.yaml,
                 sourceMetadata: sourceProfiles,
+                projectionRegistry: projectionRegistry.registry,
                 executionPlan,
                 executionSubmission,
                 metadataArtifacts: {
@@ -142,8 +169,10 @@ export class OrchestrationService {
                     progressFileUri: parrotBootstrap.artifacts.progressFileUri,
                     sentinelReportUri: parrotBootstrap.artifacts.sentinelReportUri,
                     mindmapYamlUri,
+                    mindmapManifestUri,
                     executionPlanUri: parrotBootstrap.artifacts.executionPlanUri,
-                    executionSubmissionUri: parrotBootstrap.artifacts.executionSubmissionUri
+                    executionSubmissionUri: parrotBootstrap.artifacts.executionSubmissionUri,
+                    projectionRegistryUri: projectionRegistry.registryUri
                 }
             };
 
@@ -152,7 +181,7 @@ export class OrchestrationService {
                 pathUsed: 'parrot_os',
                 cacheHitRate: 0,
                 estimatedTokensUsed: 0,
-                tasksExecuted: ['bronze_discovery', 'workload_planning', 'execution_submission', 'mindmap_generation', 'recommendation_staging'],
+                tasksExecuted: ['bronze_discovery', 'projection_registry', 'workload_planning', 'execution_submission', 'mindmap_generation', 'recommendation_staging'],
                 startedAt: new Date(startTime).toISOString(),
                 completedAt: new Date().toISOString()
             } satisfies RuntimeVitals;
@@ -168,8 +197,10 @@ export class OrchestrationService {
                     ...(finalProject.parrotRuntime || { mode: 'parrot_os' }),
                     sourceMetadataUris: sourceProfiles.map((profile) => profile.metadataUri || '').filter(Boolean),
                     mindmapYamlUri,
+                    mindmapManifestUri,
                     executionPlanUri: parrotBootstrap.artifacts.executionPlanUri,
                     executionSubmissionUri: parrotBootstrap.artifacts.executionSubmissionUri,
+                    projectionRegistryUri: projectionRegistry.registryUri,
                     executionEngine: executionPlan.engine,
                     executionStatus: executionSubmission.status
                 };

@@ -146,6 +146,24 @@ class R2StorageService {
     getGoldGlobUri(tenantId, projectId, sourceName) {
         return this.getS3Uri(tenantId, projectId, 'gold', sourceName, '*', '*.parquet');
     }
+    getSourceObjectUri(tenantId, projectId, sourceName, filename, date) {
+        return this.getS3Uri(tenantId, projectId, 'sources', sourceName, date || this.getDatePartition(), filename);
+    }
+    getSourceObjectGlobUri(tenantId, projectId, sourceName) {
+        return this.getS3Uri(tenantId, projectId, 'sources', sourceName, '*', '*.parquet');
+    }
+    getProjectionUri(tenantId, projectId, projectionName, version, filename) {
+        return this.getS3Uri(tenantId, projectId, 'projections', projectionName, version, filename);
+    }
+    getProjectionGlobUri(tenantId, projectId, projectionName) {
+        return this.getS3Uri(tenantId, projectId, 'projections', projectionName, '*', '*.parquet');
+    }
+    async generateSourceUploadUrl(tenantId, projectId, sourceName, filename) {
+        const key = this.getS3Key(tenantId, projectId, 'sources', sourceName, this.getDatePartition(), filename);
+        const command = new client_s3_1.PutObjectCommand({ Bucket: this.dataBucket, Key: key, ContentType: 'application/octet-stream' });
+        const url = await (0, s3_request_presigner_1.getSignedUrl)(this.client, command, { expiresIn: 3600 });
+        return { url, uri: `s3://${this.dataBucket}/${key}` };
+    }
     async generatePartitionedUploadUrl(tenantId, projectId, sourceName, filename) {
         const key = this.getS3Key(tenantId, projectId, 'bronze', sourceName, this.getDatePartition(), filename);
         const command = new client_s3_1.PutObjectCommand({ Bucket: this.dataBucket, Key: key, ContentType: 'application/octet-stream' });
@@ -153,7 +171,7 @@ class R2StorageService {
         return { url, uri: `s3://${this.dataBucket}/${key}` };
     }
     async saveDiscovery(tenantId, projectId, discovery) {
-        const key = this.getS3Key(tenantId, projectId, 'discovery', 'source_classification.json');
+        const key = this.getS3Key(tenantId, projectId, 'runtime', 'discovery', 'source_classification.json');
         await this.client.send(new client_s3_1.PutObjectCommand({
             Bucket: this.dataBucket, Key: key,
             Body: JSON.stringify(discovery, null, 2),

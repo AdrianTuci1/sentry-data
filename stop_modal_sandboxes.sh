@@ -1,18 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Script to stop all running Modal apps associated with the Sentry project
-# Usage: ./stop_modal_sandboxes.sh
+set -euo pipefail
 
-APP_NAME="sentry-sandbox-executor"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo "Listing active Modal apps..."
-python3 -m modal app list
-
-echo "Stopping app: $APP_NAME..."
-python3 -m modal app stop $APP_NAME
-
-echo "Stopping any other active ephemeral apps if they exist..."
-# This is a bit more aggressive, it lists all apps and tries to stop them if they are not permanent
-# But for now, we'll stick to the specific app name which is the most common case.
-
-echo "Done."
+exec "${SCRIPT_DIR}/modal_apps/scripts/stop_all.sh" "$@"

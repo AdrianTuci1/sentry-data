@@ -9,6 +9,7 @@ import { TenantRepository } from '../src/infrastructure/repositories/TenantRepos
 import { ProjectRepository } from '../src/infrastructure/repositories/ProjectRepository';
 import { SourceRepository } from '../src/infrastructure/repositories/SourceRepository';
 import { v4 as uuidv4 } from 'uuid';
+import { deployWidgetsToR2 } from './lib/widget_deploy';
 
 // ═══════════════════════════════════════════════════════════
 // DATASET CONFIGURATION — Edit this array to change what gets seeded
@@ -109,33 +110,10 @@ async function seed() {
             createdAt: new Date().toISOString()
         });
 
-        // ── STEP 2: UPLOAD SYSTEM BOILERPLATES ──────────────
+        // ── STEP 2: UPLOAD DISCOVERY WIDGETS ────────────────
 
-        const boilerplatesPath = path.join(__dirname, '../../boilerplates');
-
-        const uploadDirectory = async (localDirPath: string, bucketPrefix: string) => {
-            if (!fs.existsSync(localDirPath)) return;
-
-            const items = fs.readdirSync(localDirPath, { withFileTypes: true });
-            for (const item of items) {
-                const fullLocalPath = path.join(localDirPath, item.name);
-                const bucketKey = `${bucketPrefix}/${item.name}`;
-
-                if (item.isDirectory()) {
-                    await uploadDirectory(fullLocalPath, bucketKey);
-                } else if (item.isFile()) {
-                    await s3Client.send(new PutObjectCommand({
-                        Bucket: config.r2.bucketData,
-                        Key: bucketKey,
-                        Body: fs.readFileSync(fullLocalPath)
-                    }));
-                    console.log(`[R2] Uploaded: ${bucketKey}`);
-                }
-            }
-        };
-
-        console.log('\n[R2] Uploading System Boilerplates...');
-        await uploadDirectory(boilerplatesPath, 'system/boilerplates');
+        console.log('\n[R2] Uploading discovery widgets...');
+        await deployWidgetsToR2({ s3Client });
 
         // ── STEP 3: UPLOAD DATASETS & CREATE SOURCE CONNECTORS ──
 
@@ -155,14 +133,14 @@ async function seed() {
                 continue;
             }
 
-            // Upload parquet to R2 bronze layer (following production partitioned structure)
+            // Upload parquet to the zero-ETL source object prefix
             const sanitizedName = dataset.name.replace(/\s+/g, '_');
             const currentDate = new Date().toISOString().split('T')[0];
-            const r2Key = `tenants/${tenantId}/projects/${projectId}/bronze/${sanitizedName}/${currentDate}/${dataset.localFile}`;
+            const r2Key = `tenants/${tenantId}/projects/${projectId}/sources/${sanitizedName}/${currentDate}/${dataset.localFile}`;
             const r2UriExact = `s3://${config.r2.bucketData}/${r2Key}`;
 
-            // The pipeline should read ALL partitions for a connector.
-            const r2UriGlob = `s3://${config.r2.bucketData}/tenants/${tenantId}/projects/${projectId}/bronze/${sanitizedName}/**/*.parquet`;
+            // The runtime should read all partitions for a connector.
+            const r2UriGlob = `s3://${config.r2.bucketData}/tenants/${tenantId}/projects/${projectId}/sources/${sanitizedName}/**/*.parquet`;
 
             console.log(`[R2] Uploading: ${dataset.name} → ${r2Key}`);
             await s3Client.send(new PutObjectCommand({

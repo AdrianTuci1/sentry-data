@@ -1,10 +1,23 @@
 import { ParrotRuntimeMode } from './parrot';
+import { ObjectStorageConfig, SourceDataCursor, SourceStorageMetrics } from './storage';
+
+export interface RuntimeSourceDescriptor {
+    sourceId?: string;
+    sourceName: string;
+    uri: string;
+    type?: string;
+    connectorId?: string;
+    storageConfig?: ObjectStorageConfig;
+    dataCursor?: SourceDataCursor;
+    observedMetrics?: SourceStorageMetrics;
+}
 
 export interface RuntimeContext {
     tenantId: string;
     projectId: string;
     rawSourceUris: string[];
     sourceNames: string[];
+    sourceDescriptors?: RuntimeSourceDescriptor[];
     runtimeMode?: ParrotRuntimeMode;
     requestId?: string;
     executionScoreUri?: string;

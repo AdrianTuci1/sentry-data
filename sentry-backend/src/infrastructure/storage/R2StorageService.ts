@@ -161,6 +161,35 @@ export class R2StorageService {
         return this.getS3Uri(tenantId, projectId, 'gold', sourceName, '*', '*.parquet');
     }
 
+    public getSourceObjectUri(tenantId: string, projectId: string, sourceName: string, filename: string, date?: string): string {
+        return this.getS3Uri(tenantId, projectId, 'sources', sourceName, date || this.getDatePartition(), filename);
+    }
+
+    public getSourceObjectGlobUri(tenantId: string, projectId: string, sourceName: string): string {
+        return this.getS3Uri(tenantId, projectId, 'sources', sourceName, '*', '*.parquet');
+    }
+
+    public getProjectionUri(
+        tenantId: string,
+        projectId: string,
+        projectionName: string,
+        version: string,
+        filename: string
+    ): string {
+        return this.getS3Uri(tenantId, projectId, 'projections', projectionName, version, filename);
+    }
+
+    public getProjectionGlobUri(tenantId: string, projectId: string, projectionName: string): string {
+        return this.getS3Uri(tenantId, projectId, 'projections', projectionName, '*', '*.parquet');
+    }
+
+    public async generateSourceUploadUrl(tenantId: string, projectId: string, sourceName: string, filename: string): Promise<{ url: string; uri: string }> {
+        const key = this.getS3Key(tenantId, projectId, 'sources', sourceName, this.getDatePartition(), filename);
+        const command = new PutObjectCommand({ Bucket: this.dataBucket, Key: key, ContentType: 'application/octet-stream' });
+        const url = await getSignedUrl(this.client, command, { expiresIn: 3600 });
+        return { url, uri: `s3://${this.dataBucket}/${key}` };
+    }
+
     public async generatePartitionedUploadUrl(tenantId: string, projectId: string, sourceName: string, filename: string): Promise<{ url: string; uri: string }> {
         const key = this.getS3Key(tenantId, projectId, 'bronze', sourceName, this.getDatePartition(), filename);
         const command = new PutObjectCommand({ Bucket: this.dataBucket, Key: key, ContentType: 'application/octet-stream' });
@@ -169,7 +198,7 @@ export class R2StorageService {
     }
 
     public async saveDiscovery(tenantId: string, projectId: string, discovery: any): Promise<void> {
-        const key = this.getS3Key(tenantId, projectId, 'discovery', 'source_classification.json');
+        const key = this.getS3Key(tenantId, projectId, 'runtime', 'discovery', 'source_classification.json');
         await this.client.send(new PutObjectCommand({
             Bucket: this.dataBucket, Key: key,
             Body: JSON.stringify(discovery, null, 2),

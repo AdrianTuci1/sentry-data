@@ -9,7 +9,13 @@ import {
 } from './index.js';
 
 const require = createRequire(import.meta.url);
-const yaml = require('../../sentry-backend/node_modules/js-yaml');
+const yaml = (() => {
+    try {
+        return require('js-yaml');
+    } catch (runtimeError) {
+        return require('../../sentry-backend/node_modules/js-yaml');
+    }
+})();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

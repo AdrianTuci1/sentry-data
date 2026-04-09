@@ -38,6 +38,12 @@ const SOURCE_ICON_BY_TYPE = {
     api: Globe,
     http: Globe,
     crm: Globe,
+    ga4: Globe,
+    facebook_ads: Globe,
+    shopify: Globe,
+    tiktok_ads: Globe,
+    stripe: Globe,
+    hubspot: Globe,
     stream: Activity,
     kafka: Activity,
     events: Activity

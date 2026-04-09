@@ -11,9 +11,11 @@ const WidgetDataMapper_1 = require("../utils/WidgetDataMapper");
 //     - [ ] Verify R2 object existence for components
 // - [ ] Final Verification
 class AnalyticsService {
-    constructor(projectRepository, widgetService, _widgetRenderer) {
+    constructor(projectRepository, sourceRepository, widgetService, _widgetRenderer, objectStorageService) {
         this.projectRepository = projectRepository;
+        this.sourceRepository = sourceRepository;
         this.widgetService = widgetService;
+        this.objectStorageService = objectStorageService;
         // Internal worker connection details
         this.analyticsWorkerUrl = process.env.ANALYTICS_WORKER_URL || 'http://localhost:4000/execute';
         this.workerSecret = process.env.INTERNAL_API_SECRET || 'secret';
@@ -55,13 +57,14 @@ class AnalyticsService {
             return { tenantId, projectId, status: 'discovery', dashboards: enrichedDashboards };
         }
         try {
+            const storageConfig = await this.resolveWorkerStorageConfig(tenantId, projectId);
             const response = await fetch(this.analyticsWorkerUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-Internal-Secret': this.workerSecret
                 },
-                body: JSON.stringify({ tenantId, projectId, queries: project.queryConfigs })
+                body: JSON.stringify({ tenantId, projectId, queries: project.queryConfigs, storageConfig })
             });
             if (!response.ok)
                 throw new Error(`Worker Failed: ${response.status}`);
@@ -174,7 +177,12 @@ class AnalyticsService {
                 'Content-Type': 'application/json',
                 'X-Internal-Secret': this.workerSecret
             },
-            body: JSON.stringify({ tenantId, projectId, queries: [queryConfig] })
+            body: JSON.stringify({
+                tenantId,
+                projectId,
+                queries: [queryConfig],
+                storageConfig: await this.resolveWorkerStorageConfig(tenantId, projectId)
+            })
         });
         const workerRes = await response.json() || { results: [] };
         const result = workerRes?.results?.[0];
@@ -205,6 +213,10 @@ class AnalyticsService {
             data: mappedData,
             isMock: (Array.isArray(result.data) && result.data.length === 0)
         };
+    }
+    async resolveWorkerStorageConfig(tenantId, projectId) {
+        const sources = await this.sourceRepository.findAllForProject(tenantId, projectId);
+        return this.objectStorageService.resolveSharedWorkerStorageConfig(sources);
     }
 }
 exports.AnalyticsService = AnalyticsService;

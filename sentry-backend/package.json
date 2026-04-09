@@ -7,6 +7,8 @@
     "build": "tsc",
     "start": "node dist/app.js",
     "dev": "nodemon src/server.ts",
+    "deploy:widgets": "ts-node scripts/sync_widgets.ts",
+    "refresh:check": "ts-node scripts/check_source_updates.ts",
     "seed": "ts-node scripts/seed_test_data.ts",
     "clean": "ts-node scripts/full_cleanup.ts",
     "runtime": "ts-node scripts/test_runtime.ts",

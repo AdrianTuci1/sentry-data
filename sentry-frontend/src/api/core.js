@@ -50,11 +50,75 @@ export const ProjectService = {
     /**
      * Connects a new raw data source to the project.
      */
-    async addSource(projectId, sourceName, sourceUri) {
+    async addSource(projectId, sourceInput, sourceUri) {
+        const payload = typeof sourceInput === 'object'
+            ? sourceInput
+            : { sourceName: sourceInput, sourceUri };
         const res = await fetch(`${API_BASE_URL}/projects/${projectId}/sources`, {
             method: 'POST',
             headers: getHeaders(),
-            body: JSON.stringify({ sourceName, sourceUri })
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        return res.json();
+    },
+
+    /**
+     * Retrieves all sources for a project.
+     */
+    async getSources(projectId) {
+        const res = await fetch(`${API_BASE_URL}/projects/${projectId}/sources`, {
+            method: 'GET',
+            headers: getHeaders()
+        });
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        return res.json();
+    },
+
+    /**
+     * Returns the connector capability catalog used by the frontend hub.
+     */
+    async getConnectorCatalog() {
+        const res = await fetch(`${API_BASE_URL}/projects/connectors/catalog`, {
+            method: 'GET',
+            headers: getHeaders()
+        });
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        return res.json();
+    },
+
+    /**
+     * Previews datasets inside a customer-owned object storage prefix.
+     */
+    async discoverSources(projectId, storageConfig) {
+        const res = await fetch(`${API_BASE_URL}/projects/${projectId}/sources/discover`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ storageConfig })
+        });
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        return res.json();
+    },
+
+    /**
+     * Deletes a source from the project.
+     */
+    async deleteSource(projectId, sourceId) {
+        const res = await fetch(`${API_BASE_URL}/projects/${projectId}/sources/${sourceId}`, {
+            method: 'DELETE',
+            headers: getHeaders()
+        });
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        return res.json();
+    },
+
+    /**
+     * Polls object storage and retriggers runtime if new data is detected.
+     */
+    async checkSourceUpdates(projectId) {
+        const res = await fetch(`${API_BASE_URL}/projects/${projectId}/runtime/check-updates`, {
+            method: 'POST',
+            headers: getHeaders()
         });
         if (!res.ok) throw new Error(`API Error: ${res.status}`);
         return res.json();

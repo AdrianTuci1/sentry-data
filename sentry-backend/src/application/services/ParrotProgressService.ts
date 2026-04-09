@@ -16,13 +16,14 @@ export class ParrotProgressService {
 
     public buildArtifactUris(tenantId: string, projectId: string, requestId: string): ParrotArtifactUris {
         return {
-            executionScoreUri: this.r2StorageService.getS3Uri(tenantId, projectId, 'metadata', 'requests', requestId, 'execution-score.json'),
-            progressFileUri: this.r2StorageService.getS3Uri(tenantId, projectId, 'metadata', 'requests', requestId, 'progress.json'),
-            sentinelReportUri: this.r2StorageService.getS3Uri(tenantId, projectId, 'metadata', 'requests', requestId, 'sentinel-report.json'),
-            outputManifestUri: this.r2StorageService.getS3Uri(tenantId, projectId, 'metadata', 'requests', requestId, 'output-manifest.json'),
-            reverseEtlReceiptsUri: this.r2StorageService.getS3Uri(tenantId, projectId, 'metadata', 'requests', requestId, 'reverse-etl-receipts.json'),
-            executionPlanUri: this.r2StorageService.getS3Uri(tenantId, projectId, 'metadata', 'requests', requestId, 'execution-plan.json'),
-            executionSubmissionUri: this.r2StorageService.getS3Uri(tenantId, projectId, 'metadata', 'requests', requestId, 'execution-submission.json')
+            executionScoreUri: this.r2StorageService.getS3Uri(tenantId, projectId, 'runtime', 'requests', requestId, 'execution-score.json'),
+            progressFileUri: this.r2StorageService.getS3Uri(tenantId, projectId, 'runtime', 'requests', requestId, 'progress.json'),
+            sentinelReportUri: this.r2StorageService.getS3Uri(tenantId, projectId, 'runtime', 'requests', requestId, 'sentinel-report.json'),
+            outputManifestUri: this.r2StorageService.getS3Uri(tenantId, projectId, 'runtime', 'requests', requestId, 'output-manifest.json'),
+            reverseEtlReceiptsUri: this.r2StorageService.getS3Uri(tenantId, projectId, 'runtime', 'requests', requestId, 'reverse-etl-receipts.json'),
+            executionPlanUri: this.r2StorageService.getS3Uri(tenantId, projectId, 'runtime', 'requests', requestId, 'execution-plan.json'),
+            executionSubmissionUri: this.r2StorageService.getS3Uri(tenantId, projectId, 'runtime', 'requests', requestId, 'execution-submission.json'),
+            mindmapManifestUri: this.r2StorageService.getS3Uri(tenantId, projectId, 'runtime', 'requests', requestId, 'mindmap-manifest.json')
         };
     }
 
@@ -54,43 +55,57 @@ export class ParrotProgressService {
     }
 
     public async saveExecutionScore(tenantId: string, projectId: string, requestId: string, executionScore: ParrotExecutionScore): Promise<void> {
-        await this.r2StorageService.saveJson(tenantId, projectId, 'metadata', executionScore, 'requests', requestId, 'execution-score.json');
+        await this.r2StorageService.saveJson(tenantId, projectId, 'runtime', executionScore, 'requests', requestId, 'execution-score.json');
     }
 
     public async saveExecutionPlan(tenantId: string, projectId: string, requestId: string, executionPlan: ParrotExecutionPlan): Promise<void> {
-        await this.r2StorageService.saveJson(tenantId, projectId, 'metadata', executionPlan, 'requests', requestId, 'execution-plan.json');
+        await this.r2StorageService.saveJson(tenantId, projectId, 'runtime', executionPlan, 'requests', requestId, 'execution-plan.json');
     }
 
     public async saveExecutionSubmission(tenantId: string, projectId: string, requestId: string, executionSubmission: ParrotExecutionSubmission): Promise<void> {
-        await this.r2StorageService.saveJson(tenantId, projectId, 'metadata', executionSubmission, 'requests', requestId, 'execution-submission.json');
+        await this.r2StorageService.saveJson(tenantId, projectId, 'runtime', executionSubmission, 'requests', requestId, 'execution-submission.json');
     }
 
     public async saveProgressFile(tenantId: string, projectId: string, requestId: string, progressFile: ParrotProgressFile): Promise<void> {
-        await this.r2StorageService.saveJson(tenantId, projectId, 'metadata', progressFile, 'requests', requestId, 'progress.json');
+        await this.r2StorageService.saveJson(tenantId, projectId, 'runtime', progressFile, 'requests', requestId, 'progress.json');
     }
 
     public async saveSentinelReport(tenantId: string, projectId: string, requestId: string, report: ParrotSentinelReport): Promise<void> {
-        await this.r2StorageService.saveJson(tenantId, projectId, 'metadata', report, 'requests', requestId, 'sentinel-report.json');
+        await this.r2StorageService.saveJson(tenantId, projectId, 'runtime', report, 'requests', requestId, 'sentinel-report.json');
     }
 
     public async saveOutputManifest(tenantId: string, projectId: string, requestId: string, manifest: ParrotOutputManifest): Promise<void> {
-        await this.r2StorageService.saveJson(tenantId, projectId, 'metadata', manifest, 'requests', requestId, 'output-manifest.json');
+        await this.r2StorageService.saveJson(tenantId, projectId, 'runtime', manifest, 'requests', requestId, 'output-manifest.json');
     }
 
     public async saveReverseEtlReceipts(tenantId: string, projectId: string, requestId: string, receipts: ReverseEtlReceipt[]): Promise<void> {
-        await this.r2StorageService.saveJson(tenantId, projectId, 'metadata', receipts, 'requests', requestId, 'reverse-etl-receipts.json');
+        await this.r2StorageService.saveJson(tenantId, projectId, 'runtime', receipts, 'requests', requestId, 'reverse-etl-receipts.json');
     }
 
     public async saveMindMapYaml(tenantId: string, projectId: string, requestId: string, yamlContent: string): Promise<{ uri: string }> {
         const result = await this.r2StorageService.saveText(
             tenantId,
             projectId,
-            'metadata',
+            'runtime',
             yamlContent,
             'application/yaml',
             'requests',
             requestId,
             'mindmap.yaml'
+        );
+
+        return { uri: result.uri };
+    }
+
+    public async saveMindMapManifest(tenantId: string, projectId: string, requestId: string, manifest: unknown): Promise<{ uri: string }> {
+        const result = await this.r2StorageService.saveJson(
+            tenantId,
+            projectId,
+            'runtime',
+            manifest,
+            'requests',
+            requestId,
+            'mindmap-manifest.json'
         );
 
         return { uri: result.uri };

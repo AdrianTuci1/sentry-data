@@ -29,6 +29,10 @@ import { ExecutionPlaneService } from '../application/services/ExecutionPlaneSer
 import { ModalExecutionProvider } from '../application/execution/ModalExecutionProvider';
 import { RayDaftExecutionProvider } from '../application/execution/RayDaftExecutionProvider';
 import { RuntimeOrchestratorService } from '../application/services/RuntimeOrchestratorService';
+import { ObjectStorageService } from '../application/services/ObjectStorageService';
+import { ProjectionRegistryService } from '../application/services/ProjectionRegistryService';
+import { SourceUpdateMonitorService } from '../application/services/SourceUpdateMonitorService';
+import { ConnectorCatalogService } from '../application/services/ConnectorCatalogService';
 
 export function initContainer() {
     console.log('[DI Container] Bootstrapping Application dependencies...');
@@ -43,19 +47,22 @@ export function initContainer() {
 
     // 2. Initialize Infrastructure Providers
     const r2StorageService = new R2StorageService();
+    const objectStorageService = new ObjectStorageService();
+    const connectorCatalogService = new ConnectorCatalogService();
 
     // 3. Initialize Domain Services 
     const authService = new AuthService(tenantRepo);
     const widgetService = new WidgetService(r2StorageService);
     const widgetRenderer = new WidgetRenderer(r2StorageService);
-    const analyticsService = new AnalyticsService(projectRepo, widgetService, widgetRenderer);
+    const analyticsService = new AnalyticsService(projectRepo, sourceRepo, widgetService, widgetRenderer, objectStorageService);
     const sentinelClient = new SentinelClient();
     const parrotNeuralEngineService = new ParrotNeuralEngineService();
     const parrotProgressService = new ParrotProgressService(r2StorageService);
     const reverseEtlHeadService = new ReverseEtlHeadService();
-    const bronzeDiscoveryService = new BronzeDiscoveryService(r2StorageService);
+    const bronzeDiscoveryService = new BronzeDiscoveryService(r2StorageService, objectStorageService, connectorCatalogService);
     const mindMapManifestService = new MindMapManifestService();
     const workloadPlannerService = new WorkloadPlannerService();
+    const projectionRegistryService = new ProjectionRegistryService(r2StorageService);
     const modalExecutionProvider = new ModalExecutionProvider();
     const rayDaftExecutionProvider = new RayDaftExecutionProvider();
     const executionPlaneService = new ExecutionPlaneService([
@@ -79,10 +86,12 @@ export function initContainer() {
         mindMapManifestService,
         parrotProgressService,
         workloadPlannerService,
-        executionPlaneService
+        executionPlaneService,
+        projectionRegistryService
     );
     
     const runtimeOrchestratorService = new RuntimeOrchestratorService(orchestrationService, sourceRepo);
+    const sourceUpdateMonitorService = new SourceUpdateMonitorService(sourceRepo, objectStorageService, orchestrationService);
 
     // 4. Initialize Controllers
     // Controllers are standalone objects that will be passed into the App class
@@ -90,7 +99,16 @@ export function initContainer() {
     const dashboardController = new DashboardController(analyticsService, authService);
     const sseController = new SSEController(sseManager, authService);
     const webhookController = new WebhookController(runtimeOrchestratorService);
-    const projectController = new ProjectController(orchestrationService, analyticsService, authService, projectRepo, sourceRepo);
+    const projectController = new ProjectController(
+        orchestrationService,
+        analyticsService,
+        authService,
+        projectRepo,
+        sourceRepo,
+        objectStorageService,
+        sourceUpdateMonitorService,
+        connectorCatalogService
+    );
 
     const controllers = [
         healthController,
@@ -120,11 +138,15 @@ export function initContainer() {
             sourceRepo,
             sseManager,
             r2StorageService,
+            objectStorageService,
+            connectorCatalogService,
             parrotRuntimeService,
             bronzeDiscoveryService,
             mindMapManifestService,
             workloadPlannerService,
-            executionPlaneService
+            executionPlaneService,
+            projectionRegistryService,
+            sourceUpdateMonitorService
         }
     };
 }

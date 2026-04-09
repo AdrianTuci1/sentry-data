@@ -1,7 +1,9 @@
 import { ProjectRepository } from '../../infrastructure/repositories/ProjectRepository';
+import { SourceRepository } from '../../infrastructure/repositories/SourceRepository';
 import { WidgetDataMapper } from '../utils/WidgetDataMapper';
 import { WidgetService } from './WidgetService';
 import { WidgetRenderer } from '../utils/WidgetRenderer';
+import { ObjectStorageService } from './ObjectStorageService';
 
 // Debugging Tasks:
 // - [x] Debug "fetch failed" / "401 Unauthorized" in `AnalyticsService`
@@ -14,17 +16,23 @@ import { WidgetRenderer } from '../utils/WidgetRenderer';
 
 export class AnalyticsService {
     private projectRepository: ProjectRepository;
+    private sourceRepository: SourceRepository;
     private widgetService: WidgetService;
+    private objectStorageService: ObjectStorageService;
     private analyticsWorkerUrl: string;
     private workerSecret: string;
 
     constructor(
         projectRepository: ProjectRepository,
+        sourceRepository: SourceRepository,
         widgetService: WidgetService,
-        _widgetRenderer: WidgetRenderer
+        _widgetRenderer: WidgetRenderer,
+        objectStorageService: ObjectStorageService
     ) {
         this.projectRepository = projectRepository;
+        this.sourceRepository = sourceRepository;
         this.widgetService = widgetService;
+        this.objectStorageService = objectStorageService;
         // Internal worker connection details
         this.analyticsWorkerUrl = process.env.ANALYTICS_WORKER_URL || 'http://localhost:4000/execute';
         this.workerSecret = process.env.INTERNAL_API_SECRET || 'secret';
@@ -72,13 +80,14 @@ export class AnalyticsService {
         }
 
         try {
+            const storageConfig = await this.resolveWorkerStorageConfig(tenantId, projectId);
             const response = await fetch(this.analyticsWorkerUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-Internal-Secret': this.workerSecret
                 },
-                body: JSON.stringify({ tenantId, projectId, queries: project.queryConfigs })
+                body: JSON.stringify({ tenantId, projectId, queries: project.queryConfigs, storageConfig })
             });
 
             if (!response.ok) throw new Error(`Worker Failed: ${response.status}`);
@@ -210,7 +219,12 @@ export class AnalyticsService {
                 'Content-Type': 'application/json',
                 'X-Internal-Secret': this.workerSecret
             },
-            body: JSON.stringify({ tenantId, projectId, queries: [queryConfig] })
+            body: JSON.stringify({
+                tenantId,
+                projectId,
+                queries: [queryConfig],
+                storageConfig: await this.resolveWorkerStorageConfig(tenantId, projectId)
+            })
         });
 
         const workerRes = await response.json() || { results: [] };
@@ -245,5 +259,10 @@ export class AnalyticsService {
             data: mappedData,
             isMock: (Array.isArray(result.data) && result.data.length === 0)
         };
+    }
+
+    private async resolveWorkerStorageConfig(tenantId: string, projectId: string) {
+        const sources = await this.sourceRepository.findAllForProject(tenantId, projectId);
+        return this.objectStorageService.resolveSharedWorkerStorageConfig(sources);
     }
 }

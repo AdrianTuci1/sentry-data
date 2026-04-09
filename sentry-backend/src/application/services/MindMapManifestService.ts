@@ -68,6 +68,8 @@ export class MindMapManifestService {
                     id: profile.sourceId,
                     name: profile.sourceName,
                     type: profile.sourceType,
+                    connector_id: profile.connectorId,
+                    icon_path: profile.iconPath,
                     uri: profile.uri,
                     metadata_uri: profile.metadataUri
                 })),
