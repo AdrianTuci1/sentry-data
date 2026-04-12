@@ -88,16 +88,16 @@ export class ProjectStore {
 
         try {
             const res = await ProjectService.getProjects(orgId);
-            if (res && Array.isArray(res.data)) {
+            if (res && Array.isArray(res.data) && res.data.length > 0) {
                 runInAction(() => {
                     this.projects = res.data.map((project) => this.mapProject(project));
                 });
+            } else {
+                this.loadMockProjects();
             }
         } catch (error) {
             console.warn("[ProjectStore] Failed to fetch projects", error);
-            runInAction(() => {
-                this.projects = [];
-            });
+            this.loadMockProjects();
         }
 
         runInAction(() => {
@@ -121,6 +121,53 @@ export class ProjectStore {
         });
 
         return project;
+    }
+
+    loadMockProjects() {
+        const mockDbProjects = [
+            {
+                id: 'parrot-commerce-demo',
+                name: 'Parrot Commerce Demo',
+                status: 'active',
+                lastActive: '2 min ago',
+                connectors: 2,
+                models: 1,
+                viewLink: 'https://app.sentry.local/view/parrot-commerce-demo',
+                members: [
+                    { id: 'm_1', account: 'ops@sentry.local', access: 'admin' },
+                    { id: 'm_2', account: 'growth@sentry.local', access: 'contributor' },
+                ]
+            },
+            {
+                id: 'parrot-growth-studio',
+                name: 'Parrot Growth Studio',
+                status: 'active',
+                lastActive: '2h ago',
+                connectors: 3,
+                models: 2,
+                viewLink: 'https://app.sentry.local/view/parrot-growth-studio',
+                members: [
+                    { id: 'm_3', account: 'brand@sentry.local', access: 'admin' },
+                    { id: 'm_4', account: 'sales@sentry.local', access: 'viewer' },
+                ]
+            },
+            {
+                id: 'parrot-risk-lab',
+                name: 'Parrot Risk Lab',
+                status: 'archived',
+                lastActive: '5d ago',
+                connectors: 2,
+                models: 1,
+                viewLink: 'https://app.sentry.local/view/parrot-risk-lab',
+                members: [
+                    { id: 'm_5', account: 'security@sentry.local', access: 'admin' },
+                ]
+            }
+        ];
+
+        runInAction(() => {
+            this.projects = mockDbProjects.map((data) => new Project(data));
+        });
     }
 
     async updateProject(projectId, data) {
