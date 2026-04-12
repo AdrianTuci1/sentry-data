@@ -19,11 +19,19 @@
 }
 
 .navbar-brand {
+  display: inline-flex;
+  align-items: center;
   color: #11100d;
   font-family: "Helvetica Neue", "Avenir Next", "Segoe UI", sans-serif;
   font-size: 1.22rem;
   font-weight: 600;
   letter-spacing: -0.06em;
+}
+
+.navbar-brand img {
+  display: block;
+  width: auto;
+  height: 1.85rem;
 }
 
 .navbar-nav {

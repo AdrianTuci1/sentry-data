@@ -1,14 +1,10 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import fallbackAnalyticsData from '../../../sentry-frontend/src/data/analyticsData-saas.json'
 import './HeroMicroWidgets.css'
 
 const formatNumber = (value) => new Intl.NumberFormat('en-US').format(Math.round(value))
 const parseMetricNumber = (value) => Number.parseFloat(String(value).replace(/,/g, ''))
 
-const CARD_DIMENSIONS = {
-  wide: { width: 496, height: 280 },
-  small: { width: 238, height: 280 },
-  tall: { width: 238, height: 624 },
-}
 
 const optimalTimeData = {
   title: 'Peak Engagement',
@@ -80,6 +76,8 @@ const technicalHealthCard = {
     ],
   },
 }
+
+const marketingRoasCard = fallbackAnalyticsData.find((widget) => widget.id === 'marketing-roas')
 
 function easeCountUp(progress) {
   if (progress <= 0) {
@@ -653,7 +651,6 @@ function HeroLiveTrafficWidget() {
     [chartDomain, chartHeight, chartPadding, chartWidth, lineValues],
   )
   const renderedLine = useMemo(() => buildPartialLine(chart.points, drawProgress), [chart.points, drawProgress])
-  const activeMarkerThreshold = drawProgress * Math.max(0, chart.points.length - 1)
   const focusPoint = renderedLine.point
   const tagLabel = `${formatNumber(interpolateSeriesValue(lineValues, drawProgress))} live`
 
@@ -734,20 +731,6 @@ function HeroLiveTrafficWidget() {
           })}
           <path d={renderedLine.path} className="hero-live-line-shadow" />
           <path d={renderedLine.path} className="hero-live-line" />
-          {chart.points.map(([x, y], index) => {
-            const isVisible = activeMarkerThreshold >= index - 0.06
-
-            return (
-              <g
-                key={`${x}-${y}`}
-                className={`hero-live-point ${isVisible ? 'is-visible' : ''}`}
-                style={{ opacity: isVisible ? 1 : 0.18 }}
-              >
-                <circle cx={x} cy={y} r="7" className="hero-live-point-halo" />
-                <circle cx={x} cy={y} r="3.2" className="hero-live-point-dot" />
-              </g>
-            )
-          })}
           <circle cx={focusPoint[0]} cy={focusPoint[1]} r="10" className="hero-live-highlight-ring" />
           <circle cx={focusPoint[0]} cy={focusPoint[1]} r="4" className="hero-live-highlight-core" />
         </svg>
@@ -935,10 +918,32 @@ function HeroTechnicalHealthWidget() {
   )
 }
 
+function HeroMarketingRoasWidget() {
+  return (
+    <div className={`micro-card ${marketingRoasCard?.colorTheme || 'theme-productivity'}`}>
+      <div className="micro-card-header">
+        <h3 className="micro-title">{marketingRoasCard?.title}</h3>
+        <span className="micro-subtitle">{marketingRoasCard?.subtitle}</span>
+      </div>
+      <div className="micro-card-body">
+        <MetricTrendMicro data={marketingRoasCard?.data} />
+      </div>
+      <div className="micro-card-footer">
+        <span className="footer-main">{marketingRoasCard?.footerText}</span>
+      </div>
+    </div>
+  )
+}
+
 export function HeroMicroWidgets() {
   return (
     <>
-      <div className="hero-card hero-card-sessions hero-card-entrance" style={{ '--hero-card-delay': '40ms' }}>
+      <div className="hero-card hero-card-roas hero-card-entrance" style={{ '--hero-card-delay': '40ms' }}>
+        <HeroCardFrame variant="small">
+          <HeroMarketingRoasWidget />
+        </HeroCardFrame>
+      </div>
+      <div className="hero-card hero-card-sessions hero-card-entrance" style={{ '--hero-card-delay': '860ms' }}>
         <HeroCardFrame variant="wide">
           <HeroLiveTrafficWidget />
         </HeroCardFrame>

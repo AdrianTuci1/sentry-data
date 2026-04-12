@@ -1,15 +1,18 @@
 .hero-card-frame {
   width: 100%;
   height: 100%;
+  border-radius: 8px;
 }
 
 .hero-card-shell {
   width: 100%;
   height: 100%;
   flex: none;
+  border-radius: inherit;
+  overflow: hidden;
 }
 
-.hero-card-shell > * {
+.hero-card-shell>* {
   width: 100%;
   height: 100%;
 }
@@ -20,7 +23,7 @@
   height: 100%;
   min-height: 0;
   padding: 1.5rem;
-  border-radius: 0;
+  border-radius: 8px;
   overflow: hidden;
   isolation: isolate;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
@@ -158,7 +161,7 @@
   transform: translate(-50%, calc(-100% - 0.65rem));
   padding: 0.36rem 0.62rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 0;
+  border-radius: 6px;
   background: rgba(3, 3, 3, 0.94);
   color: rgba(255, 255, 255, 0.92);
   font: 700 0.68rem "JetBrains Mono", "SFMono-Regular", monospace;
@@ -267,9 +270,7 @@
   margin: 0.25rem 0.35rem 0.4rem;
   padding: 1.8rem 0.6rem 1.65rem;
   overflow: hidden;
-  border-radius: 0;
-  background: rgba(255, 255, 255, 0.03);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
 }
 
 .hero-funnel-visual {
@@ -312,7 +313,7 @@
   min-width: 5.6rem;
   height: 1.7rem;
   padding: 0 0.72rem;
-  border-radius: 0;
+  border-radius: 6px;
   transform: translateX(-50%);
   background: rgba(3, 3, 3, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -348,7 +349,7 @@
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: 0;
+  border-radius: 8px;
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -360,15 +361,19 @@
 }
 
 .theme-weather {
-  background: #241213;
+  background: #050505;
 }
 
 .theme-natural {
-  background: #18210f;
+  background: #050505;
 }
 
 .theme-color {
-  background: #10211d;
+  background: #050505;
+}
+
+.theme-productivity {
+  background: #050505;
 }
 
 .micro-card.optimal-time-card {
@@ -494,7 +499,7 @@
 .uptime-strip-bar {
   flex: 1;
   min-width: 2px;
-  border-radius: 0;
+  border-radius: 3px 3px 0 0;
   opacity: 0.92;
 }
 
@@ -568,7 +573,7 @@
 
 .optimal-time-cell {
   min-height: 36px;
-  border-radius: 0;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -690,7 +695,7 @@
 @media (max-width: 1024px) {
   .micro-card {
     padding: 1rem;
-    border-radius: 0;
+    border-radius: 8px;
   }
 
   .hero-widget {
@@ -717,7 +722,7 @@
   .optimal-time-cell {
     min-height: 32px;
     font-size: 0.72rem;
-    border-radius: 0;
+    border-radius: 4px;
   }
 
   .optimal-time-summary {
@@ -770,7 +775,7 @@
   .optimal-time-cell {
     min-height: 28px;
     font-size: 0.64rem;
-    border-radius: 0;
+    border-radius: 4px;
     padding: 0.2rem;
   }
 

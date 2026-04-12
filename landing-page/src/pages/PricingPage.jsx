@@ -11,7 +11,7 @@ const pricingPlans = [
     badge: null,
     accent: 'pricing-tier-surface-highlight',
     ctaLabel: 'Request access',
-    ctaHref: '/support',
+    ctaHref: '/request-access',
     summary: 'For testing a workflow before you wire the full stack.',
     highlights: [
       '1 active project',
@@ -29,7 +29,7 @@ const pricingPlans = [
     badge: null,
     accent: 'pricing-tier-surface',
     ctaLabel: 'Request access',
-    ctaHref: '/support',
+    ctaHref: '/request-access',
     summary: 'For lean teams shipping their first automated data science workflows.',
     highlights: [
       '3 active projects',
@@ -47,7 +47,7 @@ const pricingPlans = [
     badge: 'Popular',
     accent: 'pricing-tier-surface-popular',
     ctaLabel: 'Request access',
-    ctaHref: '/support',
+    ctaHref: '/request-access',
     summary: 'For production-grade orchestration across multiple datasets and teams.',
     highlights: [
       '10 active projects',

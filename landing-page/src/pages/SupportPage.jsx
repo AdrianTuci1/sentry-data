@@ -1,4 +1,5 @@
 import './SupportPage.css'
+import logo from '../../assets/logo.png'
 
 const supportOptions = [
   {
@@ -14,7 +15,7 @@ const supportOptions = [
   {
     title: 'Operator support',
     body:
-      'If you are already evaluating ParrotOS, we can help with onboarding, workflow design, and system guidance.',
+      'If you are already evaluating the platform, we can help with onboarding, workflow design, and system guidance.',
   },
 ]
 
@@ -49,7 +50,7 @@ export function SupportPage() {
           <p className="support-kicker">Contact</p>
           <div className="support-contact-row">
             <div>
-              <h2>hello@parrotos.com</h2>
+              <img className="support-contact-logo" src={logo} alt="" />
               <p>Use this address for access requests, sales conversations, and support.</p>
             </div>
 

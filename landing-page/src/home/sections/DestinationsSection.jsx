@@ -1,3 +1,5 @@
+import { DestinationsVisual } from '../ui/ProductVisuals'
+
 export function DestinationsSection({ destinations }) {
   return (
     <section className="home-section home-destinations">
@@ -18,22 +20,7 @@ export function DestinationsSection({ destinations }) {
         </div>
 
         <div className="home-destinations-visual" aria-hidden="true">
-          <div className="home-destination-placeholder">
-            <div className="home-destination-bar" />
-            <div className="home-destination-flow">
-              <span className="home-destination-node is-source">Signal</span>
-              <span className="home-destination-line" />
-              <span className="home-destination-node is-system">ParrotOS</span>
-              <span className="home-destination-line" />
-              <span className="home-destination-node is-output">Any destination</span>
-            </div>
-            <div className="home-destination-grid">
-              <span />
-              <span />
-              <span />
-              <span />
-            </div>
-          </div>
+          <DestinationsVisual />
         </div>
       </div>
     </section>
