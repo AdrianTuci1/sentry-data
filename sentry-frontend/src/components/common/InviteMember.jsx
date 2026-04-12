@@ -1,19 +1,48 @@
 /* src/components/InviteMember.jsx */
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import { observer } from 'mobx-react-lite';
 import { X } from 'lucide-react';
+import { useStore } from '../../store/StoreProvider';
 import './InviteMember.css';
 
-const InviteMember = ({ isOpen, onClose }) => {
+const InviteMember = observer(({ isOpen, onClose }) => {
+    const { organizationStore } = useStore();
     const [email, setEmail] = useState('');
     const [role, setRole] = useState('Member');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState('');
 
     if (!isOpen) return null;
 
-    const handleInvite = (e) => {
+    const currentWorkspaceName = organizationStore.currentOrg?.name || 'current workspace';
+    const normalizedRole = useMemo(() => role.toLowerCase(), [role]);
+
+    const handleInvite = async (e) => {
         e.preventDefault();
-        if (email) {
-            console.log(`Inviting ${email} as ${role}`);
+
+        if (!email) {
+            return;
+        }
+
+        setIsSubmitting(true);
+        setError('');
+
+        try {
+            const invitation = await organizationStore.inviteMember({
+                email,
+                role: normalizedRole
+            });
+            if (invitation?.inviteUrl) {
+                navigator.clipboard?.writeText(invitation.inviteUrl).catch(() => {});
+            }
+            setEmail('');
+            setRole('Member');
             onClose();
+        } catch (inviteError) {
+            console.error('[InviteMember] Failed to invite member:', inviteError);
+            setError('Invite could not be sent right now.');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -24,7 +53,7 @@ const InviteMember = ({ isOpen, onClose }) => {
                     <div>
                         <h2 className="invite-modal-title">Add member</h2>
                         <p className="invite-modal-subtitle">
-                            Add a collaborator directly or share a controlled access link.
+                            Invite a collaborator into {currentWorkspaceName} and keep access tied to the active workspace.
                         </p>
                     </div>
                     <button className="invite-close-btn" type="button" onClick={onClose} aria-label="Close invite overlay">
@@ -50,6 +79,7 @@ const InviteMember = ({ isOpen, onClose }) => {
                                 className="invite-select"
                                 value={role}
                                 onChange={(e) => setRole(e.target.value)}
+                                disabled={isSubmitting}
                             >
                                 <option>Member</option>
                                 <option>Admin</option>
@@ -58,17 +88,19 @@ const InviteMember = ({ isOpen, onClose }) => {
                         </div>
                     </div>
 
+                    {error && <div className="invite-feedback invite-feedback-error">{error}</div>}
+
                     <button
                         type="submit"
                         className={`send-invite-btn ${email ? 'active' : ''}`}
-                        disabled={!email}
+                        disabled={!email || isSubmitting}
                     >
-                        Send invite
+                        {isSubmitting ? 'Sending invite...' : 'Send invite'}
                     </button>
                 </form>
             </div>
         </div>
     );
-};
+});
 
 export default InviteMember;

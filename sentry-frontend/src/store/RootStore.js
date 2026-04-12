@@ -16,6 +16,7 @@ class RootStore {
         this.workspaceStore = new WorkspaceRootStore(this);
         this.dockStore = new DockStore(this);
         makeAutoObservable(this);
+        this.organizationStore.initialize();
     }
 }
 

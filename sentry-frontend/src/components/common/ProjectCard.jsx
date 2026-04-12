@@ -1,6 +1,6 @@
 import React from 'react';
 import './ProjectCard.css';
-import { ChevronRight, Pencil, Users } from 'lucide-react';
+import { ChevronRight, Pencil, Share2, Users } from 'lucide-react';
 
 const renderMicroGraphic = (type) => {
     switch (type) {
@@ -50,7 +50,7 @@ const renderMicroGraphic = (type) => {
     }
 };
 
-const ProjectCard = ({ project, onClick, onEdit, graphicType }) => {
+const ProjectCard = ({ project, onClick, onEdit, onShare, graphicType }) => {
     return (
         <div className={`project-card theme-${graphicType}`} onClick={onClick}>
             <div className="project-card-header">
@@ -58,17 +58,30 @@ const ProjectCard = ({ project, onClick, onEdit, graphicType }) => {
                     <span className="card-subtitle">{project.status}</span>
                     <h3 className="card-title">{project.name}</h3>
                 </div>
-                <button
-                    type="button"
-                    className="project-card-edit"
-                    onClick={(event) => {
-                        event.stopPropagation();
-                        onEdit?.(project);
-                    }}
-                    aria-label={`Edit ${project.name}`}
-                >
-                    <Pencil size={16} />
-                </button>
+                <div className="project-card-actions">
+                    <button
+                        type="button"
+                        className="project-card-edit"
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            onShare?.(project);
+                        }}
+                        aria-label={`Share ${project.name}`}
+                    >
+                        <Share2 size={16} />
+                    </button>
+                    <button
+                        type="button"
+                        className="project-card-edit"
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            onEdit?.(project);
+                        }}
+                        aria-label={`Edit ${project.name}`}
+                    >
+                        <Pencil size={16} />
+                    </button>
+                </div>
             </div>
 
             <div className="project-card-graphic">

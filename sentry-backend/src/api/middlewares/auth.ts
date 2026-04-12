@@ -1,12 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthService } from '../../application/services/AuthService';
 import { AppError } from './errorHandler';
+import { AuthContext } from '../../types/controlPlane';
 
 // Extend Express Request interface to include tenantId
 declare global {
     namespace Express {
         interface Request {
             tenantId?: string;
+            userId?: string;
+            userEmail?: string;
+            workspaceId?: string;
+            authContext?: AuthContext;
         }
     }
 }
@@ -30,11 +35,14 @@ export const requireAuth = (authService: AuthService) => {
                 throw new AppError('Not authorized. No Bearer token provided.', 401);
             }
 
-            // Use AuthService (which has the mock bypass for 'mock-tenant-token-123')
-            const tenantId = await authService.validateTokenAndGetTenant(token);
+            const authContext = await authService.validateToken(token);
 
             // Attach tenantId to request context
-            req.tenantId = tenantId;
+            req.authContext = authContext;
+            req.tenantId = authContext.tenantId;
+            req.userId = authContext.userId;
+            req.userEmail = authContext.email;
+            req.workspaceId = authContext.workspaceId;
             next();
         } catch (error) {
             next(error);

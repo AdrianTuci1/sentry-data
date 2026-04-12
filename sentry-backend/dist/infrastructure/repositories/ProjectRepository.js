@@ -29,10 +29,12 @@ class ProjectRepository extends BaseRepository_1.BaseRepository {
         const entityToSave = {
             tenantId: project.tenantId,
             projectId: project.projectId,
+            workspaceId: project.workspaceId,
             name: project.name,
             sourceType: project.sourceType,
             status: project.status,
             createdAt: project.createdAt,
+            viewLink: project.viewLink,
             runtimeMode: project.runtimeMode,
             queryConfigs: project.queryConfigs,
             discoveryMetadata: project.discoveryMetadata,

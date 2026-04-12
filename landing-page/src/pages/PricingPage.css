@@ -90,32 +90,45 @@
   position: relative;
   overflow: hidden;
   border-radius: 0;
-  min-height: 18.5rem;
+  height: 18.5rem;
   padding: 1.7rem;
   border: 1px solid rgba(20, 18, 14, 0.08);
+  background: url('../../assets/gradients/grad.png') center / cover no-repeat;
+}
+
+.pricing-tier-surface {
+  display: flex;
+  flex-direction: column;
 }
 
 .pricing-tier-surface::before,
 .pricing-estimator-card::before {
-  display: none;
+  content: '';
+  position: absolute;
+  inset: 0;
+  display: block;
+  background: rgba(255, 255, 255, 0.56);
+  pointer-events: none;
 }
 
-.pricing-tier-surface-highlight {
-  background: #f3e5d7;
+.pricing-tier-surface.pricing-tier-surface,
+.pricing-estimator-card.pricing-tier-surface {
+  background-image: url('../../assets/gradients/blue.jpg');
 }
 
-.pricing-tier-surface {
-  background: rgba(255, 255, 255, 0.58);
+.pricing-tier-surface.pricing-tier-surface-highlight,
+.pricing-estimator-card.pricing-tier-surface-highlight {
+  background-image: url('../../assets/gradients/green.jpg');
 }
 
-.pricing-tier-surface-popular,
+.pricing-tier-surface.pricing-tier-surface-popular,
 .pricing-estimator-card.pricing-tier-surface-popular {
-  background: #e7ddd2;
+  background-image: url('../../assets/gradients/orange.jpg');
 }
 
-.pricing-tier-surface-enterprise,
+.pricing-tier-surface.pricing-tier-surface-enterprise,
 .pricing-estimator-card.pricing-tier-surface-enterprise {
-  background: #efe8df;
+  background-image: url('../../assets/gradients/purple.png');
 }
 
 .pricing-tier-topline,
@@ -168,7 +181,8 @@
   display: flex;
   align-items: baseline;
   gap: 0.35rem;
-  margin-top: 3.9rem;
+  margin-top: auto;
+  padding-top: 2rem;
 }
 
 .pricing-tier-price-row strong,
@@ -314,6 +328,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  height: 20rem;
 }
 
 .pricing-comparison {
@@ -403,13 +418,17 @@
 
   .pricing-tier-surface,
   .pricing-estimator-card {
-    min-height: auto;
+    height: 17.5rem;
     padding: 1.35rem;
+  }
+
+  .pricing-estimator-card {
+    height: 19rem;
   }
 
   .pricing-tier-price-row,
   .pricing-estimator-price {
-    margin-top: 2.8rem;
+    padding-top: 1.6rem;
   }
 
   .pricing-tier-button,

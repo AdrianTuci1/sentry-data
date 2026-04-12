@@ -19,10 +19,13 @@ const requireAuth = (authService) => {
             if (!token) {
                 throw new errorHandler_1.AppError('Not authorized. No Bearer token provided.', 401);
             }
-            // Use AuthService (which has the mock bypass for 'mock-tenant-token-123')
-            const tenantId = await authService.validateTokenAndGetTenant(token);
+            const authContext = await authService.validateToken(token);
             // Attach tenantId to request context
-            req.tenantId = tenantId;
+            req.authContext = authContext;
+            req.tenantId = authContext.tenantId;
+            req.userId = authContext.userId;
+            req.userEmail = authContext.email;
+            req.workspaceId = authContext.workspaceId;
             next();
         }
         catch (error) {

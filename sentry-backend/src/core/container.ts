@@ -33,6 +33,17 @@ import { ObjectStorageService } from '../application/services/ObjectStorageServi
 import { ProjectionRegistryService } from '../application/services/ProjectionRegistryService';
 import { SourceUpdateMonitorService } from '../application/services/SourceUpdateMonitorService';
 import { ConnectorCatalogService } from '../application/services/ConnectorCatalogService';
+import { UserRepository } from '../infrastructure/repositories/UserRepository';
+import { WorkspaceRepository } from '../infrastructure/repositories/WorkspaceRepository';
+import { WorkspaceMembershipRepository } from '../infrastructure/repositories/WorkspaceMembershipRepository';
+import { WorkspaceInvitationRepository } from '../infrastructure/repositories/WorkspaceInvitationRepository';
+import { AuditEventRepository } from '../infrastructure/repositories/AuditEventRepository';
+import { ProjectAccessRepository } from '../infrastructure/repositories/ProjectAccessRepository';
+import { ProjectShareRepository } from '../infrastructure/repositories/ProjectShareRepository';
+import { ControlPlaneService } from '../application/services/ControlPlaneService';
+import { AccountController } from '../api/controllers/AccountController';
+import { WorkspaceController } from '../api/controllers/WorkspaceController';
+import { PublicAccessController } from '../api/controllers/PublicAccessController';
 
 export function initContainer() {
     console.log('[DI Container] Bootstrapping Application dependencies...');
@@ -43,6 +54,13 @@ export function initContainer() {
     const projectRepo = new ProjectRepository(dynamoDbDocumentClient, dynamoTable);
     const tenantRepo = new TenantRepository(dynamoDbDocumentClient, dynamoTable);
     const sourceRepo = new SourceRepository(dynamoDbDocumentClient, dynamoTable);
+    const userRepo = new UserRepository(dynamoDbDocumentClient, dynamoTable);
+    const workspaceRepo = new WorkspaceRepository(dynamoDbDocumentClient, dynamoTable);
+    const workspaceMembershipRepo = new WorkspaceMembershipRepository(dynamoDbDocumentClient, dynamoTable);
+    const workspaceInvitationRepo = new WorkspaceInvitationRepository(dynamoDbDocumentClient, dynamoTable);
+    const auditEventRepo = new AuditEventRepository(dynamoDbDocumentClient, dynamoTable);
+    const projectAccessRepo = new ProjectAccessRepository(dynamoDbDocumentClient, dynamoTable);
+    const projectShareRepo = new ProjectShareRepository(dynamoDbDocumentClient, dynamoTable);
     const sseManager = new SSEManager();
 
     // 2. Initialize Infrastructure Providers
@@ -52,6 +70,17 @@ export function initContainer() {
 
     // 3. Initialize Domain Services 
     const authService = new AuthService(tenantRepo);
+    const controlPlaneService = new ControlPlaneService(
+        tenantRepo,
+        userRepo,
+        workspaceRepo,
+        workspaceMembershipRepo,
+        workspaceInvitationRepo,
+        auditEventRepo,
+        projectRepo,
+        projectAccessRepo,
+        projectShareRepo
+    );
     const widgetService = new WidgetService(r2StorageService);
     const widgetRenderer = new WidgetRenderer(r2StorageService);
     const analyticsService = new AnalyticsService(projectRepo, sourceRepo, widgetService, widgetRenderer, objectStorageService);
@@ -96,7 +125,10 @@ export function initContainer() {
     // 4. Initialize Controllers
     // Controllers are standalone objects that will be passed into the App class
     const healthController = new HealthController();
-    const dashboardController = new DashboardController(analyticsService, authService);
+    const accountController = new AccountController(authService, controlPlaneService);
+    const workspaceController = new WorkspaceController(authService, controlPlaneService);
+    const dashboardController = new DashboardController(analyticsService, authService, controlPlaneService);
+    const publicAccessController = new PublicAccessController(authService, controlPlaneService, analyticsService);
     const sseController = new SSEController(sseManager, authService);
     const webhookController = new WebhookController(runtimeOrchestratorService);
     const projectController = new ProjectController(
@@ -107,12 +139,16 @@ export function initContainer() {
         sourceRepo,
         objectStorageService,
         sourceUpdateMonitorService,
-        connectorCatalogService
+        connectorCatalogService,
+        controlPlaneService
     );
 
     const controllers = [
         healthController,
+        accountController,
+        workspaceController,
         dashboardController,
+        publicAccessController,
         sseController,
         webhookController,
         projectController
@@ -125,17 +161,28 @@ export function initContainer() {
         // Exporting instances could be useful for manual testing/scripts
         instances: {
             healthController,
+            accountController,
+            workspaceController,
             dashboardController,
+            publicAccessController,
             sseController,
             webhookController,
             projectController,
             analyticsService,
             authService,
+            controlPlaneService,
             runtimeOrchestratorService,
             orchestrationService,
             projectRepo,
             tenantRepo,
             sourceRepo,
+            userRepo,
+            workspaceRepo,
+            workspaceMembershipRepo,
+            workspaceInvitationRepo,
+            auditEventRepo,
+            projectAccessRepo,
+            projectShareRepo,
             sseManager,
             r2StorageService,
             objectStorageService,

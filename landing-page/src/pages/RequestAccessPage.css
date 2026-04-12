@@ -1,0 +1,131 @@
+.request-access-page {
+  min-height: calc(100vh - 5rem);
+  padding: clamp(4rem, 8vw, 7rem) clamp(1rem, 3vw, 2.6rem) clamp(4rem, 8vw, 6rem);
+}
+
+.request-access-shell {
+  width: min(100%, 1160px);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(22rem, 0.78fr);
+  gap: clamp(2rem, 7vw, 7rem);
+  align-items: start;
+}
+
+.request-access-copy {
+  padding-top: clamp(0rem, 4vw, 3rem);
+}
+
+.request-access-kicker {
+  margin: 0 0 1rem;
+  color: rgba(20, 18, 14, 0.48);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.request-access-copy h1 {
+  max-width: 11ch;
+  margin: 0;
+  color: #11100d;
+  font-size: clamp(3rem, 7vw, 6rem);
+  font-weight: 500;
+  letter-spacing: -0.06em;
+  line-height: 0.94;
+}
+
+.request-access-copy p:not(.request-access-kicker) {
+  max-width: 32rem;
+  margin: 1.25rem 0 0;
+  color: rgba(20, 18, 14, 0.64);
+  font-size: 1rem;
+  line-height: 1.72;
+}
+
+.request-access-form {
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1.2rem, 3vw, 1.6rem);
+  border: 1px solid rgba(20, 18, 14, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 253, 248, 0.72);
+}
+
+.request-access-field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.request-access-field span {
+  color: rgba(20, 18, 14, 0.56);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.request-access-field input,
+.request-access-field textarea {
+  width: 100%;
+  border: 1px solid rgba(20, 18, 14, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.7);
+  color: #11100d;
+  font-size: 1rem;
+  line-height: 1.45;
+  outline: none;
+  transition: border-color 180ms ease, background 180ms ease;
+}
+
+.request-access-field input {
+  min-height: 3.2rem;
+  padding: 0 0.95rem;
+}
+
+.request-access-field textarea {
+  resize: vertical;
+  min-height: 9rem;
+  padding: 0.9rem 0.95rem;
+}
+
+.request-access-field input:focus,
+.request-access-field textarea:focus {
+  border-color: rgba(20, 18, 14, 0.36);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.request-access-field input::placeholder,
+.request-access-field textarea::placeholder {
+  color: rgba(20, 18, 14, 0.34);
+}
+
+.request-access-submit {
+  min-height: 3.2rem;
+  margin-top: 0.35rem;
+  border: 1px solid rgba(20, 18, 14, 0.12);
+  border-radius: 8px;
+  background: #12110e;
+  color: #fff8ee;
+  cursor: pointer;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: background 180ms ease, transform 180ms ease;
+}
+
+.request-access-submit:hover {
+  transform: translateY(-1px);
+  background: #2b2721;
+}
+
+@media (max-width: 860px) {
+  .request-access-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .request-access-copy h1 {
+    max-width: none;
+  }
+}

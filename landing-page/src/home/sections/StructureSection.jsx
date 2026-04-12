@@ -1,3 +1,5 @@
+import { StructureCardVisual } from '../ui/ProductVisuals'
+
 export function StructureSection({ structure }) {
   return (
     <section className="home-section home-principles" id="system">
@@ -18,50 +20,16 @@ export function StructureSection({ structure }) {
             <article key={item.title} className="home-principle-card">
               <div className={`home-principle-media is-${item.placeholder}`}>
                 <div className={`home-principle-placeholder is-${item.placeholder}`}>
-                  {item.placeholder === 'warm' ? (
-                    <div className="home-placeholder-card">
-                      <span className="home-placeholder-label">System Journeys</span>
-                      <strong>365</strong>
-                      <span className="home-placeholder-meta">142 progressing as planned</span>
-                      <div className="home-placeholder-rule" />
-                      <div className="home-placeholder-stats">
-                        <span>120 intake</span>
-                        <span>200 in-system</span>
-                        <span>45 outputs</span>
-                      </div>
-                    </div>
-                  ) : null}
-
-                  {item.placeholder === 'cool' ? (
-                    <div className="home-placeholder-chart">
-                      <div className="home-placeholder-chart-top">
-                        <span>System Cycles</span>
-                        <span>1-7 Apr</span>
-                      </div>
-                      <div className="home-placeholder-chart-bars">
-                        <span />
-                        <span className="is-active" />
-                        <span />
-                        <span />
-                      </div>
-                      <div className="home-placeholder-chart-labels">
-                        <span>Tue</span>
-                        <span>Wed</span>
-                        <span>Thu</span>
-                        <span>Fri</span>
-                      </div>
-                      <div className="home-placeholder-chart-footer">34.4% on track</div>
-                    </div>
-                  ) : null}
+                  <StructureCardVisual kind={item.placeholder} />
 
                   {item.placeholder === 'green' ? (
                     <div className="home-placeholder-avatars">
                       <div className="home-placeholder-avatars-tag">Live guidance</div>
                       <div className="home-placeholder-avatar-row">
-                        <span />
-                        <span />
-                        <span />
-                        <span />
+                        <img src="/assets/avatars/avatar-1.png" alt="" className='avatar' />
+                        <img src="/assets/avatars/avatar-2.png" alt="" className='avatar' />
+                        <img src="/assets/avatars/avatar-3.png" alt="" className='avatar' />
+                        <img src="/assets/avatars/avatar-4.png" alt="" className='avatar' />
                       </div>
                     </div>
                   ) : null}

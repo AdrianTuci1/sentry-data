@@ -5,6 +5,7 @@ import { Footer } from './components/Footer'
 import { ScrollManager } from './components/ScrollManager'
 import { HomePage } from './home/HomePage'
 import { PricingPage } from './pages/PricingPage'
+import { RequestAccessPage } from './pages/RequestAccessPage'
 import { SupportPage } from './pages/SupportPage'
 import { UseCaseArticlePage } from './pages/UseCaseArticlePage'
 
@@ -18,6 +19,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/request-access" element={<RequestAccessPage />} />
             <Route path="/support" element={<SupportPage />} />
             <Route path="/use-cases/:slug" element={<UseCaseArticlePage />} />
           </Routes>

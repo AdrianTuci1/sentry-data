@@ -15,7 +15,7 @@ export function HeroSection({ hero }) {
           <p className="home-hero-description">{hero.description}</p>
 
           <div className="home-actions">
-            <Link className="home-action home-action-primary" to="/support">
+            <Link className="home-action home-action-primary" to="/request-access">
               {hero.primaryActionLabel}
             </Link>
             <Link className="home-action home-action-secondary" to="/pricing">

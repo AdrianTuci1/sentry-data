@@ -1,6 +1,6 @@
 export const minimalHomePageContent = {
   hero: {
-    kicker: 'ParrotOS',
+    kicker: '',
     title: 'Insights as fast as thought',
     lead: 'A new era of data engineering, designed in natural language.',
     description:
@@ -15,7 +15,7 @@ export const minimalHomePageContent = {
     kicker: 'System Structure',
     title: 'Structure and clarity across the full data system.',
     intro:
-      'ParrotOS replaces fragmented pipelines with a structured, connected software layer built for teams that want live visibility, cleaner control, and far less operational drag.',
+      'The platform replaces fragmented pipelines with a structured, connected software layer built for teams that want live visibility, cleaner control, and far less operational drag.',
     cards: [
       {
         title: 'Structured data flows',

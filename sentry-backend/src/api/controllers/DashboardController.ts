@@ -5,16 +5,19 @@ import { AnalyticsService } from '../../application/services/AnalyticsService';
 import { AuthService } from '../../application/services/AuthService';
 import { requireAuth } from '../middlewares/auth';
 import { AppError } from '../middlewares/errorHandler';
+import { ControlPlaneService } from '../../application/services/ControlPlaneService';
 
 export class DashboardController implements IController {
     public path = '/dashboard';
     public router = Router();
     private analyticsService: AnalyticsService;
     private authService: AuthService;
+    private controlPlaneService: ControlPlaneService;
 
-    constructor(analyticsService: AnalyticsService, authService: AuthService) {
+    constructor(analyticsService: AnalyticsService, authService: AuthService, controlPlaneService: ControlPlaneService) {
         this.analyticsService = analyticsService;
         this.authService = authService;
+        this.controlPlaneService = controlPlaneService;
         this.initRoutes();
     }
 
@@ -31,6 +34,9 @@ export class DashboardController implements IController {
             const { projectId } = req.params;
             const tenantId = req.tenantId;
             if (!tenantId) throw new AppError('Tenant ID not present', 500);
+            if (!req.authContext) throw new AppError('Auth context not present', 500);
+
+            await this.controlPlaneService.assertProjectAccess(req.authContext, projectId);
 
             const data = await this.analyticsService.getDashboardData(tenantId, projectId);
             res.status(200).json({ status: 'success', data });
@@ -44,6 +50,9 @@ export class DashboardController implements IController {
             const { projectId } = req.params;
             const tenantId = req.tenantId;
             if (!tenantId) throw new AppError('Tenant ID not present', 500);
+            if (!req.authContext) throw new AppError('Auth context not present', 500);
+
+            await this.controlPlaneService.assertProjectAccess(req.authContext, projectId);
 
             const data = await this.analyticsService.getDashboardManifest(tenantId, projectId);
             res.status(200).json({ status: 'success', data });
@@ -57,6 +66,9 @@ export class DashboardController implements IController {
             const { projectId, widgetId } = req.params;
             const tenantId = req.tenantId;
             if (!tenantId) throw new AppError('Tenant ID not present', 500);
+            if (!req.authContext) throw new AppError('Auth context not present', 500);
+
+            await this.controlPlaneService.assertProjectAccess(req.authContext, projectId);
 
             const data = await this.analyticsService.getWidgetDataInstance(tenantId, projectId, widgetId);
             res.status(200).json({ status: 'success', data });

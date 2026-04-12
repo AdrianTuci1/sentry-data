@@ -92,6 +92,12 @@
   margin-top: 1rem;
 }
 
+.support-contact-logo {
+  display: block;
+  width: auto;
+  height: 2.4rem;
+}
+
 .support-contact-action {
   min-height: 3.2rem;
   padding: 0.9rem 1.25rem;

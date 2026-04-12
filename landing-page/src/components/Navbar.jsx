@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import './Navbar.css'
 import { navigation, useCaseDropdownItems } from '../content'
+import logo from '../../assets/logo.png'
 
 export function Navbar() {
   const location = useLocation()
@@ -14,8 +15,8 @@ export function Navbar() {
   return (
     <header className="navbar-shell">
       <div className="navbar">
-        <Link className="navbar-brand" to="/" aria-label="ParrotOS home" onClick={handleHomeClick}>
-          ParrotOS
+        <Link className="navbar-brand" to="/" aria-label="Home" onClick={handleHomeClick}>
+          <img src={logo} alt="" />
         </Link>
 
         <nav className="navbar-nav" aria-label="Primary navigation">
@@ -50,7 +51,7 @@ export function Navbar() {
             ))}
         </nav>
 
-        <Link className="navbar-cta" to="/support">
+        <Link className="navbar-cta" to="/request-access">
           Request access
         </Link>
       </div>

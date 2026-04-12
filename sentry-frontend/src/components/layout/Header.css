@@ -124,6 +124,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    color: #eaf7ff;
+    font-size: 0.72rem;
+    font-weight: 700;
 }
 
 .user-avatar::after {
