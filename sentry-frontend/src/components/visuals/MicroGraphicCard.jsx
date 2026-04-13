@@ -64,6 +64,7 @@ const MicroGraphicCard = ({ data: initialData = {}, isExpanded, onClick }) => {
         data.id === 'sales-funnel' ? 'funnel-hero-card' : '',
     ].filter(Boolean).join(' ');
     const isImmersiveCard = data.type === '3d-map' || data.type === 'optimal-time' || immersiveEditorialCardIds.has(data.id) || immersiveCardIds.has(data.id);
+    const shouldShowHeader = !isImmersiveCard || data.type === '3d-map';
 
     // Render specific graphic based on type
     const renderGraphic = () => {
@@ -88,7 +89,7 @@ const MicroGraphicCard = ({ data: initialData = {}, isExpanded, onClick }) => {
             className={`micro-card ${data.colorTheme || 'theme-productivity'} ${spanClass} ${visualClass} ${isExpanded ? 'expanded' : ''}`}
             onClick={() => onClick?.(data.id)}
         >
-            {!isImmersiveCard && (
+            {shouldShowHeader && (
                 <div className="micro-card-header">
                     {data.title && <h3 className="micro-title">{data.title}</h3>}
                     {data.subtitle && <span className="micro-subtitle">{data.subtitle}</span>}

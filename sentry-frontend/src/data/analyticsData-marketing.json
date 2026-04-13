@@ -1111,7 +1111,7 @@
         "title": "Marketing Attribution",
         "subtitle": "Monthly and yearly budget allocation",
         "colorTheme": "theme-productivity",
-        "gridSpan": "col-span-2 row-span-2",
+        "gridSpan": "col-span-2",
         "data": {
             "summaryValue": "$24.8K",
             "summaryLabel": "Monthly Budget",

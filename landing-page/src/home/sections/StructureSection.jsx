@@ -1,4 +1,8 @@
 import { StructureCardVisual } from '../ui/ProductVisuals'
+import avatar1 from '../../assets/avatars/avatar-1.png'
+import avatar2 from '../../assets/avatars/avatar-2.png'
+import avatar3 from '../../assets/avatars/avatar-3.png'
+import avatar4 from '../../assets/avatars/avatar-4.png'
 
 export function StructureSection({ structure }) {
   return (
@@ -26,10 +30,10 @@ export function StructureSection({ structure }) {
                     <div className="home-placeholder-avatars">
                       <div className="home-placeholder-avatars-tag">Live guidance</div>
                       <div className="home-placeholder-avatar-row">
-                        <img src="/assets/avatars/avatar-1.png" alt="" className='avatar' />
-                        <img src="/assets/avatars/avatar-2.png" alt="" className='avatar' />
-                        <img src="/assets/avatars/avatar-3.png" alt="" className='avatar' />
-                        <img src="/assets/avatars/avatar-4.png" alt="" className='avatar' />
+                        <img src={avatar1} alt="" className='avatar' />
+                        <img src={avatar2} alt="" className='avatar' />
+                        <img src={avatar3} alt="" className='avatar' />
+                        <img src={avatar4} alt="" className='avatar' />
                       </div>
                     </div>
                   ) : null}

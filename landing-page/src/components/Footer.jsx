@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import './Footer.css'
 import { navigation } from '../content'
-import logo from '../../assets/logo.png'
+import logo from '../assets/logo.png'
 
 export function Footer() {
   const location = useLocation()

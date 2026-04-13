@@ -154,8 +154,16 @@ function renderComparisonValue(value) {
 
 export function PricingPage() {
   const [gigabytes, setGigabytes] = useState(32)
+  const [activeComparisonPlanId, setActiveComparisonPlanId] = useState(pricingPlans[2].id)
+  const [isComparisonMenuOpen, setIsComparisonMenuOpen] = useState(false)
   const recommendedPlan = getRecommendedPlan(gigabytes)
   const usageCopy = getUtilizationCopy(gigabytes)
+  const selectedComparisonPlanIndex = pricingPlans.findIndex(
+    (plan) => plan.id === activeComparisonPlanId,
+  )
+  const activeComparisonPlanIndex =
+    selectedComparisonPlanIndex >= 0 ? selectedComparisonPlanIndex : 0
+  const activeComparisonPlan = pricingPlans[activeComparisonPlanIndex] ?? pricingPlans[0]
 
   return (
     <section className="pricing-page">
@@ -281,9 +289,54 @@ export function PricingPage() {
             <table className="pricing-comparison-table">
               <thead>
                 <tr>
-                  <th>Plan details</th>
+                  <th>
+                    <div className="pricing-comparison-plan-picker">
+                      <span>Plan details</span>
+                      <button
+                        type="button"
+                        className="pricing-comparison-plan-button"
+                        aria-haspopup="menu"
+                        aria-expanded={isComparisonMenuOpen}
+                        onClick={() => setIsComparisonMenuOpen((isOpen) => !isOpen)}
+                      >
+                        {activeComparisonPlan.name}
+                      </button>
+                      {isComparisonMenuOpen ? (
+                        <div className="pricing-comparison-plan-menu" role="menu">
+                          {pricingPlans.map((plan) => (
+                            <button
+                              key={plan.id}
+                              type="button"
+                              role="menuitemradio"
+                              aria-checked={plan.id === activeComparisonPlan.id}
+                              className={
+                                plan.id === activeComparisonPlan.id
+                                  ? 'pricing-comparison-plan-option is-active'
+                                  : 'pricing-comparison-plan-option'
+                              }
+                              onClick={() => {
+                                setActiveComparisonPlanId(plan.id)
+                                setIsComparisonMenuOpen(false)
+                              }}
+                            >
+                              {plan.name}
+                            </button>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  </th>
                   {pricingPlans.map((plan) => (
-                    <th key={plan.id}>{plan.name}</th>
+                    <th
+                      key={plan.id}
+                      className={
+                        plan.id === activeComparisonPlan.id
+                          ? 'pricing-comparison-plan-column is-active-mobile'
+                          : 'pricing-comparison-plan-column'
+                      }
+                    >
+                      {plan.name}
+                    </th>
                   ))}
                 </tr>
               </thead>
@@ -292,7 +345,14 @@ export function PricingPage() {
                   <tr key={row.label}>
                     <th>{row.label}</th>
                     {row.values.map((value, index) => (
-                      <td key={`${row.label}-${pricingPlans[index].id}`}>
+                      <td
+                        key={`${row.label}-${pricingPlans[index].id}`}
+                        className={
+                          index === activeComparisonPlanIndex
+                            ? 'pricing-comparison-plan-column is-active-mobile'
+                            : 'pricing-comparison-plan-column'
+                        }
+                      >
                         {renderComparisonValue(value)}
                       </td>
                     ))}

@@ -18,6 +18,10 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^5.1.1",
-    "vite": "^7.2.4"
+    "sharp": "^0.34.5",
+    "svgo": "^4.0.1",
+    "vite": "^7.2.4",
+    "vite-plugin-compression": "^0.5.1",
+    "vite-plugin-image-optimizer": "^2.0.3"
   }
 }

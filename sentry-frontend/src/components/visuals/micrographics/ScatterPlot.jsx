@@ -18,7 +18,7 @@ const ScatterPlot = ({ data }) => {
         maximumFractionDigits: 0,
     });
     const ltvColor = '#7CFF5B';
-    const cacColor = '#35C9FF';
+    const ratioSeries = scatterData.map(([cac, ltv]) => Number((ltv / Math.max(cac, 1)).toFixed(1)));
 
     const option = {
         animation: true,
@@ -31,7 +31,7 @@ const ScatterPlot = ({ data }) => {
             itemHeight: 12,
             selectedMode: false,
             textStyle: { color: 'rgba(255, 255, 255, 0.72)', fontSize: 11 },
-            data: ['LTV', 'CAC'],
+            data: ['LTV', 'CAC', 'LTV:CAC'],
         },
         tooltip: {
             trigger: 'axis',
@@ -46,11 +46,16 @@ const ScatterPlot = ({ data }) => {
             },
             formatter: (params) => {
                 const label = params?.[0]?.axisValueLabel || '';
-                const lines = params.map((item) => `${item.marker}${item.seriesName}: ${currency.format(item.value)}`);
+                const lines = params.map((item) => {
+                    const value = Array.isArray(item.value) ? item.value[1] : item.value;
+                    const formattedValue = item.seriesName === 'LTV:CAC' ? `${value}x` : currency.format(value);
+
+                    return `${item.marker}${item.seriesName}: ${formattedValue}`;
+                });
                 return [label, ...lines].join('<br/>');
             },
         },
-        grid: { left: 56, right: 96, top: 38, bottom: 40 },
+        grid: { left: 54, right: 72, top: 42, bottom: 38 },
         xAxis: {
             type: 'category',
             boundaryGap: false,
@@ -79,7 +84,7 @@ const ScatterPlot = ({ data }) => {
                 axisLabel: {
                     color: 'rgba(255,255,255,0.42)',
                     fontSize: 10,
-                    formatter: (value) => `$${value}`,
+                    formatter: (value) => `$${Math.round(value)}`,
                 },
                 splitLine: {
                     lineStyle: {
@@ -103,12 +108,62 @@ const ScatterPlot = ({ data }) => {
                 axisLabel: {
                     color: 'rgba(255,255,255,0.42)',
                     fontSize: 10,
-                    formatter: (value) => `$${value}`,
+                    formatter: (value) => `$${Math.round(value)}`,
                 },
                 splitLine: { show: false },
             },
+            {
+                type: 'value',
+                name: 'ratio',
+                min: 0,
+                max: (value) => Math.ceil(value.max + 1),
+                show: false,
+            },
         ],
         series: [
+            {
+                name: 'CAC',
+                type: 'bar',
+                data: cacSeries,
+                yAxisIndex: 1,
+                barMaxWidth: 16,
+                itemStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: 'rgba(53, 201, 255, 0.82)' },
+                        { offset: 1, color: 'rgba(53, 201, 255, 0.18)' },
+                    ]),
+                    borderRadius: [3, 3, 0, 0],
+                },
+                emphasis: {
+                    focus: 'series',
+                },
+            },
+            {
+                name: 'LTV:CAC',
+                type: 'line',
+                smooth: 0.5,
+                showSymbol: false,
+                data: ratioSeries,
+                yAxisIndex: 2,
+                lineStyle: {
+                    color: 'rgba(255, 200, 87, 0.92)',
+                    width: 2,
+                    type: 'dashed',
+                },
+                itemStyle: {
+                    color: '#ffc857',
+                },
+                endLabel: {
+                    show: true,
+                    color: 'rgba(255,255,255,0.78)',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    formatter: ({ value }) => `${value}x`,
+                },
+                emphasis: {
+                    focus: 'series',
+                },
+            },
             {
                 name: 'LTV',
                 type: 'line',
@@ -139,41 +194,6 @@ const ScatterPlot = ({ data }) => {
                     fontSize: 13,
                     fontWeight: 600,
                     formatter: ({ value }) => `LTV ${currency.format(value)}`,
-                },
-                emphasis: {
-                    focus: 'series',
-                },
-            },
-            {
-                name: 'CAC',
-                type: 'line',
-                smooth: 0.45,
-                symbol: 'circle',
-                showSymbol: false,
-                symbolSize: 8,
-                data: cacSeries,
-                yAxisIndex: 1,
-                lineStyle: {
-                    color: cacColor,
-                    width: 3,
-                },
-                itemStyle: {
-                    color: '#0d0e13',
-                    borderColor: cacColor,
-                    borderWidth: 3,
-                },
-                areaStyle: {
-                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                        { offset: 0, color: 'rgba(53, 201, 255, 0.16)' },
-                        { offset: 1, color: 'rgba(53, 201, 255, 0)' },
-                    ]),
-                },
-                endLabel: {
-                    show: true,
-                    color: 'rgba(255,255,255,0.88)',
-                    fontSize: 13,
-                    fontWeight: 600,
-                    formatter: ({ value }) => `CAC ${currency.format(value)}`,
                 },
                 emphasis: {
                     focus: 'series',

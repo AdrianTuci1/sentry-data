@@ -249,19 +249,19 @@
 }
 
 .home-principle-media.is-warm {
-  background: url('../../assets/gradients/orange.jpg') center / cover no-repeat;
+  background: url('../assets/gradients/orange.jpg') center / cover no-repeat;
 }
 
 .home-principle-media.is-cool {
-  background: url('../../assets/gradients/blue.jpg') center / cover no-repeat;
+  background: url('../assets/gradients/blue.jpg') center / cover no-repeat;
 }
 
 .home-principle-media.is-green {
-  background: url('../../assets/gradients/green.jpg') center / cover no-repeat;
+  background: url('../assets/gradients/green.jpg') center / cover no-repeat;
 }
 
 .home-principle-media.is-dark {
-  background: url('../../assets/gradients/dark.png') center / cover no-repeat;
+  background: url('../assets/gradients/dark.png') center / cover no-repeat;
 }
 
 .home-principle-placeholder {
@@ -426,7 +426,7 @@
 }
 
 .home-mindmap-mini.is-approval {
-  background: url("../../assets/gradients/orange.jpg") center / cover no-repeat;
+  background: url("../assets/gradients/orange.jpg") center / cover no-repeat;
 }
 
 .home-mindmap-grid,
@@ -877,12 +877,12 @@
 }
 
 .home-feature-visual-shell.is-impact {
-  background: url('../../assets/gradients/blue.jpg') center / cover no-repeat;
+  background: url('../assets/gradients/blue.jpg') center / cover no-repeat;
   filter: saturate(0.9);
 }
 
 .home-feature-visual-shell.is-preview {
-  background: url('../../assets/gradients/purple.png') center / cover no-repeat;
+  background: url('../assets/gradients/purple.png') center / cover no-repeat;
 }
 
 
@@ -1051,11 +1051,11 @@
 }
 
 .home-feature-visual-shell.is-impact-loop {
-  background: url('../../assets/gradients/dark.png') center / cover no-repeat;
+  background: url('../assets/gradients/dark.png') center / cover no-repeat;
 }
 
 .home-feature-visual-shell.is-approval-stage {
-  background: url('../../assets/gradients/purple.png') center / cover no-repeat;
+  background: url('../assets/gradients/purple.png') center / cover no-repeat;
 }
 
 .home-impact-board {

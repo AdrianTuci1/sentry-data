@@ -56,7 +56,7 @@
 .pricing-header-note {
   padding: 1.4rem 1.45rem;
   border: 1px solid rgba(20, 18, 14, 0.08);
-  border-radius: 0;
+  border-radius: 8px;
   background: rgba(255, 255, 255, 0.45);
 }
 
@@ -82,6 +82,7 @@
   min-width: 0;
   padding: 0.2rem;
   border: 1px solid rgba(20, 18, 14, 0.08);
+  border-radius: 8px;
   background: rgba(255, 255, 255, 0.35);
 }
 
@@ -89,11 +90,11 @@
 .pricing-estimator-card {
   position: relative;
   overflow: hidden;
-  border-radius: 0;
+  border-radius: 8px;
   height: 18.5rem;
   padding: 1.7rem;
   border: 1px solid rgba(20, 18, 14, 0.08);
-  background: url('../../assets/gradients/grad.png') center / cover no-repeat;
+  background: url('../assets/gradients/grad.png') center / cover no-repeat;
 }
 
 .pricing-tier-surface {
@@ -113,22 +114,22 @@
 
 .pricing-tier-surface.pricing-tier-surface,
 .pricing-estimator-card.pricing-tier-surface {
-  background-image: url('../../assets/gradients/blue.jpg');
+  background-image: url('../assets/gradients/blue.jpg');
 }
 
 .pricing-tier-surface.pricing-tier-surface-highlight,
 .pricing-estimator-card.pricing-tier-surface-highlight {
-  background-image: url('../../assets/gradients/green.jpg');
+  background-image: url('../assets/gradients/green.jpg');
 }
 
 .pricing-tier-surface.pricing-tier-surface-popular,
 .pricing-estimator-card.pricing-tier-surface-popular {
-  background-image: url('../../assets/gradients/orange.jpg');
+  background-image: url('../assets/gradients/orange.jpg');
 }
 
 .pricing-tier-surface.pricing-tier-surface-enterprise,
 .pricing-estimator-card.pricing-tier-surface-enterprise {
-  background-image: url('../../assets/gradients/purple.png');
+  background-image: url('../assets/gradients/purple.png');
 }
 
 .pricing-tier-topline,
@@ -156,7 +157,7 @@
   min-height: 2rem;
   padding: 0.2rem 0.75rem;
   border: 1px solid rgba(20, 18, 14, 0.14);
-  border-radius: 0;
+  border-radius: 8px;
   background: rgba(255, 255, 255, 0.55);
   color: #11100d;
   font-size: 0.75rem;
@@ -207,7 +208,7 @@
   align-items: center;
   justify-content: center;
   border: 1px solid rgba(20, 18, 14, 0.12);
-  border-radius: 0;
+  border-radius: 8px;
   background: #12110e;
   color: #f6f1e8;
   font-size: 0.9rem;
@@ -284,7 +285,7 @@
   margin-top: 2rem;
 }
 
-.pricing-range-field > span {
+.pricing-range-field>span {
   display: block;
   color: #11100d;
   font-size: 1.02rem;
@@ -338,8 +339,10 @@
 .pricing-comparison-table-shell {
   margin-top: 1.5rem;
   overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
   border: 1px solid rgba(20, 18, 14, 0.08);
-  border-radius: 0;
+  border-radius: 8px;
   background: rgba(255, 255, 255, 0.42);
 }
 
@@ -376,21 +379,84 @@
   font-size: 0.95rem;
 }
 
-.pricing-comparison-table tr > *:last-child {
+.pricing-comparison-table tr>*:last-child {
   border-right: 0;
 }
 
-.pricing-comparison-table tbody tr:last-child > * {
+.pricing-comparison-table tbody tr:last-child>* {
   border-bottom: 0;
+}
+
+.pricing-comparison-plan-picker {
+  position: relative;
+}
+
+.pricing-comparison-plan-picker>span {
+  display: block;
+}
+
+.pricing-comparison-plan-button,
+.pricing-comparison-plan-option {
+  font: inherit;
+}
+
+.pricing-comparison-plan-button {
+  display: none;
+  width: 100%;
+  min-height: 2.75rem;
+  margin-top: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid rgba(20, 18, 14, 0.14);
+  border-radius: 8px;
+  background: #12110e;
+  color: #f6f1e8;
+  font-weight: 700;
+  text-align: left;
+}
+
+.pricing-comparison-plan-menu {
+  display: none;
+  padding: 0.35rem;
+  border: 1px solid rgba(20, 18, 14, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.pricing-comparison-plan-option {
+  display: flex;
+  width: 100%;
+  min-height: 2.45rem;
+  align-items: center;
+  padding: 0.55rem 0.65rem;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #11100d;
+  font-weight: 700;
+  text-align: left;
+}
+
+.pricing-comparison-plan-option.is-active {
+  background: rgba(20, 18, 14, 0.08);
+}
+
+.pricing-comparison-plan-option:hover,
+.pricing-comparison-plan-option:focus-visible {
+  background: rgba(20, 18, 14, 0.12);
 }
 
 @media (max-width: 1180px) {
   .pricing-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .pricing-comparison-table {
+    width: max-content;
+  }
 }
 
 @media (max-width: 980px) {
+
   .pricing-header,
   .pricing-estimator {
     grid-template-columns: 1fr;
@@ -410,6 +476,10 @@
   .pricing-page {
     padding-left: 0.9rem;
     padding-right: 0.9rem;
+  }
+
+  .pricing-header {
+    gap: 1.25rem;
   }
 
   .pricing-grid {
@@ -439,5 +509,45 @@
   .pricing-tier-list li,
   .pricing-estimator-list li {
     font-size: 0.94rem;
+  }
+
+  .pricing-comparison-table-shell {
+    overflow-x: auto;
+    overflow-y: visible;
+  }
+
+  .pricing-comparison-table {
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+  }
+
+  .pricing-comparison-table th,
+  .pricing-comparison-table td {
+    width: 50%;
+    padding: 0.95rem;
+    white-space: normal;
+  }
+
+  .pricing-comparison-plan-button,
+  .pricing-comparison-plan-menu {
+    display: block;
+  }
+
+  .pricing-comparison-plan-menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    z-index: 5;
+    width: min(13rem, 100%);
+    box-shadow: 0 1rem 2rem rgba(20, 18, 14, 0.14);
+  }
+
+  .pricing-comparison-plan-column {
+    display: none;
+  }
+
+  .pricing-comparison-plan-column.is-active-mobile {
+    display: table-cell;
   }
 }

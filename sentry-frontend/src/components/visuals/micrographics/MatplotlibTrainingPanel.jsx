@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactECharts from 'echarts-for-react';
+import * as echarts from 'echarts';
 
 const defaultSteps = ['80', '160', '240', '320', '400', '480', '560', '640'];
 const defaultTrainLoss = [2.84, 2.41, 2.02, 1.78, 1.59, 1.42, 1.34, 1.29];
@@ -19,10 +20,18 @@ const MatplotlibTrainingPanel = ({ data = {} }) => {
         { label: 'Tokens / sec', value: '38.4k', accent: '#ffc857', meta: '8x H100' },
     ];
     const bestValIndex = valLoss.reduce((best, value, index, values) => (value < values[best] ? index : best), 0);
+    const lossValues = [...trainLoss, ...valLoss].map(Number).filter(Number.isFinite);
+    const perplexityValues = perplexity.map(Number).filter(Number.isFinite);
+    const minLoss = Math.max(0, Math.floor((Math.min(...lossValues) - 0.12) * 10) / 10);
+    const maxLoss = Math.ceil((Math.max(...lossValues) + 0.12) * 10) / 10;
+    const minPerplexity = Math.max(0, Math.floor((Math.min(...perplexityValues) - 0.8) * 10) / 10);
+    const maxPerplexity = Math.ceil((Math.max(...perplexityValues) + 0.8) * 10) / 10;
 
     const option = {
-        animation: false,
-        grid: { left: 40, right: 46, top: 18, bottom: 34 },
+        animation: true,
+        animationDuration: 850,
+        animationEasing: 'cubicOut',
+        grid: { left: 42, right: 52, top: 28, bottom: 34 },
         legend: {
             top: 0,
             right: 0,
@@ -47,8 +56,8 @@ const MatplotlibTrainingPanel = ({ data = {} }) => {
             {
                 type: 'value',
                 name: 'loss',
-                min: 1.1,
-                max: 3.2,
+                min: minLoss,
+                max: maxLoss,
                 splitNumber: 4,
                 nameTextStyle: { color: 'rgba(214,218,229,0.45)', padding: [0, 0, 6, 0] },
                 axisLine: { show: false },
@@ -59,8 +68,8 @@ const MatplotlibTrainingPanel = ({ data = {} }) => {
             {
                 type: 'value',
                 name: 'ppl',
-                min: 6,
-                max: 20,
+                min: minPerplexity,
+                max: maxPerplexity,
                 splitNumber: 4,
                 nameTextStyle: { color: 'rgba(214,218,229,0.45)', padding: [0, 0, 6, 0] },
                 axisLine: { show: false },
@@ -76,8 +85,14 @@ const MatplotlibTrainingPanel = ({ data = {} }) => {
                 smooth: true,
                 showSymbol: false,
                 data: trainLoss,
-                lineStyle: { width: 2.2, color: '#7cff5b' },
+                lineStyle: { width: 3, color: '#7cff5b' },
                 itemStyle: { color: '#7cff5b' },
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: 'rgba(124, 255, 91, 0.22)' },
+                        { offset: 1, color: 'rgba(124, 255, 91, 0)' },
+                    ]),
+                },
             },
             {
                 name: 'val_loss',
@@ -85,8 +100,14 @@ const MatplotlibTrainingPanel = ({ data = {} }) => {
                 smooth: true,
                 showSymbol: false,
                 data: valLoss,
-                lineStyle: { width: 2.2, color: '#7bd3ff' },
+                lineStyle: { width: 3, color: '#7bd3ff' },
                 itemStyle: { color: '#7bd3ff' },
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: 'rgba(123, 211, 255, 0.18)' },
+                        { offset: 1, color: 'rgba(123, 211, 255, 0)' },
+                    ]),
+                },
                 markPoint: {
                     symbolSize: 34,
                     data: [{
@@ -112,7 +133,7 @@ const MatplotlibTrainingPanel = ({ data = {} }) => {
                 smooth: true,
                 showSymbol: false,
                 data: perplexity,
-                lineStyle: { width: 1.6, type: 'dashed', color: '#ffc857' },
+                lineStyle: { width: 2, type: 'dashed', color: '#ffc857' },
                 itemStyle: { color: '#ffc857' },
             },
         ],

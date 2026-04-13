@@ -7,6 +7,7 @@ const GLOBE_CENTER = [14, 22];
 const CLUSTER_LON_STEP = 0.028;
 const CLUSTER_LAT_STEP = 0.018;
 const AVATAR_COLORS = ['#7CFF5B', '#35C9FF', '#8B5CF6', '#FF4D8D', '#FFC533', '#7A7F87'];
+const DEFAULT_MAP_STYLE = 'mapbox://styles/tucian/cm30z5uf300vy01o06vda4yv6';
 
 const fallbackLocations = [
     { name: 'Pipera Hub', address: 'Bucharest', longitude: 26.1212, latitude: 44.4923, intensity: 3 },
@@ -175,6 +176,7 @@ const RealMapbox = ({ data }) => {
     const mapZoom = Number.isFinite(Number(data?.mapZoom)) ? Number(data.mapZoom) : (isGlobe ? 1.15 : 9.8);
     const mapPitch = Number.isFinite(Number(data?.mapPitch)) ? Number(data.mapPitch) : (isGlobe ? 0 : 12);
     const mapBearing = Number.isFinite(Number(data?.mapBearing)) ? Number(data.mapBearing) : (isGlobe ? 0 : -8);
+    const mapStyle = data?.mapStyle || DEFAULT_MAP_STYLE;
     const fitMapToMarkers = data?.mapFitBounds ?? !isGlobe;
     const rotationSpeed = Number.isFinite(Number(data?.mapRotationSpeed)) ? Number(data.mapRotationSpeed) : 2.8;
     const shouldAutoRotate = Boolean(isGlobe && (data?.mapAutoRotate ?? true));
@@ -192,7 +194,7 @@ const RealMapbox = ({ data }) => {
 
         map.current = new mapboxgl.Map({
             container: mapContainer.current,
-            style: 'mapbox://styles/mapbox/dark-v11',
+            style: mapStyle,
             center: mapCenter,
             zoom: mapZoom,
             pitch: mapPitch,
@@ -241,7 +243,7 @@ const RealMapbox = ({ data }) => {
 
             resizeObserver.disconnect();
         };
-    }, [MAPBOX_TOKEN, isGlobe, mapBearing, mapCenter, mapPitch, mapZoom]);
+    }, [MAPBOX_TOKEN, isGlobe, mapBearing, mapCenter, mapPitch, mapStyle, mapZoom]);
 
     useEffect(() => {
         if (!map.current) return;

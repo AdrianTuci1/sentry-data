@@ -1,12 +1,12 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
-import bucketImage from '../../assets/pyramid/bucket.png'
-import googleImage from '../../assets/pyramid/google.png'
-import neuralImage from '../../assets/pyramid/neural.png'
-import parrotLogoImage from '../../assets/pyramid/parrot-white.png'
-import postgresImage from '../../assets/pyramid/postgres.png'
-import r2Image from '../../assets/pyramid/r2.png'
-import tiktokImage from '../../assets/pyramid/tiktok.png'
+import bucketImage from '../assets/pyramid/bucket.png'
+import googleImage from '../assets/pyramid/google.png'
+import neuralImage from '../assets/pyramid/neural.png'
+import parrotLogoImage from '../assets/pyramid/parrot-white.png'
+import postgresImage from '../assets/pyramid/postgres.png'
+import r2Image from '../assets/pyramid/r2.png'
+import tiktokImage from '../assets/pyramid/tiktok.png'
 
 const clamp01 = (value) => Math.min(Math.max(value, 0), 1)
 
@@ -308,7 +308,7 @@ function ArchitectureLayersCanvas() {
     renderer.shadowMap.enabled = true
     renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
-    let requestRender = () => {}
+    let requestRender = () => { }
     const textureLoader = new THREE.TextureLoader()
     const anisotropy = renderer.capabilities.getMaxAnisotropy()
     const loadTexture = (url) => {

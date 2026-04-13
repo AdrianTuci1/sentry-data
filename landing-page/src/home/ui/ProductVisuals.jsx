@@ -1,13 +1,13 @@
 import { useEffect, useRef } from 'react'
 
 import { RingSummaryMicro } from '../../../../sentry-frontend/src/components/visuals/micrographics/DashboardMicros'
-import anywhereLogo from '../../../assets/output/anywhere.png'
-import logo from '../../../assets/pyramid/parrot-white.png'
-import hubspotLogo from '../../../assets/output/hubspot.png'
-import metaLogo from '../../../assets/output/meta.png'
-import neuralLogo from '../../../assets/pyramid/neural.png'
-import postgresLogo from '../../../assets/pyramid/postgres.png'
-import r2Logo from '../../../assets/pyramid/r2.png'
+import anywhereLogo from '../../assets/output/anywhere.png'
+import logo from '../../assets/pyramid/parrot-white.png'
+import hubspotLogo from '../../assets/output/hubspot.png'
+import metaLogo from '../../assets/output/meta.png'
+import neuralLogo from '../../assets/pyramid/neural.png'
+import postgresLogo from '../../assets/pyramid/postgres.png'
+import r2Logo from '../../assets/pyramid/r2.png'
 
 const sourceLogos = [
   { src: postgresLogo, label: 'Postgres' },

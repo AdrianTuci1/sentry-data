@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import './Navbar.css'
 import { navigation, useCaseDropdownItems } from '../content'
-import logo from '../../assets/logo.png'
+import logo from '../assets/logo.png'
 
 export function Navbar() {
   const location = useLocation()
@@ -16,7 +16,7 @@ export function Navbar() {
     <header className="navbar-shell">
       <div className="navbar">
         <Link className="navbar-brand" to="/" aria-label="Home" onClick={handleHomeClick}>
-          <img src={logo} alt="" />
+          <img src={logo} alt="StatsParrot Logo" />
         </Link>
 
         <nav className="navbar-nav" aria-label="Primary navigation">

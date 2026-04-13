@@ -23,39 +23,39 @@ const formatMetricValue = (value, options = {}) => {
     let formatterOptions;
 
     switch (format) {
-    case 'number':
-        formatterOptions = {
-            style: 'decimal',
-            notation: compact ? 'compact' : 'standard',
-            maximumFractionDigits: maximumFractionDigits ?? (compact ? 1 : 0),
-            minimumFractionDigits,
-        };
-        break;
-    case 'compact-number':
-        formatterOptions = {
-            style: 'decimal',
-            notation: 'compact',
-            maximumFractionDigits: maximumFractionDigits ?? 1,
-            minimumFractionDigits,
-        };
-        break;
-    case 'percent':
-        formatterOptions = {
-            style: 'percent',
-            maximumFractionDigits: maximumFractionDigits ?? 1,
-            minimumFractionDigits,
-        };
-        break;
-    case 'currency':
-    default:
-        formatterOptions = {
-            style: 'currency',
-            currency,
-            notation: compact ? 'compact' : 'standard',
-            maximumFractionDigits: maximumFractionDigits ?? (compact ? 1 : 0),
-            minimumFractionDigits,
-        };
-        break;
+        case 'number':
+            formatterOptions = {
+                style: 'decimal',
+                notation: compact ? 'compact' : 'standard',
+                maximumFractionDigits: maximumFractionDigits ?? (compact ? 1 : 0),
+                minimumFractionDigits,
+            };
+            break;
+        case 'compact-number':
+            formatterOptions = {
+                style: 'decimal',
+                notation: 'compact',
+                maximumFractionDigits: maximumFractionDigits ?? 1,
+                minimumFractionDigits,
+            };
+            break;
+        case 'percent':
+            formatterOptions = {
+                style: 'percent',
+                maximumFractionDigits: maximumFractionDigits ?? 1,
+                minimumFractionDigits,
+            };
+            break;
+        case 'currency':
+        default:
+            formatterOptions = {
+                style: 'currency',
+                currency,
+                notation: compact ? 'compact' : 'standard',
+                maximumFractionDigits: maximumFractionDigits ?? (compact ? 1 : 0),
+                minimumFractionDigits,
+            };
+            break;
     }
 
     return `${prefix}${new Intl.NumberFormat('en-US', formatterOptions).format(value)}${suffix}`;
@@ -119,7 +119,7 @@ const AttributionModels = ({ data }) => {
             text: summaryValue,
             subtext: summaryLabel.toUpperCase(),
             left: 'center',
-            top: '37%',
+            top: '20%',
             textStyle: {
                 color: '#fff',
                 fontSize: 26,
@@ -137,8 +137,8 @@ const AttributionModels = ({ data }) => {
             {
                 name: data?.seriesName || 'Channel Mix',
                 type: 'pie',
-                radius: ['56%', '77%'],
-                center: ['50%', '48%'],
+                radius: ['36%', '57%'],
+                center: ['50%', '24%'],
                 startAngle: 90,
                 itemStyle: {
                     borderColor: '#09090a',
@@ -153,7 +153,7 @@ const AttributionModels = ({ data }) => {
     };
 
     return (
-        <div style={{ height: '100%', width: '100%', display: 'grid', gridTemplateColumns: 'minmax(320px, 1.02fr) minmax(240px, 0.98fr)', gridTemplateRows: 'auto 1fr', gap: '16px', alignItems: 'stretch' }}>
+        <div style={{ height: '100%', width: '100%', display: 'grid', gridTemplateColumns: 'minmax(320px, 1.05fr) minmax(240px, 0.95fr)', gridTemplateRows: 'auto 1fr', gap: '14px 18px', alignItems: 'stretch' }}>
             <div style={{ gridColumn: '1 / 2', gridRow: '1 / 3', minHeight: '360px' }}>
                 <ReactECharts
                     option={option}
@@ -162,7 +162,7 @@ const AttributionModels = ({ data }) => {
                 />
             </div>
 
-            <div style={{ gridColumn: '2 / 3', gridRow: '1 / 2', display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '18px' }}>
+            <div style={{ gridColumn: '2 / 3', gridRow: '1 / 2', display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '18px', alignSelf: 'start', marginTop: '-48px' }}>
                 {(periodMetrics.length ? periodMetrics : [
                     { label: secondaryMetricLabel, value: formatMetricValue(totalMonthly, secondaryValueFormat), delta: '+19.6%', note: `${formatMetricValue(totalMonthly * 0.82, secondaryValueFormat)} baseline`, tone: '#7CFF5B' },
                     { label: primaryMetricLabel, value: formatMetricValue(totalYearly, valueFormat), delta: '+2.5%', note: `${formatMetricValue(totalYearly * 0.96, valueFormat)} baseline`, tone: '#FFC533' },
@@ -181,7 +181,7 @@ const AttributionModels = ({ data }) => {
                 ))}
             </div>
 
-            <div style={{ gridColumn: '2 / 3', gridRow: '2 / 3', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
+            <div style={{ gridColumn: '2 / 3', gridRow: '2 / 3', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginTop: '-26px' }}>
                 {listRows.map((row, index) => (
                     <div
                         key={row.label}

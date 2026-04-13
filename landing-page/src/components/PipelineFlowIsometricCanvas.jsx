@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
-import processorImage from '../../assets/pyramid/neural.png'
+import processorImage from '../assets/pyramid/neural.png'
 import { mix, rangeProgress } from './LiveInsightsBridge.model'
 
 function configureTexture(texture, anisotropy = 1) {
