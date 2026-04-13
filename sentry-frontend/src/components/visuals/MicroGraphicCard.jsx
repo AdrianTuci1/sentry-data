@@ -48,7 +48,18 @@ const getExplorerPayload = (data) => data?.results ||
     data?.forecast ||
     null;
 
-const MicroGraphicCard = ({ data: initialData = {}, isExpanded, onClick }) => {
+const MicroGraphicCard = ({
+    data: initialData = {},
+    isExpanded,
+    isDragging,
+    isDragTarget,
+    gridPlacement,
+    onClick,
+    onDragStart,
+    onDragOver,
+    onDrop,
+    onDragEnd,
+}) => {
     const data = useMemo(() => prepareMicroGraphicData(initialData), [initialData]);
     const GraphicComponent = useMemo(() => resolveMicroGraphicComponent(data), [data]);
     const explorerPayload = getExplorerPayload(data);
@@ -86,9 +97,29 @@ const MicroGraphicCard = ({ data: initialData = {}, isExpanded, onClick }) => {
 
     return (
         <div
-            className={`micro-card ${data.colorTheme || 'theme-productivity'} ${spanClass} ${visualClass} ${isExpanded ? 'expanded' : ''}`}
+            className={`micro-card ${data.colorTheme || 'theme-productivity'} ${spanClass} ${visualClass} ${isExpanded ? 'expanded' : ''} ${isDragging ? 'is-dragging' : ''} ${isDragTarget ? 'is-drag-target' : ''}`}
+            data-widget-id={data.id}
+            style={isExpanded ? undefined : gridPlacement}
             onClick={() => onClick?.(data.id)}
+            onDragOver={(event) => onDragOver?.(event, data.id)}
+            onDrop={(event) => onDrop?.(event, data.id)}
         >
+            {!isExpanded && (
+                <button
+                    type="button"
+                    className="micro-card-drag-handle"
+                    draggable
+                    aria-label={`Move ${data.title || 'widget'}`}
+                    title="Move widget"
+                    onClick={(event) => event.stopPropagation()}
+                    onPointerDown={(event) => event.stopPropagation()}
+                    onDragStart={(event) => onDragStart?.(event, data.id)}
+                    onDragEnd={onDragEnd}
+                >
+                    <LucideIcons.Grip size={16} strokeWidth={2.2} />
+                </button>
+            )}
+
             {shouldShowHeader && (
                 <div className="micro-card-header">
                     {data.title && <h3 className="micro-title">{data.title}</h3>}

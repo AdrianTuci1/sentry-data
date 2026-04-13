@@ -11,8 +11,9 @@
     color: #fff;
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.34);
     transition: box-shadow 0.3s ease, border-color 0.3s ease;
-    height: auto;
-    aspect-ratio: 1 / 1;
+    height: 100%;
+    min-height: 0;
+    aspect-ratio: auto;
     padding: 1.5rem;
     border: 1px solid rgba(255, 255, 255, 0.05);
     background: #000;
@@ -51,54 +52,85 @@
     box-shadow: 0 22px 48px rgba(0, 0, 0, 0.42);
 }
 
+.micro-card.is-dragging {
+    opacity: 0.5;
+    border-color: rgba(124, 255, 91, 0.28);
+}
+
+.micro-card.is-drag-target {
+    border-color: rgba(124, 255, 91, 0.52);
+    box-shadow: 0 22px 54px rgba(0, 0, 0, 0.44), 0 0 0 2px rgba(124, 255, 91, 0.18);
+}
+
+.micro-card-drag-handle {
+    appearance: none;
+    -webkit-appearance: none;
+    position: absolute;
+    top: 0.85rem;
+    left: 0.85rem;
+    z-index: 30;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    margin: 0;
+    padding: 0;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(8, 8, 10, 0.74);
+    color: rgba(255, 255, 255, 0.78);
+    cursor: grab;
+    opacity: 0;
+    backdrop-filter: blur(10px);
+    transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.micro-card-drag-handle:hover,
+.micro-card-drag-handle:focus-visible {
+    opacity: 1;
+    color: #fff;
+    border-color: rgba(124, 255, 91, 0.34);
+    background: rgba(14, 16, 14, 0.9);
+    outline: none;
+    transform: translateY(-1px);
+}
+
+.micro-card-drag-handle:active {
+    cursor: grabbing;
+}
+
+.micro-card:hover .micro-card-drag-handle,
+.micro-card:focus-within .micro-card-drag-handle {
+    opacity: 1;
+}
+
 
 .col-span-2 {
     grid-column: span 2;
-    aspect-ratio: auto;
-    height: 280px;
 }
 
 .col-span-3 {
     grid-column: span 3;
-    aspect-ratio: auto;
-    height: 280px;
 }
 
 .row-span-2 {
     grid-row: span 2;
-    aspect-ratio: auto;
-    height: 624px;
-    /* (300 * 2) + gap (24px approximated) */
 }
 
 .col-span-2.row-span-2 {
     grid-column: span 2;
     grid-row: span 2;
-    height: 624px;
 }
 
 .col-span-3.row-span-2 {
     grid-column: span 3;
     grid-row: span 2;
-    height: 624px;
 }
 
 @media (max-width: 1024px) {
     .micro-card {
-        height: auto;
         padding: 1rem;
-    }
-
-    .col-span-2,
-    .col-span-3 {
-        height: 250px;
-    }
-
-    .row-span-2,
-    .col-span-2.row-span-2,
-    .col-span-3.row-span-2 {
-        height: 524px;
-        /* (250 * 2) + 24gap */
     }
 
     .col-span-2 {
@@ -111,22 +143,6 @@
 }
 
 @media (max-width: 600px) {
-    .micro-card {
-        height: auto;
-    }
-
-    .col-span-2,
-    .col-span-3 {
-        height: 220px;
-    }
-
-    .row-span-2,
-    .col-span-2.row-span-2,
-    .col-span-3.row-span-2 {
-        height: 460px;
-        /* (220 * 2) + 20gap */
-    }
-
     .col-span-3 {
         grid-column: span 2;
     }
@@ -300,22 +316,26 @@
 }
 
 .micro-card.map-bleed-card .expand-indicator,
-.micro-card.map-bleed-card .close-indicator {
+.micro-card.map-bleed-card .close-indicator,
+.micro-card.map-bleed-card .micro-card-drag-handle {
     z-index: 6;
 }
 
 .micro-card.optimal-time-card .expand-indicator,
-.micro-card.optimal-time-card .close-indicator {
+.micro-card.optimal-time-card .close-indicator,
+.micro-card.optimal-time-card .micro-card-drag-handle {
     z-index: 6;
 }
 
 .micro-card.editorial-card .expand-indicator,
-.micro-card.editorial-card .close-indicator {
+.micro-card.editorial-card .close-indicator,
+.micro-card.editorial-card .micro-card-drag-handle {
     z-index: 6;
 }
 
 .micro-card.funnel-hero-card .expand-indicator,
-.micro-card.funnel-hero-card .close-indicator {
+.micro-card.funnel-hero-card .close-indicator,
+.micro-card.funnel-hero-card .micro-card-drag-handle {
     z-index: 6;
 }
 
@@ -447,6 +467,7 @@
 
 @media (prefers-reduced-motion: reduce) {
     .micro-card,
+    .micro-card-drag-handle,
     .expand-indicator,
     .close-indicator {
         transition: none;

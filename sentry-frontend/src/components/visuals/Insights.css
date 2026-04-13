@@ -130,18 +130,25 @@
  * Tablet/Desktop: 3 to 4 columns depending on width
  */
 .insights-grid {
+    --insights-grid-gap: 1.1rem;
+    --insights-grid-row-size: calc((100cqw - var(--insights-grid-gap)) / 2);
+
+    container-type: inline-size;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: minmax(0, var(--insights-grid-row-size));
     grid-auto-flow: dense;
-    gap: 1.1rem;
+    gap: var(--insights-grid-gap);
     transition: all 0.3s ease;
     padding-block: 0px 100px;
 }
 
 @media (min-width: 1024px) {
     .insights-grid {
+        --insights-grid-gap: 1.25rem;
+        --insights-grid-row-size: calc((100cqw - var(--insights-grid-gap) - var(--insights-grid-gap) - var(--insights-grid-gap)) / 4);
+
         grid-template-columns: repeat(4, 1fr);
-        gap: 1.25rem;
     }
 }
 
@@ -161,6 +168,7 @@
 /* Layout adjustments when a card is expanded */
 .insights-grid.has-expanded {
     grid-template-columns: 1fr;
+    grid-auto-rows: auto;
     max-width: 800px;
     margin: 0 auto;
 }

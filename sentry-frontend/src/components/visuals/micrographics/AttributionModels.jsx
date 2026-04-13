@@ -119,7 +119,7 @@ const AttributionModels = ({ data }) => {
             text: summaryValue,
             subtext: summaryLabel.toUpperCase(),
             left: 'center',
-            top: '20%',
+            top: '27%',
             textStyle: {
                 color: '#fff',
                 fontSize: 26,
@@ -138,7 +138,7 @@ const AttributionModels = ({ data }) => {
                 name: data?.seriesName || 'Channel Mix',
                 type: 'pie',
                 radius: ['36%', '57%'],
-                center: ['50%', '24%'],
+                center: ['50%', '34%'],
                 startAngle: 90,
                 itemStyle: {
                     borderColor: '#09090a',
