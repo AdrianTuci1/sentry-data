@@ -243,7 +243,8 @@ export class ParrotNeuralEngineService {
                 generated: Array.from(new Set(generated)),
                 warnings
             },
-            invalidationHints: runtimeState.invalidationHints
+            invalidationHints: runtimeState.invalidationHints,
+            sentinelModelSignals: []
         };
     }
 

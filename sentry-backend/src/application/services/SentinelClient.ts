@@ -1,6 +1,14 @@
 import { config } from '../../config';
 import { ProjectionRegistryDocument } from './ProjectionRegistryService';
-import { ParrotInvalidationHint, ParrotSourceProfile } from '../../types/parrot';
+import {
+    ParrotInteractionPolicyState,
+    ParrotInvalidationHint,
+    ParrotMLRecommendation,
+    ParrotQuerySpec,
+    ParrotSentinelModelSignal,
+    ParrotSourceProfile
+} from '../../types/parrot';
+import { SentinelModelSuite } from './SentinelModels';
 
 export interface SentinelGoalResponse {
     status: string;
@@ -22,6 +30,8 @@ export interface SentinelAlignmentResponse {
 
 export class SentinelClient {
     private baseUrl: string;
+    private readonly modelSuite = new SentinelModelSuite();
+    private lastModelSignals: ParrotSentinelModelSignal[] = [];
 
     constructor() {
         this.baseUrl = config.parrot.sentinelApiUrl;
@@ -108,7 +118,10 @@ export class SentinelClient {
         projectId: string,
         sourceProfiles: ParrotSourceProfile[],
         previousProjectionRegistry?: ProjectionRegistryDocument,
-        invalidatedSources: string[] = []
+        invalidatedSources: string[] = [],
+        querySpecs: ParrotQuerySpec[] = [],
+        mlRecommendations: ParrotMLRecommendation[] = [],
+        policyState?: ParrotInteractionPolicyState
     ): Promise<ParrotInvalidationHint[]> {
         if (this.baseUrl) {
             try {
@@ -123,11 +136,17 @@ export class SentinelClient {
                         project_id: projectId,
                         source_profiles: sourceProfiles,
                         previous_projection_registry: previousProjectionRegistry,
-                        invalidated_sources: invalidatedSources
+                        invalidated_sources: invalidatedSources,
+                        query_specs: querySpecs,
+                        ml_recommendations: mlRecommendations,
+                        policy_state: policyState
                     })
                 });
 
                 const data = await response.json().catch(() => ({}));
+                if (Array.isArray(data.sentinel_model_signals)) {
+                    this.lastModelSignals = data.sentinel_model_signals as ParrotSentinelModelSignal[];
+                }
                 if (response.ok && Array.isArray(data.invalidation_hints)) {
                     return data.invalidation_hints as ParrotInvalidationHint[];
                 }
@@ -138,7 +157,21 @@ export class SentinelClient {
             }
         }
 
-        return this.buildLocalInvalidationHints(sourceProfiles, previousProjectionRegistry, invalidatedSources);
+        const evaluation = this.modelSuite.evaluateRuntime({
+            sourceProfiles,
+            previousProjectionRegistry,
+            invalidatedSources,
+            querySpecs,
+            mlRecommendations,
+            policyState
+        });
+        this.lastModelSignals = evaluation.signals;
+
+        return this.buildLocalInvalidationHints(sourceProfiles, previousProjectionRegistry, invalidatedSources, evaluation.hints);
+    }
+
+    public getLastModelSignals(): ParrotSentinelModelSignal[] {
+        return this.lastModelSignals;
     }
 
     private buildFallbackAlignment(executionScore: any, reason: string): SentinelAlignmentResponse {
@@ -157,9 +190,10 @@ export class SentinelClient {
     private buildLocalInvalidationHints(
         sourceProfiles: ParrotSourceProfile[],
         previousProjectionRegistry?: ProjectionRegistryDocument,
-        invalidatedSources: string[] = []
+        invalidatedSources: string[] = [],
+        modelHints: ParrotInvalidationHint[] = []
     ): ParrotInvalidationHint[] {
-        const hints: ParrotInvalidationHint[] = [];
+        const hints: ParrotInvalidationHint[] = [...modelHints];
         const createdAt = new Date().toISOString();
         const projectionEntries = Object.values(previousProjectionRegistry?.projections || {});
 
@@ -237,7 +271,17 @@ export class SentinelClient {
             }
         }
 
-        return hints;
+        return this.dedupeHints(hints);
+    }
+
+    private dedupeHints(hints: ParrotInvalidationHint[]): ParrotInvalidationHint[] {
+        const seen = new Set<string>();
+        return hints.filter((hint) => {
+            const key = `${hint.scope}:${hint.targetId}:${hint.reason}`;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
     }
 
     private buildHint(

@@ -47,6 +47,37 @@ SENTINEL_API_URL=<modal-or-http-url>
 ML_EXECUTOR_API_URL=<modal-or-http-url>
 ```
 
+## 2.1. Terraform pentru resurse durabile
+
+Exista acum un scaffold Terraform in:
+
+[infra/terraform](/Users/adriantucicovenco/Proiecte/sentry-data/infra/terraform)
+
+Acopera:
+
+- DynamoDB single-table;
+- Cloudflare R2 bucket pentru surse raw, proiectii, runtime artifacts, query cache, feedback Sentinel si widget catalog.
+
+Rulare:
+
+```bash
+cd /Users/adriantucicovenco/Proiecte/sentry-data/infra/terraform
+cp terraform.tfvars.example terraform.tfvars
+terraform init
+terraform plan
+terraform apply
+```
+
+Modal apps raman deploy-uri aplicative separate:
+
+```bash
+modal deploy modal_apps/sentinel.py
+modal deploy modal_apps/pne.py
+modal deploy modal_apps/ml_executor.py
+```
+
+URL-urile rezultate intra in `PNE_API_URL`, `SENTINEL_API_URL` si `ML_EXECUTOR_API_URL`.
+
 ## 3. Deploy pentru widgets
 
 Comanda canonica este:

@@ -7,8 +7,11 @@ import { ReverseEtlHeadService } from './ReverseEtlHeadService';
 import { SentinelClient } from './SentinelClient';
 import {
     ParrotBootstrapResult,
+    ParrotInteractionPolicyState,
     ParrotInvalidationHint,
+    ParrotMLRecommendation,
     ParrotProjectionPlan,
+    ParrotQuerySpec,
     ParrotProgressFile,
     ParrotRuntimeMetadata,
     ParrotRuntimeState,
@@ -139,15 +142,25 @@ export class ParrotRuntimeService {
         projectId: string,
         sourceProfiles: ParrotSourceProfile[],
         previousProjectionRegistry?: ProjectionRegistryDocument,
-        invalidatedSources: string[] = []
+        invalidatedSources: string[] = [],
+        querySpecs: ParrotQuerySpec[] = [],
+        mlRecommendations: ParrotMLRecommendation[] = [],
+        policyState?: ParrotInteractionPolicyState
     ): Promise<ParrotInvalidationHint[]> {
         return this.sentinelClient.buildInvalidationHints(
             tenantId,
             projectId,
             sourceProfiles,
             previousProjectionRegistry,
-            invalidatedSources
+            invalidatedSources,
+            querySpecs,
+            mlRecommendations,
+            policyState
         );
+    }
+
+    public getLastSentinelModelSignals() {
+        return this.sentinelClient.getLastModelSignals();
     }
 
     public async compileProjectionPlan(runtimeState: ParrotRuntimeState): Promise<ParrotProjectionPlan> {

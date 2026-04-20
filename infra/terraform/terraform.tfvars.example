@@ -1,0 +1,10 @@
+environment           = "dev"
+aws_region            = "eu-central-1"
+dynamo_table_name     = "SentryAppTable"
+cloudflare_account_id = "<cloudflare-account-id>"
+cloudflare_api_token  = "<cloudflare-api-token>"
+r2_bucket_data        = "statsparrot-data"
+
+tags = {
+  Owner = "statsparrot"
+}

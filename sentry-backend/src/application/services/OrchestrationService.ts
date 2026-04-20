@@ -9,6 +9,7 @@ import { WorkloadPlannerService } from './WorkloadPlannerService';
 import { ExecutionPlaneService } from './ExecutionPlaneService';
 import { ProjectionRegistryService } from './ProjectionRegistryService';
 import { QueryRegistryService } from './QueryRegistryService';
+import { SentinelFeedbackService } from './SentinelFeedbackService';
 
 /**
  * OrchestrationService is the entrypoint for the Parrot OS runtime.
@@ -25,6 +26,7 @@ export class OrchestrationService {
     private executionPlaneService: ExecutionPlaneService;
     private projectionRegistryService: ProjectionRegistryService;
     private queryRegistryService: QueryRegistryService;
+    private sentinelFeedbackService: SentinelFeedbackService;
 
     constructor(
         projectRepo: ProjectRepository,
@@ -36,7 +38,8 @@ export class OrchestrationService {
         workloadPlannerService: WorkloadPlannerService,
         executionPlaneService: ExecutionPlaneService,
         projectionRegistryService: ProjectionRegistryService,
-        queryRegistryService: QueryRegistryService
+        queryRegistryService: QueryRegistryService,
+        sentinelFeedbackService: SentinelFeedbackService
     ) {
         this.projectRepo = projectRepo;
         this.sseManager = sseManager;
@@ -48,6 +51,7 @@ export class OrchestrationService {
         this.executionPlaneService = executionPlaneService;
         this.projectionRegistryService = projectionRegistryService;
         this.queryRegistryService = queryRegistryService;
+        this.sentinelFeedbackService = sentinelFeedbackService;
     }
 
     /**
@@ -107,12 +111,16 @@ export class OrchestrationService {
             const sourceProfiles = await this.bronzeDiscoveryService.discoverSources(ctx);
             const previousProjectionRegistry = await this.projectionRegistryService.loadRegistry(tenantId, projectId);
             const previousQueryRegistry = await this.queryRegistryService.loadRegistry(tenantId, projectId);
-            const invalidationHints = await this.parrotRuntimeService.buildRuntimeInvalidationHints(
+            const sentinelPolicyState = await this.sentinelFeedbackService.loadPolicyState(tenantId, projectId);
+            const initialInvalidationHints = await this.parrotRuntimeService.buildRuntimeInvalidationHints(
                 tenantId,
                 projectId,
                 sourceProfiles,
                 previousProjectionRegistry,
-                invalidatedSources
+                invalidatedSources,
+                [],
+                [],
+                sentinelPolicyState
             );
 
             this.sseManager.broadcastToTenant(tenantId, 'runtime_progress', {
@@ -120,7 +128,7 @@ export class OrchestrationService {
                 progress: 52,
                 status: 'in_progress',
                 requestId: parrotBootstrap.requestId,
-                invalidationHints: invalidationHints.length
+                invalidationHints: initialInvalidationHints.length
             });
 
             const compiledAt = new Date().toISOString();
@@ -131,7 +139,8 @@ export class OrchestrationService {
                 sourceProfiles,
                 previousProjectionRegistry,
                 previousQueryRegistry,
-                invalidationHints,
+                invalidationHints: initialInvalidationHints,
+                sentinelPolicyState,
                 activeProjectionVersions: Object.fromEntries(
                     Object.entries(previousProjectionRegistry.projections).map(([projectionId, entry]) => [projectionId, entry.latestVersion])
                 ),
@@ -140,6 +149,19 @@ export class OrchestrationService {
                 invalidatedSources,
                 compiledAt
             });
+
+            const fullInvalidationHints = await this.parrotRuntimeService.buildRuntimeInvalidationHints(
+                tenantId,
+                projectId,
+                sourceProfiles,
+                previousProjectionRegistry,
+                invalidatedSources,
+                projectionPlan.querySpecs,
+                projectionPlan.mlRecommendations,
+                sentinelPolicyState
+            );
+            projectionPlan.invalidationHints = fullInvalidationHints;
+            projectionPlan.sentinelModelSignals = this.parrotRuntimeService.getLastSentinelModelSignals();
 
             await this.parrotProgressService.saveProjectionPlan(
                 tenantId,
@@ -220,6 +242,8 @@ export class OrchestrationService {
                 queryRegistry: queryRegistry.registry,
                 mlRecommendations: projectionPlan.mlRecommendations,
                 invalidationHints: projectionPlan.invalidationHints,
+                sentinelModelSignals: projectionPlan.sentinelModelSignals || [],
+                sentinelPolicyState,
                 executionPlan,
                 executionSubmission,
                 metadataArtifacts: {
@@ -324,8 +348,15 @@ export class OrchestrationService {
             }))
             .filter((q: any) => q.widgetId && q.sqlString);
 
-        // Update Project Entity with discovery metadata
-        project.discoveryMetadata = discovery;
+        const preservedOverrides = Array.isArray(project.discoveryMetadata?.decisionOverrides)
+            ? project.discoveryMetadata.decisionOverrides
+            : [];
+
+        // Update Project Entity with discovery metadata while keeping user-authored overrides.
+        project.discoveryMetadata = {
+            ...discovery,
+            decisionOverrides: preservedOverrides
+        };
         project.status = 'active';
 
         // Save execution telemetry / vitals if provided

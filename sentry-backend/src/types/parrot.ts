@@ -115,6 +115,83 @@ export interface ParrotInvalidationHint {
     createdAt: string;
 }
 
+export type ParrotSentinelModelName = 'CoverageRanker' | 'DriftClassifier' | 'QueryRiskModel' | 'InteractionPolicyModel';
+
+export interface ParrotSentinelModelSignal {
+    signalId: string;
+    modelName: ParrotSentinelModelName;
+    targetType: ParrotInvalidationScope;
+    targetId: string;
+    sourceId?: string;
+    score: number;
+    severity: 'info' | 'warning' | 'critical';
+    reason: string;
+    features: Record<string, unknown>;
+    createdAt: string;
+}
+
+export interface ParrotSentinelFeedbackEvent {
+    eventId: string;
+    targetType: ParrotInvalidationScope;
+    targetId: string;
+    sourceId?: string;
+    action: 'view' | 'accept' | 'reject' | 'edit' | 'override' | 'execute' | 'dismiss';
+    reward: number;
+    metadata: {
+        widgetType?: string;
+        queryHash?: string;
+        modelName?: string;
+        reason?: string;
+        cohort?: string;
+    };
+    actorHash?: string;
+    occurredAt: string;
+}
+
+export interface ParrotInteractionPolicyState {
+    version: 1;
+    updatedAt: string;
+    eventCount: number;
+    rewardScore: number;
+    widgetWeights: Record<string, number>;
+    sourceInterestWeights: Record<string, number>;
+    modelWeights: Partial<Record<ParrotSentinelModelName, number>>;
+    quarantine: Array<{
+        eventId: string;
+        reason: string;
+        occurredAt: string;
+    }>;
+}
+
+export interface ParrotDecisionOverride {
+    overrideId: string;
+    targetType: 'projection' | 'query' | 'widget' | 'ml_recommendation';
+    targetId: string;
+    codeFormula?: string;
+    userIntent?: string;
+    status: 'active' | 'warning' | 'blocked';
+    validation: {
+        functional: boolean;
+        warnings: string[];
+        errors: string[];
+        checkedAt: string;
+    };
+    createdBy?: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface ParrotCodeFormulaView {
+    formulaId: string;
+    targetType: 'projection' | 'query' | 'widget' | 'ml_recommendation';
+    targetId: string;
+    title: string;
+    language: 'sql' | 'python' | 'policy' | 'json';
+    displayCode: string;
+    editable: boolean;
+    warnings: string[];
+}
+
 export interface ParrotProjectionDependency {
     sourceIds: string[];
     columns: string[];
@@ -203,6 +280,7 @@ export interface ParrotRuntimeState {
     previousProjectionRegistry?: unknown;
     previousQueryRegistry?: unknown;
     invalidationHints: ParrotInvalidationHint[];
+    sentinelPolicyState?: ParrotInteractionPolicyState;
     activeProjectionVersions?: Record<string, string>;
     widgetCatalogVersion: string;
     forceRediscover?: boolean;
@@ -224,6 +302,7 @@ export interface ParrotProjectionPlan {
         warnings: string[];
     };
     invalidationHints: ParrotInvalidationHint[];
+    sentinelModelSignals?: ParrotSentinelModelSignal[];
 }
 
 export interface ParrotSourceTransformation {

@@ -13,9 +13,15 @@ import { SourceUpdateMonitorService } from '../../application/services/SourceUpd
 import { ConnectorCatalogService } from '../../application/services/ConnectorCatalogService';
 import { ControlPlaneService } from '../../application/services/ControlPlaneService';
 import { MLExecutorClient, MLTrainRequest } from '../../application/services/MLExecutorClient';
+import { SentinelFeedbackService } from '../../application/services/SentinelFeedbackService';
+import { DecisionOverrideService } from '../../application/services/DecisionOverrideService';
 import { AppError } from '../middlewares/errorHandler';
 import { ProjectMemberInput } from '../../types/controlPlane';
-import { ParrotMLRecommendation } from '../../types/parrot';
+import {
+    ParrotDecisionOverride,
+    ParrotMLRecommendation,
+    ParrotSentinelFeedbackEvent
+} from '../../types/parrot';
 
 export class ProjectController implements IController {
     public path = '/projects';
@@ -31,7 +37,9 @@ export class ProjectController implements IController {
         private readonly sourceUpdateMonitorService: SourceUpdateMonitorService,
         private readonly connectorCatalogService: ConnectorCatalogService,
         private readonly controlPlaneService: ControlPlaneService,
-        private readonly mlExecutorClient: MLExecutorClient
+        private readonly mlExecutorClient: MLExecutorClient,
+        private readonly sentinelFeedbackService: SentinelFeedbackService,
+        private readonly decisionOverrideService: DecisionOverrideService
     ) {
         this.initRoutes();
     }
@@ -53,6 +61,10 @@ export class ProjectController implements IController {
 
         this.router.get('/:projectId/ml/recommendations', auth, this.getMlRecommendations);
         this.router.post('/:projectId/ml/recommendations/:recommendationId/train', auth, this.trainMlRecommendation);
+        this.router.get('/:projectId/runtime/code-formulas', auth, this.getCodeFormulas);
+        this.router.get('/:projectId/runtime/overrides', auth, this.getDecisionOverrides);
+        this.router.post('/:projectId/runtime/overrides', auth, this.createDecisionOverride);
+        this.router.post('/:projectId/feedback/sentinel', auth, this.recordSentinelFeedback);
 
         this.router.get('/:projectId', auth, this.getProjectById);
         this.router.post('/:projectId/runtime/run', auth, this.runRuntime);
@@ -624,6 +636,171 @@ export class ProjectController implements IController {
         });
 
         await this.projectRepo.createOrUpdate(project);
+    }
+
+    private getCodeFormulas = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const authContext = this.getAuthContext(req);
+            const { projectId } = req.params;
+            const { project } = await this.controlPlaneService.assertProjectAccess(authContext, projectId);
+            const discoveryMetadata = project.discoveryMetadata || {};
+            const formulas = this.decisionOverrideService.buildFormulaViews({
+                querySpecs: discoveryMetadata.querySpecs || discoveryMetadata.projectionPlan?.querySpecs || [],
+                projectionSpecs: discoveryMetadata.projectionSpecs || discoveryMetadata.projectionPlan?.projectionSpecs || [],
+                mlRecommendations: this.extractMlRecommendations(discoveryMetadata),
+                overrides: this.extractDecisionOverrides(discoveryMetadata)
+            });
+
+            res.status(200).json({
+                status: 'success',
+                data: {
+                    formulas
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    private getDecisionOverrides = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const authContext = this.getAuthContext(req);
+            const { projectId } = req.params;
+            const { project } = await this.controlPlaneService.assertProjectAccess(authContext, projectId);
+
+            res.status(200).json({
+                status: 'success',
+                data: {
+                    overrides: this.extractDecisionOverrides(project.discoveryMetadata)
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    private createDecisionOverride = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const authContext = this.getAuthContext(req);
+            const { projectId } = req.params;
+            const { project } = await this.controlPlaneService.assertProjectAccess(authContext, projectId);
+            const { targetType, targetId, codeFormula, userIntent } = req.body as {
+                targetType?: ParrotDecisionOverride['targetType'];
+                targetId?: string;
+                codeFormula?: string;
+                userIntent?: string;
+            };
+
+            if (!targetType || !targetId) {
+                res.status(400).json({ error: 'targetType and targetId are required' });
+                return;
+            }
+
+            const override = this.decisionOverrideService.buildOverride({
+                targetType,
+                targetId,
+                codeFormula,
+                userIntent,
+                createdBy: authContext.userId
+            });
+            project.discoveryMetadata = project.discoveryMetadata || {};
+            const existingOverrides = this.extractDecisionOverrides(project.discoveryMetadata)
+                .filter((item) => !(item.targetType === override.targetType && item.targetId === override.targetId));
+            project.discoveryMetadata.decisionOverrides = [...existingOverrides, override];
+
+            if (override.status !== 'blocked') {
+                project.queryConfigs = this.applyOverrideToProjectQueries(project.queryConfigs || [], project.discoveryMetadata, override);
+            }
+
+            await this.projectRepo.createOrUpdate(project);
+
+            res.status(override.status === 'blocked' ? 422 : 201).json({
+                status: override.status === 'blocked' ? 'blocked' : 'success',
+                data: {
+                    override,
+                    executionWarning: override.status === 'warning'
+                        ? 'Override saved, but Sentinel will warn before execution.'
+                        : undefined
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    private recordSentinelFeedback = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const authContext = this.getAuthContext(req);
+            const { projectId } = req.params;
+            const { project } = await this.controlPlaneService.assertProjectAccess(authContext, projectId);
+            const body = req.body as Partial<ParrotSentinelFeedbackEvent>;
+
+            if (!body.targetType || !body.targetId || !body.action) {
+                res.status(400).json({ error: 'targetType, targetId and action are required' });
+                return;
+            }
+
+            const result = await this.sentinelFeedbackService.recordFeedback(authContext.tenantId, projectId, {
+                targetType: body.targetType,
+                targetId: body.targetId,
+                sourceId: body.sourceId,
+                action: body.action,
+                reward: typeof body.reward === 'number' ? body.reward : this.rewardForAction(body.action),
+                metadata: body.metadata || {},
+                actorHash: this.sentinelFeedbackService.hashActor(authContext.userId)
+            });
+
+            project.discoveryMetadata = project.discoveryMetadata || {};
+            project.discoveryMetadata.sentinelPolicyState = result.policyState;
+            await this.projectRepo.createOrUpdate(project);
+
+            res.status(201).json({
+                status: 'success',
+                data: result
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    private extractDecisionOverrides(discoveryMetadata: any): ParrotDecisionOverride[] {
+        return Array.isArray(discoveryMetadata?.decisionOverrides)
+            ? discoveryMetadata.decisionOverrides as ParrotDecisionOverride[]
+            : [];
+    }
+
+    private applyOverrideToProjectQueries(
+        queryConfigs: Array<{ widgetId: string; sqlString: string }>,
+        discoveryMetadata: any,
+        override: ParrotDecisionOverride
+    ): Array<{ widgetId: string; sqlString: string }> {
+        const querySpecs = discoveryMetadata.querySpecs || discoveryMetadata.projectionPlan?.querySpecs || [];
+        const matchingQuery = querySpecs.find((querySpec: any) => (
+            querySpec.queryId === override.targetId
+            || querySpec.widgetId === override.targetId
+        ));
+        const normalizedOverride = matchingQuery && override.targetType === 'query'
+            ? { ...override, targetId: matchingQuery.widgetId }
+            : override;
+
+        return this.decisionOverrideService.applyOverrideToQueryConfigs(queryConfigs, normalizedOverride);
+    }
+
+    private rewardForAction(action: ParrotSentinelFeedbackEvent['action']): number {
+        switch (action) {
+            case 'accept':
+            case 'execute':
+                return 1;
+            case 'edit':
+            case 'override':
+                return 0.4;
+            case 'reject':
+            case 'dismiss':
+                return -0.6;
+            case 'view':
+            default:
+                return 0.1;
+        }
     }
 
     private buildStorageConfig(body: Record<string, any>): ObjectStorageConfig | undefined {

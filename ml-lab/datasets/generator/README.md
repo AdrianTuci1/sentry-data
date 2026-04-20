@@ -24,3 +24,20 @@ Din `ml-lab/`:
 ```bash
 python3 -m datasets.generator --output-dir datasets/training_bundle --rows-per-source 240
 ```
+
+## Gemini synthetic datasets
+
+Pentru varietate controlata de LLM, fara dependinte Python extra:
+
+```bash
+GEMINI_API_KEY=<key> \
+GEMINI_MODEL=gemini-2.5-flash \
+python3 ml-lab/datasets/generator/gemini_synthetic.py \
+  --domain omnichannel_commerce \
+  --sources orders,web_sessions,ad_spend,support_tickets \
+  --rows-per-source 80 \
+  --variety stress \
+  --output-dir ml-lab/datasets/gemini_synthetic/commerce_stress
+```
+
+Modelul este configurabil prin `GEMINI_MODEL`, deci poate fi schimbat la `gemini-3.1-flash` daca acel cod de model exista in contul/API-ul folosit. Scriptul scrie CSV, JSONL si `manifest.json`.

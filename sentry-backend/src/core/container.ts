@@ -35,6 +35,8 @@ import { QueryRegistryService } from '../application/services/QueryRegistryServi
 import { SourceUpdateMonitorService } from '../application/services/SourceUpdateMonitorService';
 import { ConnectorCatalogService } from '../application/services/ConnectorCatalogService';
 import { MLExecutorClient } from '../application/services/MLExecutorClient';
+import { SentinelFeedbackService } from '../application/services/SentinelFeedbackService';
+import { DecisionOverrideService } from '../application/services/DecisionOverrideService';
 import { UserRepository } from '../infrastructure/repositories/UserRepository';
 import { WorkspaceRepository } from '../infrastructure/repositories/WorkspaceRepository';
 import { WorkspaceMembershipRepository } from '../infrastructure/repositories/WorkspaceMembershipRepository';
@@ -96,6 +98,8 @@ export function initContainer() {
     const projectionRegistryService = new ProjectionRegistryService(r2StorageService);
     const queryRegistryService = new QueryRegistryService(r2StorageService);
     const mlExecutorClient = new MLExecutorClient();
+    const sentinelFeedbackService = new SentinelFeedbackService(r2StorageService);
+    const decisionOverrideService = new DecisionOverrideService();
     const modalExecutionProvider = new ModalExecutionProvider();
     const rayDaftExecutionProvider = new RayDaftExecutionProvider();
     const executionPlaneService = new ExecutionPlaneService([
@@ -121,7 +125,8 @@ export function initContainer() {
         workloadPlannerService,
         executionPlaneService,
         projectionRegistryService,
-        queryRegistryService
+        queryRegistryService,
+        sentinelFeedbackService
     );
     
     const runtimeOrchestratorService = new RuntimeOrchestratorService(orchestrationService, sourceRepo);
@@ -146,7 +151,9 @@ export function initContainer() {
         sourceUpdateMonitorService,
         connectorCatalogService,
         controlPlaneService,
-        mlExecutorClient
+        mlExecutorClient,
+        sentinelFeedbackService,
+        decisionOverrideService
     );
 
     const controllers = [
@@ -201,6 +208,8 @@ export function initContainer() {
             projectionRegistryService,
             queryRegistryService,
             mlExecutorClient,
+            sentinelFeedbackService,
+            decisionOverrideService,
             sourceUpdateMonitorService
         }
     };
