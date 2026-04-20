@@ -7,7 +7,7 @@ import modal
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 WORKER_LOCAL_DIR = REPO_ROOT / "sentry-analytics-worker"
-WIDGETS_LOCAL_DIR = REPO_ROOT / "boilerplates" / "widgets"
+WIDGETS_LOCAL_DIR = REPO_ROOT / "r2-system" / "widgets"
 WORKER_REMOTE_DIR = "/root/sentry-analytics-worker"
 WIDGETS_REMOTE_DIR = "/opt/statsparrot/widgets"
 NODE_RUNTIME_DIR = "/opt/statsparrot/node-runtime"

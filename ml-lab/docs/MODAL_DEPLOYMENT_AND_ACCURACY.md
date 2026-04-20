@@ -1,32 +1,28 @@
 # Modal Deployment And Accuracy Guide
 
-Acest document descrie cum se poate face deploy pentru training, testare si inference pe Modal, plecand de la codul existent in repo, si ce merita ajustat pentru a creste precizia modelelor si a recomandarilor generate de agenti.
-
-Ghidul combina:
-- implementarea reala din repo;
-- conventiile deja folosite de backend;
-- recomandarile oficiale Modal pentru `modal deploy`, `modal serve`, Secrets, Volumes si web endpoints.
+Acest document descrie runtime-ul Modal curent, fara managerul agentic vechi. `modal_executor.py` ramane doar un scaffold de compatibilitate: nu mai incarca task templates, nu mai ruleaza prompturi vechi si nu mai forteaza agentii sa execute cod generat din `boilerplates`.
 
 ## Ce exista acum in repo
 
 | Flux | Fisier | Rol | Stare actuala |
 | --- | --- | --- | --- |
-| Agent sandbox execution | `modal_executor.py` | expune un endpoint FastAPI pe Modal care ruleaza `agent_manager.py` in containere efemere | implementat |
-| Training Sentinel | `ml-lab/modal_training.py` | antreneaza modelul LSTM si scrie checkpoint-uri intr-un Volume Modal | implementat |
-| Sentinel API local | `ml-lab/main.py` | FastAPI local pentru evaluarea nodurilor si injectarea de goal-uri | implementat local, nu este inca wrap-uit in Modal |
-| Inference prin backend | `sentry-backend/src/infrastructure/providers/ModalInferenceProvider.ts` | backend-ul stie sa cheme endpoint-uri Modal per model | provider implementat, dar un app dedicat de inference nu este inca versionat in repo |
+| Analytics Worker | `modal_apps/analytics_worker.py` | executa query-uri aprobate si citeste catalogul de widget-uri din `r2-system/widgets` | activ |
+| PNE | `modal_apps/pne.py` | compileaza planuri de proiectii si scoruri de executie folosind prompturi runtime | activ |
+| Sentinel | `modal_apps/sentinel.py` | evalueaza runtime-ul, riscul de query, drift-ul si guardrails de executie | activ |
+| ML Executor | `modal_apps/ml_executor.py` | lanseaza fluxuri ML aprobate si executa job-uri controlate | activ |
+| Runtime scaffold | `modal_apps/executor.py` / `modal_executor.py` | returneaza explicit ca managerul vechi a fost eliminat | compatibilitate |
+| Training Sentinel | `ml-lab/modal_training.py` | antreneaza modelul LSTM si scrie checkpoint-uri intr-un Volume Modal | activ |
 
-## Observatie importanta despre arhitectura curenta
+## Sursa runtime canonica
 
-Astazi exista doua moduri realiste de rulare pe Modal:
+`r2-system` inlocuieste directorul vechi `boilerplates`.
 
-1. `sandbox execution`
-Backend-ul trimite task-uri catre `modal_executor.py`, iar acolo un agent genereaza sau executa scripturile Python in container.
+- `r2-system/widgets/` contine catalogul, indexul si manifestele pentru widget discovery.
+- `r2-system/prompts/runtime/` contine prompturile citite de PNE si Sentinel.
+- `r2-system/scaffolds/modal/` contine contracte JSON pentru payload-uri Modal, nu cod care trebuie executat orbeste de agenti.
+- prefixul R2 canonic este `system/r2-system/...`.
 
-2. `training job`
-`ml-lab/modal_training.py` ruleaza ca job remote, foloseste GPU daca este disponibil si salveaza modele / manifesturi in Volume.
-
-Pentru `direct model inference`, backend-ul are deja un provider, dar lipseste inca un fisier dedicat de tip `ml-lab/modal_inference.py` sau echivalent. Din acest motiv, in productie poti porni cu sandbox-based inference si apoi sa separi inference-ul intr-un endpoint dedicat.
+Nu mai exista `agent_manager.py`, task templates Python sau prompturi vechi pentru ETL clasic. Datele raman asa cum intra, iar PNE construieste proiectii versionate peste ele.
 
 ## Preconditii
 
@@ -37,16 +33,15 @@ pip install modal
 modal setup
 ```
 
-Resurse si credențiale necesare:
+Resurse si credentiale necesare:
 
-- un workspace Modal activ;
+- workspace Modal activ;
 - secrete pentru R2 sau S3 compatibil;
-- cheia LLM folosita de `agent_manager.py` daca vrei task-uri agentice;
-- variabile backend pentru selectarea providerului Modal.
+- `INTERNAL_API_SECRET` pentru apeluri backend <-> Modal;
+- cheia LLM folosita de PNE/Sentinel, daca prompturile runtime sunt executate cu model extern;
+- variabile backend pentru endpoint-urile Modal.
 
 ## Secrets recomandate in Modal
-
-`modal_executor.py` foloseste `modal.Secret.from_name("sentry-r2-secrets")`, deci secretul ar trebui sa includa cel putin:
 
 ```bash
 modal secret create sentry-r2-secrets \
@@ -58,24 +53,19 @@ modal secret create sentry-r2-secrets \
   R2_BUCKET=statsparrot-data \
   R2_BUCKET_DATA=statsparrot-data \
   GEMINI_API_KEY=<gemini_key> \
-  AGENT_MODEL=gemini-2.0-flash-exp
+  AGENT_MODEL=gemini-3.1-flash \
+  INTERNAL_API_SECRET=<shared_secret>
 ```
 
-Daca vrei sa porti si alte credențiale in containerele Modal, secretul poate include si:
-
-- `OPENAI_API_KEY`
-- `ANTHROPIC_API_KEY`
-- `AWS_ACCESS_KEY_ID`
-- `AWS_SECRET_ACCESS_KEY`
+Secretul poate include si chei pentru alti provideri, dar fluxurile runtime trebuie sa ramana controlate prin PNE, Sentinel, Analytics Worker si ML Executor.
 
 ## Variabile pentru backend
 
-In backend, Modal este activat prin `.env`:
-
 ```bash
-SANDBOX_PROVIDER=modal
-MODAL_TOKEN_ID=<modal_token_id>
-MODAL_TOKEN_SECRET=<modal_token_secret>
+PNE_API_URL=https://<workspace>--statsparrot-pne-fastapi-app.modal.run
+SENTINEL_API_URL=https://<workspace>--statsparrot-sentinel-fastapi-app.modal.run
+ML_EXECUTOR_API_URL=https://<workspace>--statsparrot-ml-executor-fastapi-app.modal.run
+INTERNAL_API_SECRET=<shared_secret>
 R2_ENDPOINT=https://<account>.r2.cloudflarestorage.com
 R2_ACCESS_KEY_ID=<key>
 R2_SECRET_ACCESS_KEY=<secret>
@@ -83,85 +73,41 @@ R2_REGION=auto
 R2_BUCKET_DATA=statsparrot-data
 ```
 
-## Deploy pentru sandbox execution
+## Deploy pentru runtime
 
-Acesta este fluxul folosit cand backend-ul vrea sa ruleze task-uri precum `ML_Architect`, `ML_Trainer`, `ML_Inference` sau `Query_Generator_V2` in containere efemere.
-
-### Development
+Deploy-ul se face explicit per app:
 
 ```bash
-modal serve modal_executor.py
+modal deploy modal_analytics_worker.py
+modal deploy modal_pne.py
+modal deploy modal_sentinel.py
+modal deploy modal_ml_executor.py
 ```
 
-Cand rulezi cu `modal serve`, endpoint-ul este servit cu hot reload. Conform documentatiei Modal, URL-ul de dev primeste in mod normal un sufix dedicat de development.
-
-### Production
-
-```bash
-modal deploy modal_executor.py
-```
-
-Ce face efectiv:
-- construieste imaginea;
-- injecteaza secretul `sentry-r2-secrets`;
-- expune endpoint-ul FastAPI definit prin `@modal.fastapi_endpoint(method="POST")`.
-
-### Cum este legat de backend
-
-`ModalSandboxProvider` posteaza catre un URL fix:
-
-- `https://adrian-tucicovenco--sentry-sandbox-executor-sandbox-executor.modal.run`
-
-Daca schimbi workspace-ul, numele app-ului sau eticheta endpoint-ului, trebuie actualizat si URL-ul din provider.
+`modal deploy modal_executor.py` este optional si ar trebui folosit doar daca ai nevoie de endpoint-ul de compatibilitate care semnaleaza eliminarea managerului vechi.
 
 ## Deploy pentru training
 
-### Ce antreneaza acum
-
 `ml-lab/modal_training.py`:
+
 - construieste o imagine separata pentru PyTorch si ML;
 - monteaza Volume-ul `sentinel-ml-checkpoints`;
 - antreneaza `LSTMDriftModel`;
 - genereaza un `gold_manifest.json`;
 - scrie checkpoint-urile in `/checkpoints`.
 
-### Lansare
+Lansare:
 
 ```bash
 modal run ml-lab/modal_training.py
 ```
 
-### Ce merita verificat dupa run
-
-Volume-ul Modal:
-
-```bash
-modal volume ls sentinel-ml-checkpoints /
-```
-
-Sau descarcare locala:
-
-```bash
-modal volume get sentinel-ml-checkpoints / .
-```
-
 Artefacte asteptate:
+
 - `drift_lstm.pth`
 - `gold_manifest.json`
 
-### Recomandare
-
-Pentru productie, checkpoint-urile ar trebui versiunate separat pe:
-- `latest`
-- `candidate`
-- `rollback`
-
-si insotite de metadata cu:
-- dataset version;
-- feature version;
-- target variable;
-- scoruri de evaluare;
-- timestamp si commit SHA.
+Pentru productie, checkpoint-urile ar trebui versiunate pe `latest`, `candidate` si `rollback`, cu metadata pentru dataset version, feature version, target variable, scoruri de evaluare, timestamp si commit SHA.
 
 ## Testare recomandata
 
@@ -177,157 +123,84 @@ python3 ml-lab/datasets/generate_bundle.py --output-dir ml-lab/datasets/training
 python3 ml-lab/main.py
 ```
 
-### 3. Test de sandbox in Modal
+### 3. Test pentru runtime Modal
 
-Porneste:
+```bash
+modal serve modal_pne.py
+modal serve modal_sentinel.py
+modal serve modal_ml_executor.py
+```
+
+Trimite payload-uri conforme cu contractele din `r2-system/scaffolds/modal/`.
+
+### 4. Test pentru scaffold-ul de compatibilitate
 
 ```bash
 modal serve modal_executor.py
 ```
 
-Apoi testeaza un POST simplu cu payload de forma:
-
-```json
-{
-  "script": "print('hello from modal')",
-  "sandboxId": "manual-test",
-  "envVars": {
-    "tenantId": "tenant_demo",
-    "projectId": "project_demo",
-    "taskName": "manual_smoke"
-  }
-}
-```
-
-### 4. Test de training remote
-
-Ruleaza:
-
-```bash
-modal run ml-lab/modal_training.py
-```
-
-si verifica daca Volume-ul contine noile artefacte.
-
-## Direct model inference: ce lipseste si cum sa il gandesti
-
-`ModalInferenceProvider` este deja gata sa apeleze endpoint-uri de forma:
-
-- `https://<workspace>--<modelName>.modal.run`
-
-Dar un app dedicat pentru inference nu este inca versionat in repo. Din acest motiv, exista doua optiuni:
-
-1. Varianta rapida
-Continui sa rulezi inference-ul ca task agentic prin `modal_executor.py`.
-
-2. Varianta buna pentru productie
-Adaugi un app separat, de exemplu `ml-lab/modal_inference.py`, care:
-- monteaza Volume-ul cu modele;
-- face `volume.reload()` inainte sa citeasca artefactele active;
-- expune endpoint-uri stabile pentru fiecare model sau pentru un router generic;
-- intoarce payload-uri simple si predictibile pentru backend.
-
-## Observatie importanta despre autentificare
-
-In codul curent, providerii backend trimit header de forma:
-
-- `Authorization: Bearer <MODAL_TOKEN_ID>:<MODAL_TOKEN_SECRET>`
-
-Acest comportament este o conventie interna si nu este acelasi lucru cu proxy auth-ul oficial Modal. Din documentatia oficiala Modal, pentru proxy auth este preferata schema cu:
-
-- `Modal-Key`
-- `Modal-Secret`
-
-sau o validare custom de Bearer token in endpoint-ul FastAPI.
-
-Pentru productie, merita sa alegi una dintre variante si sa o faci explicita:
-
-1. proxy auth oficial Modal;
-2. custom bearer auth validat in endpoint;
-3. acces restrans doar din backend privat plus secret de aplicatie.
+Endpoint-ul trebuie sa intoarca `deprecated_agent_manager_removed`, nu sa execute task-uri.
 
 ## Ce sa ajustezi pentru precizie mai buna
 
 ### 1. Date si etichete
 
-Impact mare:
-
 - adauga source packs dedicate pentru banking si enterprise BI;
-- separa clar train, validation si holdout pe timp, nu aleator;
+- separa train, validation si holdout pe timp, nu aleator;
 - evita target leakage in mixed-source joins;
-- pune semnale de business si tehnice in acelasi feature store doar dupa normalizare unitara.
+- pastreaza semnalele brute si descrie proiectiile, nu transforma datele in loc.
 
-### 2. Granularitate si ferestre temporale
+### 2. Proiectii si versionare
 
-In `RNNDriftPredictor`, `sequence_length` si pragul de drift sunt globale. Pentru productie, mai bine:
+- fiecare proiectie trebuie sa aiba `projection_id`, `projection_version`, `source_fingerprint`, `schema_fingerprint` si `query_fingerprint`;
+- Sentinel invalideaza doar cache-urile afectate de schimbari reale;
+- Analytics Worker poate reutiliza rezultate materializate cand fingerprint-urile sunt stabile.
 
-- secvente diferite pe domenii;
-- praguri diferite pe field families;
-- ferestre distincte pentru daily, hourly si weekly.
-
-### 3. Hyperparametri
-
-Zone utile de tuning:
-
-- `epochs` si `lr` din `ml-lab/modal_training.py`;
-- `hidden_size`, `num_layers`, `sequence_length` si `threshold` din `ml-lab/models/predictive_drift.py`;
-- `ANOMALY_THRESHOLD` si `DRIFT_THRESHOLD` din `ml-lab/core/config.py`.
-
-### 4. Feature engineering
-
-Creste precizia daca:
-
-- faci features per rol semantic, nu doar per nume de coloana;
-- introduci lag-uri, rolling windows si rate normalizate per sursa;
-- pastrezi `field_specs.json` ca sursa de adevar pentru unitati, validari si widget hints.
-
-### 5. Mixed-source confidence
-
-Cand proiectul amesteca surse:
+### 3. Mixed-source confidence
 
 - calculeaza explicit `join confidence`;
-- propagheaza lipsurile de acoperire in metadata;
-- evita sa arati forecast-uri foarte sigure peste join-uri slabe.
+- propaga lipsurile de acoperire in metadata;
+- evita forecast-uri foarte sigure peste join-uri slabe.
 
-### 6. Evaluare si recalibrare
-
-Nu te baza doar pe un singur scor de eroare:
+### 4. Evaluare si recalibrare
 
 - regresie: MAE, RMSE, MAPE;
 - clasificare: precision, recall, AUC, calibration;
 - clustering: silhouette, stability, cluster drift;
 - recomandare de widget-uri: acceptance rate, expansion rate, user re-open rate.
 
-### 7. RL si adaptare colectiva
-
-Pentru componenta RL:
+### 5. RL si adaptare colectiva
 
 - foloseste feedback explicit si implicit;
 - separa reward pe `overview`, `diagnostic`, `predictive`;
-- ajusteaza pe field, nu doar pe widget;
-- cere un minim de useri per cluster inainte de schimbari globale.
+- ajusteaza pe field si pe proiectie, nu doar pe widget;
+- cere un minim de useri per cluster inainte de schimbari globale;
+- trateaza override-urile userilor ca preferinte versionate, nu ca invalidari automate.
 
 ## Configuratie recomandata pe etape
 
 ### Etapa 1: validare tehnica
 
-- `modal serve modal_executor.py`
+- `modal serve modal_pne.py`
+- `modal serve modal_sentinel.py`
 - training remote cu date sintetice
-- inference prin sandbox
+- ML executor cu aprobari manuale
 
 ### Etapa 2: pilot intern
 
-- `modal deploy modal_executor.py`
+- `modal deploy modal_pne.py`
+- `modal deploy modal_sentinel.py`
+- `modal deploy modal_analytics_worker.py`
+- `modal deploy modal_ml_executor.py`
 - training versionat in Volume
-- un endpoint dedicat de inference pentru modelul principal
 
 ### Etapa 3: productie
 
-- endpoint-uri separate pentru training orchestration si inference;
+- endpoint-uri separate pentru PNE, Sentinel, analytics si ML;
 - proxy auth sau auth custom clar;
-- Volume pentru checkpoint-uri si model registry;
+- model registry pentru checkpoint-uri;
 - versionare si rollback pe modele;
-- evaluare continua cu retraining conditionat de drift si reward.
+- observabilitate continua cu retraining conditionat de drift si reward.
 
 ## Surse oficiale Modal utile
 
@@ -339,8 +212,4 @@ Pentru componenta RL:
 
 ## Concluzie operationala
 
-Pentru starea actuala a repo-ului, cea mai solida ruta este:
-
-1. folosesti `modal_executor.py` pentru task-uri agentice si inference orchestrat;
-2. folosesti `ml-lab/modal_training.py` pentru training si checkpointing;
-3. adaugi ulterior un endpoint dedicat de inference, dupa ce ai stabilizat schema de artefacte si model registry-ul.
+Ruta curenta este: PNE compileaza proiectii versionate, Sentinel decide invalidari si guardrails, Analytics Worker executa query-uri aprobate, iar ML Executor porneste fluxuri ML cu aprobare. `modal_executor.py` nu mai este un runtime agentic.

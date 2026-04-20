@@ -1,0 +1,29 @@
+{
+  "contract": "sentinel_runtime_evaluation",
+  "version": 1,
+  "service": "statsparrot-sentinel",
+  "input": {
+    "source_profiles": "ParrotSourceProfile[]",
+    "previous_projection_registry": "ProjectionRegistryDocument?",
+    "invalidated_sources": "string[]",
+    "query_specs": "ParrotQuerySpec[]",
+    "ml_recommendations": "ParrotMLRecommendation[]",
+    "policy_state": "ParrotInteractionPolicyState?"
+  },
+  "output": {
+    "invalidation_hints": "ParrotInvalidationHint[]",
+    "sentinel_model_signals": "ParrotSentinelModelSignal[]"
+  },
+  "models": [
+    "CoverageRanker",
+    "DriftClassifier",
+    "QueryRiskModel",
+    "InteractionPolicyModel"
+  ],
+  "rules": [
+    "Do not invalidate user overrides unless they are nonfunctional or unsafe.",
+    "Warn before execution when risk is recoverable.",
+    "Feedback learning is metadata-only and cohort-safe.",
+    "Raw rows are never stored in policy state."
+  ]
+}

@@ -10,7 +10,7 @@ from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
 
 
-PROMPT_DIR = "/root/parrot-prompts"
+PROMPT_DIR = "/root/r2-system/prompts/runtime"
 TRANSLATOR_VERSION = "pne-modal-v1"
 INTERNAL_SECRET = os.getenv("INTERNAL_API_SECRET", "secret")
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -18,7 +18,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 image = (
     modal.Image.debian_slim()
     .pip_install("fastapi[standard]", "pydantic", "duckdb", "pyyaml")
-    .add_local_dir(str(REPO_ROOT / "parrot-prompts"), remote_path=PROMPT_DIR)
+    .add_local_dir(str(REPO_ROOT / "r2-system" / "prompts" / "runtime"), remote_path=PROMPT_DIR)
 )
 
 app = modal.App("statsparrot-pne")

@@ -5,7 +5,7 @@ Acest document descrie ce tipuri de vizualizari poate genera platforma in functi
 Documentul este aliniat cu:
 - bundle-ul de antrenare din `ml-lab/datasets/training_bundle/metadata/`;
 - catalogul de widget-uri sintetice de antrenare cu 44 de widget-uri;
-- componentele UI deja existente in `boilerplates/widgets/`.
+- componentele UI deja existente in `r2-system/widgets/`.
 
 ## Cum alege sistemul vizualizarile
 

@@ -2,7 +2,7 @@ import { WidgetDefinition } from '../services/WidgetService';
 
 /**
  * SDUIHydrator dynamically maps raw SQL results to React props
- * based on the YAML definitions in boilerplates/config/widgets.
+ * based on the YAML definitions in r2-system/widgets.
  */
 export class SDUIHydrator {
     /**

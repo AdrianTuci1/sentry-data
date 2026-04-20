@@ -4,7 +4,7 @@ set -euo pipefail
 
 MODAL_BIN="${MODAL_BIN:-modal}"
 APPS=(
-  "sentry-sandbox-executor"
+  "statsparrot-runtime-scaffold"
   "statsparrot-analytics-worker"
   "statsparrot-pne"
   "statsparrot-sentinel"

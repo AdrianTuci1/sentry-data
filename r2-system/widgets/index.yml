@@ -1,5 +1,5 @@
 version: 1
-source_of_truth: "boilerplates/widgets/index.js"
+source_of_truth: "r2-system/widgets/index.js"
 widget_count: 51
 widgets:
   metric-trend:

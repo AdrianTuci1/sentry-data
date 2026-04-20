@@ -12,8 +12,8 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@widgets': path.resolve(__dirname, '../boilerplates/widgets'),
-      '@graphics': path.resolve(__dirname, '../boilerplates/widgets/micrographics'),
+      '@widgets': path.resolve(__dirname, '../r2-system/widgets'),
+      '@graphics': path.resolve(__dirname, '../r2-system/widgets/micrographics'),
       'react': path.resolve(__dirname, 'node_modules/react'),
       'react-dom': path.resolve(__dirname, 'node_modules/react-dom')
     }
@@ -22,7 +22,7 @@ export default defineConfig({
     fs: {
       allow: [
         '.',
-        path.resolve(__dirname, '../boilerplates/widgets')
+        path.resolve(__dirname, '../r2-system/widgets')
       ]
     }
   }

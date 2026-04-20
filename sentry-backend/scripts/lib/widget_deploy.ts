@@ -13,9 +13,9 @@ interface DeployWidgetsOptions {
 }
 
 const REPO_ROOT = path.resolve(__dirname, '../../..');
-const WIDGETS_LOCAL_DIR = path.join(REPO_ROOT, 'boilerplates', 'widgets');
+const WIDGETS_LOCAL_DIR = path.join(REPO_ROOT, 'r2-system', 'widgets');
 const WIDGET_ARTIFACT_SCRIPT = path.join(WIDGETS_LOCAL_DIR, 'generate-artifacts.mjs');
-const WIDGETS_BUCKET_PREFIX = 'system/boilerplates/widgets';
+const WIDGETS_BUCKET_PREFIX = 'system/r2-system/widgets';
 
 function detectContentType(filePath: string): string {
     const extension = path.extname(filePath).toLowerCase();

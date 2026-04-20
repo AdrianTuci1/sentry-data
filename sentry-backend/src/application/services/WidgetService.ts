@@ -24,7 +24,7 @@ export interface WidgetDefinition {
  * Now fetches everything from R2 storage.
  */
 export class WidgetService {
-    private r2Prefix = 'system/boilerplates/widgets/';
+    private r2Prefix = 'system/r2-system/widgets/';
     private cache: Map<string, WidgetDefinition> = new Map();
     private catalogPromise: Promise<void> | null = null;
 
@@ -49,7 +49,7 @@ export class WidgetService {
         this.catalogPromise = (async () => {
             console.log('[WidgetService] Populating widget cache using FLAT DISCOVERY...');
             try {
-                // Flat listing of EVERYTHING under system/boilerplates/widgets/
+                // Flat listing of EVERYTHING under system/r2-system/widgets/
                 const allKeys = await this.r2Storage.listAllUnder(this.r2Prefix);
                 
                 // We search for manifests: .../widgets/{category}/{id}/manifest.yml

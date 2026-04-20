@@ -36,14 +36,14 @@ const writeYamlFile = async (relativePath, value) => {
 
 const buildCatalogPayload = () => ({
     version: 1,
-    source_of_truth: 'boilerplates/widgets/index.js',
+    source_of_truth: 'r2-system/widgets/index.js',
     widget_count: widgetManifestIndex.length,
     widgets: widgetCatalogMap,
 });
 
 const buildIndexPayload = () => ({
     version: 1,
-    source_of_truth: 'boilerplates/widgets/index.js',
+    source_of_truth: 'r2-system/widgets/index.js',
     widget_count: widgetManifestIndex.length,
     widgets: Object.fromEntries(widgetManifestIndex.map((widget) => [
         widget.id,

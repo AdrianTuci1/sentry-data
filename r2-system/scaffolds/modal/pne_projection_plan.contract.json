@@ -1,0 +1,32 @@
+{
+  "contract": "pne_projection_plan",
+  "version": 1,
+  "service": "statsparrot-pne",
+  "input": {
+    "runtime_state": {
+      "tenantId": "string",
+      "projectId": "string",
+      "requestId": "string",
+      "sourceProfiles": "ParrotSourceProfile[]",
+      "previousProjectionRegistry": "ProjectionRegistryDocument?",
+      "previousQueryRegistry": "QueryRegistryDocument?",
+      "invalidationHints": "ParrotInvalidationHint[]",
+      "sentinelPolicyState": "ParrotInteractionPolicyState?"
+    }
+  },
+  "output": {
+    "projection_plan": {
+      "projectionSpecs": "ParrotProjectionSpec[]",
+      "querySpecs": "ParrotQuerySpec[]",
+      "mlRecommendations": "ParrotMLRecommendation[]",
+      "coverage": "coverage matrix",
+      "invalidationHints": "ParrotInvalidationHint[]"
+    }
+  },
+  "rules": [
+    "Never mutate raw data.",
+    "Projections are versioned logical views over raw source URIs.",
+    "Query specs must carry inputFingerprint and queryHash.",
+    "ML recommendations are manual approval only."
+  ]
+}

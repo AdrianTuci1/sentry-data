@@ -35,7 +35,7 @@ Each layer has a different purpose.
 
 ### 1. `index.yml` is the lookup layer
 
-Use [index.yml](/Users/adriantucicovenco/Proiecte/sentry-data/boilerplates/widgets/index.yml) for cheap resolution:
+Use [index.yml](/Users/adriantucicovenco/Proiecte/sentry-data/r2-system/widgets/index.yml) for cheap resolution:
 
 - alias -> canonical widget id
 - runtime type -> canonical widget id
@@ -52,7 +52,7 @@ Example:
 
 ### 2. `catalog.yml` is the shortlist layer
 
-Use [catalog.yml](/Users/adriantucicovenco/Proiecte/sentry-data/boilerplates/widgets/catalog.yml) to rank a small set of candidates.
+Use [catalog.yml](/Users/adriantucicovenco/Proiecte/sentry-data/r2-system/widgets/catalog.yml) to rank a small set of candidates.
 
 Each entry contains only lightweight decision metadata:
 
@@ -175,14 +175,12 @@ That is accurate but expensive.
 
 We already have the right building blocks:
 
-- [index.js](/Users/adriantucicovenco/Proiecte/sentry-data/boilerplates/widgets/index.js)
+- [index.js](/Users/adriantucicovenco/Proiecte/sentry-data/r2-system/widgets/index.js)
   Exports the canonical widget inventory and lookup helpers.
-- [catalog.yml](/Users/adriantucicovenco/Proiecte/sentry-data/boilerplates/widgets/catalog.yml)
+- [catalog.yml](/Users/adriantucicovenco/Proiecte/sentry-data/r2-system/widgets/catalog.yml)
   Stores lightweight catalog metadata per widget.
-- [index.yml](/Users/adriantucicovenco/Proiecte/sentry-data/boilerplates/widgets/index.yml)
+- [index.yml](/Users/adriantucicovenco/Proiecte/sentry-data/r2-system/widgets/index.yml)
   Stores lookup tables for aliases, runtime types, component ids and manifest paths.
-- [query_generator.py](/Users/adriantucicovenco/Proiecte/sentry-data/boilerplates/tasks/query_generator.py)
-  Already knows how to resolve selected widgets through `catalog.yml` and `index.yml`.
 
 ## Recommended Runtime Pattern
 

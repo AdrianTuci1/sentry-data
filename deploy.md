@@ -89,11 +89,11 @@ npm run deploy:widgets
 
 Ce face:
 
-1. ruleaza [generate-artifacts.mjs](/Users/adriantucicovenco/Proiecte/sentry-data/boilerplates/widgets/generate-artifacts.mjs);
-2. urca exclusiv continutul din [boilerplates/widgets](/Users/adriantucicovenco/Proiecte/sentry-data/boilerplates/widgets) in:
+1. ruleaza [generate-artifacts.mjs](/Users/adriantucicovenco/Proiecte/sentry-data/r2-system/widgets/generate-artifacts.mjs);
+2. urca exclusiv continutul din [r2-system/widgets](/Users/adriantucicovenco/Proiecte/sentry-data/r2-system/widgets) in:
 
 ```text
-system/boilerplates/widgets/...
+system/r2-system/widgets/...
 ```
 
 Acesta este singurul deploy necesar pentru discovery-ul de widgets.
@@ -329,7 +329,7 @@ tenants/<tenantId>/projects/<projectId>/runtime/requests/<request-id>/mindmap.ya
 Widget discovery catalog:
 
 ```text
-system/boilerplates/widgets/<category>/<widget>/...
+system/r2-system/widgets/<category>/<widget>/...
 ```
 
 ## 8. Modal
@@ -341,8 +341,9 @@ modal deploy modal_analytics_worker.py
 modal deploy modal_pne.py
 modal deploy modal_sentinel.py
 modal deploy modal_ml_executor.py
-modal deploy modal_executor.py
 ```
+
+[modal_executor.py](/Users/adriantucicovenco/Proiecte/sentry-data/modal_executor.py) este pastrat doar ca scaffold de compatibilitate. Nu mai ruleaza managerul agentic vechi si nu trebuie folosit ca runtime pentru transformari sau query-uri.
 
 Pentru oprire exista in continuare:
 

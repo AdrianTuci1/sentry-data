@@ -9,7 +9,7 @@ import { config } from '../../config';
  * It dynamically loads components from R2 and transforms them for browser consumption.
  */
 export class WidgetRenderer {
-    private r2Prefix = 'system/boilerplates/widgets/';
+    private r2Prefix = 'system/r2-system/widgets/';
 
     constructor(private r2Storage: R2StorageService) {}
 
