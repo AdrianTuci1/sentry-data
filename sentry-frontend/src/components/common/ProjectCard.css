@@ -25,29 +25,29 @@
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
 }
 
-.theme-weather {
-    background: linear-gradient(135deg, #FF0044 0%, #7B00FF 100%);
+.project-card.theme-weather {
+    background: linear-gradient(180deg, #181B1E 0%, #101214 100%);
 }
 
-.theme-natural {
-    background: linear-gradient(135deg, #B2FF59 0%, #7CB342 100%);
-    color: #1a1a1a;
+.project-card.theme-natural {
+    background: linear-gradient(180deg, #181B1E 0%, #101214 100%);
+    color: #fff;
 }
 
-.theme-wind {
-    background: linear-gradient(135deg, #c7d2fe 0%, #4338ca 100%);
+.project-card.theme-wind {
+    background: linear-gradient(180deg, #181B1E 0%, #101214 100%);
 }
 
-.theme-color {
-    background: linear-gradient(135deg, #6EE7B7 0%, #047857 100%);
+.project-card.theme-color {
+    background: linear-gradient(180deg, #181B1E 0%, #101214 100%);
 }
 
-.theme-red {
-    background: linear-gradient(135deg, #FDA4AF 0%, #BE123C 100%);
+.project-card.theme-red {
+    background: linear-gradient(180deg, #181B1E 0%, #101214 100%);
 }
 
-.theme-light {
-    background: linear-gradient(135deg, #A1887F 0%, #5D4037 100%);
+.project-card.theme-light {
+    background: linear-gradient(180deg, #181B1E 0%, #101214 100%);
 }
 
 .project-card-header {
@@ -187,16 +187,85 @@
 /* Micro Graphics Layer */
 .project-card-graphic {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
+    inset: 5.55rem 1.25rem 4.95rem;
+    pointer-events: auto;
     z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.project-card-widget-frame {
+    width: min(100%, 13rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.project-card-widget-square {
+    width: min(100%, 10.5rem);
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.project-card-widget-square > * {
+    width: 100%;
+    height: 100%;
+}
+
+.project-card-widget-caption {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    text-align: center;
+}
+
+.project-card-widget-caption span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0;
+}
+
+.project-card-widget-caption p {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    margin: 0;
+    overflow: hidden;
+    color: currentColor;
+    font-size: 0.7rem;
+    line-height: 1.25;
+    opacity: 0.72;
+}
+
+.project-card-widget-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(100%, 13rem);
+    aspect-ratio: 1 / 1;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.82rem;
+    font-weight: 650;
+    text-align: center;
+}
+
+@media (max-width: 500px) {
+    .project-card-graphic {
+        inset: 4.55rem 0.75rem 4.05rem;
+    }
+
+    .project-card-widget-square {
+        width: min(100%, 8rem);
+    }
 }
 
 /* Weather */

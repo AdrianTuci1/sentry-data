@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 
 import { RingSummaryMicro } from '../../../../sentry-frontend/src/components/visuals/micrographics/DashboardMicros'
 import anywhereLogo from '../../assets/output/anywhere.png'
-import logo from '../../assets/pyramid/parrot-white.png'
+import logo from '../../assets/logo-html.png'
 import hubspotLogo from '../../assets/output/hubspot.png'
 import metaLogo from '../../assets/output/meta.png'
 import neuralLogo from '../../assets/pyramid/neural.png'

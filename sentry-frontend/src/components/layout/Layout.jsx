@@ -5,6 +5,7 @@ import { observer } from 'mobx-react-lite';
 import { useStore } from '../../store/StoreProvider';
 import GlobalNav from './GlobalNav';
 import RecommendationsMenu from './RecommendationsMenu';
+import FeatureMindMapOverlay from './FeatureMindMapOverlay';
 import ProjectEditorOverlay from '../common/ProjectEditorOverlay';
 import InviteMember from '../common/InviteMember';
 import './FloatingNav.css';
@@ -256,6 +257,8 @@ const Layout = observer(() => {
                 isOpen={dockStore.isRecommendationsOpen}
                 onClose={() => dockStore.setRecommendationsOpen(false)}
             />
+
+            <FeatureMindMapOverlay />
 
             <ProjectEditorOverlay
                 isOpen={dockStore.projectEditor.isOpen}

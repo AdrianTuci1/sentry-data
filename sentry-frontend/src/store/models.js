@@ -9,6 +9,8 @@ export class Project {
     models = 0;
     members = [];
     viewLink = '';
+    viewLinkDisabled = false;
+    cardWidgetId = '';
 
     constructor(data) {
         makeAutoObservable(this);
@@ -31,6 +33,8 @@ export class Project {
             }))
             : this.members;
         this.viewLink = data.viewLink ?? this.viewLink;
+        this.viewLinkDisabled = data.viewLinkDisabled ?? this.viewLinkDisabled;
+        this.cardWidgetId = data.cardWidgetId ?? this.cardWidgetId;
     }
 }
 

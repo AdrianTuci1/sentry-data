@@ -1,54 +1,7 @@
 import React from 'react';
 import './ProjectCard.css';
 import { ChevronRight, Pencil, Share2, Users } from 'lucide-react';
-
-const renderMicroGraphic = (type) => {
-    switch (type) {
-        case 'weather':
-            return (
-                <div className="micro-weather">
-                    <span className="weather-temp">29&deg;</span>
-                    <div className="weather-lines">
-                        <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-                    </div>
-                </div>
-            );
-        case 'natural':
-            return (
-                <div className="micro-natural">
-                    <span className="natural-val">75<small style={{ fontSize: '1.5rem' }}>%</small></span>
-                    <div className="natural-slider"></div>
-                </div>
-            );
-        case 'wind':
-            return (
-                <div className="micro-wind">
-                    <span className="wind-val">07</span>
-                    <div className="wind-orb"></div>
-                </div>
-            );
-        case 'color':
-            return (
-                <div className="micro-color">
-                    <div className="color-knob"></div>
-                </div>
-            );
-        case 'red':
-            return (
-                <div className="micro-red">
-                    <div className="bar"></div>
-                </div>
-            );
-        case 'light':
-            return (
-                <div className="micro-light">
-                    <span className="light-val">75 lx</span>
-                </div>
-            );
-        default:
-            return null;
-    }
-};
+import { ProjectCardWidget } from './ProjectCardWidget';
 
 const ProjectCard = ({ project, onClick, onEdit, onShare, graphicType }) => {
     return (
@@ -85,7 +38,10 @@ const ProjectCard = ({ project, onClick, onEdit, onShare, graphicType }) => {
             </div>
 
             <div className="project-card-graphic">
-                {renderMicroGraphic(graphicType)}
+                <ProjectCardWidget
+                    projectId={project.id}
+                    widgetId={project.cardWidgetId}
+                />
             </div>
 
             <div className="project-card-footer">

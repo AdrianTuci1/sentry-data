@@ -1,4 +1,4 @@
-import { makeAutoObservable } from 'mobx';
+import { makeAutoObservable, observable } from 'mobx';
 
 export class UIStore {
     rootStore;
@@ -10,10 +10,14 @@ export class UIStore {
     lastMousePos = { x: 0, y: 0 };
     selectedItems = new Set();
     acceptedRecommendations = new Set();
+    activeMindMapStore = null;
 
     constructor(rootStore) {
         this.rootStore = rootStore;
-        makeAutoObservable(this);
+        makeAutoObservable(this, {
+            rootStore: false,
+            activeMindMapStore: observable.ref
+        });
     }
 
     setActiveTab(tab) {
@@ -71,6 +75,16 @@ export class UIStore {
 
     resetRecommendations() {
         this.acceptedRecommendations = new Set();
+    }
+
+    setActiveMindMapStore(store) {
+        this.activeMindMapStore = store;
+    }
+
+    clearActiveMindMapStore(store) {
+        if (!store || this.activeMindMapStore === store) {
+            this.activeMindMapStore = null;
+        }
     }
 
     initializeSelection(data) {

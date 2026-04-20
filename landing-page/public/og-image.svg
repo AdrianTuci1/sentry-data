@@ -1,0 +1,36 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#09090B"/>
+  
+  <!-- Decorative background elements -->
+  <circle cx="1100" cy="530" r="300" fill="url(#paint0_radial)" fill-opacity="0.15"/>
+  <circle cx="100" cy="100" r="200" fill="url(#paint1_radial)" fill-opacity="0.1"/>
+  
+  <!-- Parrot Logo Mark (Now on the left, moved in slightly) -->
+  <g transform="translate(60, 100) scale(1.1)">
+    <path d="M288 215C288 215 298.605 224.818 306.5 229.5C313.492 233.647 325.5 238 325.5 238C325.5 238 318.25 246.436 311 249.5C303.806 252.541 291.5 252.5 291.5 252.5C291.5 252.5 284.138 241.426 283.5 233.5C282.885 225.853 288 215 288 215Z" fill="white"/>
+    <path d="M352 153.5C352 153.5 377.221 189.283 376.5 212.5C375.751 236.602 346.5 259 346.5 259C346.5 259 342.959 244.315 333 234C321.485 222.074 300.161 208.119 292.954 203.54C291.769 202.787 291.687 201.08 292.781 200.2C298.787 195.369 314.825 181.855 318.5 172.5C324 158.5 328.5 153.5 328.5 153.5C328.5 153.5 335.346 148.416 340.5 148.5C345.478 148.582 352 153.5 352 153.5Z" fill="white"/>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M266.5 111C346.382 93.2485 346.5 138.866 346.5 139C346.5 139 309.7 141 286 190.5C259.551 245.741 281.402 264.716 285.4 267.598C285.786 267.876 286.083 268.239 286.221 268.694C287.503 272.924 293.675 296.173 286 330C280.963 352.202 261.561 382.904 261.5 383C261.521 382.817 270.944 301.494 221 296.5C147.073 289.107 101.59 371.337 101.5 371.5C101.631 371.367 183.422 288.382 226.5 320.5C267.318 350.933 230.071 452.306 230 452.5C229.962 452.498 152.487 448.969 101.5 415C45.0001 377.358 19.5 316 19.5 316C19.5491 315.952 35.7575 300.212 46.5 292C56.9583 284.006 73.5 274.5 73.5 274.5L69.5 316C69.5855 315.787 140.576 138.983 266.5 111ZM280.024 144.125C274.475 135.82 261.309 134.879 250.619 142.023C239.929 149.166 235.762 161.69 241.312 169.994C246.861 178.299 260.027 179.24 270.717 172.097C281.407 164.953 285.574 152.43 280.024 144.125Z" fill="white"/>
+    <circle cx="265.5" cy="157.5" r="9.5" fill="white"/>
+  </g>
+
+  <!-- Text Content Group (Now on the right) -->
+  <g transform="translate(520, 260)">
+    <text x="0" y="0" fill="white" style="font-family: sans-serif; font-weight: 700; font-size: 84px; letter-spacing: -0.02em;">Statsparrot</text>
+    <text x="0" y="65" fill="#A1A1AA" style="font-family: sans-serif; font-weight: 400; font-size: 32px;">Simplifying the future of</text>
+    <text x="0" y="110" fill="#A1A1AA" style="font-family: sans-serif; font-weight: 400; font-size: 32px;">data infrastructure.</text>
+    
+    <!-- Accent Line -->
+    <rect x="0" y="150" width="80" height="4" fill="#3B82F6"/>
+  </g>
+
+  <defs>
+    <radialGradient id="paint0_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1100 530) rotate(90) scale(300)">
+      <stop stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#3B82F6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="paint1_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(100 100) rotate(90) scale(200)">
+      <stop stop-color="#60A5FA"/>
+      <stop offset="1" stop-color="#60A5FA" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+</svg>

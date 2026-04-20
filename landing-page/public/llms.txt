@@ -1,0 +1,17 @@
+# Statsparrot
+
+Statsparrot is a next-gen AI data pipeline and decision engine designed for enterprise scalability and real-time insights. It automates entire data workflows in a self-healing AI system, simplifying complex data infrastructure for modern organizations.
+
+## Key Features
+- **Self-Healing AI**: Automated maintenance and optimization of data pipelines.
+- **Enterprise Scalability**: Built to handle massive data loads with reliability.
+- **Real-Time Insights**: Instant decision-making capabilities powered by AI.
+- **Seamless Integration**: Connects modern data sources with ease.
+
+## Technology Stack
+- **Frontend**: React (v19), Vite.
+- **Visualization**: Apache ECharts, Three.js for interactive 3D topology.
+- **Infrastructure**: Automated data pipelines and decision engines.
+
+## Mission
+To simplify the future of data infrastructure by eliminating manual pipeline management and accelerating decision-making through AI.

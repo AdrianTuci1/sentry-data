@@ -14,7 +14,7 @@ import {
     Play,
     Sparkles
 } from 'lucide-react';
-import { useStore } from '../../store/StoreProvider';
+import { useStore } from './MockStoreProvider';
 import { FeatureMindMapStore } from './FeatureMindMapStore';
 
 const NODE_LAYOUT = {

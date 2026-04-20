@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Plus, Trash2, X } from 'lucide-react';
 import './ProjectEditorOverlay.css';
+import { ProjectWidgetSelector } from './ProjectCardWidget';
+import { getDefaultProjectCardWidget, useProjectDefaultSpanWidgets } from './ProjectCardWidgetData';
 
 const ACCESS_OPTIONS = [
     { value: 'viewer', label: 'Viewer' },
@@ -24,22 +26,13 @@ const createDefaultViewLink = (projectName = '') => {
     return `https://app.sentry.local/view/${slug || `project-${Date.now()}`}`;
 };
 
-const ProjectEditorOverlay = ({ isOpen, mode, project, onClose, onSubmit }) => {
-    const [title, setTitle] = useState('');
-    const [members, setMembers] = useState([createEmptyMember()]);
-    const [viewLink, setViewLink] = useState('');
-
-    useEffect(() => {
-        if (!isOpen) return;
-
-        setTitle(project?.name || '');
-        setMembers(project?.members?.length ? project.members : [createEmptyMember()]);
-        setViewLink(project?.viewLink || '');
-    }, [isOpen, project]);
-
-    if (!isOpen) {
-        return null;
-    }
+const ProjectEditorModal = ({ mode, project, onClose, onSubmit }) => {
+    const [title, setTitle] = useState(() => project?.name || '');
+    const [members, setMembers] = useState(() => (project?.members?.length ? project.members : [createEmptyMember()]));
+    const [viewLink, setViewLink] = useState(() => project?.viewLink || '');
+    const [isViewLinkDisabled, setIsViewLinkDisabled] = useState(() => Boolean(project?.viewLinkDisabled));
+    const [selectedCardWidgetId, setSelectedCardWidgetId] = useState(() => project?.cardWidgetId || '');
+    const { widgets: defaultSpanWidgets, isLoading: isLoadingWidgets } = useProjectDefaultSpanWidgets(project?.id);
 
     const updateMember = (memberId, key, value) => {
         setMembers((currentMembers) =>
@@ -84,7 +77,9 @@ const ProjectEditorOverlay = ({ isOpen, mode, project, onClose, onSubmit }) => {
         onSubmit({
             name: title.trim(),
             members: normalizedMembers,
-            viewLink: viewLink.trim(),
+            viewLink: isViewLinkDisabled ? '' : viewLink.trim(),
+            viewLinkDisabled: isViewLinkDisabled,
+            cardWidgetId: selectedCardWidgetId || getDefaultProjectCardWidget(defaultSpanWidgets, selectedCardWidgetId)?.id || '',
         });
     };
 
@@ -133,16 +128,42 @@ const ProjectEditorOverlay = ({ isOpen, mode, project, onClose, onSubmit }) => {
                                     value={viewLink}
                                     onChange={(event) => setViewLink(event.target.value)}
                                     placeholder="https://..."
+                                    disabled={isViewLinkDisabled}
                                 />
                                 <button
                                     type="button"
                                     className="project-editor-inline-action"
                                     onClick={resetViewLink}
+                                    disabled={isViewLinkDisabled}
                                 >
                                     Reset
                                 </button>
                             </div>
+                            <label className="project-editor-toggle">
+                                <input
+                                    type="checkbox"
+                                    checked={isViewLinkDisabled}
+                                    onChange={(event) => setIsViewLinkDisabled(event.target.checked)}
+                                />
+                                <span>Disable view-only link</span>
+                            </label>
                         </label>
+                    </div>
+
+                    <div className="project-editor-widget-section">
+                        <div className="project-editor-widget-header">
+                            <span>Project card widget</span>
+                            <p>Only default-span widgets fit in the square project card preview.</p>
+                        </div>
+                        {isLoadingWidgets ? (
+                            <div className="project-widget-selector-empty">Loading widgets...</div>
+                        ) : (
+                            <ProjectWidgetSelector
+                                widgets={defaultSpanWidgets}
+                                selectedWidgetId={selectedCardWidgetId}
+                                onChange={setSelectedCardWidgetId}
+                            />
+                        )}
                     </div>
 
                     <div className="project-editor-members">
@@ -201,6 +222,22 @@ const ProjectEditorOverlay = ({ isOpen, mode, project, onClose, onSubmit }) => {
                 </form>
             </div>
         </div>
+    );
+};
+
+const ProjectEditorOverlay = ({ isOpen, mode, project, onClose, onSubmit }) => {
+    if (!isOpen) {
+        return null;
+    }
+
+    return (
+        <ProjectEditorModal
+            key={`${mode}-${project?.id || 'new'}`}
+            mode={mode}
+            project={project}
+            onClose={onClose}
+            onSubmit={onSubmit}
+        />
     );
 };
 

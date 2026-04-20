@@ -133,6 +133,7 @@ export class ProjectStore {
                 connectors: 2,
                 models: 1,
                 viewLink: 'https://app.sentry.local/view/parrot-commerce-demo',
+                cardWidgetId: 'marketing-roas',
                 members: [
                     { id: 'm_1', account: 'ops@sentry.local', access: 'admin' },
                     { id: 'm_2', account: 'growth@sentry.local', access: 'contributor' },
@@ -146,6 +147,7 @@ export class ProjectStore {
                 connectors: 3,
                 models: 2,
                 viewLink: 'https://app.sentry.local/view/parrot-growth-studio',
+                cardWidgetId: 'marketing-cpa',
                 members: [
                     { id: 'm_3', account: 'brand@sentry.local', access: 'admin' },
                     { id: 'm_4', account: 'sales@sentry.local', access: 'viewer' },
@@ -159,6 +161,7 @@ export class ProjectStore {
                 connectors: 2,
                 models: 1,
                 viewLink: 'https://app.sentry.local/view/parrot-risk-lab',
+                cardWidgetId: 'technical-health',
                 members: [
                     { id: 'm_5', account: 'security@sentry.local', access: 'admin' },
                 ]
@@ -180,7 +183,9 @@ export class ProjectStore {
                 currentProject.update({
                     ...nextProject,
                     members: nextProject.members,
-                    viewLink: nextProject.viewLink
+                    viewLink: nextProject.viewLink,
+                    viewLinkDisabled: nextProject.viewLinkDisabled,
+                    cardWidgetId: nextProject.cardWidgetId
                 });
             } else {
                 this.projects.push(nextProject);
@@ -215,6 +220,8 @@ export class ProjectStore {
             models: 0,
             members: project.members || [],
             viewLink: project.viewLink || '',
+            viewLinkDisabled: Boolean(project.viewLinkDisabled || project.view_link_disabled),
+            cardWidgetId: project.cardWidgetId || project.card_widget_id || '',
         });
     }
 

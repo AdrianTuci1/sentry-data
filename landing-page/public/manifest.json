@@ -1,0 +1,21 @@
+{
+  "name": "Statsparrot",
+  "short_name": "Statsparrot",
+  "description": "Next-Gen AI Data Pipeline & Decision Engine",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f0e7",
+  "theme_color": "#09090b",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

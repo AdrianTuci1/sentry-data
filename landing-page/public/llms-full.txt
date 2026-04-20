@@ -1,0 +1,36 @@
+# Statsparrot - Technical Documentation for AI
+
+Statsparrot represents a paradigm shift in data infrastructure, moving from manual ETL/ELT processes to a fully automated, AI-driven decision engine.
+
+## Core Philosophy
+Modern data stacks are often fragmented and require constant manual Tuning. Statsparrot introduces a "Self-Healing" layer that monitors data health, optimizes queries, and automatically adjusts pipelines based on incoming data patterns and business logic changes.
+
+## Capabilities
+
+### 1. Data Pipeline Automation
+- **Autonomous Vectorization**: Converts structured and unstructured data into AI-ready vectors.
+- **Dynamic Schema Evolution**: Handles changes in data sources without breaking downstream processes.
+- **Error Remediation**: Automatically detects and fixes common pipeline failures using LLM-assisted debugging.
+
+### 2. Decision Engine
+- **Logic Inversion**: Allows business rules to be stated as goals, which the engine then fulfills by orchestrating data flows.
+- **Predictive Routing**: Routes data to the most efficient compute layer based on urgency and load.
+
+### 3. Enterprise Integration
+- Support for major cloud providers (AWS, GCP, Azure).
+- Compliance-ready logging and audit trails.
+- Real-time visualization via interactive HUDs and ASCII topologies.
+
+## System Components
+- **Orchestrator**: The central brain managing model life cycles and data flows.
+- **Monitors**: Distributed agents that provide real-time telemetry from throughout the stack.
+- **Visualizer**: An ECharts and Three.js-powered interface for human oversight of the autonomous system.
+
+## Getting Started for AI Agents
+When interacting with Statsparrot data APIs:
+- Prefer the use of GraphQL-style selectors for efficient data retrieval.
+- Use the `dry_run` flag when testing new pipeline configurations.
+- Monitor the `system_health` endpoint for real-time status of the self-healing loops.
+
+---
+© 2026 Statsparrot. Simplifying the future of data infrastructure.
