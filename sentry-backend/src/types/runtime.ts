@@ -34,6 +34,7 @@ export interface RuntimeVitals {
     runtimeLatencyMs: number;
     pathUsed: 'parrot_os';
     cacheHitRate: number;
+    cacheEligibleQueryRatio?: number;
     estimatedTokensUsed: number;
     tasksExecuted: string[];
     startedAt: string;

@@ -1,9 +1,22 @@
-import { ProjectRepository } from '../../infrastructure/repositories/ProjectRepository';
+import { createHash } from 'crypto';
+import { ProjectEntity, ProjectRepository } from '../../infrastructure/repositories/ProjectRepository';
 import { SourceRepository } from '../../infrastructure/repositories/SourceRepository';
+import { R2StorageService } from '../../infrastructure/storage/R2StorageService';
 import { WidgetDataMapper } from '../utils/WidgetDataMapper';
 import { WidgetService } from './WidgetService';
 import { WidgetRenderer } from '../utils/WidgetRenderer';
 import { ObjectStorageService } from './ObjectStorageService';
+import { ParrotQuerySpec } from '../../types/parrot';
+
+interface QueryConfig {
+    widgetId: string;
+    sqlString: string;
+}
+
+interface QueryExecutionResult {
+    results: any[];
+    observability: any[];
+}
 
 // Debugging Tasks:
 // - [x] Debug "fetch failed" / "401 Unauthorized" in `AnalyticsService`
@@ -19,6 +32,7 @@ export class AnalyticsService {
     private sourceRepository: SourceRepository;
     private widgetService: WidgetService;
     private objectStorageService: ObjectStorageService;
+    private r2StorageService: R2StorageService;
     private analyticsWorkerUrl: string;
     private workerSecret: string;
 
@@ -27,12 +41,14 @@ export class AnalyticsService {
         sourceRepository: SourceRepository,
         widgetService: WidgetService,
         _widgetRenderer: WidgetRenderer,
-        objectStorageService: ObjectStorageService
+        objectStorageService: ObjectStorageService,
+        r2StorageService: R2StorageService
     ) {
         this.projectRepository = projectRepository;
         this.sourceRepository = sourceRepository;
         this.widgetService = widgetService;
         this.objectStorageService = objectStorageService;
+        this.r2StorageService = r2StorageService;
         // Internal worker connection details
         this.analyticsWorkerUrl = process.env.ANALYTICS_WORKER_URL || 'http://localhost:4000/execute';
         this.workerSecret = process.env.INTERNAL_API_SECRET || 'secret';
@@ -80,19 +96,7 @@ export class AnalyticsService {
         }
 
         try {
-            const storageConfig = await this.resolveWorkerStorageConfig(tenantId, projectId);
-            const response = await fetch(this.analyticsWorkerUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Internal-Secret': this.workerSecret
-                },
-                body: JSON.stringify({ tenantId, projectId, queries: project.queryConfigs, storageConfig })
-            });
-
-            if (!response.ok) throw new Error(`Worker Failed: ${response.status}`);
-
-            const workerResult = await response.json() || { results: [] };
+            const workerResult = await this.executeQueriesWithCache(tenantId, project, project.queryConfigs);
             const rawMetadata = project.discoveryMetadata?.insight || project.discoveryMetadata?.dashboards || [];
             const metadataDashboards = WidgetDataMapper.unmarshall(rawMetadata) || [];
 
@@ -138,11 +142,22 @@ export class AnalyticsService {
                     ...baseWidget,
                     data: mappedData,
                     isMock: false,
-                    latency: result.latency_ms
+                    latency: result.latency_ms,
+                    cache: {
+                        hit: result.cache_hit === true,
+                        uri: result.cache_uri,
+                        cachedAt: result.cached_at,
+                        queryHash: result.query_hash
+                    }
                 };
             }));
 
-            return { tenantId, projectId, dashboards: enrichedDashboards };
+            return {
+                tenantId,
+                projectId,
+                dashboards: enrichedDashboards,
+                queryExecution: workerResult.observability
+            };
         } catch (error: any) {
             console.error(`[AnalyticsService] Error:`, error.message);
             throw new Error(`Failed to generate data: ${error.message}`);
@@ -213,21 +228,7 @@ export class AnalyticsService {
             };
         }
 
-        const response = await fetch(this.analyticsWorkerUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Internal-Secret': this.workerSecret
-            },
-            body: JSON.stringify({
-                tenantId,
-                projectId,
-                queries: [queryConfig],
-                storageConfig: await this.resolveWorkerStorageConfig(tenantId, projectId)
-            })
-        });
-
-        const workerRes = await response.json() || { results: [] };
+        const workerRes = await this.executeQueriesWithCache(tenantId, project, [queryConfig]);
         const result = workerRes?.results?.[0];
 
         if (!result) throw new Error(`No worker result for ${widgetId}`);
@@ -257,8 +258,202 @@ export class AnalyticsService {
             gridSpan: widgetMetadata.grid_span || widgetMetadata.gridSpan || definition.grid_span || 'col-span-1',
             colorTheme: widgetMetadata.color_theme || widgetMetadata.colorTheme || definition.color_theme || 'theme-productivity',
             data: mappedData,
-            isMock: (Array.isArray(result.data) && result.data.length === 0)
+            isMock: (Array.isArray(result.data) && result.data.length === 0),
+            cache: {
+                hit: result.cache_hit === true,
+                uri: result.cache_uri,
+                cachedAt: result.cached_at,
+                queryHash: result.query_hash
+            }
         };
+    }
+
+    private async executeQueriesWithCache(tenantId: string, project: ProjectEntity, queryConfigs: QueryConfig[]): Promise<QueryExecutionResult> {
+        const querySpecs = this.extractQuerySpecs(project.discoveryMetadata);
+        const cachedResults: any[] = [];
+        const workerQueries: QueryConfig[] = [];
+        const observability: any[] = [];
+        const projectId = project.projectId;
+
+        for (const queryConfig of queryConfigs) {
+            const querySpec = this.findQuerySpec(querySpecs, queryConfig.widgetId);
+            const baseObservation = {
+                widgetId: queryConfig.widgetId,
+                queryId: querySpec?.queryId,
+                executionMode: querySpec?.executionPolicy.mode || 'direct',
+                refreshStrategy: querySpec?.executionPolicy.refreshStrategy || 'always',
+                inputFingerprint: querySpec?.inputFingerprint,
+                queryHash: querySpec?.queryHash,
+                cacheEligible: this.isCacheEligible(querySpec)
+            };
+
+            if (this.isCacheEligible(querySpec)) {
+                const cached = await this.loadCachedQueryResult(tenantId, projectId, querySpec!);
+                if (cached) {
+                    cachedResults.push(cached.result);
+                    observability.push({
+                        ...baseObservation,
+                        cacheHit: true,
+                        cacheUri: cached.uri,
+                        executedBy: 'r2_query_result_cache'
+                    });
+                    continue;
+                }
+            }
+
+            workerQueries.push(queryConfig);
+            observability.push({
+                ...baseObservation,
+                cacheHit: false,
+                executedBy: 'analytics_worker'
+            });
+        }
+
+        let workerResults: any[] = [];
+        if (workerQueries.length > 0) {
+            const storageConfig = await this.resolveWorkerStorageConfig(tenantId, projectId);
+            const response = await fetch(this.analyticsWorkerUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Internal-Secret': this.workerSecret
+                },
+                body: JSON.stringify({ tenantId, projectId, queries: workerQueries, storageConfig })
+            });
+
+            if (!response.ok) throw new Error(`Worker Failed: ${response.status}`);
+
+            const workerResult = await response.json() || { results: [] };
+            workerResults = Array.isArray(workerResult.results) ? workerResult.results : [];
+
+            for (const result of workerResults) {
+                const querySpec = this.findQuerySpec(querySpecs, result?.widgetId);
+                if (!this.isCacheEligible(querySpec) || result?.error) {
+                    continue;
+                }
+
+                const cached = await this.saveCachedQueryResult(tenantId, projectId, querySpec!, result);
+                result.cache_hit = false;
+                result.cache_uri = cached.uri;
+                result.cached_at = cached.cachedAt;
+                result.query_hash = querySpec!.queryHash;
+
+                const observation = observability.find((item) => item.widgetId === result.widgetId);
+                if (observation) {
+                    observation.cacheUri = cached.uri;
+                    observation.cachedAt = cached.cachedAt;
+                }
+            }
+        }
+
+        return {
+            results: [...cachedResults, ...workerResults],
+            observability
+        };
+    }
+
+    private extractQuerySpecs(discoveryMetadata: any): ParrotQuerySpec[] {
+        if (!discoveryMetadata) return [];
+        if (Array.isArray(discoveryMetadata.querySpecs)) {
+            return discoveryMetadata.querySpecs as ParrotQuerySpec[];
+        }
+
+        if (Array.isArray(discoveryMetadata.projectionPlan?.querySpecs)) {
+            return discoveryMetadata.projectionPlan.querySpecs as ParrotQuerySpec[];
+        }
+
+        return [];
+    }
+
+    private findQuerySpec(querySpecs: ParrotQuerySpec[], widgetId: string): ParrotQuerySpec | undefined {
+        return querySpecs.find((querySpec) => querySpec.widgetId === widgetId || querySpec.queryId === widgetId);
+    }
+
+    private isCacheEligible(querySpec?: ParrotQuerySpec): boolean {
+        return Boolean(querySpec && querySpec.status === 'active' && querySpec.executionPolicy.mode !== 'direct');
+    }
+
+    private async loadCachedQueryResult(
+        tenantId: string,
+        projectId: string,
+        querySpec: ParrotQuerySpec
+    ): Promise<{ result: any; uri: string } | null> {
+        const cacheKey = this.buildQueryCacheKey(querySpec);
+        const key = this.r2StorageService.getS3Key(tenantId, projectId, 'queries', 'cache', querySpec.queryId, `${cacheKey}.json`);
+        const uri = this.r2StorageService.getS3Uri(tenantId, projectId, 'queries', 'cache', querySpec.queryId, `${cacheKey}.json`);
+
+        try {
+            const cached = await this.r2StorageService.getJsonIfExists<any>(key);
+            if (!cached) {
+                return null;
+            }
+
+            if (cached.queryHash !== querySpec.queryHash || cached.inputFingerprint !== querySpec.inputFingerprint) {
+                return null;
+            }
+
+            return {
+                uri,
+                result: {
+                    widgetId: querySpec.widgetId,
+                    data: cached.data || [],
+                    latency_ms: cached.latency_ms,
+                    cache_hit: true,
+                    cache_uri: uri,
+                    cached_at: cached.cachedAt,
+                    query_hash: querySpec.queryHash
+                }
+            };
+        } catch {
+            return null;
+        }
+    }
+
+    private async saveCachedQueryResult(
+        tenantId: string,
+        projectId: string,
+        querySpec: ParrotQuerySpec,
+        result: any
+    ): Promise<{ uri: string; cachedAt: string }> {
+        const cachedAt = new Date().toISOString();
+        const cacheKey = this.buildQueryCacheKey(querySpec);
+        const document = {
+            version: 1,
+            tenantId,
+            projectId,
+            queryId: querySpec.queryId,
+            widgetId: querySpec.widgetId,
+            queryHash: querySpec.queryHash,
+            inputFingerprint: querySpec.inputFingerprint,
+            executionPolicy: querySpec.executionPolicy,
+            latency_ms: result.latency_ms,
+            rowCount: Array.isArray(result.data) ? result.data.length : 0,
+            data: result.data || [],
+            cachedAt
+        };
+        const saved = await this.r2StorageService.saveJson(
+            tenantId,
+            projectId,
+            'queries',
+            document,
+            'cache',
+            querySpec.queryId,
+            `${cacheKey}.json`
+        );
+
+        return {
+            uri: saved.uri,
+            cachedAt
+        };
+    }
+
+    private buildQueryCacheKey(querySpec: ParrotQuerySpec): string {
+        const hash = createHash('sha256');
+        hash.update(JSON.stringify({
+            queryHash: querySpec.queryHash,
+            inputFingerprint: querySpec.inputFingerprint
+        }));
+        return hash.digest('hex');
     }
 
     private async resolveWorkerStorageConfig(tenantId: string, projectId: string) {

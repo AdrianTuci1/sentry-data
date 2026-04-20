@@ -12,8 +12,10 @@ import { ObjectStorageService } from '../../application/services/ObjectStorageSe
 import { SourceUpdateMonitorService } from '../../application/services/SourceUpdateMonitorService';
 import { ConnectorCatalogService } from '../../application/services/ConnectorCatalogService';
 import { ControlPlaneService } from '../../application/services/ControlPlaneService';
+import { MLExecutorClient, MLTrainRequest } from '../../application/services/MLExecutorClient';
 import { AppError } from '../middlewares/errorHandler';
 import { ProjectMemberInput } from '../../types/controlPlane';
+import { ParrotMLRecommendation } from '../../types/parrot';
 
 export class ProjectController implements IController {
     public path = '/projects';
@@ -28,7 +30,8 @@ export class ProjectController implements IController {
         private readonly objectStorageService: ObjectStorageService,
         private readonly sourceUpdateMonitorService: SourceUpdateMonitorService,
         private readonly connectorCatalogService: ConnectorCatalogService,
-        private readonly controlPlaneService: ControlPlaneService
+        private readonly controlPlaneService: ControlPlaneService,
+        private readonly mlExecutorClient: MLExecutorClient
     ) {
         this.initRoutes();
     }
@@ -47,6 +50,9 @@ export class ProjectController implements IController {
         this.router.get('/:projectId/sources', auth, this.getSources);
         this.router.post('/:projectId/sources/discover', auth, this.discoverSources);
         this.router.delete('/:projectId/sources/:sourceId', auth, this.deleteSource);
+
+        this.router.get('/:projectId/ml/recommendations', auth, this.getMlRecommendations);
+        this.router.post('/:projectId/ml/recommendations/:recommendationId/train', auth, this.trainMlRecommendation);
 
         this.router.get('/:projectId', auth, this.getProjectById);
         this.router.post('/:projectId/runtime/run', auth, this.runRuntime);
@@ -480,6 +486,145 @@ export class ProjectController implements IController {
             next(error);
         }
     };
+
+    private getMlRecommendations = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const authContext = this.getAuthContext(req);
+            const { projectId } = req.params;
+            const { project } = await this.controlPlaneService.assertProjectAccess(authContext, projectId);
+            const recommendations = this.extractMlRecommendations(project.discoveryMetadata);
+
+            res.status(200).json({
+                status: 'success',
+                data: {
+                    configured: this.mlExecutorClient.isConfigured(),
+                    recommendations
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    private trainMlRecommendation = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const authContext = this.getAuthContext(req);
+            const { projectId, recommendationId } = req.params;
+            const { project } = await this.controlPlaneService.assertProjectAccess(authContext, projectId);
+
+            if (!this.mlExecutorClient.isConfigured()) {
+                res.status(503).json({
+                    error: 'ML executor is not configured',
+                    code: 'ml_executor_not_configured'
+                });
+                return;
+            }
+
+            const recommendations = this.extractMlRecommendations(project.discoveryMetadata);
+            const recommendation = recommendations.find((item) => item.recommendationId === recommendationId);
+
+            if (!recommendation) {
+                res.status(404).json({ error: 'ML recommendation not found' });
+                return;
+            }
+
+            const requestId = `ml-${Date.now()}`;
+            const request: MLTrainRequest = {
+                tenantId: authContext.tenantId,
+                projectId,
+                requestId,
+                datasetUri: recommendation.datasetUri,
+                taskType: recommendation.taskType,
+                targetColumn: recommendation.targetColumn,
+                featureColumns: recommendation.featureColumns,
+                modelName: `${recommendation.recommendationId}-${Date.now()}`,
+                testSize: recommendation.request?.testSize,
+                randomState: recommendation.request?.randomState,
+                hyperparameters: req.body?.hyperparameters
+            };
+
+            const result = await this.mlExecutorClient.train(request);
+            this.updateRecommendationState(project.discoveryMetadata, recommendation.recommendationId, {
+                ...recommendation,
+                status: 'trained',
+                lastRun: {
+                    requestId,
+                    status: result?.status || 'trained',
+                    modelId: result?.model_id || result?.modelId,
+                    metrics: result?.metrics,
+                    executedAt: new Date().toISOString()
+                }
+            });
+
+            await this.projectRepo.createOrUpdate(project);
+
+            res.status(202).json({
+                status: 'accepted',
+                message: 'ML training was approved and submitted.',
+                data: result
+            });
+        } catch (error: any) {
+            if (req.params?.projectId && req.params?.recommendationId && req.authContext?.tenantId) {
+                await this.markMlRecommendationFailed(
+                    req.authContext.tenantId,
+                    req.params.projectId,
+                    req.params.recommendationId,
+                    error.message
+                );
+            }
+            next(error);
+        }
+    };
+
+    private extractMlRecommendations(discoveryMetadata: any): ParrotMLRecommendation[] {
+        if (!discoveryMetadata) return [];
+        if (Array.isArray(discoveryMetadata.mlRecommendations)) {
+            return discoveryMetadata.mlRecommendations as ParrotMLRecommendation[];
+        }
+
+        if (Array.isArray(discoveryMetadata.projectionPlan?.mlRecommendations)) {
+            return discoveryMetadata.projectionPlan.mlRecommendations as ParrotMLRecommendation[];
+        }
+
+        return [];
+    }
+
+    private updateRecommendationState(discoveryMetadata: any, recommendationId: string, nextRecommendation: ParrotMLRecommendation): void {
+        if (!discoveryMetadata) return;
+
+        if (Array.isArray(discoveryMetadata.mlRecommendations)) {
+            discoveryMetadata.mlRecommendations = discoveryMetadata.mlRecommendations.map((item: ParrotMLRecommendation) => (
+                item.recommendationId === recommendationId ? nextRecommendation : item
+            ));
+        }
+
+        if (Array.isArray(discoveryMetadata.projectionPlan?.mlRecommendations)) {
+            discoveryMetadata.projectionPlan.mlRecommendations = discoveryMetadata.projectionPlan.mlRecommendations.map((item: ParrotMLRecommendation) => (
+                item.recommendationId === recommendationId ? nextRecommendation : item
+            ));
+        }
+    }
+
+    private async markMlRecommendationFailed(tenantId: string, projectId: string, recommendationId: string, errorMessage: string): Promise<void> {
+        const project = await this.projectRepo.findById(tenantId, projectId);
+        if (!project?.discoveryMetadata) return;
+
+        const recommendation = this.extractMlRecommendations(project.discoveryMetadata).find((item) => item.recommendationId === recommendationId);
+        if (!recommendation) return;
+
+        this.updateRecommendationState(project.discoveryMetadata, recommendationId, {
+            ...recommendation,
+            status: 'failed',
+            lastRun: {
+                requestId: `ml-${Date.now()}`,
+                status: 'failed',
+                executedAt: new Date().toISOString(),
+                error: errorMessage
+            }
+        });
+
+        await this.projectRepo.createOrUpdate(project);
+    }
 
     private buildStorageConfig(body: Record<string, any>): ObjectStorageConfig | undefined {
         if (body.storageConfig) {

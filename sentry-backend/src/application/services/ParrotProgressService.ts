@@ -4,6 +4,7 @@ import {
     ParrotExecutionScore,
     ParrotExecutionPlan,
     ParrotExecutionSubmission,
+    ParrotProjectionPlan,
     ParrotProgressFile,
     ParrotSentinelReport,
     ParrotOutputManifest,
@@ -23,7 +24,10 @@ export class ParrotProgressService {
             reverseEtlReceiptsUri: this.r2StorageService.getS3Uri(tenantId, projectId, 'runtime', 'requests', requestId, 'reverse-etl-receipts.json'),
             executionPlanUri: this.r2StorageService.getS3Uri(tenantId, projectId, 'runtime', 'requests', requestId, 'execution-plan.json'),
             executionSubmissionUri: this.r2StorageService.getS3Uri(tenantId, projectId, 'runtime', 'requests', requestId, 'execution-submission.json'),
-            mindmapManifestUri: this.r2StorageService.getS3Uri(tenantId, projectId, 'runtime', 'requests', requestId, 'mindmap-manifest.json')
+            mindmapManifestUri: this.r2StorageService.getS3Uri(tenantId, projectId, 'runtime', 'requests', requestId, 'mindmap-manifest.json'),
+            projectionPlanUri: this.r2StorageService.getS3Uri(tenantId, projectId, 'runtime', 'requests', requestId, 'projection-plan.json'),
+            queryRegistryUri: this.r2StorageService.getS3Uri(tenantId, projectId, 'queries', 'registry.json'),
+            projectionRegistryUri: this.r2StorageService.getS3Uri(tenantId, projectId, 'projections', 'registry.json')
         };
     }
 
@@ -64,6 +68,10 @@ export class ParrotProgressService {
 
     public async saveExecutionSubmission(tenantId: string, projectId: string, requestId: string, executionSubmission: ParrotExecutionSubmission): Promise<void> {
         await this.r2StorageService.saveJson(tenantId, projectId, 'runtime', executionSubmission, 'requests', requestId, 'execution-submission.json');
+    }
+
+    public async saveProjectionPlan(tenantId: string, projectId: string, requestId: string, projectionPlan: ParrotProjectionPlan): Promise<void> {
+        await this.r2StorageService.saveJson(tenantId, projectId, 'runtime', projectionPlan, 'requests', requestId, 'projection-plan.json');
     }
 
     public async saveProgressFile(tenantId: string, projectId: string, requestId: string, progressFile: ParrotProgressFile): Promise<void> {

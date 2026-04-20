@@ -48,6 +48,9 @@ export interface ParrotRuntimeMetadata {
     executionPlanUri?: string;
     executionSubmissionUri?: string;
     projectionRegistryUri?: string;
+    queryRegistryUri?: string;
+    projectionPlanUri?: string;
+    mlRecommendationCount?: number;
     executionEngine?: ParrotExecutionEngine;
     executionStatus?: ParrotExecutionSubmissionStatus;
 }
@@ -94,6 +97,133 @@ export interface ParrotWidgetContractRef {
     requiredFields: string[];
     alignmentMode: 'strict' | 'best_effort';
     source: 'catalog_manifest' | 'runtime_contract';
+}
+
+export type ParrotArtifactStatus = 'active' | 'stale' | 'invalidated' | 'draft';
+export type ParrotInvalidationScope = 'source' | 'projection' | 'query' | 'widget' | 'ml_recommendation';
+export type ParrotProjectionMaterializationPolicy = 'virtual' | 'incremental_partitioned' | 'materialized_snapshot' | 'approx_preview';
+
+export interface ParrotInvalidationHint {
+    id: string;
+    scope: ParrotInvalidationScope;
+    targetId: string;
+    sourceId?: string;
+    reason: string;
+    severity: 'info' | 'warning' | 'critical';
+    invalidates: ParrotInvalidationScope[];
+    recommendedAction: string;
+    createdAt: string;
+}
+
+export interface ParrotProjectionDependency {
+    sourceIds: string[];
+    columns: string[];
+    upstreamProjectionIds?: string[];
+}
+
+export interface ParrotProjectionSpec {
+    projectionId: string;
+    title: string;
+    sourceId: string;
+    sourceName: string;
+    version: string;
+    rawUri: string;
+    servingUri: string;
+    status: ParrotArtifactStatus;
+    materialization: ParrotProjectionMaterializationPolicy;
+    inputFingerprint: string;
+    specHash: string;
+    dependency: ParrotProjectionDependency;
+    columns: ParrotSchemaColumn[];
+    logic: ParrotEditableLogic;
+    storageMetrics?: ParrotSourceProfile['storageMetrics'];
+    invalidationReason?: string;
+    createdAt: string;
+}
+
+export interface ParrotQuerySpec {
+    queryId: string;
+    widgetId: string;
+    projectionId: string;
+    sourceId: string;
+    title: string;
+    widgetType: string;
+    sql: string;
+    status: ParrotArtifactStatus;
+    queryHash: string;
+    inputFingerprint: string;
+    dependencies: ParrotProjectionDependency;
+    executionPolicy: {
+        mode: 'direct' | 'cached_result' | 'incremental_refresh';
+        refreshStrategy: 'always' | 'on_source_change' | 'on_projection_change';
+    };
+    resultCache?: {
+        latestResultUri?: string;
+        lastExecutedAt?: string;
+        latencyMs?: number;
+        rowCount?: number;
+    };
+    widgetContract?: ParrotWidgetContractRef;
+    compiledAt: string;
+    invalidationReason?: string;
+}
+
+export interface ParrotMLRecommendation {
+    recommendationId: string;
+    sourceId: string;
+    projectionId: string;
+    title: string;
+    taskType: 'classification' | 'regression' | 'clustering' | 'anomaly';
+    status: 'recommended' | 'approved' | 'running' | 'trained' | 'failed';
+    launchMode: 'manual_approval';
+    datasetUri: string;
+    targetColumn?: string;
+    featureColumns: string[];
+    rationale: string;
+    executor: 'ml_executor';
+    request?: {
+        testSize?: number;
+        randomState?: number;
+    };
+    lastRun?: {
+        requestId: string;
+        status: string;
+        modelId?: string;
+        metrics?: Record<string, unknown>;
+        executedAt: string;
+        error?: string;
+    };
+}
+
+export interface ParrotRuntimeState {
+    tenantId: string;
+    projectId: string;
+    requestId: string;
+    sourceProfiles: ParrotSourceProfile[];
+    previousProjectionRegistry?: unknown;
+    previousQueryRegistry?: unknown;
+    invalidationHints: ParrotInvalidationHint[];
+    activeProjectionVersions?: Record<string, string>;
+    widgetCatalogVersion: string;
+    forceRediscover?: boolean;
+    invalidatedSources?: string[];
+    compiledAt: string;
+}
+
+export interface ParrotProjectionPlan {
+    version: 1;
+    requestId: string;
+    compiledAt: string;
+    translatorVersion: string;
+    projectionSpecs: ParrotProjectionSpec[];
+    querySpecs: ParrotQuerySpec[];
+    mlRecommendations: ParrotMLRecommendation[];
+    coverage: {
+        required: string[];
+        generated: string[];
+        warnings: string[];
+    };
+    invalidationHints: ParrotInvalidationHint[];
 }
 
 export interface ParrotSourceTransformation {
@@ -182,6 +312,8 @@ export interface ParrotMindMapInsight {
     suggestions?: ParrotMindMapSuggestion[];
     validation?: ParrotValidationState;
     widgetContract?: ParrotWidgetContractRef;
+    querySpec?: ParrotQuerySpec;
+    mlRecommendation?: ParrotMLRecommendation;
 }
 
 export interface ParrotMindMapManifest {
@@ -242,6 +374,10 @@ export interface ParrotMindMapManifest {
         gold: Record<string, ParrotGoldView[]>;
         groups: ParrotMindMapGroup[];
         insights: ParrotMindMapInsight[];
+        projections?: ParrotProjectionSpec[];
+        queries?: ParrotQuerySpec[];
+        mlRecommendations?: ParrotMLRecommendation[];
+        invalidationHints?: ParrotInvalidationHint[];
     };
 }
 
@@ -360,6 +496,8 @@ export interface ParrotArtifactUris {
     executionSubmissionUri: string;
     mindmapManifestUri?: string;
     projectionRegistryUri?: string;
+    queryRegistryUri?: string;
+    projectionPlanUri?: string;
 }
 
 export interface ParrotProgressFile {

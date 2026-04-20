@@ -31,8 +31,10 @@ import { RayDaftExecutionProvider } from '../application/execution/RayDaftExecut
 import { RuntimeOrchestratorService } from '../application/services/RuntimeOrchestratorService';
 import { ObjectStorageService } from '../application/services/ObjectStorageService';
 import { ProjectionRegistryService } from '../application/services/ProjectionRegistryService';
+import { QueryRegistryService } from '../application/services/QueryRegistryService';
 import { SourceUpdateMonitorService } from '../application/services/SourceUpdateMonitorService';
 import { ConnectorCatalogService } from '../application/services/ConnectorCatalogService';
+import { MLExecutorClient } from '../application/services/MLExecutorClient';
 import { UserRepository } from '../infrastructure/repositories/UserRepository';
 import { WorkspaceRepository } from '../infrastructure/repositories/WorkspaceRepository';
 import { WorkspaceMembershipRepository } from '../infrastructure/repositories/WorkspaceMembershipRepository';
@@ -83,7 +85,7 @@ export function initContainer() {
     );
     const widgetService = new WidgetService(r2StorageService);
     const widgetRenderer = new WidgetRenderer(r2StorageService);
-    const analyticsService = new AnalyticsService(projectRepo, sourceRepo, widgetService, widgetRenderer, objectStorageService);
+    const analyticsService = new AnalyticsService(projectRepo, sourceRepo, widgetService, widgetRenderer, objectStorageService, r2StorageService);
     const sentinelClient = new SentinelClient();
     const parrotNeuralEngineService = new ParrotNeuralEngineService();
     const parrotProgressService = new ParrotProgressService(r2StorageService);
@@ -92,6 +94,8 @@ export function initContainer() {
     const mindMapManifestService = new MindMapManifestService();
     const workloadPlannerService = new WorkloadPlannerService();
     const projectionRegistryService = new ProjectionRegistryService(r2StorageService);
+    const queryRegistryService = new QueryRegistryService(r2StorageService);
+    const mlExecutorClient = new MLExecutorClient();
     const modalExecutionProvider = new ModalExecutionProvider();
     const rayDaftExecutionProvider = new RayDaftExecutionProvider();
     const executionPlaneService = new ExecutionPlaneService([
@@ -116,7 +120,8 @@ export function initContainer() {
         parrotProgressService,
         workloadPlannerService,
         executionPlaneService,
-        projectionRegistryService
+        projectionRegistryService,
+        queryRegistryService
     );
     
     const runtimeOrchestratorService = new RuntimeOrchestratorService(orchestrationService, sourceRepo);
@@ -140,7 +145,8 @@ export function initContainer() {
         objectStorageService,
         sourceUpdateMonitorService,
         connectorCatalogService,
-        controlPlaneService
+        controlPlaneService,
+        mlExecutorClient
     );
 
     const controllers = [
@@ -193,6 +199,8 @@ export function initContainer() {
             workloadPlannerService,
             executionPlaneService,
             projectionRegistryService,
+            queryRegistryService,
+            mlExecutorClient,
             sourceUpdateMonitorService
         }
     };

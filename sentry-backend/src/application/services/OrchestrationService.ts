@@ -8,6 +8,7 @@ import { ParrotProgressService } from './ParrotProgressService';
 import { WorkloadPlannerService } from './WorkloadPlannerService';
 import { ExecutionPlaneService } from './ExecutionPlaneService';
 import { ProjectionRegistryService } from './ProjectionRegistryService';
+import { QueryRegistryService } from './QueryRegistryService';
 
 /**
  * OrchestrationService is the entrypoint for the Parrot OS runtime.
@@ -23,6 +24,7 @@ export class OrchestrationService {
     private workloadPlannerService: WorkloadPlannerService;
     private executionPlaneService: ExecutionPlaneService;
     private projectionRegistryService: ProjectionRegistryService;
+    private queryRegistryService: QueryRegistryService;
 
     constructor(
         projectRepo: ProjectRepository,
@@ -33,7 +35,8 @@ export class OrchestrationService {
         parrotProgressService: ParrotProgressService,
         workloadPlannerService: WorkloadPlannerService,
         executionPlaneService: ExecutionPlaneService,
-        projectionRegistryService: ProjectionRegistryService
+        projectionRegistryService: ProjectionRegistryService,
+        queryRegistryService: QueryRegistryService
     ) {
         this.projectRepo = projectRepo;
         this.sseManager = sseManager;
@@ -44,6 +47,7 @@ export class OrchestrationService {
         this.workloadPlannerService = workloadPlannerService;
         this.executionPlaneService = executionPlaneService;
         this.projectionRegistryService = projectionRegistryService;
+        this.queryRegistryService = queryRegistryService;
     }
 
     /**
@@ -101,11 +105,62 @@ export class OrchestrationService {
             });
 
             const sourceProfiles = await this.bronzeDiscoveryService.discoverSources(ctx);
-            const projectionRegistry = await this.projectionRegistryService.registerSourceProfiles(
+            const previousProjectionRegistry = await this.projectionRegistryService.loadRegistry(tenantId, projectId);
+            const previousQueryRegistry = await this.queryRegistryService.loadRegistry(tenantId, projectId);
+            const invalidationHints = await this.parrotRuntimeService.buildRuntimeInvalidationHints(
+                tenantId,
+                projectId,
+                sourceProfiles,
+                previousProjectionRegistry,
+                invalidatedSources
+            );
+
+            this.sseManager.broadcastToTenant(tenantId, 'runtime_progress', {
+                step: 'Projection Planning',
+                progress: 52,
+                status: 'in_progress',
+                requestId: parrotBootstrap.requestId,
+                invalidationHints: invalidationHints.length
+            });
+
+            const compiledAt = new Date().toISOString();
+            const projectionPlan = await this.parrotRuntimeService.compileProjectionPlan({
+                tenantId,
+                projectId,
+                requestId: parrotBootstrap.requestId,
+                sourceProfiles,
+                previousProjectionRegistry,
+                previousQueryRegistry,
+                invalidationHints,
+                activeProjectionVersions: Object.fromEntries(
+                    Object.entries(previousProjectionRegistry.projections).map(([projectionId, entry]) => [projectionId, entry.latestVersion])
+                ),
+                widgetCatalogVersion: 'runtime-widget-catalog-v1',
+                forceRediscover,
+                invalidatedSources,
+                compiledAt
+            });
+
+            await this.parrotProgressService.saveProjectionPlan(
                 tenantId,
                 projectId,
                 parrotBootstrap.requestId,
-                sourceProfiles
+                projectionPlan
+            );
+
+            const projectionRegistry = await this.projectionRegistryService.registerProjectionSpecs(
+                tenantId,
+                projectId,
+                parrotBootstrap.requestId,
+                projectionPlan.projectionSpecs,
+                projectionPlan.invalidationHints
+            );
+            const queryRegistry = await this.queryRegistryService.registerQuerySpecs(
+                tenantId,
+                projectId,
+                parrotBootstrap.requestId,
+                projectionPlan.querySpecs,
+                projectionPlan.invalidationHints
             );
 
             this.sseManager.broadcastToTenant(tenantId, 'runtime_progress', {
@@ -141,7 +196,7 @@ export class OrchestrationService {
                 executionSubmission
             );
 
-            const mindMapPackage = this.mindMapManifestService.build(sourceProfiles, parrotBootstrap.reverseEtl, executionPlan);
+            const mindMapPackage = this.mindMapManifestService.build(sourceProfiles, parrotBootstrap.reverseEtl, executionPlan, projectionPlan);
             const { uri: mindmapYamlUri } = await this.parrotProgressService.saveMindMapYaml(
                 tenantId,
                 projectId,
@@ -160,7 +215,11 @@ export class OrchestrationService {
                 mindmapManifest: mindMapPackage.manifest,
                 mindmapYaml: mindMapPackage.yaml,
                 sourceMetadata: sourceProfiles,
+                projectionPlan,
                 projectionRegistry: projectionRegistry.registry,
+                queryRegistry: queryRegistry.registry,
+                mlRecommendations: projectionPlan.mlRecommendations,
+                invalidationHints: projectionPlan.invalidationHints,
                 executionPlan,
                 executionSubmission,
                 metadataArtifacts: {
@@ -172,16 +231,30 @@ export class OrchestrationService {
                     mindmapManifestUri,
                     executionPlanUri: parrotBootstrap.artifacts.executionPlanUri,
                     executionSubmissionUri: parrotBootstrap.artifacts.executionSubmissionUri,
-                    projectionRegistryUri: projectionRegistry.registryUri
+                    projectionRegistryUri: projectionRegistry.registryUri,
+                    queryRegistryUri: queryRegistry.registryUri,
+                    projectionPlanUri: parrotBootstrap.artifacts.projectionPlanUri
                 }
             };
 
+            const cacheEligibleQueries = projectionPlan.querySpecs.filter((querySpec) => querySpec.executionPolicy.mode !== 'direct').length;
             finalVitals = {
                 runtimeLatencyMs: Date.now() - startTime,
                 pathUsed: 'parrot_os',
                 cacheHitRate: 0,
+                cacheEligibleQueryRatio: projectionPlan.querySpecs.length > 0 ? cacheEligibleQueries / projectionPlan.querySpecs.length : 0,
                 estimatedTokensUsed: 0,
-                tasksExecuted: ['bronze_discovery', 'projection_registry', 'workload_planning', 'execution_submission', 'mindmap_generation', 'recommendation_staging'],
+                tasksExecuted: [
+                    'bronze_discovery',
+                    'sentinel_invalidation',
+                    'projection_plan_compilation',
+                    'projection_registry',
+                    'query_registry',
+                    'workload_planning',
+                    'execution_submission',
+                    'mindmap_generation',
+                    'recommendation_staging'
+                ],
                 startedAt: new Date(startTime).toISOString(),
                 completedAt: new Date().toISOString()
             } satisfies RuntimeVitals;
@@ -201,6 +274,9 @@ export class OrchestrationService {
                     executionPlanUri: parrotBootstrap.artifacts.executionPlanUri,
                     executionSubmissionUri: parrotBootstrap.artifacts.executionSubmissionUri,
                     projectionRegistryUri: projectionRegistry.registryUri,
+                    queryRegistryUri: queryRegistry.registryUri,
+                    projectionPlanUri: parrotBootstrap.artifacts.projectionPlanUri,
+                    mlRecommendationCount: projectionPlan.mlRecommendations.length,
                     executionEngine: executionPlan.engine,
                     executionStatus: executionSubmission.status
                 };
@@ -259,6 +335,7 @@ export class OrchestrationService {
             project.runtimeVitals.lastRunDurationMs = vitals.runtimeLatencyMs;
             project.runtimeVitals.lastPathUsed = vitals.pathUsed;
             project.runtimeVitals.cacheHitRate = vitals.cacheHitRate;
+            project.runtimeVitals.cacheEligibleQueryRatio = vitals.cacheEligibleQueryRatio;
             project.runtimeVitals.runsThisMonth += 1;
             project.runtimeVitals.estimatedTokensUsed += vitals.estimatedTokensUsed;
         }

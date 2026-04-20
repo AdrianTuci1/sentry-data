@@ -7,10 +7,15 @@ import { ReverseEtlHeadService } from './ReverseEtlHeadService';
 import { SentinelClient } from './SentinelClient';
 import {
     ParrotBootstrapResult,
+    ParrotInvalidationHint,
+    ParrotProjectionPlan,
     ParrotProgressFile,
     ParrotRuntimeMetadata,
-    ParrotSentinelReport
+    ParrotRuntimeState,
+    ParrotSentinelReport,
+    ParrotSourceProfile
 } from '../../types/parrot';
+import { ProjectionRegistryDocument } from './ProjectionRegistryService';
 
 export class ParrotRuntimeService {
     constructor(
@@ -80,6 +85,9 @@ export class ParrotRuntimeService {
             reverseEtlReceiptsUri: artifacts.reverseEtlReceiptsUri,
             executionPlanUri: artifacts.executionPlanUri,
             executionSubmissionUri: artifacts.executionSubmissionUri,
+            projectionPlanUri: artifacts.projectionPlanUri,
+            queryRegistryUri: artifacts.queryRegistryUri,
+            projectionRegistryUri: artifacts.projectionRegistryUri,
             sourceFingerprint: alignedExecutionScore.metadata.source_fingerprint,
             translatorVersion: alignedExecutionScore.metadata.translator_version,
             updatedAt: new Date().toISOString(),
@@ -126,6 +134,26 @@ export class ParrotRuntimeService {
         return progressFile;
     }
 
+    public async buildRuntimeInvalidationHints(
+        tenantId: string,
+        projectId: string,
+        sourceProfiles: ParrotSourceProfile[],
+        previousProjectionRegistry?: ProjectionRegistryDocument,
+        invalidatedSources: string[] = []
+    ): Promise<ParrotInvalidationHint[]> {
+        return this.sentinelClient.buildInvalidationHints(
+            tenantId,
+            projectId,
+            sourceProfiles,
+            previousProjectionRegistry,
+            invalidatedSources
+        );
+    }
+
+    public async compileProjectionPlan(runtimeState: ParrotRuntimeState): Promise<ParrotProjectionPlan> {
+        return this.parrotNeuralEngine.compileProjectionPlan(runtimeState);
+    }
+
     public async completeRun(
         tenantId: string,
         projectId: string,
@@ -164,6 +192,9 @@ export class ParrotRuntimeService {
             reverseEtlReceiptsUri: bootstrap.artifacts.reverseEtlReceiptsUri,
             executionPlanUri: bootstrap.artifacts.executionPlanUri,
             executionSubmissionUri: bootstrap.artifacts.executionSubmissionUri,
+            projectionPlanUri: bootstrap.artifacts.projectionPlanUri,
+            queryRegistryUri: bootstrap.artifacts.queryRegistryUri,
+            projectionRegistryUri: bootstrap.artifacts.projectionRegistryUri,
             sourceFingerprint: bootstrap.executionScore.metadata.source_fingerprint,
             translatorVersion: bootstrap.executionScore.metadata.translator_version,
             updatedAt: new Date().toISOString(),

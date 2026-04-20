@@ -1,4 +1,6 @@
 import { config } from '../../config';
+import { ProjectionRegistryDocument } from './ProjectionRegistryService';
+import { ParrotInvalidationHint, ParrotSourceProfile } from '../../types/parrot';
 
 export interface SentinelGoalResponse {
     status: string;
@@ -101,6 +103,44 @@ export class SentinelClient {
         }
     }
 
+    public async buildInvalidationHints(
+        tenantId: string,
+        projectId: string,
+        sourceProfiles: ParrotSourceProfile[],
+        previousProjectionRegistry?: ProjectionRegistryDocument,
+        invalidatedSources: string[] = []
+    ): Promise<ParrotInvalidationHint[]> {
+        if (this.baseUrl) {
+            try {
+                const response = await fetch(this.resolveApiUrl('evaluate_runtime'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Internal-Secret': config.worker.secret
+                    },
+                    body: JSON.stringify({
+                        tenant_id: tenantId,
+                        project_id: projectId,
+                        source_profiles: sourceProfiles,
+                        previous_projection_registry: previousProjectionRegistry,
+                        invalidated_sources: invalidatedSources
+                    })
+                });
+
+                const data = await response.json().catch(() => ({}));
+                if (response.ok && Array.isArray(data.invalidation_hints)) {
+                    return data.invalidation_hints as ParrotInvalidationHint[];
+                }
+
+                console.warn(`[SentinelClient] Runtime evaluation failed with status ${response.status}. Using local invalidation heuristics.`);
+            } catch (error) {
+                console.warn('[SentinelClient] Runtime evaluation unavailable. Using local invalidation heuristics.', error);
+            }
+        }
+
+        return this.buildLocalInvalidationHints(sourceProfiles, previousProjectionRegistry, invalidatedSources);
+    }
+
     private buildFallbackAlignment(executionScore: any, reason: string): SentinelAlignmentResponse {
         return {
             status: 'fallback_aligned',
@@ -111,6 +151,116 @@ export class SentinelClient {
             details: {
                 mode: 'local_fallback'
             }
+        };
+    }
+
+    private buildLocalInvalidationHints(
+        sourceProfiles: ParrotSourceProfile[],
+        previousProjectionRegistry?: ProjectionRegistryDocument,
+        invalidatedSources: string[] = []
+    ): ParrotInvalidationHint[] {
+        const hints: ParrotInvalidationHint[] = [];
+        const createdAt = new Date().toISOString();
+        const projectionEntries = Object.values(previousProjectionRegistry?.projections || {});
+
+        for (const profile of sourceProfiles) {
+            if (invalidatedSources.includes(profile.sourceId)) {
+                hints.push(this.buildHint(
+                    `sentinel-${profile.sourceId}-source-invalidated`,
+                    'source',
+                    profile.sourceId,
+                    profile.sourceId,
+                    'source_cursor_changed',
+                    'warning',
+                    ['source', 'projection', 'query', 'widget', 'ml_recommendation'],
+                    'Recompile projections and query specs for this source before serving cached outputs.',
+                    createdAt
+                ));
+            }
+
+            const previousForSource = projectionEntries.filter((entry) => entry.sourceId === profile.sourceId);
+            const fingerprintChanged = previousForSource.some((entry) => entry.inputFingerprint && entry.inputFingerprint !== profile.fingerprint);
+            if (fingerprintChanged) {
+                hints.push(this.buildHint(
+                    `sentinel-${profile.sourceId}-fingerprint-drift`,
+                    'source',
+                    profile.sourceId,
+                    profile.sourceId,
+                    'source_schema_or_partition_fingerprint_changed',
+                    'warning',
+                    ['projection', 'query', 'widget', 'ml_recommendation'],
+                    'Invalidate dependent query results and compile a new projection version from the raw source.',
+                    createdAt
+                ));
+            }
+
+            if (profile.storageMetrics && profile.storageMetrics.objectCount === 0) {
+                hints.push(this.buildHint(
+                    `sentinel-${profile.sourceId}-empty-prefix`,
+                    'source',
+                    profile.sourceId,
+                    profile.sourceId,
+                    'no_objects_detected_for_source_prefix',
+                    'critical',
+                    ['source', 'projection', 'query', 'widget', 'ml_recommendation'],
+                    'Hold automatic widgets until the source prefix contains queryable objects.',
+                    createdAt
+                ));
+            }
+
+            if (profile.metricCandidates.length === 0) {
+                hints.push(this.buildHint(
+                    `sentinel-${profile.sourceId}-no-metrics`,
+                    'source',
+                    profile.sourceId,
+                    profile.sourceId,
+                    'metric_candidates_missing',
+                    'info',
+                    ['widget', 'ml_recommendation'],
+                    'Prefer coverage and freshness widgets; skip supervised ML recommendations until metrics are detected.',
+                    createdAt
+                ));
+            }
+
+            if (profile.timestampCandidates.length === 0) {
+                hints.push(this.buildHint(
+                    `sentinel-${profile.sourceId}-no-timestamps`,
+                    'source',
+                    profile.sourceId,
+                    profile.sourceId,
+                    'timestamp_candidates_missing',
+                    'info',
+                    ['widget', 'ml_recommendation'],
+                    'Avoid time-series widgets and use snapshot-safe queries for this source.',
+                    createdAt
+                ));
+            }
+        }
+
+        return hints;
+    }
+
+    private buildHint(
+        id: string,
+        scope: ParrotInvalidationHint['scope'],
+        targetId: string,
+        sourceId: string | undefined,
+        reason: string,
+        severity: ParrotInvalidationHint['severity'],
+        invalidates: ParrotInvalidationHint['invalidates'],
+        recommendedAction: string,
+        createdAt: string
+    ): ParrotInvalidationHint {
+        return {
+            id,
+            scope,
+            targetId,
+            sourceId,
+            reason,
+            severity,
+            invalidates,
+            recommendedAction,
+            createdAt
         };
     }
 

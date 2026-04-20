@@ -1,9 +1,12 @@
 import yaml from 'js-yaml';
 import {
     ParrotExecutionPlan,
+    ParrotMLRecommendation,
     ParrotMindMapGroup,
     ParrotMindMapInsight,
     ParrotMindMapManifest,
+    ParrotProjectionPlan,
+    ParrotQuerySpec,
     ParrotSourceProfile,
     ReverseEtlStreamPlan
 } from '../../types/parrot';
@@ -15,9 +18,16 @@ export interface MindMapDiscoveryPackage {
 }
 
 export class MindMapManifestService {
-    public build(sourceProfiles: ParrotSourceProfile[], reverseEtl: ReverseEtlStreamPlan, executionPlan: ParrotExecutionPlan): MindMapDiscoveryPackage {
+    public build(
+        sourceProfiles: ParrotSourceProfile[],
+        reverseEtl: ReverseEtlStreamPlan,
+        executionPlan: ParrotExecutionPlan,
+        projectionPlan?: ParrotProjectionPlan
+    ): MindMapDiscoveryPackage {
         const groups = this.buildGroups(sourceProfiles);
-        const insights = this.buildInsights(sourceProfiles, groups, reverseEtl);
+        const insights = projectionPlan
+            ? this.buildInsightsFromProjectionPlan(sourceProfiles, groups, reverseEtl, projectionPlan)
+            : this.buildInsights(sourceProfiles, groups, reverseEtl);
 
         const manifest: ParrotMindMapManifest = {
             version: '1.0',
@@ -80,12 +90,16 @@ export class MindMapManifestService {
                     sourceProfiles.map((profile) => [profile.sourceId, profile.goldViews])
                 ),
                 groups,
-                insights
+                insights,
+                projections: projectionPlan?.projectionSpecs,
+                queries: projectionPlan?.querySpecs,
+                mlRecommendations: projectionPlan?.mlRecommendations,
+                invalidationHints: projectionPlan?.invalidationHints
             }
         };
 
         const yamlContent = yaml.dump(manifest, { noRefs: true, lineWidth: 120 });
-        const projection = this.buildProjection(sourceProfiles, groups, insights);
+        const projection = this.buildProjection(sourceProfiles, groups, insights, projectionPlan);
         projection.mindmapManifest = manifest;
         projection.mindmapYaml = yamlContent;
 
@@ -403,7 +417,125 @@ export class MindMapManifestService {
         return insights;
     }
 
-    private buildProjection(sourceProfiles: ParrotSourceProfile[], groups: ParrotMindMapGroup[], insights: ParrotMindMapInsight[]) {
+    private buildInsightsFromProjectionPlan(
+        sourceProfiles: ParrotSourceProfile[],
+        groups: ParrotMindMapGroup[],
+        reverseEtl: ReverseEtlStreamPlan,
+        projectionPlan: ParrotProjectionPlan
+    ): ParrotMindMapInsight[] {
+        const operationalGroup = groups.find((group) => group.id === 'grp-operational')!;
+        const mlGroup = groups.find((group) => group.id === 'grp-ml-recommended')!;
+        const reverseInsights = this.buildInsights(sourceProfiles, groups, reverseEtl)
+            .filter((insight) => insight.group_id === 'grp-reverse-etl-recommended');
+
+        const queryInsights = projectionPlan.querySpecs.map((querySpec) => this.buildQueryInsight(querySpec, operationalGroup.id));
+        const mlInsights = projectionPlan.mlRecommendations.map((recommendation) => this.buildMlInsight(recommendation, mlGroup.id));
+
+        return [...queryInsights, ...mlInsights, ...reverseInsights];
+    }
+
+    private buildQueryInsight(querySpec: ParrotQuerySpec, groupId: string): ParrotMindMapInsight {
+        const isActive = querySpec.status === 'active';
+        return {
+            id: querySpec.widgetId,
+            title: querySpec.title,
+            type: querySpec.widgetType,
+            widget_type: querySpec.widgetType,
+            group_id: groupId,
+            status: isActive ? 'active' : 'recommended',
+            activationMode: isActive ? 'automatic' : 'manual',
+            adjusted_data_columns: querySpec.dependencies.columns,
+            query: querySpec.sql,
+            sql: querySpec.sql,
+            logic: {
+                intent: `Serve ${querySpec.title} from projection ${querySpec.projectionId}.`,
+                code: querySpec.sql,
+                compiled_code: querySpec.sql,
+                effective_query: querySpec.sql
+            },
+            lineage: {
+                source_keys: [querySpec.projectionId]
+            },
+            editMode: 'code',
+            suggestions: [
+                {
+                    id: `suggest-${querySpec.queryId}-cache-policy`,
+                    source: 'sentinel',
+                    mode: 'intent',
+                    title: 'Keep cache tied to source fingerprint',
+                    rationale: `This query uses ${querySpec.executionPolicy.mode} and refreshes ${querySpec.executionPolicy.refreshStrategy}.`,
+                    proposedIntent: 'Refresh only when Sentinel marks the source or projection fingerprint stale.'
+                }
+            ],
+            validation: isActive
+                ? this.buildActiveValidation('Query spec was compiled from the versioned projection plan.')
+                : {
+                    status: 'draft',
+                    checks: [
+                        { name: 'safety', status: 'pending', message: querySpec.invalidationReason || 'Sentinel requested validation before activation.' }
+                    ]
+                },
+            widgetContract: querySpec.widgetContract,
+            querySpec
+        };
+    }
+
+    private buildMlInsight(recommendation: ParrotMLRecommendation, groupId: string): ParrotMindMapInsight {
+        return {
+            id: `ins-${recommendation.recommendationId}`,
+            title: recommendation.title,
+            type: 'predictive',
+            widget_type: 'predictive',
+            group_id: groupId,
+            status: 'recommended',
+            activationMode: 'manual',
+            adjusted_data_columns: [
+                ...(recommendation.targetColumn ? [recommendation.targetColumn] : []),
+                ...recommendation.featureColumns
+            ],
+            logic: {
+                intent: recommendation.rationale,
+                code: 'ml_model.launch = manual_approval',
+                compiled_code: JSON.stringify(recommendation, null, 2)
+            },
+            lineage: {
+                source_keys: [recommendation.projectionId]
+            },
+            editMode: 'intent',
+            suggestions: [
+                {
+                    id: `suggest-${recommendation.recommendationId}-approval`,
+                    source: 'sentinel',
+                    mode: 'intent',
+                    title: 'Require reviewed ML launch',
+                    rationale: 'The executor is available through an explicit approval endpoint; no model starts from discovery alone.',
+                    proposedIntent: 'Start training only after the user approves target, feature set, and objective.'
+                }
+            ],
+            validation: {
+                status: 'draft',
+                checks: [
+                    { name: 'schema', status: 'passed', message: 'Recommendation was compiled from discovered metadata only.' },
+                    { name: 'safety', status: 'passed', message: 'Launch policy is manual approval.' }
+                ]
+            },
+            widgetContract: {
+                widgetType: 'predictive',
+                expectedShape: 'table',
+                requiredFields: ['model_id', 'metrics'],
+                alignmentMode: 'best_effort',
+                source: 'runtime_contract'
+            },
+            mlRecommendation: recommendation
+        };
+    }
+
+    private buildProjection(
+        sourceProfiles: ParrotSourceProfile[],
+        groups: ParrotMindMapGroup[],
+        insights: ParrotMindMapInsight[],
+        projectionPlan?: ParrotProjectionPlan
+    ) {
         const connector = sourceProfiles.map((profile) => ({
             id: profile.sourceId,
             name: profile.sourceName,
@@ -459,7 +591,12 @@ export class MindMapManifestService {
             })),
             mindmapManifest: undefined,
             mindmapYaml: '',
-            sourceMetadata: sourceProfiles
+            sourceMetadata: sourceProfiles,
+            projectionPlan,
+            projectionSpecs: projectionPlan?.projectionSpecs || [],
+            querySpecs: projectionPlan?.querySpecs || [],
+            mlRecommendations: projectionPlan?.mlRecommendations || [],
+            invalidationHints: projectionPlan?.invalidationHints || []
         };
 
         return projection;

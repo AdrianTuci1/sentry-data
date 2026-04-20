@@ -101,6 +101,20 @@ export class R2StorageService {
         }
     }
 
+    public async getJsonIfExists<T = unknown>(key: string): Promise<T | null> {
+        try {
+            const result = await this.client.send(new GetObjectCommand({ Bucket: this.dataBucket, Key: key }));
+            const str = await result.Body?.transformToString();
+            if (!str) return null;
+            return JSON.parse(str) as T;
+        } catch (error: any) {
+            if (error.name === 'NoSuchKey' || error.name === 'NotFound' || error.$metadata?.httpStatusCode === 404) {
+                return null;
+            }
+            throw error;
+        }
+    }
+
     /**
      * Lists ALL objects under a prefix (flat list, no delimiter).
      */

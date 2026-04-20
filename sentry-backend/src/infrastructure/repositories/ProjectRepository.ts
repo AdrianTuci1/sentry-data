@@ -32,6 +32,7 @@ export interface ProjectEntity extends Entity {
         lastRunDurationMs?: number;
         lastPathUsed?: string;
         cacheHitRate?: number;
+        cacheEligibleQueryRatio?: number;
     };
     parrotRuntime?: ParrotRuntimeMetadata;
 }
