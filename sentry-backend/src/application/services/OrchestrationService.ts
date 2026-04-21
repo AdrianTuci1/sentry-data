@@ -109,6 +109,11 @@ export class OrchestrationService {
             });
 
             const sourceProfiles = await this.bronzeDiscoveryService.discoverSources(ctx);
+            this.emitRuntimeMindmapPartial(tenantId, parrotBootstrap.requestId, 'bronze_discovery', {
+                ...this.buildRuntimeMindmapPatch(sourceProfiles),
+                sourceMetadata: sourceProfiles
+            });
+
             const previousProjectionRegistry = await this.projectionRegistryService.loadRegistry(tenantId, projectId);
             const previousQueryRegistry = await this.queryRegistryService.loadRegistry(tenantId, projectId);
             const sentinelPolicyState = await this.sentinelFeedbackService.loadPolicyState(tenantId, projectId);
@@ -122,6 +127,10 @@ export class OrchestrationService {
                 [],
                 sentinelPolicyState
             );
+            this.emitRuntimeMindmapPartial(tenantId, parrotBootstrap.requestId, 'sentinel_invalidation', {
+                invalidationHints: initialInvalidationHints,
+                sentinelModelSignals: this.parrotRuntimeService.getLastSentinelModelSignals()
+            });
 
             this.sseManager.broadcastToTenant(tenantId, 'runtime_progress', {
                 step: 'Projection Planning',
@@ -162,6 +171,20 @@ export class OrchestrationService {
             );
             projectionPlan.invalidationHints = fullInvalidationHints;
             projectionPlan.sentinelModelSignals = this.parrotRuntimeService.getLastSentinelModelSignals();
+            this.emitRuntimeMindmapPartial(tenantId, parrotBootstrap.requestId, 'projection_plan', {
+                ...this.buildRuntimeMindmapPatch(sourceProfiles, projectionPlan),
+                projectionPlanPreview: {
+                    projectionCount: projectionPlan.projectionSpecs.length,
+                    queryCount: projectionPlan.querySpecs.length,
+                    mlRecommendationCount: projectionPlan.mlRecommendations.length,
+                    invalidationHintCount: projectionPlan.invalidationHints.length
+                },
+                projectionSpecs: projectionPlan.projectionSpecs,
+                querySpecs: projectionPlan.querySpecs,
+                mlRecommendations: projectionPlan.mlRecommendations,
+                invalidationHints: projectionPlan.invalidationHints,
+                sentinelModelSignals: projectionPlan.sentinelModelSignals || []
+            });
 
             await this.parrotProgressService.saveProjectionPlan(
                 tenantId,
@@ -329,6 +352,115 @@ export class OrchestrationService {
             });
             throw error;
         }
+    }
+
+    private emitRuntimeMindmapPartial(tenantId: string, requestId: string, stage: string, discoveryPatch: any): void {
+        this.sseManager.broadcastToTenant(tenantId, 'runtime_mindmap_partial', {
+            requestId,
+            stage,
+            emittedAt: new Date().toISOString(),
+            discoveryPatch
+        });
+    }
+
+    private buildRuntimeMindmapPatch(sourceProfiles: any[], projectionPlan?: any): any {
+        const connector = sourceProfiles.map((profile) => ({
+            id: profile.sourceId,
+            name: profile.sourceName,
+            type: profile.sourceType,
+            status: 'ok',
+            uri: profile.uri,
+            metricCount: profile.metricCandidates?.length || 0,
+            timestampCount: profile.timestampCandidates?.length || 0
+        }));
+
+        const actionType = sourceProfiles.map((profile) => ({
+            id: `action-${profile.sourceId}`,
+            name: 'Virtualize',
+            connector_id: profile.sourceId,
+            status: 'ok'
+        }));
+
+        const adjustedData = sourceProfiles.flatMap((profile) => (profile.goldViews || []).map((goldView: any) => ({
+            id: goldView.id,
+            name: goldView.title,
+            title: goldView.title,
+            origin_id: profile.sourceId,
+            action_type_id: `action-${profile.sourceId}`,
+            status: 'ok',
+            columns: (goldView.columns || []).map((column: any) => ({
+                id: `${goldView.id}-${column.name}`,
+                name: column.name,
+                title: column.name,
+                type: column.type,
+                status: 'ok'
+            }))
+        })));
+
+        const queryGroup = projectionPlan?.querySpecs?.length
+            ? [{
+                id: 'runtime-query-insights',
+                name: 'Runtime query insights',
+                title: 'Runtime query insights',
+                status: 'ok',
+                color: 'default',
+                activation_mode: 'automatic',
+                adjusted_data_ids: projectionPlan.projectionSpecs?.map((spec: any) => spec.projectionId) || []
+            }]
+            : [];
+
+        const mlGroup = projectionPlan?.mlRecommendations?.length
+            ? [{
+                id: 'runtime-ml-recommendations',
+                name: 'ML recommendations',
+                title: 'ML recommendations',
+                status: 'warning',
+                color: 'blue',
+                activation_mode: 'manual',
+                adjusted_data_ids: projectionPlan.mlRecommendations.map((recommendation: any) => recommendation.projectionId)
+            }]
+            : [];
+
+        const queryInsights = (projectionPlan?.querySpecs || []).map((querySpec: any) => ({
+            id: querySpec.widgetId || querySpec.queryId,
+            title: querySpec.title,
+            type: querySpec.widgetType,
+            widget_type: querySpec.widgetType,
+            group_id: 'runtime-query-insights',
+            status: querySpec.status === 'active' ? 'ok' : 'warning',
+            activationMode: 'automatic',
+            adjusted_data_columns: querySpec.dependencies?.columns || [],
+            query: querySpec.sql,
+            sql: querySpec.sql,
+            grid_span: 'col-span-1',
+            color_theme: 'theme-audience',
+            footerText: querySpec.executionPolicy?.mode || 'runtime',
+            footerBottom: 'Projection query'
+        }));
+
+        const mlInsights = (projectionPlan?.mlRecommendations || []).map((recommendation: any) => ({
+            id: recommendation.recommendationId,
+            title: recommendation.title,
+            type: recommendation.taskType,
+            widget_type: 'predictive',
+            group_id: 'runtime-ml-recommendations',
+            status: 'warning',
+            activationMode: 'manual',
+            adjusted_data_columns: recommendation.featureColumns || [],
+            grid_span: 'col-span-1',
+            color_theme: 'theme-productivity',
+            footerText: 'Manual approval',
+            footerBottom: recommendation.scaffoldId || 'ML scaffold'
+        }));
+
+        return {
+            connector,
+            actionType,
+            origin: [],
+            adjustedData,
+            group: [...queryGroup, ...mlGroup],
+            insight: [...queryInsights, ...mlInsights]
+        };
     }
 
     public async saveProjectDiscovery(tenantId: string, projectId: string, discovery: any, vitals?: RuntimeVitals) {

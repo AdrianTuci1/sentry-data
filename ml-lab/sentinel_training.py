@@ -7,7 +7,6 @@ import argparse
 import json
 import os
 import shutil
-import sys
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -20,11 +19,22 @@ import torch.nn as nn
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from sklearn.model_selection import train_test_split
 
-BASE_DIR = Path(__file__).resolve().parent
-if str(BASE_DIR) not in sys.path:
-    sys.path.insert(0, str(BASE_DIR))
 
-from models.predictive_drift import LSTMDriftModel
+class LSTMDriftModel(nn.Module):
+    """PyTorch LSTM used by the Sentinel drift trainer."""
+
+    def __init__(self, input_size=1, hidden_size=32, num_layers=2):
+        super().__init__()
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+        self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
+        self.fc = nn.Linear(hidden_size, 1)
+
+    def forward(self, x):
+        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(x.device)
+        c0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(x.device)
+        out, _ = self.lstm(x, (h0, c0))
+        return self.fc(out[:, -1, :])
 
 
 @dataclass

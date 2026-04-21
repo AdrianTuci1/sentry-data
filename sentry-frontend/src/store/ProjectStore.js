@@ -75,6 +75,11 @@ export class ProjectStore {
         if (type === 'runtime_progress') {
             console.log("[ProjectStore] Runtime Progress:", data.step, `${data.progress}%`);
         }
+
+        if (type === 'runtime_mindmap_partial') {
+            console.log("[ProjectStore] Runtime MindMap Partial:", data.stage);
+            this.rootStore.workspaceStore.data.applyRuntimeMindMapPartial(data);
+        }
     }
 
     async loadProjectsForOrg(orgId) {
