@@ -90,19 +90,42 @@ python3 align_demo.py
 ### Training remote pe Modal
 
 ```bash
-modal run ml-lab/modal_training.py
+modal run ml-lab/modal_training.py --epochs 40 --lr 0.001 --hidden-size 32 --sequence-length 10 --rows-per-source 320
 ```
 
-### Sandbox executor in development
+### Training local parametrizabil
 
 ```bash
-modal serve modal_executor.py
+python3 ml-lab/sentinel_training.py \
+  --bundle-dir ml-lab/datasets/training_bundle \
+  --output-dir ml-lab/checkpoints/sentinel \
+  --epochs 40 \
+  --learning-rate 0.001 \
+  --hidden-size 32 \
+  --num-layers 2 \
+  --sequence-length 10
 ```
 
-### Sandbox executor in production
+Pentru publicare in R2:
 
 ```bash
-modal deploy modal_executor.py
+python3 ml-lab/sentinel_training.py \
+  --bundle-dir ml-lab/datasets/training_bundle \
+  --output-dir ml-lab/checkpoints/sentinel \
+  --upload-r2 \
+  --r2-prefix system/r2-system/models/sentinel
+```
+
+### Sentinel runtime in development
+
+```bash
+modal serve modal_sentinel.py
+```
+
+### Sentinel runtime in production
+
+```bash
+modal deploy modal_sentinel.py
 ```
 
 ### Vezi volume-urile Modal

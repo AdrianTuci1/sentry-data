@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import numpy as np
 import os
+import json
+from pathlib import Path
 
 class LSTMDriftModel(nn.Module):
     """
@@ -27,17 +29,44 @@ class RNNDriftPredictor:
     Evaluates concept drift using a pre-trained LSTM model.
     If no model is found, it falls back to basic statistical checks.
     """
-    def __init__(self, sequence_length: int = 10, model_path: str = "checkpoints/drift_lstm.pth"):
+    def __init__(
+        self,
+        sequence_length: int = 10,
+        model_path: str = "checkpoints/drift_lstm.pth",
+        manifest_path: str = None,
+    ):
         self.sequence_length = sequence_length
         self.threshold = 0.15
         self.model_path = model_path
+        self.manifest_path = manifest_path
         self.model = None
+        self.manifest = {}
         self._load_model()
 
     def _load_model(self):
+        manifest_path = self.manifest_path
+        if manifest_path is None:
+            candidate = Path(self.model_path).with_name("sentinel_model_manifest.json")
+            manifest_path = str(candidate) if candidate.exists() else None
+
+        if manifest_path and os.path.exists(manifest_path):
+            try:
+                with open(manifest_path, "r", encoding="utf-8") as handle:
+                    self.manifest = json.load(handle)
+                config = self.manifest.get("config", {})
+                self.sequence_length = int(config.get("sequence_length", self.sequence_length))
+                self.threshold = float(config.get("drift_z_threshold", self.threshold))
+            except Exception as e:
+                print(f"⚠️ Error loading Sentinel manifest: {e}.")
+
         if os.path.exists(self.model_path):
             try:
-                self.model = LSTMDriftModel()
+                config = self.manifest.get("config", {})
+                self.model = LSTMDriftModel(
+                    input_size=1,
+                    hidden_size=int(config.get("hidden_size", 32)),
+                    num_layers=int(config.get("num_layers", 2)),
+                )
                 self.model.load_state_dict(torch.load(self.model_path, map_location=torch.device('cpu')))
                 self.model.eval()
                 print(f"✅ LSTM Model loaded from {self.model_path}")
@@ -58,10 +87,8 @@ class RNNDriftPredictor:
         if self.model:
             with torch.no_grad():
                 tensor_input = torch.FloatTensor(input_data).view(1, self.sequence_length, 1)
-                prediction = self.model(tensor_input).item()
-                # Prediction is treated as 'next expected value' or 'drift score'
-                # For this implementation, let's assume it predicts the drift probability [0, 1]
-                drift_prob = float(prediction)
+                prediction = self.model(tensor_input)
+                drift_prob = float(torch.sigmoid(prediction).item())
         else:
             # Fallback to simulated logic
             avg = sum(input_data) / len(input_data)

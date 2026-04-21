@@ -102,22 +102,29 @@ Backend-ul nu ruleaza DuckDB si nu executa scaffolds Python. El cere un lease, t
 
 - construieste o imagine separata pentru PyTorch si ML;
 - monteaza Volume-ul `sentinel-ml-checkpoints`;
-- antreneaza `LSTMDriftModel`;
-- genereaza un `gold_manifest.json`;
-- scrie checkpoint-urile in `/checkpoints`.
+- genereaza un bundle sintetic de training;
+- antreneaza `LSTMDriftModel` cu hiperparametri configurabili;
+- scrie checkpoint-uri versionate in `/checkpoints/sentinel/<version>` si `/checkpoints/sentinel/latest`;
+- poate publica aceleasi artefacte in R2 sub `system/r2-system/models/sentinel/<version>`.
 
 Lansare:
 
 ```bash
-modal run ml-lab/modal_training.py
+modal run ml-lab/modal_training.py --epochs 40 --lr 0.001 --hidden-size 32 --sequence-length 10 --rows-per-source 320
 ```
 
 Artefacte asteptate:
 
 - `drift_lstm.pth`
-- `gold_manifest.json`
+- `sentinel_model_manifest.json`
 
-Pentru productie, checkpoint-urile ar trebui versiunate pe `latest`, `candidate` si `rollback`, cu metadata pentru dataset version, feature version, target variable, scoruri de evaluare, timestamp si commit SHA.
+Training-ul local foloseste acelasi cod:
+
+```bash
+python3 ml-lab/sentinel_training.py --bundle-dir ml-lab/datasets/training_bundle --output-dir ml-lab/checkpoints/sentinel --epochs 40 --learning-rate 0.001
+```
+
+Pentru productie, checkpoint-urile sunt versionate pe `<version>` si `latest`. Promovarea `candidate -> latest -> rollback` ar trebui facuta prin schimbarea pointerului/manifestului R2, nu prin redeploy obligatoriu al backend-ului.
 
 ## Testare recomandata
 
@@ -142,6 +149,7 @@ modal serve modal_ml_executor.py
 ```
 
 Trimite payload-uri conforme cu contractele din `r2-system/scaffolds/modal/`.
+Pentru Sentinel, `/health` trebuie sa arate daca modelul a fost incarcat din Volume sau din `SENTINEL_MODEL_MANIFEST_URI`.
 
 ### 4. Test pentru scaffold-ul de compatibilitate
 
