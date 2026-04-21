@@ -40,4 +40,11 @@ python3 ml-lab/datasets/generator/gemini_synthetic.py \
   --output-dir ml-lab/.generated/gemini_synthetic/commerce_stress
 ```
 
+Upload bundle-ul generat in R2:
+
+```bash
+python3 ml-lab/datasets/upload_bundle_to_r2.py \
+  --bundle-dir ml-lab/.generated/training_bundle
+```
+
 Modelul este configurabil prin `GEMINI_MODEL`, deci poate fi schimbat la `gemini-3.1-flash` daca acel cod de model exista in contul/API-ul folosit. Scriptul scrie CSV, JSONL si `manifest.json`.

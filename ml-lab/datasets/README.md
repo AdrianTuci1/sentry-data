@@ -28,6 +28,22 @@ Din `ml-lab/`:
 python3 -m datasets.generator --output-dir .generated/training_bundle --rows-per-source 240
 ```
 
+## Upload in R2
+
+```bash
+python3 ml-lab/datasets/upload_bundle_to_r2.py \
+  --bundle-dir ml-lab/.generated/training_bundle
+```
+
+Modal training poate folosi apoi acelasi prefix:
+
+```bash
+modal run ml-lab/modal_training.py \
+  --executor gpu-a10g
+```
+
+Prefix implicit: `s3://$R2_BUCKET_DATA/system/r2-system/training/sentinel/generated/latest`.
+
 ## Artefacte produse
 
 - `csv/`: surse sintetice gata de inspectat sau de convertit mai departe.

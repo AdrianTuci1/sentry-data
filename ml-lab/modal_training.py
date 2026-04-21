@@ -46,6 +46,7 @@ def _run_training_job(
     seed: int = 42,
     drift_z_threshold: float = 2.25,
     upload_r2: bool = True,
+    bundle_r2_uri: str = "",
     executor: str = "gpu-a10g",
 ):
     import os
@@ -53,8 +54,8 @@ def _run_training_job(
 
     sys.path.insert(0, "/root/ml-lab")
 
-    from datasets.generator.bundle import materialize_training_bundle
     from sentinel_training import TrainingConfig, train, upload_directory_to_r2
+    from training.sentinel.io import default_model_bundle_uri, default_r2_bucket, default_training_bundle_uri, parse_s3_uri
 
     bundle_dir = "/checkpoints/training_bundle"
     output_dir = "/checkpoints/sentinel"
@@ -64,9 +65,13 @@ def _run_training_job(
         from sentinel_training import now_version
         version = now_version()
 
+    resolved_bundle_r2_uri = bundle_r2_uri or default_training_bundle_uri()
+
     print(f"Starting Sentinel training on Modal executor '{executor}'.")
-    print(f"Generating synthetic bundle at {bundle_dir}")
-    materialize_training_bundle(output_dir=bundle_dir, rows_per_source=rows_per_source, seed=seed)
+    if resolved_bundle_r2_uri:
+        print(f"Using Sentinel training bundle from R2: {resolved_bundle_r2_uri}")
+    else:
+        print(f"No bundle R2 URI provided; generating synthetic bundle at {bundle_dir}")
 
     result = train(TrainingConfig(
         bundle_dir=bundle_dir,
@@ -82,17 +87,23 @@ def _run_training_job(
         test_size=0.2,
         seed=seed,
         rows_per_source=rows_per_source,
-    ))
+    ), bundle_r2_uri=resolved_bundle_r2_uri or None)
 
     if upload_r2:
-        bucket = os.getenv("R2_BUCKET_DATA") or os.getenv("R2_BUCKET")
+        model_r2_uri = default_model_bundle_uri(version)
+        bucket = default_r2_bucket()
+        if model_r2_uri:
+            bucket, prefix = parse_s3_uri(model_r2_uri)
+        else:
+            prefix = f"system/r2-system/models/sentinel/{version}"
         if bucket:
             uploaded = upload_directory_to_r2(
                 local_dir=Path(result["artifact_dir"]),
                 bucket=bucket,
-                prefix=f"system/r2-system/models/sentinel/{version}",
+                prefix=prefix,
             )
             result["r2"] = uploaded
+            result["model_bundle_uri"] = f"s3://{bucket}/{prefix}"
 
     volume.commit()
     print(result)
@@ -118,6 +129,7 @@ def train_drift_model_cpu(
     seed: int = 42,
     drift_z_threshold: float = 2.25,
     upload_r2: bool = True,
+    bundle_r2_uri: str = "",
 ):
     return _run_training_job(
         epochs=epochs,
@@ -130,6 +142,7 @@ def train_drift_model_cpu(
         seed=seed,
         drift_z_threshold=drift_z_threshold,
         upload_r2=upload_r2,
+        bundle_r2_uri=bundle_r2_uri,
         executor="cpu-large",
     )
 
@@ -154,6 +167,7 @@ def train_drift_model_gpu(
     seed: int = 42,
     drift_z_threshold: float = 2.25,
     upload_r2: bool = True,
+    bundle_r2_uri: str = "",
 ):
     return _run_training_job(
         epochs=epochs,
@@ -166,6 +180,7 @@ def train_drift_model_gpu(
         seed=seed,
         drift_z_threshold=drift_z_threshold,
         upload_r2=upload_r2,
+        bundle_r2_uri=bundle_r2_uri,
         executor="gpu-a10g",
     )
 
@@ -186,6 +201,7 @@ def main(
     seed: int = 42,
     drift_z_threshold: float = 2.25,
     upload_r2: bool = True,
+    bundle_r2_uri: str = "",
 ):
     if executor not in EXECUTOR_PROFILES:
         raise ValueError(f"Unknown executor '{executor}'. Choose one of: {', '.join(EXECUTOR_PROFILES)}")
@@ -204,4 +220,5 @@ def main(
         seed=seed,
         drift_z_threshold=drift_z_threshold,
         upload_r2=upload_r2,
+        bundle_r2_uri=bundle_r2_uri,
     )

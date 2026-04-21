@@ -32,6 +32,19 @@ GEMINI_API_KEY=... python3 ml-lab/datasets/generator/gemini_synthetic.py \
 
 If `gemini-3.1-flash` is not enabled in the account, pass the currently enabled Gemini Flash model through `--model` or `GEMINI_MODEL`.
 
+Upload the generated bundle to R2:
+
+```bash
+python3 ml-lab/datasets/upload_bundle_to_r2.py \
+  --bundle-dir ml-lab/.generated/training_bundle
+```
+
+Default training data path:
+
+```text
+s3://$R2_BUCKET_DATA/system/r2-system/training/sentinel/generated/latest
+```
+
 ## Train Locally
 
 ```bash
@@ -42,6 +55,16 @@ python3 ml-lab/sentinel_training.py \
   --learning-rate 0.001 \
   --hidden-size 32 \
   --sequence-length 10
+```
+
+Train locally from an R2 bundle:
+
+```bash
+python3 ml-lab/sentinel_training.py \
+  --bundle-r2-uri "s3://$R2_BUCKET_DATA/system/r2-system/training/sentinel/synthetic-v1" \
+  --bundle-dir ml-lab/.generated/r2-training-bundle \
+  --output-dir ml-lab/checkpoints/sentinel \
+  --epochs 40
 ```
 
 Upload trained artifacts to R2:
@@ -99,6 +122,12 @@ modal run ml-lab/modal_training.py \
   --upload-r2 true
 ```
 
+If `--bundle-r2-uri` is omitted, Modal uses `SENTINEL_TRAINING_BUNDLE_URI` or the default training data path above. Model artifacts are uploaded by default under:
+
+```text
+s3://$R2_BUCKET_DATA/system/r2-system/models/sentinel/<version>
+```
+
 Executor profiles live in `ml-lab/modal_training.py`:
 
 - `cpu-large`: 8 CPU, 32 GB RAM, no GPU, 2 hour timeout.
@@ -122,10 +151,11 @@ modal deploy modal_sentinel.py
 
 Runtime model loading order:
 
-1. `SENTINEL_MODEL_MANIFEST_URI` and optional `SENTINEL_MODEL_CHECKPOINT_URI` from R2.
-2. `SENTINEL_MODEL_DIR`.
-3. Modal Volume path `/sentinel-models/sentinel/latest`.
-4. Fallback statistics if no checkpoint exists.
+1. `SENTINEL_MODEL_BUNDLE_URI`, for example `s3://bucket/system/r2-system/models/sentinel/<version>`.
+2. `SENTINEL_MODEL_MANIFEST_URI` and optional `SENTINEL_MODEL_CHECKPOINT_URI` from R2.
+3. `SENTINEL_MODEL_DIR`.
+4. Modal Volume path `/sentinel-models/sentinel/latest`.
+5. Fallback statistics if no checkpoint exists.
 
 Health check:
 

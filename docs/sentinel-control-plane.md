@@ -12,7 +12,7 @@ Sentinel are doua roluri complementare:
 - `QueryRiskModel`: model antrenat din scenarii de query generation plus augmentari SQL sigure/riscante; detecteaza SQL distructiv sau formule riscante.
 - `InteractionPolicyModel`: model antrenat din `rl_feedback_events.jsonl`; estimeaza interesul pentru recomandari ML si widget-uri fara raw rows.
 
-Trainerul este in [sentinel_training.py](/Users/adriantucicovenco/Proiecte/sentry-data/ml-lab/sentinel_training.py), iar runtime-ul Modal este in [sentinel_service](/Users/adriantucicovenco/Proiecte/sentry-data/modal_apps/sentinel_service).
+Trainerul este modularizat in [training/sentinel](/Users/adriantucicovenco/Proiecte/sentry-data/ml-lab/training/sentinel), entrypoint-ul CLI este [sentinel_training.py](/Users/adriantucicovenco/Proiecte/sentry-data/ml-lab/sentinel_training.py), iar runtime-ul Modal este in [sentinel_service](/Users/adriantucicovenco/Proiecte/sentry-data/modal_apps/sentinel_service).
 
 ## Feedback RL
 

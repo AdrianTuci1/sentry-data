@@ -42,7 +42,25 @@ def download_r2_artifact(uri: str, target_path: Path) -> None:
     client.download_file(bucket, key, str(target_path))
 
 
+def model_bundle_artifact_uri(bundle_uri: str, artifact: str) -> str:
+    return f"{bundle_uri.rstrip('/')}/{artifact}"
+
+
 def resolve_model_dir() -> Path:
+    bundle_uri = os.getenv("SENTINEL_MODEL_BUNDLE_URI", "")
+    if bundle_uri:
+        manifest_path = MODEL_DOWNLOAD_DIR / "sentinel_model_manifest.json"
+        download_r2_artifact(model_bundle_artifact_uri(bundle_uri, "sentinel_model_manifest.json"), manifest_path)
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        artifacts = {manifest.get("checkpoint", "drift_lstm.pth")}
+        for model in (manifest.get("models") or {}).values():
+            artifact = model.get("artifact") if isinstance(model, dict) else None
+            if artifact:
+                artifacts.add(artifact)
+        for artifact in sorted(artifacts):
+            download_r2_artifact(model_bundle_artifact_uri(bundle_uri, artifact), MODEL_DOWNLOAD_DIR / artifact)
+        return MODEL_DOWNLOAD_DIR
+
     manifest_uri = os.getenv("SENTINEL_MODEL_MANIFEST_URI", "")
     if manifest_uri:
         manifest_path = MODEL_DOWNLOAD_DIR / "sentinel_model_manifest.json"
