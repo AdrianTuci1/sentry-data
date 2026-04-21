@@ -81,6 +81,7 @@ def _run_training_job(
         drift_z_threshold=drift_z_threshold,
         test_size=0.2,
         seed=seed,
+        rows_per_source=rows_per_source,
     ))
 
     if upload_r2:

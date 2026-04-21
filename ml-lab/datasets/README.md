@@ -19,13 +19,13 @@ Source packs dedicate incluse acum:
 Din radacina repository-ului:
 
 ```bash
-python3 ml-lab/datasets/generate_bundle.py --output-dir ml-lab/datasets/training_bundle --rows-per-source 240
+python3 ml-lab/datasets/generate_bundle.py --output-dir ml-lab/.generated/training_bundle --rows-per-source 240
 ```
 
 Din `ml-lab/`:
 
 ```bash
-python3 -m datasets.generator --output-dir datasets/training_bundle --rows-per-source 240
+python3 -m datasets.generator --output-dir .generated/training_bundle --rows-per-source 240
 ```
 
 ## Artefacte produse

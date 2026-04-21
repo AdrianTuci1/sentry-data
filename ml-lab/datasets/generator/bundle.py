@@ -496,7 +496,7 @@ def _write_jsonl(path: Path, rows: Iterable[Dict[str, Any]]) -> int:
     return count
 
 
-def materialize_training_bundle(output_dir: str = "ml-lab/datasets/training_bundle", rows_per_source: int = 240, seed: int = DEFAULT_SEED) -> Dict[str, Any]:
+def materialize_training_bundle(output_dir: str = "ml-lab/.generated/training_bundle", rows_per_source: int = 240, seed: int = DEFAULT_SEED) -> Dict[str, Any]:
     output_path = Path(output_dir)
     csv_dir = output_path / "csv"
     parquet_dir = output_path / "parquet"
@@ -595,4 +595,3 @@ __all__ = [
     "project_fields_for_domains",
     "recommend_widgets",
 ]
-

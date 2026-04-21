@@ -9,7 +9,7 @@ from .common import DEFAULT_SEED
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Materialize multi-domain training datasets for ml-lab.")
-    parser.add_argument("--output-dir", default="ml-lab/datasets/training_bundle", help="Directory where bundle artifacts will be written.")
+    parser.add_argument("--output-dir", default="ml-lab/.generated/training_bundle", help="Directory where bundle artifacts will be written.")
     parser.add_argument("--rows-per-source", type=int, default=240, help="Number of rows to generate per source dataset.")
     parser.add_argument("--seed", type=int, default=DEFAULT_SEED, help="Deterministic seed for synthetic data generation.")
     return parser

@@ -3,7 +3,13 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from .config import SENTINEL_VERSION
-from .model_runtime import drift_predictor_details, evaluate_drift_from_sample
+from .model_runtime import (
+    drift_predictor_details,
+    evaluate_coverage_ranker,
+    evaluate_drift_from_sample,
+    evaluate_interaction_policy,
+    evaluate_query_risk,
+)
 from .prompts import load_prompt
 from .schemas import RuntimeEvaluationRequest
 
@@ -74,7 +80,9 @@ def evaluate_runtime_policy(request: RuntimeEvaluationRequest) -> Dict[str, Any]
         sample_rows = profile.get("sampleRows") or profile.get("sample_rows") or []
         storage_metrics = profile.get("storageMetrics") or profile.get("storage_metrics") or {}
 
-        coverage_score = min(1.0, (len(metrics) + len(timestamps) + len(entity_keys)) / 6.0)
+        fallback_coverage_score = min(1.0, (len(metrics) + len(timestamps) + len(entity_keys)) / 6.0)
+        coverage_result = evaluate_coverage_ranker(profile, fallback_coverage_score)
+        coverage_score = coverage_result["score"]
         signals.append(build_signal(
             f"coverage-ranker-{source_id}",
             "CoverageRanker",
@@ -88,6 +96,7 @@ def evaluate_runtime_policy(request: RuntimeEvaluationRequest) -> Dict[str, Any]
                 "metricCount": len(metrics),
                 "timestampCount": len(timestamps),
                 "entityKeyCount": len(entity_keys),
+                "usingAi": coverage_result["using_ai"],
             },
         ))
 
@@ -174,7 +183,9 @@ def evaluate_runtime_policy(request: RuntimeEvaluationRequest) -> Dict[str, Any]
         query_id = query.get("queryId") or query.get("query_id") or query.get("widgetId") or "query"
         sql = (query.get("sql") or "").lower()
         risky_tokens = [" drop ", " delete ", " update ", " insert ", " copy ", "httpfs_secret"]
-        risk = 0.15 + (0.7 if any(token in f" {sql} " for token in risky_tokens) else 0.0)
+        fallback_risk = 0.15 + (0.7 if any(token in f" {sql} " for token in risky_tokens) else 0.0)
+        risk_result = evaluate_query_risk(query, fallback_risk)
+        risk = risk_result["score"]
         signals.append(build_signal(
             f"query-risk-{query_id}",
             "QueryRiskModel",
@@ -184,7 +195,10 @@ def evaluate_runtime_policy(request: RuntimeEvaluationRequest) -> Dict[str, Any]
             risk,
             "critical" if risk >= 0.8 else "info",
             "sql_static_risk_scan",
-            {"riskyTokens": [token.strip() for token in risky_tokens if token in f" {sql} "]},
+            {
+                "riskyTokens": [token.strip() for token in risky_tokens if token in f" {sql} "],
+                "usingAi": risk_result["using_ai"],
+            },
         ))
 
     policy_state = request.policy_state or {}
@@ -192,19 +206,22 @@ def evaluate_runtime_policy(request: RuntimeEvaluationRequest) -> Dict[str, Any]
     for recommendation in request.ml_recommendations:
         recommendation_id = recommendation.get("recommendationId") or recommendation.get("recommendation_id") or "ml"
         source_id = recommendation.get("sourceId") or recommendation.get("source_id")
+        fallback_policy_score = 0.45 + min(event_count, 100) / 250.0
+        policy_result = evaluate_interaction_policy(recommendation, policy_state, fallback_policy_score)
         signals.append(build_signal(
             f"interaction-policy-{recommendation_id}",
             "InteractionPolicyModel",
             "ml_recommendation",
             recommendation_id,
             source_id,
-            0.45 + min(event_count, 100) / 250.0,
+            policy_result["score"],
             "info",
             "metadata_only_ml_interest_prior",
             {
                 "eventCount": event_count,
                 "taskType": recommendation.get("taskType") or recommendation.get("task_type"),
                 "scaffoldId": recommendation.get("scaffoldId") or recommendation.get("scaffold_id"),
+                "usingAi": policy_result["using_ai"],
             },
         ))
 

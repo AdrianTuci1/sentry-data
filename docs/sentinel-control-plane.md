@@ -7,14 +7,12 @@ Sentinel are doua roluri complementare:
 
 ## Modele disponibile
 
-- `CoverageRanker`: verifica daca fiecare sursa are acoperire minima: volum, freshness cand exista timestamp, trend cand exista metric + timestamp, ML recommendation cand exista metric.
-- `DriftClassifier`: compara fingerprint-uri, source cursors si prefixuri goale ca sa marcheze drift sau invalidare.
-- `QueryRiskModel`: detecteaza SQL destructiv, scanari mari directe si formule neclare.
-- `InteractionPolicyModel`: aplica priors din feedback-ul agregat al utilizatorilor asupra widget-urilor, surselor si recomandarilor.
+- `CoverageRanker`: model antrenat din `source_registry.json`; estimeaza acoperirea unei surse pe baza schemei, volumului, metricilor, timpului si cheilor de entitate.
+- `DriftClassifier`: LSTM antrenat din seriile numerice generate; marcheaza drift pe sample-uri si completeaza invalidarea bazata pe fingerprint.
+- `QueryRiskModel`: model antrenat din scenarii de query generation plus augmentari SQL sigure/riscante; detecteaza SQL distructiv sau formule riscante.
+- `InteractionPolicyModel`: model antrenat din `rl_feedback_events.jsonl`; estimeaza interesul pentru recomandari ML si widget-uri fara raw rows.
 
-Implementarea backend este in:
-
-[SentinelModels.ts](/Users/adriantucicovenco/Proiecte/sentry-data/sentry-backend/src/application/services/SentinelModels.ts)
+Trainerul este in [sentinel_training.py](/Users/adriantucicovenco/Proiecte/sentry-data/ml-lab/sentinel_training.py), iar runtime-ul Modal este in [sentinel_service](/Users/adriantucicovenco/Proiecte/sentry-data/modal_apps/sentinel_service).
 
 ## Feedback RL
 

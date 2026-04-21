@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import pickle
 import shutil
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
@@ -17,7 +18,9 @@ import pandas as pd
 import torch
 import torch.nn as nn
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
+from sklearn.metrics import mean_absolute_error, r2_score
 from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 
 
 class LSTMDriftModel(nn.Module):
@@ -51,10 +54,50 @@ class TrainingConfig:
     drift_z_threshold: float
     test_size: float
     seed: int
+    rows_per_source: int
 
 
 def now_version() -> str:
     return datetime.now(timezone.utc).strftime("sentinel-%Y%m%d%H%M%S")
+
+
+def load_json(path: Path, default):
+    if not path.exists():
+        return default
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def load_jsonl(path: Path) -> List[Dict[str, object]]:
+    if not path.exists():
+        return []
+    rows: List[Dict[str, object]] = []
+    with path.open("r", encoding="utf-8") as handle:
+        for line in handle:
+            line = line.strip()
+            if line:
+                rows.append(json.loads(line))
+    return rows
+
+
+def write_pickle(path: Path, payload: object) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("wb") as handle:
+        pickle.dump(payload, handle)
+
+
+def hash_bucket(value: object, buckets: int = 997) -> float:
+    if value is None:
+        return 0.0
+    return (sum(ord(character) for character in str(value)) % buckets) / float(buckets)
+
+
+def numeric(value: object, default: float = 0.0) -> float:
+    try:
+        if value is None:
+            return default
+        return float(value)
+    except (TypeError, ValueError):
+        return default
 
 
 def discover_csv_files(bundle_dir: Path) -> List[Path]:
@@ -106,7 +149,212 @@ def build_windows(bundle_dir: Path, sequence_length: int, drift_z_threshold: flo
     return np.stack(rows).astype(np.float32), np.array(labels, dtype=np.float32).reshape(-1, 1), source_counts
 
 
-def train(config: TrainingConfig) -> Dict[str, object]:
+def source_coverage_features(source: Dict[str, object]) -> List[float]:
+    schema = source.get("schema") or []
+    schema_rows = schema if isinstance(schema, list) else []
+    names = [str(column.get("name", "")).lower() for column in schema_rows if isinstance(column, dict)]
+    dtypes = [str(column.get("dtype", "")).lower() for column in schema_rows if isinstance(column, dict)]
+    null_ratios = [numeric(column.get("nullable_ratio")) for column in schema_rows if isinstance(column, dict)]
+    metric_count = sum(any(token in name for token in ["revenue", "cost", "count", "rate", "score", "latency", "amount", "usage", "mrr", "arr"]) for name in names)
+    temporal_count = sum(any(token in name for token in ["date", "time", "timestamp", "created", "updated"]) for name in names)
+    entity_count = sum(any(token in name for token in ["id", "account", "customer", "user", "tenant", "device"]) for name in names)
+    numeric_count = sum(any(token in dtype for token in ["int", "float", "double", "bool"]) for dtype in dtypes)
+    avg_null = float(np.mean(null_ratios)) if null_ratios else 0.0
+    max_null = max(null_ratios) if null_ratios else 0.0
+    return [
+        numeric(source.get("row_count")) / 1000.0,
+        len(schema_rows) / 100.0,
+        metric_count / 20.0,
+        temporal_count / 10.0,
+        entity_count / 10.0,
+        numeric_count / 50.0,
+        avg_null,
+        max_null,
+        hash_bucket(source.get("domain")),
+        hash_bucket(source.get("grain")),
+    ]
+
+
+def source_coverage_label(source: Dict[str, object]) -> float:
+    features = source_coverage_features(source)
+    metric_score = min(1.0, features[2] * 20 / 3)
+    temporal_score = min(1.0, features[3] * 10)
+    entity_score = min(1.0, features[4] * 10 / 2)
+    null_penalty = min(0.5, features[6] * 0.8)
+    row_score = min(1.0, features[0] * 1000 / 120)
+    return max(0.0, min(1.0, (metric_score * 0.34) + (temporal_score * 0.22) + (entity_score * 0.18) + (row_score * 0.16) + 0.1 - null_penalty))
+
+
+def query_risk_features(query: Dict[str, object]) -> List[float]:
+    sql = str(query.get("sql") or query.get("instruction") or "").lower()
+    risky_tokens = ["drop", "delete", "update", "insert", "copy", "httpfs_secret", "pragma", "attach", "union"]
+    return [
+        len(sql) / 4000.0,
+        sum(token in sql for token in risky_tokens) / len(risky_tokens),
+        sql.count(" join ") / 10.0,
+        sql.count(" select ") / 10.0,
+        sql.count(";") / 5.0,
+        len(query.get("sources") or []) / 10.0 if isinstance(query.get("sources"), list) else 0.0,
+        len(query.get("core_fields") or []) / 50.0 if isinstance(query.get("core_fields"), list) else 0.0,
+        len(query.get("target_widgets") or []) / 50.0 if isinstance(query.get("target_widgets"), list) else 0.0,
+        hash_bucket(query.get("widgetType") or query.get("widget_type")),
+        hash_bucket(query.get("executionPolicy", {}).get("mode") if isinstance(query.get("executionPolicy"), dict) else None),
+    ]
+
+
+def interaction_policy_features(payload: Dict[str, object]) -> List[float]:
+    policy_adjustment = payload.get("policy_adjustment") if isinstance(payload.get("policy_adjustment"), dict) else {}
+    feature_columns = payload.get("featureColumns") or payload.get("feature_columns") or []
+    domains = payload.get("detected_domains") or payload.get("domains") or []
+    return [
+        numeric(payload.get("eventCount") or payload.get("event_count")) / 100.0,
+        len(feature_columns) / 100.0 if isinstance(feature_columns, list) else 0.0,
+        1.0 if payload.get("targetColumn") or payload.get("target_column") else 0.0,
+        hash_bucket(payload.get("taskType") or payload.get("task_type")),
+        hash_bucket(payload.get("scaffoldId") or payload.get("scaffold_id")),
+        hash_bucket(payload.get("selected_widget")),
+        hash_bucket(payload.get("tracked_field")),
+        len(domains) / 10.0 if isinstance(domains, list) else 0.0,
+        numeric(policy_adjustment.get("field_weight_shift")),
+        numeric(policy_adjustment.get("widget_rerank_bonus")),
+    ]
+
+
+def train_coverage_ranker(bundle_dir: Path, version_dir: Path, config: TrainingConfig) -> Dict[str, object]:
+    source_registry = load_json(bundle_dir / "metadata" / "source_registry.json", [])
+    if not source_registry:
+        raise ValueError("source_registry.json is required to train CoverageRanker.")
+
+    X = np.array([source_coverage_features(source) for source in source_registry], dtype=np.float32)
+    y = np.array([source_coverage_label(source) for source in source_registry], dtype=np.float32)
+    model = RandomForestRegressor(n_estimators=120, random_state=config.seed, min_samples_leaf=1)
+    model.fit(X, y)
+    predictions = model.predict(X)
+    artifact = {
+        "model": model,
+        "feature_names": [
+            "row_count_k",
+            "schema_width_100",
+            "metric_count_20",
+            "temporal_count_10",
+            "entity_count_10",
+            "numeric_count_50",
+            "avg_null_ratio",
+            "max_null_ratio",
+            "domain_hash",
+            "grain_hash",
+        ],
+    }
+    write_pickle(version_dir / "coverage_ranker.pkl", artifact)
+    return {
+        "kind": "coverage_ranker_random_forest",
+        "artifact": "coverage_ranker.pkl",
+        "metrics": {
+            "mae": float(mean_absolute_error(y, predictions)),
+            "r2": float(r2_score(y, predictions)) if len(y) > 1 else 1.0,
+            "train_rows": int(len(y)),
+        },
+    }
+
+
+def train_query_risk_model(bundle_dir: Path, version_dir: Path, config: TrainingConfig) -> Dict[str, object]:
+    scenarios = load_jsonl(bundle_dir / "metadata" / "query_generation_scenarios.jsonl")
+    rows: List[Dict[str, object]] = []
+    labels: List[int] = []
+
+    for scenario in scenarios:
+        safe_query = {
+            **scenario,
+            "sql": "select " + ", ".join((scenario.get("core_fields") or ["metric"])[:4]) + " from projection group by 1",
+        }
+        rows.append(safe_query)
+        labels.append(0)
+        for risky_sql in [
+            "drop table bronze.source",
+            "delete from projection where 1=1",
+            "copy data to 's3://external-bucket/out.csv'",
+            "select httpfs_secret from system.runtime",
+        ]:
+            rows.append({**scenario, "sql": risky_sql})
+            labels.append(1)
+
+    if len(set(labels)) < 2:
+        raise ValueError("QueryRiskModel requires both safe and risky synthetic examples.")
+
+    X = np.array([query_risk_features(row) for row in rows], dtype=np.float32)
+    y = np.array(labels, dtype=np.int64)
+    model = RandomForestClassifier(n_estimators=120, random_state=config.seed, class_weight="balanced")
+    model.fit(X, y)
+    predictions = model.predict(X)
+    probabilities = model.predict_proba(X)[:, 1]
+    artifact = {
+        "model": model,
+        "feature_names": [
+            "sql_len_4k",
+            "risky_token_ratio",
+            "join_count_10",
+            "select_count_10",
+            "statement_count_5",
+            "source_count_10",
+            "core_field_count_50",
+            "widget_count_50",
+            "widget_type_hash",
+            "execution_mode_hash",
+        ],
+    }
+    write_pickle(version_dir / "query_risk_model.pkl", artifact)
+    metrics = {
+        "accuracy": float(accuracy_score(y, predictions)),
+        "f1": float(f1_score(y, predictions, zero_division=0)),
+        "train_rows": int(len(y)),
+    }
+    if len(set(y.tolist())) > 1:
+        metrics["auc"] = float(roc_auc_score(y, probabilities))
+    return {
+        "kind": "query_risk_random_forest",
+        "artifact": "query_risk_model.pkl",
+        "metrics": metrics,
+    }
+
+
+def train_interaction_policy_model(bundle_dir: Path, version_dir: Path, config: TrainingConfig) -> Dict[str, object]:
+    events = load_jsonl(bundle_dir / "metadata" / "rl_feedback_events.jsonl")
+    if not events:
+        raise ValueError("rl_feedback_events.jsonl is required to train InteractionPolicyModel.")
+
+    X = np.array([interaction_policy_features(event) for event in events], dtype=np.float32)
+    y = np.array([numeric(event.get("reward"), 0.0) for event in events], dtype=np.float32)
+    model = RandomForestRegressor(n_estimators=160, random_state=config.seed, min_samples_leaf=2)
+    model.fit(X, y)
+    predictions = model.predict(X)
+    artifact = {
+        "model": model,
+        "feature_names": [
+            "event_count_100",
+            "feature_count_100",
+            "has_target",
+            "task_type_hash",
+            "scaffold_hash",
+            "selected_widget_hash",
+            "tracked_field_hash",
+            "domain_count_10",
+            "field_weight_shift",
+            "widget_rerank_bonus",
+        ],
+    }
+    write_pickle(version_dir / "interaction_policy_model.pkl", artifact)
+    return {
+        "kind": "interaction_policy_random_forest",
+        "artifact": "interaction_policy_model.pkl",
+        "metrics": {
+            "mae": float(mean_absolute_error(y, predictions)),
+            "r2": float(r2_score(y, predictions)) if len(y) > 1 else 1.0,
+            "train_rows": int(len(y)),
+        },
+    }
+
+
+def train_drift_classifier(config: TrainingConfig, version_dir: Path) -> Dict[str, object]:
     torch.manual_seed(config.seed)
     np.random.seed(config.seed)
 
@@ -162,20 +410,14 @@ def train(config: TrainingConfig) -> Dict[str, object]:
     if len(set(y_true.tolist())) > 1:
         metrics["auc"] = float(roc_auc_score(y_true, probabilities))
 
-    version_dir = Path(config.output_dir) / config.version
-    latest_dir = Path(config.output_dir) / "latest"
     version_dir.mkdir(parents=True, exist_ok=True)
 
     checkpoint_path = version_dir / "drift_lstm.pth"
-    manifest_path = version_dir / "sentinel_model_manifest.json"
     torch.save(model.state_dict(), checkpoint_path)
 
-    manifest = {
-        "model_id": config.version,
-        "kind": "sentinel_drift_lstm",
-        "created_at": datetime.now(timezone.utc).isoformat(),
-        "checkpoint": "drift_lstm.pth",
-        "config": asdict(config),
+    return {
+        "kind": "drift_classifier_lstm",
+        "artifact": "drift_lstm.pth",
         "metrics": metrics,
         "training_summary": {
             "window_count": int(len(X)),
@@ -184,6 +426,40 @@ def train(config: TrainingConfig) -> Dict[str, object]:
             "source_series_count": len(source_counts),
             "source_counts": source_counts,
         },
+    }
+
+
+def train(config: TrainingConfig) -> Dict[str, object]:
+    bundle_dir = Path(config.bundle_dir)
+    if not (bundle_dir / "metadata" / "training_bundle_manifest.json").exists():
+        from datasets.generator.bundle import materialize_training_bundle
+
+        materialize_training_bundle(
+            output_dir=str(bundle_dir),
+            rows_per_source=config.rows_per_source,
+            seed=config.seed,
+        )
+
+    version_dir = Path(config.output_dir) / config.version
+    latest_dir = Path(config.output_dir) / "latest"
+    version_dir.mkdir(parents=True, exist_ok=True)
+
+    models = {
+        "CoverageRanker": train_coverage_ranker(bundle_dir, version_dir, config),
+        "DriftClassifier": train_drift_classifier(config, version_dir),
+        "QueryRiskModel": train_query_risk_model(bundle_dir, version_dir, config),
+        "InteractionPolicyModel": train_interaction_policy_model(bundle_dir, version_dir, config),
+    }
+
+    manifest_path = version_dir / "sentinel_model_manifest.json"
+    manifest = {
+        "model_id": config.version,
+        "kind": "sentinel_model_bundle",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "config": asdict(config),
+        "bundle_manifest": str(bundle_dir / "metadata" / "training_bundle_manifest.json"),
+        "checkpoint": "drift_lstm.pth",
+        "models": models,
     }
     manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
@@ -200,7 +476,7 @@ def train(config: TrainingConfig) -> Dict[str, object]:
         "artifact_dir": str(version_dir),
         "latest_dir": str(latest_dir),
         "manifest_path": str(manifest_path),
-        "metrics": metrics,
+        "models": models,
     }
 
 
@@ -232,10 +508,11 @@ def upload_directory_to_r2(local_dir: Path, bucket: str, prefix: str) -> Dict[st
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Train Sentinel drift model from synthetic bundle data.")
-    parser.add_argument("--bundle-dir", default="ml-lab/datasets/training_bundle")
+    parser = argparse.ArgumentParser(description="Train the full Sentinel model bundle from generated synthetic data.")
+    parser.add_argument("--bundle-dir", default="ml-lab/.generated/training_bundle")
     parser.add_argument("--output-dir", default="ml-lab/checkpoints/sentinel")
     parser.add_argument("--version", default=now_version())
+    parser.add_argument("--rows-per-source", type=int, default=320)
     parser.add_argument("--sequence-length", type=int, default=10)
     parser.add_argument("--hidden-size", type=int, default=32)
     parser.add_argument("--num-layers", type=int, default=2)
@@ -263,6 +540,7 @@ def main() -> int:
         drift_z_threshold=args.drift_z_threshold,
         test_size=args.test_size,
         seed=args.seed,
+        rows_per_source=args.rows_per_source,
     )
     result = train(config)
 

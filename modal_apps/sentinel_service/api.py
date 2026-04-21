@@ -8,6 +8,7 @@ from .model_runtime import (
     drift_predictor_details,
     evaluate_drift_from_sample,
     load_drift_predictor,
+    load_sentinel_models,
     numeric_columns,
     safe_null_ratio,
 )
@@ -75,6 +76,7 @@ def evaluate_runtime(request: RuntimeEvaluationRequest, x_internal_secret: Optio
 @web_app.get("/health")
 def health():
     load_drift_predictor()
+    load_sentinel_models()
     return {
         "status": "ok",
         "service": "statsparrot-sentinel",

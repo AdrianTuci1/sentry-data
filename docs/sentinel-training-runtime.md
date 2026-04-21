@@ -13,7 +13,7 @@ Deterministic multi-domain bundle:
 
 ```bash
 python3 ml-lab/datasets/generate_bundle.py \
-  --output-dir ml-lab/datasets/training_bundle \
+  --output-dir ml-lab/.generated/training_bundle \
   --rows-per-source 320 \
   --seed 42
 ```
@@ -27,7 +27,7 @@ GEMINI_API_KEY=... python3 ml-lab/datasets/generator/gemini_synthetic.py \
   --rows-per-source 80 \
   --variety stress \
   --model gemini-3.1-flash \
-  --output-dir ml-lab/datasets/gemini_synthetic/commerce_stress
+  --output-dir ml-lab/.generated/gemini_synthetic/commerce_stress
 ```
 
 If `gemini-3.1-flash` is not enabled in the account, pass the currently enabled Gemini Flash model through `--model` or `GEMINI_MODEL`.
@@ -36,7 +36,7 @@ If `gemini-3.1-flash` is not enabled in the account, pass the currently enabled 
 
 ```bash
 python3 ml-lab/sentinel_training.py \
-  --bundle-dir ml-lab/datasets/training_bundle \
+  --bundle-dir ml-lab/.generated/training_bundle \
   --output-dir ml-lab/checkpoints/sentinel \
   --epochs 40 \
   --learning-rate 0.001 \
@@ -48,7 +48,7 @@ Upload trained artifacts to R2:
 
 ```bash
 python3 ml-lab/sentinel_training.py \
-  --bundle-dir ml-lab/datasets/training_bundle \
+  --bundle-dir ml-lab/.generated/training_bundle \
   --output-dir ml-lab/checkpoints/sentinel \
   --epochs 40 \
   --upload-r2 \
@@ -58,9 +58,21 @@ python3 ml-lab/sentinel_training.py \
 
 The trainer writes:
 
+- `coverage_ranker.pkl`
 - `drift_lstm.pth`
+- `query_risk_model.pkl`
+- `interaction_policy_model.pkl`
 - `sentinel_model_manifest.json`
 - `latest/` copy for local smoke tests
+
+Model training inputs:
+
+- `CoverageRanker`: trained from generated `metadata/source_registry.json` and schema coverage labels.
+- `DriftClassifier`: trained from generated numeric CSV windows and drift labels.
+- `QueryRiskModel`: trained from generated `metadata/query_generation_scenarios.jsonl` plus safe/risky SQL augmentations.
+- `InteractionPolicyModel`: trained from generated `metadata/rl_feedback_events.jsonl`.
+
+`ml-lab/datasets/training_bundle/` is intentionally ignored and should not be committed. It is only a generated working directory.
 
 ## Train On Modal
 
@@ -80,7 +92,7 @@ GPU executor for full training:
 modal run ml-lab/modal_training.py \
   --executor gpu-a10g \
   --epochs 40 \
-  --learning-rate 0.001 \
+  --lr 0.001 \
   --hidden-size 32 \
   --sequence-length 10 \
   --rows-per-source 320 \

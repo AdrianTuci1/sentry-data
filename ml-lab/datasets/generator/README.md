@@ -16,13 +16,13 @@ Directorul `ml-lab/datasets/generator/` contine generatorul modular pentru bundl
 Din radacina repo-ului:
 
 ```bash
-python3 ml-lab/datasets/generate_bundle.py --output-dir ml-lab/datasets/training_bundle --rows-per-source 240
+python3 ml-lab/datasets/generate_bundle.py --output-dir ml-lab/.generated/training_bundle --rows-per-source 240
 ```
 
 Din `ml-lab/`:
 
 ```bash
-python3 -m datasets.generator --output-dir datasets/training_bundle --rows-per-source 240
+python3 -m datasets.generator --output-dir .generated/training_bundle --rows-per-source 240
 ```
 
 ## Gemini synthetic datasets
@@ -37,7 +37,7 @@ python3 ml-lab/datasets/generator/gemini_synthetic.py \
   --sources orders,web_sessions,ad_spend,support_tickets \
   --rows-per-source 80 \
   --variety stress \
-  --output-dir ml-lab/datasets/gemini_synthetic/commerce_stress
+  --output-dir ml-lab/.generated/gemini_synthetic/commerce_stress
 ```
 
 Modelul este configurabil prin `GEMINI_MODEL`, deci poate fi schimbat la `gemini-3.1-flash` daca acel cod de model exista in contul/API-ul folosit. Scriptul scrie CSV, JSONL si `manifest.json`.

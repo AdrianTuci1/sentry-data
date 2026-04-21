@@ -14,7 +14,7 @@ MODEL_DOWNLOAD_DIR = Path("/tmp/sentinel-model")
 
 image = (
     modal.Image.debian_slim()
-    .pip_install("fastapi[standard]", "pydantic", "duckdb", "pyyaml", "torch==2.1.1", "numpy==1.26.2", "boto3")
+    .pip_install("fastapi[standard]", "pydantic", "duckdb", "pyyaml", "torch==2.1.1", "numpy==1.26.2", "scikit-learn==1.3.2", "boto3")
     .add_local_dir(str(REPO_ROOT / "r2-system" / "prompts" / "runtime"), remote_path=PROMPT_DIR)
 )
 
