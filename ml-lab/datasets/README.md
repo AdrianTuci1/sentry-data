@@ -35,6 +35,8 @@ python3 ml-lab/datasets/upload_bundle_to_r2.py \
   --bundle-dir ml-lab/.generated/training_bundle
 ```
 
+Scriptul citeste automat variabilele R2 din `sentry-backend/.env` daca nu sunt deja exportate in shell.
+
 Modal training poate folosi apoi acelasi prefix:
 
 ```bash
@@ -43,6 +45,12 @@ modal run ml-lab/modal_training.py \
 ```
 
 Prefix implicit: `s3://$R2_BUCKET_DATA/system/r2-system/training/sentinel/generated/latest`.
+
+Alternativ, Modal poate genera si urca bundle-ul direct:
+
+```bash
+modal run ml-lab/modal_r2_artifacts.py --action training-bundle --rows-per-source 320
+```
 
 ## Artefacte produse
 

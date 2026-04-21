@@ -47,4 +47,10 @@ python3 ml-lab/datasets/upload_bundle_to_r2.py \
   --bundle-dir ml-lab/.generated/training_bundle
 ```
 
+Sau direct prin Modal:
+
+```bash
+modal run ml-lab/modal_r2_artifacts.py --action training-bundle --rows-per-source 320
+```
+
 Modelul este configurabil prin `GEMINI_MODEL`, deci poate fi schimbat la `gemini-3.1-flash` daca acel cod de model exista in contul/API-ul folosit. Scriptul scrie CSV, JSONL si `manifest.json`.

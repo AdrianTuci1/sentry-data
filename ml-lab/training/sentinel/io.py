@@ -4,6 +4,10 @@ import pickle
 from pathlib import Path
 from typing import Dict, List
 
+from .env import load_ml_lab_env
+
+load_ml_lab_env()
+
 DEFAULT_TRAINING_BUNDLE_PREFIX = "system/r2-system/training/sentinel/generated/latest"
 DEFAULT_MODEL_BUNDLE_PREFIX = "system/r2-system/models/sentinel"
 
@@ -41,7 +45,7 @@ def parse_s3_uri(uri: str) -> tuple[str, str]:
 
 
 def default_r2_bucket() -> str:
-    return os.getenv("R2_BUCKET_DATA") or os.getenv("R2_BUCKET") or ""
+    return os.getenv("R2_BUCKET_DATA") or os.getenv("R2_BUCKET") or os.getenv("R2_BUCKET_BRONZE") or ""
 
 
 def default_training_bundle_uri() -> str:

@@ -39,6 +39,8 @@ python3 ml-lab/datasets/upload_bundle_to_r2.py \
   --bundle-dir ml-lab/.generated/training_bundle
 ```
 
+The script automatically loads R2 variables from `sentry-backend/.env` when they are not already exported in the shell.
+
 Default training data path:
 
 ```text
@@ -126,6 +128,60 @@ If `--bundle-r2-uri` is omitted, Modal uses `SENTINEL_TRAINING_BUNDLE_URI` or th
 
 ```text
 s3://$R2_BUCKET_DATA/system/r2-system/models/sentinel/<version>
+```
+
+## Modal Artifact Spec
+
+Generate and upload the training bundle directly from Modal:
+
+```bash
+modal run ml-lab/modal_r2_artifacts.py \
+  --action training-bundle \
+  --rows-per-source 320
+```
+
+Upload an already trained model bundle from the `sentinel-ml-checkpoints` Modal Volume to R2:
+
+```bash
+modal run ml-lab/modal_r2_artifacts.py \
+  --action model-bundle \
+  --version sentinel-YYYYMMDDHHMMSS
+```
+
+Both commands use the Modal secret `sentry-r2-secrets` and the default R2 paths unless `--target-uri` is passed.
+
+## Backend Seed And Cleanup
+
+Backend seed now also publishes the Sentinel training bundle:
+
+```bash
+cd sentry-backend
+npm run seed
+```
+
+Useful flags:
+
+```bash
+SKIP_SENTINEL_TRAINING_BUNDLE=true npm run seed
+SENTINEL_TRAINING_ROWS=120 npm run seed
+```
+
+Full cleanup deletes the bucket contents by default:
+
+```bash
+npm run clean
+```
+
+To clean project/runtime data but keep `system/r2-system` artifacts such as widgets, generated Sentinel training data and model bundles:
+
+```bash
+npm run clean:preserve-system
+```
+
+To clean only specific prefixes:
+
+```bash
+CLEAN_R2_PREFIXES=tenants,feedback npm run clean
 ```
 
 Executor profiles live in `ml-lab/modal_training.py`:

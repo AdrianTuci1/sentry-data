@@ -1,6 +1,7 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { execFileSync } from 'child_process';
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
 import path from 'path';
@@ -10,6 +11,7 @@ import { ProjectRepository } from '../src/infrastructure/repositories/ProjectRep
 import { SourceRepository } from '../src/infrastructure/repositories/SourceRepository';
 import { v4 as uuidv4 } from 'uuid';
 import { deployWidgetsToR2 } from './lib/widget_deploy';
+import { REPO_ROOT, SENTINEL_TRAINING_BUNDLE_PREFIX, uploadDirectory } from './lib/r2_artifacts';
 
 // ═══════════════════════════════════════════════════════════
 // DATASET CONFIGURATION — Edit this array to change what gets seeded
@@ -52,6 +54,33 @@ const DATASETS: DatasetConfig[] = [
         cronSchedule: '0 2 * * *',
     }
 ];
+
+const shouldSeedSentinelBundle = !['1', 'true', 'yes'].includes((process.env.SKIP_SENTINEL_TRAINING_BUNDLE || '').toLowerCase());
+const sentinelTrainingRows = process.env.SENTINEL_TRAINING_ROWS || '320';
+
+async function seedSentinelTrainingBundle(s3Client: S3Client): Promise<void> {
+    if (!shouldSeedSentinelBundle) {
+        console.log('[R2] Skipping Sentinel training bundle upload because SKIP_SENTINEL_TRAINING_BUNDLE is enabled.');
+        return;
+    }
+
+    const outputDir = path.join(REPO_ROOT, 'ml-lab', '.generated', 'training_bundle');
+    console.log(`\n[R2] Generating Sentinel synthetic training bundle (${sentinelTrainingRows} rows/source)...`);
+    execFileSync('python3', [
+        'ml-lab/datasets/generate_bundle.py',
+        '--output-dir',
+        outputDir,
+        '--rows-per-source',
+        sentinelTrainingRows,
+    ], {
+        cwd: REPO_ROOT,
+        stdio: 'inherit',
+    });
+
+    console.log(`[R2] Uploading Sentinel training bundle to ${SENTINEL_TRAINING_BUNDLE_PREFIX}...`);
+    await uploadDirectory(outputDir, SENTINEL_TRAINING_BUNDLE_PREFIX, s3Client);
+    console.log(`[R2] Sentinel training bundle URI: s3://${config.r2.bucketData}/${SENTINEL_TRAINING_BUNDLE_PREFIX}`);
+}
 
 // ═══════════════════════════════════════════════════════════
 // SEED SCRIPT
@@ -114,6 +143,9 @@ async function seed() {
 
         console.log('\n[R2] Uploading discovery widgets...');
         await deployWidgetsToR2({ s3Client });
+
+        console.log('\n[R2] Uploading Sentinel training data...');
+        await seedSentinelTrainingBundle(s3Client);
 
         // ── STEP 3: UPLOAD DATASETS & CREATE SOURCE CONNECTORS ──
 

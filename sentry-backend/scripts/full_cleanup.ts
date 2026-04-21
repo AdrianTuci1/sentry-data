@@ -1,6 +1,14 @@
 import { DynamoDBClient, ScanCommand, DeleteItemCommand } from '@aws-sdk/client-dynamodb';
-import { S3Client, ListObjectsV2Command, DeleteObjectsCommand } from '@aws-sdk/client-s3';
+import { S3Client } from '@aws-sdk/client-s3';
 import { config } from '../src/config';
+import { deleteAllObjects, deletePrefix, R2_SYSTEM_PREFIX, SENTINEL_MODEL_BUNDLE_PREFIX, SENTINEL_TRAINING_BUNDLE_PREFIX, WIDGETS_BUCKET_PREFIX } from './lib/r2_artifacts';
+
+const configuredPrefixes = (process.env.CLEAN_R2_PREFIXES || '')
+    .split(',')
+    .map((prefix) => prefix.trim())
+    .filter(Boolean);
+
+const preserveSystemArtifacts = ['1', 'true', 'yes'].includes((process.env.PRESERVE_R2_SYSTEM || '').toLowerCase());
 
 async function cleanup() {
     console.log('--- FULL CLEANUP: DYNAMODB & R2 ---');
@@ -26,13 +34,21 @@ async function cleanup() {
     try {
         // --- CLEANUP DYNAMODB ---
         console.log(`[DB] Scanning and cleaning table: ${config.aws.dynamoTable}...`);
-        const scanResult = await ddbClient.send(new ScanCommand({
-            TableName: config.aws.dynamoTable
-        }));
+        let lastEvaluatedKey: Record<string, any> | undefined;
+        let deletedDbItems = 0;
 
-        if (scanResult.Items && scanResult.Items.length > 0) {
-            console.log(`[DB] Found ${scanResult.Items.length} items. Deleting...`);
-            for (const item of scanResult.Items) {
+        do {
+            const scanResult = await ddbClient.send(new ScanCommand({
+                TableName: config.aws.dynamoTable,
+                ExclusiveStartKey: lastEvaluatedKey
+            }));
+
+            const items = scanResult.Items || [];
+            if (items.length > 0) {
+                console.log(`[DB] Found ${items.length} item(s). Deleting...`);
+            }
+
+            for (const item of items) {
                 await ddbClient.send(new DeleteItemCommand({
                     TableName: config.aws.dynamoTable,
                     Key: {
@@ -40,29 +56,40 @@ async function cleanup() {
                         SK: item.SK
                     }
                 }));
+                deletedDbItems += 1;
             }
-        } else {
+
+            lastEvaluatedKey = scanResult.LastEvaluatedKey;
+        } while (lastEvaluatedKey);
+
+        if (deletedDbItems === 0) {
             console.log('[DB] Table is already empty.');
+        } else {
+            console.log(`[DB] Deleted ${deletedDbItems} item(s).`);
         }
 
         // --- CLEANUP R2 ---
         console.log(`[R2] Cleaning bucket: ${config.r2.bucketData}...`);
-        const listResult = await s3Client.send(new ListObjectsV2Command({
-            Bucket: config.r2.bucketData
-        }));
 
-        if (listResult.Contents && listResult.Contents.length > 0) {
-            console.log(`[R2] Found ${listResult.Contents.length} objects. Deleting...`);
-            const deleteParams = {
-                Bucket: config.r2.bucketData,
-                Delete: {
-                    Objects: listResult.Contents.map(obj => ({ Key: obj.Key }))
-                }
-            };
-            await s3Client.send(new DeleteObjectsCommand(deleteParams));
+        let deletedR2Objects = 0;
+        if (configuredPrefixes.length > 0) {
+            console.log(`[R2] Cleaning configured prefix list: ${configuredPrefixes.join(', ')}`);
+            for (const prefix of configuredPrefixes) {
+                deletedR2Objects += await deletePrefix(config.r2.bucketData, prefix, s3Client);
+            }
+        } else if (preserveSystemArtifacts) {
+            console.log(`[R2] PRESERVE_R2_SYSTEM enabled. Keeping ${R2_SYSTEM_PREFIX}/ including:`);
+            console.log(`     - ${WIDGETS_BUCKET_PREFIX}`);
+            console.log(`     - ${SENTINEL_TRAINING_BUNDLE_PREFIX}`);
+            console.log(`     - ${SENTINEL_MODEL_BUNDLE_PREFIX}`);
+            for (const prefix of ['tenants', 'feedback', 'runtime']) {
+                deletedR2Objects += await deletePrefix(config.r2.bucketData, prefix, s3Client);
+            }
         } else {
-            console.log('[R2] Bucket is already empty.');
+            deletedR2Objects = await deleteAllObjects(config.r2.bucketData, s3Client);
         }
+
+        console.log(deletedR2Objects === 0 ? '[R2] Bucket/prefixes are already empty.' : `[R2] Deleted ${deletedR2Objects} object(s).`);
 
         console.log('\n--- CLEANUP COMPLETE ---');
 
