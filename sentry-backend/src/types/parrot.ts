@@ -245,17 +245,20 @@ export interface ParrotQuerySpec {
     invalidationReason?: string;
 }
 
+export type ParrotMLTaskType = 'classification' | 'regression' | 'clustering' | 'anomaly' | 'churn' | 'survival' | 'forecasting';
+
 export interface ParrotMLRecommendation {
     recommendationId: string;
     sourceId: string;
     projectionId: string;
     title: string;
-    taskType: 'classification' | 'regression' | 'clustering' | 'anomaly';
+    taskType: ParrotMLTaskType;
     status: 'recommended' | 'approved' | 'running' | 'trained' | 'failed';
     launchMode: 'manual_approval';
     datasetUri: string;
     targetColumn?: string;
     featureColumns: string[];
+    scaffoldId?: string;
     rationale: string;
     executor: 'ml_executor';
     request?: {

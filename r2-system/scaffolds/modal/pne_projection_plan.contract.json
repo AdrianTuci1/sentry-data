@@ -18,7 +18,7 @@
     "projection_plan": {
       "projectionSpecs": "ParrotProjectionSpec[]",
       "querySpecs": "ParrotQuerySpec[]",
-      "mlRecommendations": "ParrotMLRecommendation[]",
+      "mlRecommendations": "ParrotMLRecommendation[] with scaffoldId for approved ML workflows",
       "coverage": "coverage matrix",
       "invalidationHints": "ParrotInvalidationHint[]"
     }

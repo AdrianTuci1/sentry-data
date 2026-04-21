@@ -1,14 +1,18 @@
 import { config } from '../../config';
+import { ParrotMLTaskType } from '../../types/parrot';
 
 export interface MLTrainRequest {
     tenantId: string;
     projectId: string;
     requestId: string;
     datasetUri: string;
-    taskType: 'classification' | 'regression' | 'clustering' | 'anomaly';
+    taskType: ParrotMLTaskType;
     targetColumn?: string;
     featureColumns?: string[];
     modelName?: string;
+    scaffoldId?: string;
+    duckdbLeaseId?: string;
+    leaseTtlSeconds?: number;
     testSize?: number;
     randomState?: number;
     hyperparameters?: Record<string, unknown>;

@@ -19,10 +19,11 @@ Acest document descrie runtime-ul Modal curent, fara managerul agentic vechi. `m
 
 - `r2-system/widgets/` contine catalogul, indexul si manifestele pentru widget discovery.
 - `r2-system/prompts/runtime/` contine prompturile citite de PNE si Sentinel.
-- `r2-system/scaffolds/modal/` contine contracte JSON pentru payload-uri Modal, nu cod care trebuie executat orbeste de agenti.
+- `r2-system/scaffolds/modal/` contine contracte JSON pentru payload-uri Modal.
+- `r2-system/scaffolds/python/` contine scaffolds Python executate doar de Modal pentru DuckDB leases, query runtime si ML workflows aprobate.
 - prefixul R2 canonic este `system/r2-system/...`.
 
-Nu mai exista `agent_manager.py`, task templates Python sau prompturi vechi pentru ETL clasic. Datele raman asa cum intra, iar PNE construieste proiectii versionate peste ele.
+Nu mai exista `agent_manager.py`, task templates Python vechi sau prompturi pentru ETL clasic. Datele raman asa cum intra, iar PNE construieste proiectii versionate peste ele. Diferenta importanta: avem din nou scaffolds Python, dar sunt runtime scaffolds versionate pentru Modal, nu fisiere pe care agentul le rescrie liber.
 
 ## Preconditii
 
@@ -85,6 +86,15 @@ modal deploy modal_ml_executor.py
 ```
 
 `modal deploy modal_executor.py` este optional si ar trebui folosit doar daca ai nevoie de endpoint-ul de compatibilitate care semnaleaza eliminarea managerului vechi.
+
+## DuckDB leases intre Modal apps si backend
+
+Analytics Worker si ML Executor monteaza `r2-system/scaffolds/python/` si expun endpoint-uri de lease/keepalive pentru DuckDB:
+
+- Analytics Worker: `/runtime/lease`, `/runtime/leases/{leaseId}/keepalive`, `/execute`.
+- ML Executor: `/api/v1/runtime/lease`, `/api/v1/runtime/leases/{leaseId}/keepalive`, `/api/v1/ml/train`.
+
+Backend-ul nu ruleaza DuckDB si nu executa scaffolds Python. El cere un lease, trimite query-uri sau job-uri ML catre Modal si poate trimite keepalive cat timp workflow-ul este activ. Lease-ul reduce costul de setup si pastreaza conexiunea calda, dar precizia ramane data de fingerprints pentru sursa, proiectie si query.
 
 ## Deploy pentru training
 
@@ -197,6 +207,7 @@ Endpoint-ul trebuie sa intoarca `deprecated_agent_manager_removed`, nu sa execut
 ### Etapa 3: productie
 
 - endpoint-uri separate pentru PNE, Sentinel, analytics si ML;
+- keepalive pentru DuckDB leases in workflow-uri multi-step;
 - proxy auth sau auth custom clar;
 - model registry pentru checkpoint-uri;
 - versionare si rollback pe modele;

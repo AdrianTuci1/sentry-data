@@ -7,9 +7,12 @@
     "projectId": "string",
     "requestId": "string",
     "datasetUri": "string",
-    "taskType": "classification|regression|clustering|anomaly",
+    "taskType": "classification|regression|clustering|anomaly|churn|survival|forecasting",
+    "scaffoldId": "ml_workflows/<task>.py",
     "targetColumn": "string?",
     "featureColumns": "string[]",
+    "duckdbLeaseId": "string?",
+    "leaseTtlSeconds": "number?",
     "hyperparameters": "Record<string, unknown>"
   },
   "output": {
@@ -20,6 +23,7 @@
   },
   "rules": [
     "Training starts only from an explicit user approval endpoint.",
+    "The ML agent must use an approved Python scaffold and may only alter approved parameters or extension points.",
     "The executor reads from the approved projection or raw source URI.",
     "Model artifacts are versioned outside the query registry.",
     "Drift monitoring can recommend retraining but must not launch it automatically."

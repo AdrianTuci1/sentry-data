@@ -1,0 +1,27 @@
+{
+  "contract": "duckdb_runtime_lease",
+  "version": 1,
+  "services": [
+    "statsparrot-analytics-worker",
+    "statsparrot-ml-executor"
+  ],
+  "input": {
+    "leaseId": "string?",
+    "ttlSeconds": "number?",
+    "storageConfig": "ObjectStorageConfig?"
+  },
+  "output": {
+    "leaseId": "string",
+    "status": "active|missing",
+    "createdAt": "ISO datetime",
+    "touchedAt": "ISO datetime",
+    "expiresAt": "ISO datetime",
+    "storageFingerprint": "string"
+  },
+  "rules": [
+    "The backend may request or keep alive a lease, but only Modal owns the DuckDB process.",
+    "A lease is a warm connection hint, not durable storage.",
+    "If Modal scales down an idle container, callers must recreate the lease and rerun only affected queries.",
+    "Query/result precision is preserved by source, projection, and query fingerprints; leases only reduce repeated setup work."
+  ]
+}

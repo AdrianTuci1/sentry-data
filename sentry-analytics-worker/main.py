@@ -1,10 +1,12 @@
 import os
+import sys
 from fastapi import FastAPI, HTTPException, Header, Depends
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 import duckdb
 from dotenv import load_dotenv
 from datetime import datetime, timezone
+from pathlib import Path
 
 load_dotenv()
 
@@ -17,8 +19,22 @@ R2_SECRET_KEY = os.getenv("R2_SECRET_ACCESS_KEY", "")
 R2_REGION = os.getenv("R2_REGION", "auto")
 WIDGETS_DIR = os.getenv("STATS_PARROT_WIDGETS_DIR", "")
 WIDGET_ARTIFACT_SCRIPT = os.getenv("STATS_PARROT_WIDGET_ARTIFACT_SCRIPT", "")
+PYTHON_SCAFFOLDS_DIR = os.getenv("STATS_PARROT_PYTHON_SCAFFOLDS_DIR", "")
+
+LOCAL_SCAFFOLDS_DIR = Path(__file__).resolve().parents[1] / "r2-system" / "scaffolds" / "python"
+for scaffold_path in [PYTHON_SCAFFOLDS_DIR, str(LOCAL_SCAFFOLDS_DIR)]:
+    if scaffold_path and scaffold_path not in sys.path:
+        sys.path.insert(0, scaffold_path)
+
+try:
+    from r2_system_scaffolds.duckdb_runtime import DuckDBRuntimePool, QuerySpec, storage_config_from_mapping
+except Exception:
+    DuckDBRuntimePool = None
+    QuerySpec = None
+    storage_config_from_mapping = None
 
 execution_submissions: Dict[str, Dict[str, Any]] = {}
+duckdb_pool = DuckDBRuntimePool(default_ttl_seconds=int(os.getenv("DUCKDB_LEASE_TTL_SECONDS", "900"))) if DuckDBRuntimePool else None
 
 # -------------------------------------------------------------
 # Types & Validation Models
@@ -52,6 +68,14 @@ class ExecutePayload(BaseModel):
     projectId: str
     queries: List[QueryItem]
     storageConfig: Optional[StorageConfigPayload] = None
+    duckdbLeaseId: Optional[str] = None
+    leaseTtlSeconds: Optional[int] = None
+
+
+class RuntimeLeasePayload(BaseModel):
+    leaseId: Optional[str] = None
+    storageConfig: Optional[StorageConfigPayload] = None
+    ttlSeconds: Optional[int] = 900
 
 
 class ExecutionSubmitPayload(BaseModel):
@@ -82,6 +106,14 @@ def sanitize_job_name(value: str) -> str:
     safe = ''.join(ch if ch.isalnum() else '-' for ch in value.lower())
     collapsed = '-'.join(part for part in safe.split('-') if part)
     return collapsed[:48] or 'parrot-job'
+
+
+def model_to_dict(model: Optional[BaseModel]) -> Optional[Dict[str, Any]]:
+    if model is None:
+        return None
+    if hasattr(model, "model_dump"):
+        return model.model_dump(exclude_none=True)
+    return model.dict(exclude_none=True)
 
 
 def create_connection(storage_config: Optional[StorageConfigPayload] = None):
@@ -311,7 +343,9 @@ def health_check():
             "duckdb_version": duckdb.__version__,
             "widgets_dir": WIDGETS_DIR,
             "artifact_script": WIDGET_ARTIFACT_SCRIPT,
-            "artifact_script_accessible": bool(WIDGET_ARTIFACT_SCRIPT and os.path.exists(WIDGET_ARTIFACT_SCRIPT))
+            "artifact_script_accessible": bool(WIDGET_ARTIFACT_SCRIPT and os.path.exists(WIDGET_ARTIFACT_SCRIPT)),
+            "python_scaffolds_dir": PYTHON_SCAFFOLDS_DIR or str(LOCAL_SCAFFOLDS_DIR),
+            "duckdb_lease_pool": bool(duckdb_pool)
         }
         
         return {
@@ -329,6 +363,20 @@ def health_check():
 @app.post("/execute", dependencies=[Depends(verify_internal_secret)])
 def execute_queries(payload: ExecutePayload):
     print(f"[QueryController] Received execution request for Project: {payload.projectId}")
+
+    if duckdb_pool and QuerySpec and storage_config_from_mapping:
+        execution = duckdb_pool.execute_queries(
+            queries=[QuerySpec(widgetId=q.widgetId, sqlString=q.sqlString) for q in payload.queries],
+            storage_config=storage_config_from_mapping(model_to_dict(payload.storageConfig)),
+            lease_id=payload.duckdbLeaseId,
+            ttl_seconds=payload.leaseTtlSeconds,
+        )
+        return {
+            "tenantId": payload.tenantId,
+            "projectId": payload.projectId,
+            "lease": execution["lease"],
+            "results": execution["results"]
+        }
 
     con = create_connection(payload.storageConfig)
     results = []
@@ -371,6 +419,50 @@ def execute_queries(payload: ExecutePayload):
         }
     finally:
         con.close()
+
+
+@app.post("/runtime/lease", dependencies=[Depends(verify_internal_secret)])
+def create_runtime_lease(payload: RuntimeLeasePayload):
+    if not duckdb_pool or not storage_config_from_mapping:
+        raise HTTPException(status_code=503, detail="DuckDB runtime scaffold is not available.")
+
+    lease = duckdb_pool.ensure(
+        lease_id=payload.leaseId,
+        storage_config=storage_config_from_mapping(model_to_dict(payload.storageConfig)),
+        ttl_seconds=payload.ttlSeconds,
+    )
+    return duckdb_pool.lease_payload(lease)
+
+
+@app.post("/runtime/leases/{lease_id}/keepalive", dependencies=[Depends(verify_internal_secret)])
+def keep_runtime_lease(lease_id: str, payload: RuntimeLeasePayload):
+    if not duckdb_pool:
+        raise HTTPException(status_code=503, detail="DuckDB runtime scaffold is not available.")
+
+    status = duckdb_pool.keepalive(lease_id, ttl_seconds=payload.ttlSeconds)
+    if status.get("status") == "missing":
+        raise HTTPException(status_code=404, detail="DuckDB lease not found.")
+    return status
+
+
+@app.get("/runtime/leases/{lease_id}", dependencies=[Depends(verify_internal_secret)])
+def get_runtime_lease(lease_id: str):
+    if not duckdb_pool:
+        raise HTTPException(status_code=503, detail="DuckDB runtime scaffold is not available.")
+
+    status = duckdb_pool.status(lease_id)
+    if status.get("status") == "missing":
+        raise HTTPException(status_code=404, detail="DuckDB lease not found.")
+    return status
+
+
+@app.delete("/runtime/leases/{lease_id}", dependencies=[Depends(verify_internal_secret)])
+def close_runtime_lease(lease_id: str):
+    if not duckdb_pool:
+        raise HTTPException(status_code=503, detail="DuckDB runtime scaffold is not available.")
+
+    closed = duckdb_pool.close(lease_id)
+    return {"leaseId": lease_id, "closed": closed}
 
 
 @app.post("/execution/submit", dependencies=[Depends(verify_internal_secret)])

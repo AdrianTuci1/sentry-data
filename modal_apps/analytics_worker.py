@@ -1,5 +1,6 @@
 import importlib.util
 import os
+import sys
 from pathlib import Path
 
 import modal
@@ -8,8 +9,10 @@ import modal
 REPO_ROOT = Path(__file__).resolve().parents[1]
 WORKER_LOCAL_DIR = REPO_ROOT / "sentry-analytics-worker"
 WIDGETS_LOCAL_DIR = REPO_ROOT / "r2-system" / "widgets"
+PYTHON_SCAFFOLDS_LOCAL_DIR = REPO_ROOT / "r2-system" / "scaffolds" / "python"
 WORKER_REMOTE_DIR = "/root/sentry-analytics-worker"
 WIDGETS_REMOTE_DIR = "/opt/statsparrot/widgets"
+PYTHON_SCAFFOLDS_REMOTE_DIR = "/opt/statsparrot/python-scaffolds"
 NODE_RUNTIME_DIR = "/opt/statsparrot/node-runtime"
 APP_NAME = "statsparrot-analytics-worker"
 
@@ -23,6 +26,7 @@ image = (
     )
     .add_local_dir(str(WORKER_LOCAL_DIR), remote_path=WORKER_REMOTE_DIR)
     .add_local_dir(str(WIDGETS_LOCAL_DIR), remote_path=WIDGETS_REMOTE_DIR)
+    .add_local_dir(str(PYTHON_SCAFFOLDS_LOCAL_DIR), remote_path=PYTHON_SCAFFOLDS_REMOTE_DIR)
 )
 
 app = modal.App(APP_NAME)
@@ -32,6 +36,9 @@ def load_worker_app():
     os.environ.setdefault("NODE_PATH", f"{NODE_RUNTIME_DIR}/node_modules")
     os.environ.setdefault("STATS_PARROT_WIDGETS_DIR", WIDGETS_REMOTE_DIR)
     os.environ.setdefault("STATS_PARROT_WIDGET_ARTIFACT_SCRIPT", f"{WIDGETS_REMOTE_DIR}/generate-artifacts.mjs")
+    os.environ.setdefault("STATS_PARROT_PYTHON_SCAFFOLDS_DIR", PYTHON_SCAFFOLDS_REMOTE_DIR)
+    if PYTHON_SCAFFOLDS_REMOTE_DIR not in sys.path:
+        sys.path.insert(0, PYTHON_SCAFFOLDS_REMOTE_DIR)
 
     module_path = f"{WORKER_REMOTE_DIR}/main.py"
     spec = importlib.util.spec_from_file_location("statsparrot_analytics_worker_main", module_path)

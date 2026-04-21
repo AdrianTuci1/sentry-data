@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -22,6 +23,16 @@ from sklearn.preprocessing import StandardScaler
 
 INTERNAL_SECRET = os.getenv("INTERNAL_API_SECRET", "secret")
 MODEL_ROOT = Path("/models")
+REPO_ROOT = Path(__file__).resolve().parents[1]
+PYTHON_SCAFFOLDS_LOCAL_DIR = REPO_ROOT / "r2-system" / "scaffolds" / "python"
+PYTHON_SCAFFOLDS_REMOTE_DIR = "/opt/statsparrot/python-scaffolds"
+
+for scaffold_path in [str(PYTHON_SCAFFOLDS_LOCAL_DIR), PYTHON_SCAFFOLDS_REMOTE_DIR]:
+    if scaffold_path and scaffold_path not in sys.path:
+        sys.path.insert(0, scaffold_path)
+
+from r2_system_scaffolds.duckdb_runtime import DuckDBRuntimePool, storage_config_from_mapping
+from r2_system_scaffolds.ml_registry import resolve_workflow, workflow_summary
 
 image = (
     modal.Image.debian_slim()
@@ -38,12 +49,16 @@ image = (
     .run_commands(
         "python -c \"import duckdb; con = duckdb.connect(); con.execute('INSTALL httpfs;'); print('httpfs pre-installed OK')\""
     )
+    .add_local_dir(str(PYTHON_SCAFFOLDS_LOCAL_DIR), remote_path=PYTHON_SCAFFOLDS_REMOTE_DIR)
 )
 
 volume = modal.Volume.from_name("statsparrot-ml-models", create_if_missing=True)
 
 app = modal.App("statsparrot-ml-executor")
 web_app = FastAPI(title="StatsParrot ML Executor")
+duckdb_pool = DuckDBRuntimePool(default_ttl_seconds=int(os.getenv("DUCKDB_LEASE_TTL_SECONDS", "900")))
+
+MLTaskType = Literal["classification", "regression", "clustering", "anomaly", "churn", "survival", "forecasting"]
 
 
 class TrainRequest(BaseModel):
@@ -51,10 +66,13 @@ class TrainRequest(BaseModel):
     projectId: str
     requestId: str
     datasetUri: str
-    taskType: Literal["classification", "regression", "clustering", "anomaly"]
+    taskType: MLTaskType
     targetColumn: Optional[str] = None
     featureColumns: List[str] = Field(default_factory=list)
     modelName: Optional[str] = None
+    scaffoldId: Optional[str] = None
+    duckdbLeaseId: Optional[str] = None
+    leaseTtlSeconds: Optional[int] = None
     testSize: float = 0.2
     randomState: int = 42
     hyperparameters: Dict[str, Any] = Field(default_factory=dict)
@@ -67,6 +85,8 @@ class EvaluateRequest(BaseModel):
     datasetUri: str
     targetColumn: Optional[str] = None
     featureColumns: List[str] = Field(default_factory=list)
+    duckdbLeaseId: Optional[str] = None
+    leaseTtlSeconds: Optional[int] = None
 
 
 class InferRequest(BaseModel):
@@ -76,6 +96,14 @@ class InferRequest(BaseModel):
     records: List[Dict[str, Any]] = Field(default_factory=list)
     datasetUri: Optional[str] = None
     featureColumns: List[str] = Field(default_factory=list)
+    duckdbLeaseId: Optional[str] = None
+    leaseTtlSeconds: Optional[int] = None
+
+
+class RuntimeLeaseRequest(BaseModel):
+    leaseId: Optional[str] = None
+    ttlSeconds: Optional[int] = 900
+    storageConfig: Optional[Dict[str, Any]] = None
 
 
 def now_iso() -> str:
@@ -85,6 +113,13 @@ def now_iso() -> str:
 def verify_internal_secret(x_internal_secret: Optional[str]) -> None:
     if x_internal_secret != INTERNAL_SECRET:
         raise HTTPException(status_code=401, detail="Unauthorized. Invalid internal secret.")
+
+
+def resolve_workflow_or_400(task_type: str, scaffold_id: Optional[str] = None):
+    try:
+        return resolve_workflow(task_type, scaffold_id)
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error))
 
 
 def model_dir(tenant_id: str, project_id: str) -> Path:
@@ -111,17 +146,21 @@ def configure_duckdb(con: duckdb.DuckDBPyConnection) -> None:
     con.execute("SET s3_url_style='path';")
 
 
-def load_dataset(dataset_uri: str) -> pd.DataFrame:
-    con = duckdb.connect(":memory:")
-    configure_duckdb(con)
+def load_dataset(dataset_uri: str, duckdb_lease_id: Optional[str] = None, lease_ttl_seconds: Optional[int] = None) -> pd.DataFrame:
+    lease = duckdb_pool.ensure(
+        lease_id=duckdb_lease_id,
+        storage_config=storage_config_from_mapping(None),
+        ttl_seconds=lease_ttl_seconds,
+    )
     escaped_uri = dataset_uri.replace("'", "''")
     query = f"SELECT * FROM read_parquet('{escaped_uri}')"
-    return con.execute(query).fetchdf()
+    with lease.lock:
+        return lease.connection.execute(query).fetchdf()
 
 
 def infer_feature_columns(df: pd.DataFrame, target_column: Optional[str], requested: List[str]) -> List[str]:
     if requested:
-        return [column for column in requested if column in df.columns]
+        return [column for column in requested if column in df.columns and column != target_column]
 
     numeric = [column for column in df.select_dtypes(include=["number", "bool"]).columns.tolist() if column != target_column]
     if numeric:
@@ -131,39 +170,46 @@ def infer_feature_columns(df: pd.DataFrame, target_column: Optional[str], reques
     return fallback[:12]
 
 
-def build_estimator(task_type: str, hyperparameters: Dict[str, Any]) -> Any:
-    if task_type == "classification":
-        if hyperparameters.get("estimator") == "random_forest":
+def build_estimator(task_type: str, hyperparameters: Dict[str, Any], scaffold_id: Optional[str] = None) -> Any:
+    workflow = resolve_workflow_or_400(task_type, scaffold_id)
+    effective_task_type = workflow.effective_task_type
+    scaffold_params = {**workflow.default_hyperparameters, **hyperparameters}
+
+    if effective_task_type == "classification":
+        if scaffold_params.get("estimator") in {"random_forest", "random_forest_classifier"} or workflow.estimator == "random_forest_classifier":
             return RandomForestClassifier(
-                n_estimators=int(hyperparameters.get("n_estimators", 200)),
-                random_state=int(hyperparameters.get("random_state", 42)),
+                n_estimators=int(scaffold_params.get("n_estimators", 200)),
+                random_state=int(scaffold_params.get("random_state", 42)),
+                class_weight=scaffold_params.get("class_weight"),
             )
-        return LogisticRegression(max_iter=int(hyperparameters.get("max_iter", 1000)))
+        return LogisticRegression(max_iter=int(scaffold_params.get("max_iter", 1000)))
 
-    if task_type == "regression":
+    if effective_task_type == "regression":
         return RandomForestRegressor(
-            n_estimators=int(hyperparameters.get("n_estimators", 300)),
-            random_state=int(hyperparameters.get("random_state", 42)),
+            n_estimators=int(scaffold_params.get("n_estimators", 300)),
+            random_state=int(scaffold_params.get("random_state", 42)),
         )
 
-    if task_type == "clustering":
+    if effective_task_type == "clustering":
         return KMeans(
-            n_clusters=int(hyperparameters.get("n_clusters", 4)),
-            random_state=int(hyperparameters.get("random_state", 42)),
-            n_init=int(hyperparameters.get("n_init", 10)),
+            n_clusters=int(scaffold_params.get("n_clusters", 4)),
+            random_state=int(scaffold_params.get("random_state", 42)),
+            n_init=int(scaffold_params.get("n_init", 10)),
         )
 
-    if task_type == "anomaly":
+    if effective_task_type == "anomaly":
         return IsolationForest(
-            contamination=float(hyperparameters.get("contamination", 0.05)),
-            random_state=int(hyperparameters.get("random_state", 42)),
+            contamination=float(scaffold_params.get("contamination", 0.05)),
+            random_state=int(scaffold_params.get("random_state", 42)),
         )
 
     raise HTTPException(status_code=400, detail=f"Unsupported task type: {task_type}")
 
 
 def train_model(request: TrainRequest) -> Dict[str, Any]:
-    df = load_dataset(request.datasetUri)
+    workflow = resolve_workflow_or_400(request.taskType, request.scaffoldId)
+    effective_task_type = workflow.effective_task_type
+    df = load_dataset(request.datasetUri, request.duckdbLeaseId, request.leaseTtlSeconds)
     if df.empty:
         raise HTTPException(status_code=400, detail="Dataset is empty.")
 
@@ -172,13 +218,13 @@ def train_model(request: TrainRequest) -> Dict[str, Any]:
         raise HTTPException(status_code=400, detail="No usable feature columns were detected.")
 
     task_type = request.taskType
-    estimator = build_estimator(task_type, request.hyperparameters)
+    estimator = build_estimator(task_type, request.hyperparameters, request.scaffoldId)
     model_id = request.modelName or f"ml-{task_type}-{uuid.uuid4().hex[:12]}"
     created_at = now_iso()
 
-    if task_type in {"classification", "regression"}:
+    if effective_task_type in {"classification", "regression"}:
         if not request.targetColumn or request.targetColumn not in df.columns:
-            raise HTTPException(status_code=400, detail="A valid targetColumn is required for supervised training.")
+            raise HTTPException(status_code=400, detail=f"A valid targetColumn is required for {task_type} training.")
 
         training_df = df[feature_columns + [request.targetColumn]].dropna()
         if training_df.empty:
@@ -200,7 +246,7 @@ def train_model(request: TrainRequest) -> Dict[str, Any]:
         pipeline.fit(X_train, y_train)
         predictions = pipeline.predict(X_test)
 
-        if task_type == "classification":
+        if effective_task_type == "classification":
             metrics = {
                 "accuracy": float(accuracy_score(y_test, predictions)),
                 "f1_weighted": float(f1_score(y_test, predictions, average="weighted", zero_division=0)),
@@ -230,7 +276,7 @@ def train_model(request: TrainRequest) -> Dict[str, Any]:
         fitted_model.fit(training_df)
 
         metrics: Dict[str, Any] = {}
-        if task_type == "clustering":
+        if effective_task_type == "clustering":
             labels = fitted_model.predict(training_df)
             cluster_count = len(set(labels.tolist()))
             metrics["cluster_count"] = int(cluster_count)
@@ -258,6 +304,9 @@ def train_model(request: TrainRequest) -> Dict[str, Any]:
         "project_id": request.projectId,
         "request_id": request.requestId,
         "task_type": task_type,
+        "effective_task_type": effective_task_type,
+        "scaffold_id": workflow.scaffold_id,
+        "scaffold_description": workflow.description,
         "target_column": request.targetColumn,
         "feature_columns": feature_columns,
         "dataset_uri": request.datasetUri,
@@ -280,6 +329,8 @@ def train_model(request: TrainRequest) -> Dict[str, Any]:
         "metrics": metrics,
         "feature_columns": feature_columns,
         "task_type": task_type,
+        "effective_task_type": effective_task_type,
+        "scaffold_id": workflow.scaffold_id,
         "engine_used": "duckdb_local",
         "daft_ready": True,
     }
@@ -301,11 +352,12 @@ def load_model_and_metadata(tenant_id: str, project_id: str, model_id: str) -> t
 
 def evaluate_model(request: EvaluateRequest) -> Dict[str, Any]:
     model, metadata = load_model_and_metadata(request.tenantId, request.projectId, request.modelId)
-    df = load_dataset(request.datasetUri)
+    df = load_dataset(request.datasetUri, request.duckdbLeaseId, request.leaseTtlSeconds)
     feature_columns = infer_feature_columns(df, request.targetColumn or metadata.get("target_column"), request.featureColumns or metadata.get("feature_columns", []))
     task_type = metadata["task_type"]
+    effective_task_type = metadata.get("effective_task_type", task_type)
 
-    if task_type in {"classification", "regression"}:
+    if effective_task_type in {"classification", "regression"}:
         target_column = request.targetColumn or metadata.get("target_column")
         if not target_column or target_column not in df.columns:
             raise HTTPException(status_code=400, detail="Evaluation requires a valid target column.")
@@ -316,7 +368,7 @@ def evaluate_model(request: EvaluateRequest) -> Dict[str, Any]:
         y = evaluation_df[target_column]
         predictions = model.predict(X)
 
-        if task_type == "classification":
+        if effective_task_type == "classification":
             metrics = {
                 "accuracy": float(accuracy_score(y, predictions)),
                 "f1_weighted": float(f1_score(y, predictions, average="weighted", zero_division=0)),
@@ -332,7 +384,7 @@ def evaluate_model(request: EvaluateRequest) -> Dict[str, Any]:
         if evaluation_df.empty:
             raise HTTPException(status_code=400, detail="No rows remain after dropping nulls for evaluation.")
         predictions = model.predict(evaluation_df)
-        if task_type == "clustering":
+        if effective_task_type == "clustering":
             cluster_count = len(set(predictions.tolist()))
             metrics = {"cluster_count": int(cluster_count)}
         else:
@@ -342,6 +394,8 @@ def evaluate_model(request: EvaluateRequest) -> Dict[str, Any]:
         "status": "evaluated",
         "model_id": request.modelId,
         "task_type": task_type,
+        "effective_task_type": effective_task_type,
+        "scaffold_id": metadata.get("scaffold_id"),
         "feature_columns": feature_columns,
         "metrics": metrics,
         "training_metrics": metadata.get("metrics", {}),
@@ -352,7 +406,7 @@ def infer_with_model(request: InferRequest) -> Dict[str, Any]:
     model, metadata = load_model_and_metadata(request.tenantId, request.projectId, request.modelId)
 
     if request.datasetUri:
-        df = load_dataset(request.datasetUri)
+        df = load_dataset(request.datasetUri, request.duckdbLeaseId, request.leaseTtlSeconds)
     else:
         if not request.records:
             raise HTTPException(status_code=400, detail="Provide either datasetUri or records for inference.")
@@ -371,6 +425,8 @@ def infer_with_model(request: InferRequest) -> Dict[str, Any]:
         "status": "completed",
         "model_id": request.modelId,
         "task_type": metadata["task_type"],
+        "effective_task_type": metadata.get("effective_task_type", metadata["task_type"]),
+        "scaffold_id": metadata.get("scaffold_id"),
         "feature_columns": feature_columns,
         "predictions": output_records.head(200).to_dict(orient="records"),
         "row_count": int(len(output_records)),
@@ -395,6 +451,53 @@ def infer(request: InferRequest, x_internal_secret: Optional[str] = Header(None)
     return infer_with_model(request)
 
 
+@web_app.get("/api/v1/ml/workflows")
+def list_workflows(x_internal_secret: Optional[str] = Header(None)):
+    verify_internal_secret(x_internal_secret)
+    return {
+        "status": "ok",
+        "workflows": workflow_summary(),
+    }
+
+
+@web_app.post("/api/v1/runtime/lease")
+def create_runtime_lease(request: RuntimeLeaseRequest, x_internal_secret: Optional[str] = Header(None)):
+    verify_internal_secret(x_internal_secret)
+    lease = duckdb_pool.ensure(
+        lease_id=request.leaseId,
+        storage_config=storage_config_from_mapping(request.storageConfig),
+        ttl_seconds=request.ttlSeconds,
+    )
+    return duckdb_pool.lease_payload(lease)
+
+
+@web_app.post("/api/v1/runtime/leases/{lease_id}/keepalive")
+def keep_runtime_lease(lease_id: str, request: RuntimeLeaseRequest, x_internal_secret: Optional[str] = Header(None)):
+    verify_internal_secret(x_internal_secret)
+    status = duckdb_pool.keepalive(lease_id, ttl_seconds=request.ttlSeconds)
+    if status.get("status") == "missing":
+        raise HTTPException(status_code=404, detail="DuckDB lease not found.")
+    return status
+
+
+@web_app.get("/api/v1/runtime/leases/{lease_id}")
+def get_runtime_lease(lease_id: str, x_internal_secret: Optional[str] = Header(None)):
+    verify_internal_secret(x_internal_secret)
+    status = duckdb_pool.status(lease_id)
+    if status.get("status") == "missing":
+        raise HTTPException(status_code=404, detail="DuckDB lease not found.")
+    return status
+
+
+@web_app.delete("/api/v1/runtime/leases/{lease_id}")
+def close_runtime_lease(lease_id: str, x_internal_secret: Optional[str] = Header(None)):
+    verify_internal_secret(x_internal_secret)
+    return {
+        "leaseId": lease_id,
+        "closed": duckdb_pool.close(lease_id),
+    }
+
+
 @web_app.get("/health")
 def health():
     return {
@@ -402,6 +505,8 @@ def health():
         "service": "statsparrot-ml-executor",
         "volume": "statsparrot-ml-models",
         "engines": ["duckdb_local", "daft_ready"],
+        "python_scaffolds_dir": PYTHON_SCAFFOLDS_REMOTE_DIR,
+        "workflows": [item["taskType"] for item in workflow_summary()],
     }
 
 

@@ -312,19 +312,38 @@ export class AnalyticsService {
         let workerResults: any[] = [];
         if (workerQueries.length > 0) {
             const storageConfig = await this.resolveWorkerStorageConfig(tenantId, projectId);
+            const duckdbLease = await this.createDuckDbLease(storageConfig).catch((error) => {
+                console.warn(`[AnalyticsService] DuckDB lease unavailable, falling back to direct execute: ${error.message}`);
+                return undefined;
+            });
             const response = await fetch(this.analyticsWorkerUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-Internal-Secret': this.workerSecret
                 },
-                body: JSON.stringify({ tenantId, projectId, queries: workerQueries, storageConfig })
+                body: JSON.stringify({
+                    tenantId,
+                    projectId,
+                    queries: workerQueries,
+                    storageConfig,
+                    duckdbLeaseId: duckdbLease?.leaseId,
+                    leaseTtlSeconds: 900
+                })
             });
 
             if (!response.ok) throw new Error(`Worker Failed: ${response.status}`);
 
             const workerResult = await response.json() || { results: [] };
             workerResults = Array.isArray(workerResult.results) ? workerResult.results : [];
+            const activeLeaseId = workerResult.lease?.leaseId || duckdbLease?.leaseId;
+            if (activeLeaseId) {
+                for (const observation of observability) {
+                    if (observation.executedBy === 'analytics_worker' && !observation.cacheHit) {
+                        observation.duckdbLeaseId = activeLeaseId;
+                    }
+                }
+            }
 
             for (const result of workerResults) {
                 const querySpec = this.findQuerySpec(querySpecs, result?.widgetId);
@@ -342,6 +361,7 @@ export class AnalyticsService {
                 if (observation) {
                     observation.cacheUri = cached.uri;
                     observation.cachedAt = cached.cachedAt;
+                    observation.duckdbLeaseId = activeLeaseId;
                 }
             }
         }
@@ -363,6 +383,32 @@ export class AnalyticsService {
         }
 
         return [];
+    }
+
+    private async createDuckDbLease(storageConfig: any): Promise<any | undefined> {
+        const leaseUrl = this.resolveWorkerPath('/runtime/lease');
+        const response = await fetch(leaseUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Internal-Secret': this.workerSecret
+            },
+            body: JSON.stringify({
+                storageConfig,
+                ttlSeconds: 900
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`duckdb_lease_${response.status}`);
+        }
+
+        return response.json();
+    }
+
+    private resolveWorkerPath(path: string): string {
+        const baseUrl = this.analyticsWorkerUrl.replace(/\/execute\/?$/, '').replace(/\/+$/, '');
+        return `${baseUrl}${path}`;
     }
 
     private findQuerySpec(querySpecs: ParrotQuerySpec[], widgetId: string): ParrotQuerySpec | undefined {

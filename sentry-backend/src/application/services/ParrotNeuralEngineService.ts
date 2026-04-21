@@ -6,6 +6,7 @@ import {
     ParrotExecutionPlan,
     ParrotExecutionScore,
     ParrotMLRecommendation,
+    ParrotMLTaskType,
     ParrotProjectionMaterializationPolicy,
     ParrotProjectionPlan,
     ParrotProjectionSpec,
@@ -462,35 +463,94 @@ export class ParrotNeuralEngineService {
     }
 
     private buildMlRecommendation(profile: ParrotSourceProfile, projectionSpec: ParrotProjectionSpec): ParrotMLRecommendation | null {
-        const featureColumns = profile.metricCandidates.slice(0, 6);
+        const targetColumn = profile.metricCandidates[0];
+        const featureColumns = profile.metricCandidates.filter((column) => column !== targetColumn).slice(0, 6);
         if (featureColumns.length === 0) {
             return null;
         }
 
-        const targetColumn = profile.metricCandidates[0];
-        const taskType = profile.timestampCandidates.length > 0 ? 'regression' : 'clustering';
+        const taskType = this.chooseMlTaskType(profile, targetColumn);
         return {
             recommendationId: `ml-${profile.sourceId}-${this.slug(targetColumn || 'cluster')}`,
             sourceId: profile.sourceId,
             projectionId: projectionSpec.projectionId,
-            title: taskType === 'regression'
-                ? `Forecast ${targetColumn} from ${profile.sourceName}`
-                : `Cluster ${profile.sourceName} records`,
+            title: this.buildMlTitle(taskType, targetColumn, profile.sourceName),
             taskType,
             status: 'recommended',
             launchMode: 'manual_approval',
             datasetUri: projectionSpec.servingUri,
-            targetColumn: taskType === 'regression' ? targetColumn : undefined,
+            targetColumn: ['classification', 'regression', 'churn', 'survival', 'forecasting'].includes(taskType) ? targetColumn : undefined,
             featureColumns,
-            rationale: taskType === 'regression'
-                ? 'Metric and timestamp candidates were detected, so a supervised forecasting/regression workflow can be approved manually.'
-                : 'Metric candidates were detected without a timestamp, so an unsupervised clustering workflow can be approved manually.',
+            scaffoldId: `ml_workflows/${taskType}.py`,
+            rationale: this.describeMlWorkflow(taskType),
             executor: 'ml_executor',
             request: {
                 testSize: 0.2,
                 randomState: 42
             }
         };
+    }
+
+    private buildMlTitle(taskType: ParrotMLTaskType, targetColumn: string, sourceName: string): string {
+        switch (taskType) {
+            case 'churn':
+                return `Predict churn risk from ${sourceName}`;
+            case 'survival':
+                return `Estimate survival window from ${sourceName}`;
+            case 'forecasting':
+                return `Forecast ${targetColumn} from ${sourceName}`;
+            case 'classification':
+                return `Classify ${targetColumn} from ${sourceName}`;
+            case 'regression':
+                return `Model ${targetColumn} from ${sourceName}`;
+            case 'anomaly':
+                return `Detect anomalies in ${sourceName}`;
+            case 'clustering':
+            default:
+                return `Cluster ${sourceName} records`;
+        }
+    }
+
+    private chooseMlTaskType(profile: ParrotSourceProfile, targetColumn: string): ParrotMLTaskType {
+        const candidates = [
+            targetColumn,
+            ...profile.metricCandidates,
+            ...profile.schema.map((column) => column.name)
+        ].join(' ').toLowerCase();
+
+        if (/(churn|churned|retention|cancel|account_closed)/.test(candidates)) {
+            return 'churn';
+        }
+
+        if (/(survival|duration|tenure|time_to_event|days_until)/.test(candidates)) {
+            return 'survival';
+        }
+
+        if (profile.timestampCandidates.length > 0) {
+            return 'forecasting';
+        }
+
+        return 'clustering';
+    }
+
+    private describeMlWorkflow(taskType: ParrotMLTaskType): string {
+        switch (taskType) {
+            case 'churn':
+                return 'Churn-like signals were detected, so the versioned churn scaffold can be approved manually instead of generating model code from zero.';
+            case 'survival':
+                return 'Duration or time-to-event signals were detected, so the survival analytics scaffold can be approved manually.';
+            case 'forecasting':
+                return 'Metric and timestamp candidates were detected, so the forecasting scaffold can be approved manually.';
+            case 'clustering':
+                return 'Metric candidates were detected without a timestamp, so the clustering scaffold can be approved manually.';
+            case 'anomaly':
+                return 'Operational outlier signals were detected, so the anomaly scaffold can be approved manually.';
+            case 'classification':
+                return 'A labeled outcome was detected, so the classification scaffold can be approved manually.';
+            case 'regression':
+            default:
+                return 'A continuous target was detected, so the regression scaffold can be approved manually.';
+        }
     }
 
     private chooseMaterialization(profile: ParrotSourceProfile): ParrotProjectionMaterializationPolicy {
