@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import json
+import os
 import random
+import subprocess
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Iterable, List
 
 import pandas as pd
+import numpy as np
 
 from .catalog import (
     DOMAIN_COMPATIBILITY_MAP,
@@ -363,32 +366,54 @@ def build_rl_cluster_profiles() -> List[Dict[str, Any]]:
     return profiles
 
 
-def build_rl_feedback_events(cluster_profiles: List[Dict[str, Any]], seed: int = DEFAULT_SEED) -> List[Dict[str, Any]]:
-    rng = random.Random(seed)
+def build_rl_feedback_events(cluster_profiles: List[Dict[str, Any]], field_specs: List[Dict[str, Any]], seed: int = DEFAULT_SEED) -> List[Dict[str, Any]]:
+    rng = np.random.default_rng(seed)
     events: List[Dict[str, Any]] = []
     deviation_directions = [
-        "toward_efficiency",
-        "toward_deeper_diagnostics",
-        "toward_forecasting",
-        "toward_security",
-        "toward_mixed_source_views",
-        "toward_simpler_exec_boards",
+        "operational_latency", "cost_anomaly", "segment_churn", 
+        "executive_growth_shift", "regulatory_drift", "security_escalation",
+        "data_quality_degradation", "throughput_bottleneck"
     ]
+    
+    # Map field names to roles for logic calculation
+    field_to_role = {spec["field_name"]: spec["semantic_role"] for spec in field_specs}
 
+    # Industrial Upgrade: Scale feedback events significantly (from 24 to 120 per cluster)
     for cluster in cluster_profiles:
-        for idx in range(24):
+        for idx in range(120):
             tracked_field = rng.choice(cluster["tracked_fields"])
-            reward = round(rng.uniform(0.42, 0.96), 4)
+            selected_widget = rng.choice(cluster["preferred_widgets"])
+            
+            # Logic: Calculate reward based on how well the widget matches the field's role
+            field_role = field_to_role.get(tracked_field, "dimension")
+            hints = ROLE_WIDGET_HINTS.get(field_role, [])
+            
+            # Base reward logic
+            is_hinted = selected_widget in hints
+            base_reward = 0.82 if is_hinted else 0.32
+            reward = round(float(base_reward + rng.uniform(-0.15, 0.15)), 4)
+            
             deviation = rng.choice(deviation_directions)
-            field_weight_shift = round(rng.uniform(0.04, 0.22), 4)
+            field_weight_shift = round(float(rng.uniform(0.04, 0.22)), 4)
+            
+            # Fetch widget family for features.py
+            widget_family = "table"
+            for b in WIDGET_BLUEPRINTS:
+                if b["id"] == selected_widget:
+                    widget_family = b["family"]
+                    break
+
             events.append(
                 {
                     "event_id": f"{cluster['cluster_id']}__{idx:03d}",
                     "cluster_id": cluster["cluster_id"],
                     "user_id": f"user_{cluster['cluster_id'][:6]}_{idx:03d}",
                     "detected_domains": cluster["dominant_domains"],
-                    "selected_widget": rng.choice(cluster["preferred_widgets"]),
+                    "selected_widget": selected_widget,
+                    "widget_family": widget_family, 
                     "tracked_field": tracked_field,
+                    "field_role": field_role, 
+                    "is_hinted_match": is_hinted, 
                     "reward": reward,
                     "deviation_direction": deviation,
                     "policy_adjustment": {
@@ -431,25 +456,87 @@ def build_collective_adaptation_signals(cluster_profiles: List[Dict[str, Any]]) 
 
 def build_source_frames(rows_per_source: int = 240, seed: int = DEFAULT_SEED) -> Dict[str, Dict[str, Any]]:
     source_frames: Dict[str, Dict[str, Any]] = {}
+    rng = np.random.default_rng(seed)
+    
+    # Industrial Upgrade: Generate 3x mutations for each blueprint to increase variety
+    # This creates ~60-100 unique sources from the 19 core blueprints
     for idx, blueprint in enumerate(SOURCE_BLUEPRINTS):
-        generator = blueprint["generator"]
-        kwargs = dict(blueprint.get("generator_kwargs", {}))
-        kwargs.update(
-            {
-                "rows": rows_per_source,
-                "inject_anomalies": blueprint["inject_anomalies"],
-                "seed": seed + (idx * 19),
+        for mutation_idx in range(3):
+            suffix = f"_mut_{mutation_idx}" if mutation_idx > 0 else ""
+            mutant_name = f"{blueprint['source_name']}{suffix}"
+            
+            generator = blueprint["generator"]
+            kwargs = dict(blueprint.get("generator_kwargs", {}))
+            kwargs.update(
+                {
+                    "rows": rows_per_source,
+                    "inject_anomalies": blueprint["inject_anomalies"],
+                    "seed": seed + (idx * 100) + mutation_idx,
+                }
+            )
+            df = generator(**kwargs)
+            
+            # Schema Jitter: Randomly drop 1-2 columns in mutations to simulate real-world schema drift
+            if mutation_idx > 0:
+                cols_to_drop = [c for c in df.columns if c not in ["timestamp"] + blueprint["join_keys"]]
+                if cols_to_drop:
+                    to_drop = rng.choice(cols_to_drop, size=min(len(cols_to_drop), rng.integers(1, 4)), replace=False)
+                    df = df.drop(columns=to_drop)
+
+            source_frames[mutant_name] = {
+                "domain": blueprint["domain"],
+                "grain": blueprint["grain"],
+                "description": f"{blueprint['description']} (Variant {mutation_idx})",
+                "join_keys": blueprint["join_keys"],
+                "df": df,
             }
-        )
-        df = generator(**kwargs)
-        source_frames[blueprint["source_name"]] = {
-            "domain": blueprint["domain"],
-            "grain": blueprint["grain"],
-            "description": blueprint["description"],
-            "join_keys": blueprint["join_keys"],
-            "df": df,
-        }
     return source_frames
+
+
+def generate_gemini_priority_bundle(output_dir: Path, rows_per_source: int) -> List[Dict[str, Any]]:
+    """
+    Calls the gemini_synthetic engine for each of the 5 priority domains.
+    """
+    priority_domains = ["ecommerce", "marketing", "logistics", "saas", "cybersecurity"]
+    domain_sources = {
+        "ecommerce": "orders,inventory,customers,payments",
+        "marketing": "campaigns,ad_spend,conversions,leads",
+        "logistics": "shipments,fleet_status,warehouse_inventory,delivery_routes",
+        "saas": "subscriptions,web_sessions,feature_usage,support_tickets",
+        "cybersecurity": "access_logs,threat_events,system_scans,user_behavior",
+    }
+    
+    all_recommendations = []
+    
+    for domain in priority_domains:
+        print(f"[GeminiBundle] Generating priority dataset for domain: {domain}")
+        domain_output = output_dir / "gemini" / domain
+        domain_output.mkdir(parents=True, exist_ok=True)
+        
+        # Call gemini_synthetic script
+        script_path = Path(__file__).parent / "gemini_synthetic.py"
+        try:
+            subprocess.run([
+                "python3", str(script_path),
+                "--domain", domain,
+                "--sources", domain_sources[domain],
+                "--rows-per-source", str(rows_per_source),
+                "--output-dir", str(domain_output)
+            ], check=True, env=os.environ)
+            
+            # Read recommendations
+            recs_path = domain_output / "widget_recommendations.jsonl"
+            if recs_path.exists():
+                with recs_path.open("r") as f:
+                    for line in f:
+                        if line.strip():
+                            rec = json.loads(line)
+                            rec["domain"] = domain
+                            all_recommendations.append(rec)
+        except Exception as e:
+            print(f"[GeminiBundle] Failed to generate {domain}: {e}")
+            
+    return all_recommendations
 
 
 def build_training_bundle(rows_per_source: int = 240, seed: int = DEFAULT_SEED) -> Dict[str, Any]:
@@ -460,7 +547,7 @@ def build_training_bundle(rows_per_source: int = 240, seed: int = DEFAULT_SEED) 
     domain_detection = build_domain_detection_scenarios(field_specs, widget_catalog)
     query_generation = build_query_generation_scenarios(field_specs, widget_catalog)
     rl_cluster_profiles = build_rl_cluster_profiles()
-    rl_feedback_events = build_rl_feedback_events(rl_cluster_profiles, seed=seed)
+    rl_feedback_events = build_rl_feedback_events(rl_cluster_profiles, field_specs, seed=seed)
     collective_adaptation = build_collective_adaptation_signals(rl_cluster_profiles)
 
     return {
@@ -496,11 +583,24 @@ def _write_jsonl(path: Path, rows: Iterable[Dict[str, Any]]) -> int:
     return count
 
 
-def materialize_training_bundle(output_dir: str = "ml-lab/.generated/training_bundle", rows_per_source: int = 240, seed: int = DEFAULT_SEED) -> Dict[str, Any]:
+def materialize_training_bundle(
+    output_dir: str = "ml-lab/.generated/training_bundle", 
+    rows_per_source: int = 240, 
+    seed: int = DEFAULT_SEED,
+    use_gemini: bool = False
+) -> Dict[str, Any]:
     output_path = Path(output_dir)
     csv_dir = output_path / "csv"
     parquet_dir = output_path / "parquet"
     metadata_dir = output_path / "metadata"
+    
+    gemini_recommendations = []
+    if use_gemini:
+        gemini_recommendations = generate_gemini_priority_bundle(output_path, rows_per_source)
+        # Load the generated dataframes into source_frames
+        # This part requires parsing the CSVs generated by Gemini
+        # For simplicity, we'll assume the gemini_synthetic output is our source of truth
+    
     bundle = build_training_bundle(rows_per_source=rows_per_source, seed=seed)
 
     source_exports = []
@@ -536,7 +636,12 @@ def materialize_training_bundle(output_dir: str = "ml-lab/.generated/training_bu
     _write_json(metadata_dir / "collective_adaptation_signals.json", bundle["collective_adaptation_signals"])
     domain_detection_count = _write_jsonl(metadata_dir / "domain_detection_scenarios.jsonl", bundle["domain_detection_scenarios"])
     query_generation_count = _write_jsonl(metadata_dir / "query_generation_scenarios.jsonl", bundle["query_generation_scenarios"])
-    rl_feedback_count = _write_jsonl(metadata_dir / "rl_feedback_events.jsonl", bundle["rl_feedback_events"])
+    rl_feedback_count = _write_jsonl(metadata_dir / "rl_feedback_events.jsonl", build_rl_feedback_events(bundle["rl_cluster_profiles"], bundle["field_specs"], seed=seed))
+    
+    # Write gemini recommendations if they exist
+    gemini_rec_count = 0
+    if gemini_recommendations:
+        gemini_rec_count = _write_jsonl(metadata_dir / "gemini_widget_recommendations.jsonl", gemini_recommendations)
 
     manifest = {
         "version": bundle["version"],
@@ -595,3 +700,23 @@ __all__ = [
     "project_fields_for_domains",
     "recommend_widgets",
 ]
+
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Materialize a synthetic training bundle.")
+    parser.add_argument("--output-dir", default=".generated/training_bundle", help="Directory to save the bundle.")
+    parser.add_argument("--rows-per-source", type=int, default=240, help="Number of rows per source.")
+    parser.add_argument("--seed", type=int, default=DEFAULT_SEED, help="Random seed.")
+    parser.add_argument("--use-gemini", type=str, default="False", help="Whether to use Gemini for priority domains (True/False).")
+    args = parser.parse_args()
+    
+    use_gemini = args.use_gemini.lower() == "true"
+    
+    materialize_training_bundle(
+        output_dir=args.output_dir,
+        rows_per_source=args.rows_per_source,
+        seed=args.seed,
+        use_gemini=use_gemini
+    )
+    print(f"\nSuccessfully materialized bundle to {args.output_dir}")

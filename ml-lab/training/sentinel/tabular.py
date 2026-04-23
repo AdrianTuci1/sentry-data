@@ -4,6 +4,7 @@ from typing import Dict, List
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.metrics import accuracy_score, f1_score, mean_absolute_error, r2_score, roc_auc_score
+from sklearn.model_selection import train_test_split
 
 from .config import TrainingConfig
 from .features import interaction_policy_features, query_risk_features, source_coverage_features, source_coverage_label
@@ -33,23 +34,33 @@ def train_coverage_ranker(bundle_dir: Path, version_dir: Path, config: TrainingC
 
 
 def train_query_risk_model(bundle_dir: Path, version_dir: Path, config: TrainingConfig) -> Dict[str, object]:
-    scenarios = load_jsonl(bundle_dir / "metadata" / "query_generation_scenarios.jsonl")
+    # Industrial Upgrade: Load from the Vault inside the bundle
+    vault_path = bundle_dir / "metadata" / "query_vault.jsonl"
     rows: List[Dict[str, object]] = []
     labels: List[int] = []
 
-    for scenario in scenarios:
-        rows.append({
-            **scenario,
-            "sql": "select " + ", ".join((scenario.get("core_fields") or ["metric"])[:4]) + " from projection group by 1",
-        })
-        labels.append(0)
-        for risky_sql in [
-            "drop table bronze.source",
-            "delete from projection where 1=1",
-            "copy data to 's3://external-bucket/out.csv'",
-            "select httpfs_secret from system.runtime",
-        ]:
-            rows.append({**scenario, "sql": risky_sql})
+    if vault_path.exists():
+        print(f"📊 Loading {vault_path}...")
+        vault_data = load_jsonl(vault_path)
+        for item in vault_data:
+            # We map the vault item to the expected feature format
+            rows.append({
+                "sql": item.get("sql", ""),
+                "detected_domains": [item.get("domain", "general")],
+                "task_type": "adhoc_query"
+            })
+            labels.append(int(item.get("label", 0)))
+    else:
+        # Fallback to basic scenarios if vault is missing
+        print("⚠️ Query Vault missing, using basic scenarios.")
+        scenarios = load_jsonl(bundle_dir / "metadata" / "query_generation_scenarios.jsonl")
+        for scenario in scenarios:
+            core_fields = (scenario.get("core_fields") or ["metric"])[:4]
+            # Safe queries
+            rows.append({**scenario, "sql": f"SELECT {', '.join(core_fields)} FROM table"})
+            labels.append(0)
+            # Risky queries
+            rows.append({**scenario, "sql": "DROP TABLE critical_data"})
             labels.append(1)
 
     if len(set(labels)) < 2:
@@ -57,18 +68,28 @@ def train_query_risk_model(bundle_dir: Path, version_dir: Path, config: Training
 
     X = np.array([query_risk_features(row) for row in rows], dtype=np.float32)
     y = np.array(labels, dtype=np.int64)
+
+    # Split into train/test to prevent overfitting validation
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=config.test_size, random_state=config.seed, stratify=y
+    )
+
     model = RandomForestClassifier(n_estimators=120, random_state=config.seed, class_weight="balanced")
-    model.fit(X, y)
-    predictions = model.predict(X)
-    probabilities = model.predict_proba(X)[:, 1]
+    model.fit(X_train, y_train)
+    
+    predictions = model.predict(X_test)
+    probabilities = model.predict_proba(X_test)[:, 1]
+    
     write_pickle(version_dir / "query_risk_model.pkl", {"model": model, "feature_names": QUERY_RISK_FEATURES})
+    
     metrics = {
-        "accuracy": float(accuracy_score(y, predictions)),
-        "f1": float(f1_score(y, predictions, zero_division=0)),
-        "train_rows": int(len(y)),
+        "accuracy": float(accuracy_score(y_test, predictions)),
+        "f1": float(f1_score(y_test, predictions, zero_division=0)),
+        "train_rows": int(len(y_train)),
+        "test_rows": int(len(y_test)),
     }
-    if len(set(y.tolist())) > 1:
-        metrics["auc"] = float(roc_auc_score(y, probabilities))
+    if len(set(y_test.tolist())) > 1:
+        metrics["auc"] = float(roc_auc_score(y_test, probabilities))
     return {"kind": "query_risk_random_forest", "artifact": "query_risk_model.pkl", "metrics": metrics}
 
 
@@ -79,17 +100,26 @@ def train_interaction_policy_model(bundle_dir: Path, version_dir: Path, config: 
 
     X = np.array([interaction_policy_features(event) for event in events], dtype=np.float32)
     y = np.array([float(event.get("reward") or 0.0) for event in events], dtype=np.float32)
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=config.test_size, random_state=config.seed
+    )
+
     model = RandomForestRegressor(n_estimators=160, random_state=config.seed, min_samples_leaf=2)
-    model.fit(X, y)
-    predictions = model.predict(X)
+    model.fit(X_train, y_train)
+    
+    predictions = model.predict(X_test)
+    
     write_pickle(version_dir / "interaction_policy_model.pkl", {"model": model, "feature_names": INTERACTION_POLICY_FEATURES})
+    
     return {
         "kind": "interaction_policy_random_forest",
         "artifact": "interaction_policy_model.pkl",
         "metrics": {
-            "mae": float(mean_absolute_error(y, predictions)),
-            "r2": float(r2_score(y, predictions)) if len(y) > 1 else 1.0,
-            "train_rows": int(len(y)),
+            "mae": float(mean_absolute_error(y_test, predictions)),
+            "r2": float(r2_score(y_test, predictions)) if len(y_test) > 1 else 1.0,
+            "train_rows": int(len(X_train)),
+            "test_rows": int(len(X_test)),
         },
     }
 

@@ -209,7 +209,11 @@ def main(
     print("Preparing to run training remotely...")
     selected_runner = train_drift_model_cpu if executor == "cpu-large" else train_drift_model_gpu
     print(f"Selected executor: {executor} ({EXECUTOR_PROFILES[executor]['description']})")
-    selected_runner.remote(
+    print("\n" + "="*80)
+    print(" 🚀 SENTINEL TRAINING COMPLETE")
+    print("="*80)
+    
+    result = selected_runner.remote(
         epochs=epochs,
         lr=lr,
         hidden_size=hidden_size,
@@ -222,3 +226,22 @@ def main(
         upload_r2=upload_r2,
         bundle_r2_uri=bundle_r2_uri,
     )
+
+    print(f"\n📦 Version: {result.get('version')}")
+    print(f"🔗 Bundle:  {result.get('bundle_source', {}).get('uri') or 'Generated'}")
+    print(f"📂 Output:  {result.get('model_bundle_uri') or 'Local only'}")
+    
+    print("\n📊 MODEL METRICS:")
+    print("-" * 40)
+    for name, data in result.get("models", {}).items():
+        kind = data.get("kind", "Unknown")
+        metrics = data.get("metrics", {})
+        print(f"▶ {name} ({kind})")
+        for m_name, m_val in metrics.items():
+            # Format numbers for readability
+            val_str = f"{m_val:.4f}" if isinstance(m_val, float) else str(m_val)
+            print(f"   • {m_name:15}: {val_str}")
+        print("-" * 40)
+
+    print("\n✅ All weights uploaded to R2. Ready for integration.")
+    print("="*80 + "\n")

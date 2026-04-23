@@ -1,0 +1,2027 @@
+[
+  {
+    "id": "audience-copilot",
+    "title": "Audience Copilot",
+    "description": "Recommendation feed with segment, action and expected impact.",
+    "category": "assistant",
+    "selection_hints": [
+      "recommendations",
+      "AI text actions",
+      "next best action"
+    ],
+    "data_requirements": [
+      "recommendations: Ordered list of recommendations."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "recommendations",
+        "path": "data.recommendations",
+        "required": true,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(segment := segment_col, action := action_col, actionType := action_type, modification := change_note, impact := impact_text, impactTrend := impact_trend) ORDER BY priority_rank)",
+        "description": "Ordered list of recommendations."
+      }
+    ],
+    "grid_span": "col-span-2"
+  },
+  {
+    "id": "predictive",
+    "title": "Predictive Forecast",
+    "description": "Historical series with forecast extension and optional confidence bands.",
+    "category": "predictive",
+    "selection_hints": [
+      "forecast",
+      "projection",
+      "historical plus future"
+    ],
+    "data_requirements": [
+      "historical: Ordered historical values.",
+      "forecast: Ordered predicted future values."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "historical",
+        "path": "data.historical",
+        "required": true,
+        "sql_type": "number[]",
+        "expression_hint": "list(actual_value ORDER BY period_index)",
+        "description": "Ordered historical values."
+      },
+      {
+        "alias": "forecast",
+        "path": "data.forecast",
+        "required": true,
+        "sql_type": "number[]",
+        "expression_hint": "list(predicted_value ORDER BY forecast_index)",
+        "description": "Ordered predicted future values."
+      },
+      {
+        "alias": "confidenceRange",
+        "path": "data.confidenceRange",
+        "required": false,
+        "sql_type": "number[]",
+        "expression_hint": "list(confidence_value ORDER BY band_index)",
+        "description": "Optional confidence band markers."
+      }
+    ],
+    "grid_span": "col-span-2"
+  },
+  {
+    "id": "technical-health",
+    "title": "Technical Health",
+    "description": "Grid of named metrics with value and status.",
+    "category": "misc",
+    "selection_hints": [
+      "service metrics",
+      "health matrix",
+      "status grid"
+    ],
+    "data_requirements": [
+      "metrics: List of metric rows."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "metrics",
+        "path": "data.metrics",
+        "required": true,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(name := metric_name, value := metric_value, status := metric_status) ORDER BY metric_index)",
+        "description": "List of metric rows."
+      }
+    ],
+    "grid_span": "default"
+  },
+  {
+    "id": "trend-spotter",
+    "title": "Trend Spotter",
+    "description": "Weighted keyword cloud with trend direction.",
+    "category": "misc",
+    "selection_hints": [
+      "keyword cloud",
+      "emerging terms",
+      "weighted trend list"
+    ],
+    "data_requirements": [
+      "keywords: Ordered keyword rows."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "keywords",
+        "path": "data.keywords",
+        "required": true,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(text := keyword_text, weight := weight_value, trend := trend_direction) ORDER BY weight_value DESC)",
+        "description": "Ordered keyword rows."
+      }
+    ],
+    "grid_span": "col-span-2 row-span-2"
+  },
+  {
+    "id": "sparkline-stat",
+    "title": "Sparkline Stat",
+    "description": "KPI with a small sparkline showing recent movement.",
+    "category": "micro",
+    "selection_hints": [
+      "single KPI + history",
+      "recent trend",
+      "small time series"
+    ],
+    "data_requirements": [
+      "value: Current value displayed above the sparkline.",
+      "dataPoints: Ordered list of recent numeric values."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "value",
+        "path": "data.value",
+        "required": true,
+        "sql_type": "number|string",
+        "expression_hint": "value",
+        "description": "Current value displayed above the sparkline."
+      },
+      {
+        "alias": "unit",
+        "path": "data.unit",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "unit",
+        "description": "Optional unit."
+      },
+      {
+        "alias": "dataPoints",
+        "path": "data.dataPoints",
+        "required": true,
+        "sql_type": "number[]",
+        "expression_hint": "list(metric_value ORDER BY period_index)",
+        "description": "Ordered list of recent numeric values."
+      },
+      {
+        "alias": "sparklineColor",
+        "path": "data.sparklineColor",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "sparklineColor",
+        "description": "Optional hex color for the sparkline."
+      }
+    ],
+    "grid_span": "default"
+  },
+  {
+    "id": "metric-trend",
+    "title": "Metric Trend",
+    "description": "Single KPI card with optional unit and period-over-period delta.",
+    "category": "micro",
+    "selection_hints": [
+      "single KPI",
+      "delta vs previous period",
+      "executive summary"
+    ],
+    "data_requirements": [
+      "value: Primary KPI value shown in large type."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "value",
+        "path": "data.value",
+        "required": true,
+        "sql_type": "number|string",
+        "expression_hint": "value",
+        "description": "Primary KPI value shown in large type."
+      },
+      {
+        "alias": "unit",
+        "path": "data.unit",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "unit",
+        "description": "Optional unit such as %, x, min or pts."
+      },
+      {
+        "alias": "trendValue",
+        "path": "data.trendValue",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "trendValue",
+        "description": "Formatted delta value such as +4.2% or -3 pts."
+      },
+      {
+        "alias": "trendDirection",
+        "path": "data.trendDirection",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "trendDirection",
+        "description": "up, down or flat."
+      },
+      {
+        "alias": "trendTone",
+        "path": "data.trendTone",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "trendTone",
+        "description": "positive, neutral or negative."
+      },
+      {
+        "alias": "trendLabel",
+        "path": "data.trendLabel",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "trendLabel",
+        "description": "Short comparison label like vs yesterday."
+      }
+    ],
+    "grid_span": "default"
+  },
+  {
+    "id": "pulse-circle",
+    "title": "Pulse Circle",
+    "description": "Breathing status circle for a single value.",
+    "category": "micro",
+    "selection_hints": [
+      "heartbeat KPI",
+      "status pulse",
+      "compact status"
+    ],
+    "data_requirements": [
+      "value: Single displayed value."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "value",
+        "path": "data.value",
+        "required": true,
+        "sql_type": "number|string",
+        "expression_hint": "value",
+        "description": "Single displayed value."
+      }
+    ],
+    "grid_span": "default"
+  },
+  {
+    "id": "natural",
+    "title": "Natural Micro",
+    "description": "KPI with unit and a linear slider fill.",
+    "category": "micro",
+    "selection_hints": [
+      "single KPI",
+      "progress against scale",
+      "current status"
+    ],
+    "data_requirements": [
+      "value: Primary displayed value.",
+      "sliderValue: 0-100 slider fill percentage."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "value",
+        "path": "data.value",
+        "required": true,
+        "sql_type": "number|string",
+        "expression_hint": "value",
+        "description": "Primary displayed value."
+      },
+      {
+        "alias": "unit",
+        "path": "data.unit",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "unit",
+        "description": "Unit or suffix."
+      },
+      {
+        "alias": "sliderValue",
+        "path": "data.sliderValue",
+        "required": true,
+        "sql_type": "number",
+        "expression_hint": "sliderValue",
+        "description": "0-100 slider fill percentage."
+      },
+      {
+        "alias": "footerTextLeft",
+        "path": "data.footerTextLeft",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "footerTextLeft",
+        "description": "Optional left footer label."
+      },
+      {
+        "alias": "footerTextRight",
+        "path": "data.footerTextRight",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "footerTextRight",
+        "description": "Optional right footer label."
+      }
+    ],
+    "grid_span": "default"
+  },
+  {
+    "id": "chrono-dial",
+    "title": "Chrono Dial",
+    "description": "Minimal slider-pointer dial for freshness or recency scores.",
+    "category": "micro",
+    "selection_hints": [
+      "freshness",
+      "release health",
+      "recency score"
+    ],
+    "data_requirements": [
+      "sliderValue: 0-100 pointer position."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "sliderValue",
+        "path": "data.sliderValue",
+        "required": true,
+        "sql_type": "number",
+        "expression_hint": "sliderValue",
+        "description": "0-100 pointer position."
+      }
+    ],
+    "grid_span": "default"
+  },
+  {
+    "id": "liquid-gauge",
+    "title": "Liquid Gauge",
+    "description": "Circular liquid fill used for saturation or utilization metrics.",
+    "category": "micro",
+    "selection_hints": [
+      "percentage fill",
+      "saturation",
+      "coverage"
+    ],
+    "data_requirements": [
+      "value: Primary displayed value.",
+      "sliderValue: 0-100 fill percentage."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "value",
+        "path": "data.value",
+        "required": true,
+        "sql_type": "number|string",
+        "expression_hint": "value",
+        "description": "Primary displayed value."
+      },
+      {
+        "alias": "unit",
+        "path": "data.unit",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "unit",
+        "description": "Value suffix."
+      },
+      {
+        "alias": "sliderValue",
+        "path": "data.sliderValue",
+        "required": true,
+        "sql_type": "number",
+        "expression_hint": "sliderValue",
+        "description": "0-100 fill percentage."
+      }
+    ],
+    "grid_span": "default"
+  },
+  {
+    "id": "scanning-orbit",
+    "title": "Scanning Orbit",
+    "description": "Radar-like compact status widget with value and unit.",
+    "category": "micro",
+    "selection_hints": [
+      "ops per second",
+      "scan rate",
+      "compact sci-fi KPI"
+    ],
+    "data_requirements": [
+      "value: Main displayed value."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "value",
+        "path": "data.value",
+        "required": true,
+        "sql_type": "number|string",
+        "expression_hint": "value",
+        "description": "Main displayed value."
+      },
+      {
+        "alias": "unit",
+        "path": "data.unit",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "unit",
+        "description": "Displayed unit."
+      }
+    ],
+    "grid_span": "default"
+  },
+  {
+    "id": "uptime-strip",
+    "title": "Uptime Strip",
+    "description": "Compact uptime card with bar states and current uptime value.",
+    "category": "micro",
+    "selection_hints": [
+      "uptime window",
+      "availability strip",
+      "health streak"
+    ],
+    "data_requirements": [
+      "value: Primary uptime or availability value.",
+      "uptimeBars: Ordered list of status tokens: good, warn, down."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "value",
+        "path": "data.value",
+        "required": true,
+        "sql_type": "number|string",
+        "expression_hint": "value",
+        "description": "Primary uptime or availability value."
+      },
+      {
+        "alias": "unit",
+        "path": "data.unit",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "unit",
+        "description": "Value suffix."
+      },
+      {
+        "alias": "uptimeBars",
+        "path": "data.uptimeBars",
+        "required": true,
+        "sql_type": "string[]",
+        "expression_hint": "list(status ORDER BY period_index)",
+        "description": "Ordered list of status tokens: good, warn, down."
+      }
+    ],
+    "grid_span": "default"
+  },
+  {
+    "id": "color-slider",
+    "title": "Color Slider",
+    "description": "Tick-based slider used for rate or progress style metrics.",
+    "category": "micro",
+    "selection_hints": [
+      "simple progress",
+      "percentage on scale",
+      "compact slider"
+    ],
+    "data_requirements": [
+      "sliderValue: 0-100 slider position."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "sliderValue",
+        "path": "data.sliderValue",
+        "required": true,
+        "sql_type": "number",
+        "expression_hint": "sliderValue",
+        "description": "0-100 slider position."
+      }
+    ],
+    "grid_span": "default"
+  },
+  {
+    "id": "gauge-panel",
+    "title": "Gauge Panel",
+    "description": "Circular gauge showing one percentage-like score.",
+    "category": "micro",
+    "selection_hints": [
+      "single percentage",
+      "utilization",
+      "coverage"
+    ],
+    "data_requirements": [
+      "value: Display value or label at the center.",
+      "sliderValue: 0-100 numeric gauge value."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "value",
+        "path": "data.value",
+        "required": true,
+        "sql_type": "number|string",
+        "expression_hint": "value",
+        "description": "Display value or label at the center."
+      },
+      {
+        "alias": "sliderValue",
+        "path": "data.sliderValue",
+        "required": true,
+        "sql_type": "number",
+        "expression_hint": "sliderValue",
+        "description": "0-100 numeric gauge value."
+      },
+      {
+        "alias": "gaugeUnit",
+        "path": "data.gaugeUnit",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "gaugeUnit",
+        "description": "Gauge unit suffix."
+      },
+      {
+        "alias": "gaugeColor",
+        "path": "data.gaugeColor",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "gaugeColor",
+        "description": "Optional hex color."
+      }
+    ],
+    "grid_span": "default"
+  },
+  {
+    "id": "red-gradient",
+    "title": "Red Gradient",
+    "description": "Single horizontal gauge used for risk-heavy progress.",
+    "category": "micro",
+    "selection_hints": [
+      "risk progress",
+      "danger intensity",
+      "simple horizontal gauge"
+    ],
+    "data_requirements": [
+      "sliderValue: 0-100 horizontal fill percentage."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "sliderValue",
+        "path": "data.sliderValue",
+        "required": true,
+        "sql_type": "number",
+        "expression_hint": "sliderValue",
+        "description": "0-100 horizontal fill percentage."
+      }
+    ],
+    "grid_span": "default"
+  },
+  {
+    "id": "emotion-wave",
+    "title": "Emotion Wave",
+    "description": "Sentiment-style widget driven by one percentage-like score.",
+    "category": "micro",
+    "selection_hints": [
+      "sentiment score",
+      "mood level",
+      "single qualitative score"
+    ],
+    "data_requirements": [
+      "sentimentScore: 0-100 sentiment or confidence score."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "sentimentScore",
+        "path": "data.sentimentScore",
+        "required": true,
+        "sql_type": "number",
+        "expression_hint": "sentimentScore",
+        "description": "0-100 sentiment or confidence score."
+      },
+      {
+        "alias": "emoji",
+        "path": "data.emoji",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "emoji",
+        "description": "Optional emoji override."
+      }
+    ],
+    "grid_span": "default"
+  },
+  {
+    "id": "signal-scale",
+    "title": "Signal Scale",
+    "description": "Segmented signal gauge for directional quality or intensity.",
+    "category": "micro",
+    "selection_hints": [
+      "score 0-100",
+      "quality signal",
+      "health scale"
+    ],
+    "data_requirements": [
+      "value: Primary textual value displayed beside the scale.",
+      "signalScore: Numeric score from 0 to 100."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "value",
+        "path": "data.value",
+        "required": true,
+        "sql_type": "number|string",
+        "expression_hint": "value",
+        "description": "Primary textual value displayed beside the scale."
+      },
+      {
+        "alias": "unit",
+        "path": "data.unit",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "unit",
+        "description": "Unit or suffix."
+      },
+      {
+        "alias": "signalScore",
+        "path": "data.signalScore",
+        "required": true,
+        "sql_type": "number",
+        "expression_hint": "signalScore",
+        "description": "Numeric score from 0 to 100."
+      },
+      {
+        "alias": "signalOrientation",
+        "path": "data.signalOrientation",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "signalOrientation",
+        "description": "vertical or horizontal."
+      },
+      {
+        "alias": "signalLabel",
+        "path": "data.signalLabel",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "signalLabel",
+        "description": "Short quality label."
+      },
+      {
+        "alias": "signalNote",
+        "path": "data.signalNote",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "signalNote",
+        "description": "Optional longer note shown on vertical layout."
+      },
+      {
+        "alias": "goodAtHigh",
+        "path": "data.goodAtHigh",
+        "required": false,
+        "sql_type": "boolean",
+        "expression_hint": "goodAtHigh",
+        "description": "True when higher scores are better."
+      }
+    ],
+    "grid_span": "default"
+  },
+  {
+    "id": "weather",
+    "title": "Weather Micro",
+    "description": "Minimal KPI display with a compact value and unit.",
+    "category": "micro",
+    "selection_hints": [
+      "single KPI",
+      "compact metric",
+      "minimal card"
+    ],
+    "data_requirements": [
+      "value: Primary value shown in the center."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "value",
+        "path": "data.value",
+        "required": true,
+        "sql_type": "number|string",
+        "expression_hint": "value",
+        "description": "Primary value shown in the center."
+      },
+      {
+        "alias": "unit",
+        "path": "data.unit",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "unit",
+        "description": "Unit or suffix displayed next to value."
+      }
+    ],
+    "grid_span": "default"
+  },
+  {
+    "id": "neural-nexus",
+    "title": "Neural Nexus",
+    "description": "Circular tick dial for a single score.",
+    "category": "micro",
+    "selection_hints": [
+      "score dial",
+      "control coverage",
+      "single KPI"
+    ],
+    "data_requirements": [
+      "value: Displayed main value.",
+      "sliderValue: 0-100 tick activation percent."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "value",
+        "path": "data.value",
+        "required": true,
+        "sql_type": "number|string",
+        "expression_hint": "value",
+        "description": "Displayed main value."
+      },
+      {
+        "alias": "unit",
+        "path": "data.unit",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "unit",
+        "description": "Optional unit."
+      },
+      {
+        "alias": "sliderValue",
+        "path": "data.sliderValue",
+        "required": true,
+        "sql_type": "number",
+        "expression_hint": "sliderValue",
+        "description": "0-100 tick activation percent."
+      }
+    ],
+    "grid_span": "default"
+  },
+  {
+    "id": "intensity-heat",
+    "title": "Intensity Heat",
+    "description": "Single value card for fatigue, pressure or saturation style metrics.",
+    "category": "micro",
+    "selection_hints": [
+      "single severity value",
+      "saturation index",
+      "fatigue score"
+    ],
+    "data_requirements": [
+      "value: Single displayed score."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "value",
+        "path": "data.value",
+        "required": true,
+        "sql_type": "number|string",
+        "expression_hint": "value",
+        "description": "Single displayed score."
+      }
+    ],
+    "grid_span": "default"
+  },
+  {
+    "id": "productivity",
+    "title": "Productivity Micro",
+    "description": "Abstract vertical-dot spark widget fed by a short numeric sequence.",
+    "category": "micro",
+    "selection_hints": [
+      "mini histogram",
+      "activity pulse",
+      "density spark"
+    ],
+    "data_requirements": [
+      "dataPoints: Ordered array of small numeric bars."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "dataPoints",
+        "path": "data.dataPoints",
+        "required": true,
+        "sql_type": "number[]",
+        "expression_hint": "list(metric_value ORDER BY bucket_index)",
+        "description": "Ordered array of small numeric bars."
+      }
+    ],
+    "grid_span": "default"
+  },
+  {
+    "id": "budget-sensitivity",
+    "title": "Budget Sensitivity",
+    "description": "Elasticity curve over increasing budget or capacity steps.",
+    "category": "financial",
+    "selection_hints": [
+      "elasticity curve",
+      "diminishing returns",
+      "response curve"
+    ],
+    "data_requirements": [
+      "curvePoints: Ordered [x, y] points describing the curve."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "curvePoints",
+        "path": "data.curvePoints",
+        "required": true,
+        "sql_type": "array[]",
+        "expression_hint": "list([x_value, y_value] ORDER BY x_value)",
+        "description": "Ordered [x, y] points describing the curve."
+      }
+    ],
+    "grid_span": "col-span-2"
+  },
+  {
+    "id": "waterfall",
+    "title": "Waterfall",
+    "description": "Bridge from gross to net through positive and negative steps.",
+    "category": "financial",
+    "selection_hints": [
+      "bridge analysis",
+      "gross to net",
+      "step breakdown"
+    ],
+    "data_requirements": [
+      "steps: Ordered list of bridge steps."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "steps",
+        "path": "data.steps",
+        "required": true,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(name := step_name, value := step_value, isTotal := is_total) ORDER BY step_index)",
+        "description": "Ordered list of bridge steps."
+      }
+    ],
+    "grid_span": "col-span-2"
+  },
+  {
+    "id": "campaign-list",
+    "title": "Campaign List",
+    "description": "Compact ranked list with label, value and directional trend.",
+    "category": "lists",
+    "selection_hints": [
+      "ranked list",
+      "campaign leaderboard",
+      "compact comparison"
+    ],
+    "data_requirements": [
+      "campaigns: List of campaign rows."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "campaigns",
+        "path": "data.campaigns",
+        "required": true,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(name := label_col, value := metric_col, trend := trend_sign) ORDER BY metric_sort DESC)",
+        "description": "List of campaign rows."
+      }
+    ],
+    "grid_span": "row-span-2"
+  },
+  {
+    "id": "leads-list",
+    "title": "Leads List",
+    "description": "Compact live-feed of rows such as leads, incidents or routes.",
+    "category": "lists",
+    "selection_hints": [
+      "top entities",
+      "recent items",
+      "operational feed"
+    ],
+    "data_requirements": [
+      "leads: List of rows containing name, value, status and time."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "leads",
+        "path": "data.leads",
+        "required": true,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(name := name_col, value := value_col, status := status_col, time := time_label) ORDER BY sort_index)",
+        "description": "List of rows containing name, value, status and time."
+      }
+    ],
+    "grid_span": "row-span-2"
+  },
+  {
+    "id": "sankey",
+    "title": "Sankey Flow",
+    "description": "Node-link flow diagram using nodes and links.",
+    "category": "charts",
+    "selection_hints": [
+      "flow diagram",
+      "source to target",
+      "funnel movement"
+    ],
+    "data_requirements": [
+      "nodes: List of unique nodes.",
+      "links: List of source-target links."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "nodes",
+        "path": "data.nodes",
+        "required": true,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(name := node_name) ORDER BY node_order)",
+        "description": "List of unique nodes."
+      },
+      {
+        "alias": "links",
+        "path": "data.links",
+        "required": true,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(source := source_name, target := target_name, value := flow_value) ORDER BY link_order)",
+        "description": "List of source-target links."
+      }
+    ],
+    "grid_span": "col-span-2"
+  },
+  {
+    "id": "stream-graph",
+    "title": "Stream Graph",
+    "description": "Stacked stream series encoded as [period, value, category].",
+    "category": "charts",
+    "selection_hints": [
+      "stacked trends",
+      "category flow over time",
+      "streamgraph"
+    ],
+    "data_requirements": [
+      "streamData: Flat stream rows."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "streamData",
+        "path": "data.streamData",
+        "required": true,
+        "sql_type": "array[]",
+        "expression_hint": "list([period_label, metric_value, category_name] ORDER BY period_index, category_name)",
+        "description": "Flat stream rows."
+      }
+    ],
+    "grid_span": "col-span-2 row-span-2"
+  },
+  {
+    "id": "waffle",
+    "title": "Waffle Chart",
+    "description": "10x10 occupancy chart driven by a 0-100 value.",
+    "category": "charts",
+    "selection_hints": [
+      "percentage occupancy",
+      "share of total",
+      "simple proportion"
+    ],
+    "data_requirements": [
+      "value: Integer percentage from 0 to 100."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "value",
+        "path": "data.value",
+        "required": true,
+        "sql_type": "number",
+        "expression_hint": "value",
+        "description": "Integer percentage from 0 to 100."
+      },
+      {
+        "alias": "colorTheme",
+        "path": "data.colorTheme",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "colorTheme",
+        "description": "Optional theme token."
+      }
+    ],
+    "grid_span": "default"
+  },
+  {
+    "id": "semi-circle-donut",
+    "title": "Semi-Circle Donut",
+    "description": "Half-donut chart of platform shares.",
+    "category": "charts",
+    "selection_hints": [
+      "share by category",
+      "donut split",
+      "platform mix"
+    ],
+    "data_requirements": [
+      "platforms: List of slices."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "platforms",
+        "path": "data.platforms",
+        "required": true,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(name := label_col, value := metric_value, color := color_hex) ORDER BY metric_value DESC)",
+        "description": "List of slices."
+      }
+    ],
+    "grid_span": "col-span-2"
+  },
+  {
+    "id": "activity-heatmap",
+    "title": "Activity Heatmap",
+    "description": "Two-dimensional heatmap of bucketed activity.",
+    "category": "charts",
+    "selection_hints": [
+      "day vs hour",
+      "matrix intensity",
+      "bucket heatmap"
+    ],
+    "data_requirements": [
+      "heatmapData: Matrix rows encoded as [x_index, y_index, value]."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "heatmapData",
+        "path": "data.heatmapData",
+        "required": true,
+        "sql_type": "array[]",
+        "expression_hint": "list([bucket_x, bucket_y, metric_value] ORDER BY bucket_y, bucket_x)",
+        "description": "Matrix rows encoded as [x_index, y_index, value]."
+      }
+    ],
+    "grid_span": "col-span-2"
+  },
+  {
+    "id": "scatter",
+    "title": "Scatter Plot",
+    "description": "Scatter of two numeric variables with optional period labels.",
+    "category": "charts",
+    "selection_hints": [
+      "x vs y",
+      "efficiency distribution",
+      "cohort spread"
+    ],
+    "data_requirements": [
+      "scatterData: Ordered [x, y] point pairs."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "periodLabels",
+        "path": "data.periodLabels",
+        "required": false,
+        "sql_type": "string[]",
+        "expression_hint": "list(period_label ORDER BY point_index)",
+        "description": "Optional labels for scatter points."
+      },
+      {
+        "alias": "scatterData",
+        "path": "data.scatterData",
+        "required": true,
+        "sql_type": "array[]",
+        "expression_hint": "list([x_metric, y_metric] ORDER BY point_index)",
+        "description": "Ordered [x, y] point pairs."
+      }
+    ],
+    "grid_span": "col-span-2 row-span-2"
+  },
+  {
+    "id": "live-traffic",
+    "title": "Live Traffic Chart",
+    "description": "Hero line chart with current metrics, annotation and recent series.",
+    "category": "charts",
+    "selection_hints": [
+      "recent time series",
+      "concurrent activity",
+      "hero metric with trend"
+    ],
+    "data_requirements": [
+      "chartLabels: Ordered x-axis labels.",
+      "chartSeries: Ordered numeric series values."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "chartLabels",
+        "path": "data.chartLabels",
+        "required": true,
+        "sql_type": "string[]",
+        "expression_hint": "list(period_label ORDER BY period_index)",
+        "description": "Ordered x-axis labels."
+      },
+      {
+        "alias": "chartSeries",
+        "path": "data.chartSeries",
+        "required": true,
+        "sql_type": "number[]",
+        "expression_hint": "list(metric_value ORDER BY period_index)",
+        "description": "Ordered numeric series values."
+      },
+      {
+        "alias": "metricCards",
+        "path": "data.metricCards",
+        "required": false,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(icon := icon_name, label := card_label, value := card_value, delta := card_delta, note := card_note) ORDER BY card_index)",
+        "description": "Optional summary cards derived from the same query."
+      },
+      {
+        "alias": "chartMin",
+        "path": "data.chartMin",
+        "required": false,
+        "sql_type": "number",
+        "expression_hint": "chartMin",
+        "description": "Optional explicit lower bound."
+      },
+      {
+        "alias": "chartMax",
+        "path": "data.chartMax",
+        "required": false,
+        "sql_type": "number",
+        "expression_hint": "chartMax",
+        "description": "Optional explicit upper bound."
+      },
+      {
+        "alias": "annotation",
+        "path": "data.annotation",
+        "required": false,
+        "sql_type": "object",
+        "expression_hint": "struct_pack(index := annotation_index, label := annotation_label, value := annotation_value)",
+        "description": "Optional highlighted point."
+      },
+      {
+        "alias": "description",
+        "path": "data.description",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "description",
+        "description": "Optional helper copy."
+      }
+    ],
+    "grid_span": "col-span-2"
+  },
+  {
+    "id": "range-area-chart",
+    "title": "Range Area Chart",
+    "description": "Average series with min/max envelope.",
+    "category": "charts",
+    "selection_hints": [
+      "min max avg",
+      "confidence band",
+      "range over time"
+    ],
+    "data_requirements": [
+      "dates: Ordered x-axis labels.",
+      "minData: Ordered minimum values.",
+      "avgData: Ordered average values.",
+      "maxData: Ordered maximum values."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "dates",
+        "path": "data.dates",
+        "required": true,
+        "sql_type": "string[]",
+        "expression_hint": "list(period_label ORDER BY period_index)",
+        "description": "Ordered x-axis labels."
+      },
+      {
+        "alias": "minData",
+        "path": "data.minData",
+        "required": true,
+        "sql_type": "number[]",
+        "expression_hint": "list(min_value ORDER BY period_index)",
+        "description": "Ordered minimum values."
+      },
+      {
+        "alias": "avgData",
+        "path": "data.avgData",
+        "required": true,
+        "sql_type": "number[]",
+        "expression_hint": "list(avg_value ORDER BY period_index)",
+        "description": "Ordered average values."
+      },
+      {
+        "alias": "maxData",
+        "path": "data.maxData",
+        "required": true,
+        "sql_type": "number[]",
+        "expression_hint": "list(max_value ORDER BY period_index)",
+        "description": "Ordered maximum values."
+      }
+    ],
+    "grid_span": "col-span-2"
+  },
+  {
+    "id": "covariance-matrix",
+    "title": "Covariance Matrix",
+    "description": "Square matrix comparing relationships between multiple features.",
+    "category": "charts",
+    "selection_hints": [
+      "feature correlation",
+      "covariance",
+      "NxN matrix"
+    ],
+    "data_requirements": [
+      "fields: Ordered list of matrix dimensions.",
+      "matrix: Square matrix values aligned with fields."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "fields",
+        "path": "data.fields",
+        "required": true,
+        "sql_type": "string[]",
+        "expression_hint": "list(feature_name ORDER BY feature_index)",
+        "description": "Ordered list of matrix dimensions."
+      },
+      {
+        "alias": "matrix",
+        "path": "data.matrix",
+        "required": true,
+        "sql_type": "number[][]",
+        "expression_hint": "list(row_values ORDER BY row_index)",
+        "description": "Square matrix values aligned with fields."
+      }
+    ],
+    "grid_span": "col-span-2 row-span-2"
+  },
+  {
+    "id": "optimal-time",
+    "title": "Optimal Time Heatmap",
+    "description": "Calendar-style matrix for best-performing time windows with summary cards.",
+    "category": "charts",
+    "selection_hints": [
+      "best window",
+      "calendar heatmap",
+      "time-of-day optimisation"
+    ],
+    "data_requirements": [
+      "calendarValues: Flat ordered day intensities.",
+      "engagementMatrix: Matrix of intensity values."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "calendarMonth",
+        "path": "data.calendarMonth",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "calendarMonth",
+        "description": "Displayed month label."
+      },
+      {
+        "alias": "calendarOffset",
+        "path": "data.calendarOffset",
+        "required": false,
+        "sql_type": "number",
+        "expression_hint": "calendarOffset",
+        "description": "Leading offset before day 1."
+      },
+      {
+        "alias": "daysInMonth",
+        "path": "data.daysInMonth",
+        "required": false,
+        "sql_type": "number",
+        "expression_hint": "daysInMonth",
+        "description": "Number of in-month cells."
+      },
+      {
+        "alias": "totalCalendarCells",
+        "path": "data.totalCalendarCells",
+        "required": false,
+        "sql_type": "number",
+        "expression_hint": "totalCalendarCells",
+        "description": "Total rendered cells."
+      },
+      {
+        "alias": "calendarValues",
+        "path": "data.calendarValues",
+        "required": true,
+        "sql_type": "number[]",
+        "expression_hint": "list(day_value ORDER BY day_number)",
+        "description": "Flat ordered day intensities."
+      },
+      {
+        "alias": "engagementMatrix",
+        "path": "data.engagementMatrix",
+        "required": true,
+        "sql_type": "number[][]",
+        "expression_hint": "list(row_values ORDER BY row_index)",
+        "description": "Matrix of intensity values."
+      },
+      {
+        "alias": "summaryCards",
+        "path": "data.summaryCards",
+        "required": false,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(id := card_id, icon := icon_name, label := card_label, value := card_value, delta := card_delta, note := card_note, tone := card_tone) ORDER BY card_index)",
+        "description": "Summary list of top highlights."
+      },
+      {
+        "alias": "marketBreakdown",
+        "path": "data.marketBreakdown",
+        "required": false,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(label := label_col, value := value_col) ORDER BY value_sort DESC)",
+        "description": "Top markets or segments."
+      }
+    ],
+    "grid_span": "row-span-2"
+  },
+  {
+    "id": "mpl-benchmark-bars",
+    "title": "Benchmark Bars",
+    "description": "Ranked benchmark bars with score, target and delta.",
+    "category": "ml",
+    "selection_hints": [
+      "benchmark comparison",
+      "threshold pass/fail",
+      "eval guardrails"
+    ],
+    "data_requirements": [
+      "benchmarks: Ordered benchmark rows."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "benchmarks",
+        "path": "data.benchmarks",
+        "required": true,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(label := benchmark_name, score := score_value, target := target_value, delta := delta_text) ORDER BY benchmark_order)",
+        "description": "Ordered benchmark rows."
+      }
+    ],
+    "grid_span": "row-span-2"
+  },
+  {
+    "id": "lead-clustering",
+    "title": "Lead Clustering",
+    "description": "Cluster scatter using [engagement, probability, label].",
+    "category": "ml",
+    "selection_hints": [
+      "k-means style clusters",
+      "segment scatter",
+      "lead clustering"
+    ],
+    "data_requirements": [
+      "clusteringData: Rows encoded as [engagement_score, probability, entity_name]."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "clusteringData",
+        "path": "data.clusteringData",
+        "required": true,
+        "sql_type": "array[]",
+        "expression_hint": "list([engagement_score, conversion_probability, entity_name] ORDER BY engagement_score DESC)",
+        "description": "Rows encoded as [engagement_score, probability, entity_name]."
+      }
+    ],
+    "grid_span": "col-span-2 row-span-2"
+  },
+  {
+    "id": "mpl-attention-heatmap",
+    "title": "Attention Heatmap",
+    "description": "Heatmap matrix with x/y labels and side notes.",
+    "category": "ml",
+    "selection_hints": [
+      "activation heatmap",
+      "layer vs block matrix",
+      "drift matrix"
+    ],
+    "data_requirements": [
+      "xLabels: Ordered column labels.",
+      "yLabels: Ordered row labels.",
+      "matrix: Matrix values aligned to xLabels/yLabels."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "xLabels",
+        "path": "data.xLabels",
+        "required": true,
+        "sql_type": "string[]",
+        "expression_hint": "list(column_label ORDER BY column_index)",
+        "description": "Ordered column labels."
+      },
+      {
+        "alias": "yLabels",
+        "path": "data.yLabels",
+        "required": true,
+        "sql_type": "string[]",
+        "expression_hint": "list(row_label ORDER BY row_index)",
+        "description": "Ordered row labels."
+      },
+      {
+        "alias": "matrix",
+        "path": "data.matrix",
+        "required": true,
+        "sql_type": "number[][]",
+        "expression_hint": "list(row_values ORDER BY row_index)",
+        "description": "Matrix values aligned to xLabels/yLabels."
+      },
+      {
+        "alias": "sideNotes",
+        "path": "data.sideNotes",
+        "required": false,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(label := note_label, value := note_value) ORDER BY note_index)",
+        "description": "Summary notes shown to the right."
+      }
+    ],
+    "grid_span": "col-span-2 row-span-2"
+  },
+  {
+    "id": "anomaly-stream",
+    "title": "Anomaly Stream",
+    "description": "Scatter plot of anomaly candidates using x/y dispersion and entity label.",
+    "category": "ml",
+    "selection_hints": [
+      "anomaly candidates",
+      "frequency vs impact",
+      "dispersion plot"
+    ],
+    "data_requirements": [
+      "dispersionData: Scatter points as [x_value, y_value, label]."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "dispersionData",
+        "path": "data.dispersionData",
+        "required": true,
+        "sql_type": "array[]",
+        "expression_hint": "list([x_metric, y_metric, entity_name] ORDER BY y_metric DESC)",
+        "description": "Scatter points as [x_value, y_value, label]."
+      },
+      {
+        "alias": "xAxisLabel",
+        "path": "data.xAxisLabel",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "xAxisLabel",
+        "description": "Optional x-axis label."
+      },
+      {
+        "alias": "yAxisLabel",
+        "path": "data.yAxisLabel",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "yAxisLabel",
+        "description": "Optional y-axis label."
+      },
+      {
+        "alias": "valueLabel",
+        "path": "data.valueLabel",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "valueLabel",
+        "description": "Optional tooltip value label."
+      }
+    ],
+    "grid_span": "col-span-2"
+  },
+  {
+    "id": "mpl-training-loss",
+    "title": "Training Loss Panel",
+    "description": "Dual-loss panel with auxiliary perplexity and headline stats.",
+    "category": "ml",
+    "selection_hints": [
+      "training curves",
+      "train vs validation",
+      "ML convergence"
+    ],
+    "data_requirements": [
+      "steps: Ordered checkpoint or step labels.",
+      "trainLoss: Ordered training loss values.",
+      "valLoss: Ordered validation loss values."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "steps",
+        "path": "data.steps",
+        "required": true,
+        "sql_type": "string[]",
+        "expression_hint": "list(step_label ORDER BY step_index)",
+        "description": "Ordered checkpoint or step labels."
+      },
+      {
+        "alias": "trainLoss",
+        "path": "data.trainLoss",
+        "required": true,
+        "sql_type": "number[]",
+        "expression_hint": "list(train_loss ORDER BY step_index)",
+        "description": "Ordered training loss values."
+      },
+      {
+        "alias": "valLoss",
+        "path": "data.valLoss",
+        "required": true,
+        "sql_type": "number[]",
+        "expression_hint": "list(val_loss ORDER BY step_index)",
+        "description": "Ordered validation loss values."
+      },
+      {
+        "alias": "perplexity",
+        "path": "data.perplexity",
+        "required": false,
+        "sql_type": "number[]",
+        "expression_hint": "list(perplexity ORDER BY step_index)",
+        "description": "Ordered perplexity values."
+      },
+      {
+        "alias": "stats",
+        "path": "data.stats",
+        "required": false,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(label := stat_label, value := stat_value, accent := accent_color, meta := stat_note) ORDER BY stat_index)",
+        "description": "Summary stat cards."
+      }
+    ],
+    "grid_span": "col-span-2 row-span-2"
+  },
+  {
+    "id": "incremental-lift",
+    "title": "Incremental Lift",
+    "description": "Three-bar comparison for organic, paid and incremental contribution.",
+    "category": "marketing",
+    "selection_hints": [
+      "control vs test",
+      "incremental value",
+      "lift decomposition"
+    ],
+    "data_requirements": [
+      "bars: Ordered bars to display."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "bars",
+        "path": "data.bars",
+        "required": true,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(label := bucket_label, value := metric_value, color := color_hex, deltaLabel := annotation_text) ORDER BY bucket_index)",
+        "description": "Ordered bars to display."
+      }
+    ],
+    "grid_span": "default"
+  },
+  {
+    "id": "shapley-attribution",
+    "title": "Shapley Attribution",
+    "description": "Stacked periods derived from raw [channel, score, period] contributions.",
+    "category": "marketing",
+    "selection_hints": [
+      "contribution over time",
+      "channel attribution",
+      "stacked period analysis"
+    ],
+    "data_requirements": [
+      "rawData: Flat rows encoded as [channel, score, year_or_period]."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "rawData",
+        "path": "data.rawData",
+        "required": true,
+        "sql_type": "array[]",
+        "expression_hint": "list([channel_name, contribution_score, period_key] ORDER BY period_key, sample_index)",
+        "description": "Flat rows encoded as [channel, score, year_or_period]."
+      }
+    ],
+    "grid_span": "col-span-2 row-span-2"
+  },
+  {
+    "id": "interest-radar",
+    "title": "Interest Radar",
+    "description": "Radar chart of multidimensional interests or attributes.",
+    "category": "marketing",
+    "selection_hints": [
+      "radar profile",
+      "multi-axis attributes",
+      "interest mix"
+    ],
+    "data_requirements": [
+      "indicator: Radar axes as [{name,max}].",
+      "radarData: Radar series rows."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "indicator",
+        "path": "data.indicator",
+        "required": true,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(name := axis_name, max := axis_max) ORDER BY axis_index)",
+        "description": "Radar axes as [{name,max}]."
+      },
+      {
+        "alias": "radarData",
+        "path": "data.radarData",
+        "required": true,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(name := series_name, value := axis_values, itemStyle := item_style, areaStyle := area_style) ORDER BY series_index)",
+        "description": "Radar series rows."
+      }
+    ],
+    "grid_span": "col-span-2"
+  },
+  {
+    "id": "market-radar",
+    "title": "Market Sentiment Radar",
+    "description": "Radar chart summarising current posture or sentiment.",
+    "category": "marketing",
+    "selection_hints": [
+      "brand or posture radar",
+      "aggregate category scores",
+      "multi-axis snapshot"
+    ],
+    "data_requirements": [
+      "indicator: Radar axes as [{name,max}].",
+      "radarData: One or more radar series."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "indicator",
+        "path": "data.indicator",
+        "required": true,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(name := axis_name, max := axis_max) ORDER BY axis_index)",
+        "description": "Radar axes as [{name,max}]."
+      },
+      {
+        "alias": "radarData",
+        "path": "data.radarData",
+        "required": true,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(name := series_name, value := axis_values, itemStyle := item_style, areaStyle := area_style, lineStyle := line_style) ORDER BY series_index)",
+        "description": "One or more radar series."
+      }
+    ],
+    "grid_span": "col-span-2"
+  },
+  {
+    "id": "cohorts",
+    "title": "Cohort Analysis",
+    "description": "Retention cohorts with headline summary.",
+    "category": "marketing",
+    "selection_hints": [
+      "retention",
+      "cohort decay",
+      "stickiness"
+    ],
+    "data_requirements": [
+      "cohorts: Ordered cohort rows."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "summaryValue",
+        "path": "data.summaryValue",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "summaryValue",
+        "description": "Headline retention summary."
+      },
+      {
+        "alias": "summaryDelta",
+        "path": "data.summaryDelta",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "summaryDelta",
+        "description": "Comparison delta."
+      },
+      {
+        "alias": "summaryCompare",
+        "path": "data.summaryCompare",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "summaryCompare",
+        "description": "Supporting comparison copy."
+      },
+      {
+        "alias": "cohorts",
+        "path": "data.cohorts",
+        "required": true,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(week := cohort_label, size := cohort_size, data := retention_values) ORDER BY cohort_order)",
+        "description": "Ordered cohort rows."
+      }
+    ],
+    "grid_span": "default"
+  },
+  {
+    "id": "intent-sunburst",
+    "title": "Intent Sunburst",
+    "description": "Hierarchical sunburst for nested audience or behavior intent.",
+    "category": "marketing",
+    "selection_hints": [
+      "hierarchy",
+      "nested categories",
+      "intent tree"
+    ],
+    "data_requirements": [
+      "sunburstData: Hierarchy tree with nested children arrays."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "sunburstData",
+        "path": "data.sunburstData",
+        "required": true,
+        "sql_type": "object[]",
+        "expression_hint": "Return a nested JSON-compatible tree using list(struct_pack(..., children := ...)).",
+        "description": "Hierarchy tree with nested children arrays."
+      }
+    ],
+    "grid_span": "col-span-2 row-span-2"
+  },
+  {
+    "id": "attribution",
+    "title": "Attribution",
+    "description": "Donut plus supporting panels for source or channel allocation.",
+    "category": "marketing",
+    "selection_hints": [
+      "allocation by source",
+      "channel mix",
+      "contribution share"
+    ],
+    "data_requirements": [
+      "models: Ordered allocation rows."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "summaryValue",
+        "path": "data.summaryValue",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "summaryValue",
+        "description": "Center summary value."
+      },
+      {
+        "alias": "summaryLabel",
+        "path": "data.summaryLabel",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "summaryLabel",
+        "description": "Center summary label."
+      },
+      {
+        "alias": "models",
+        "path": "data.models",
+        "required": true,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(channel := channel_name, monthly := secondary_value, yearly := primary_value, yearlyColor := primary_color, monthlyColor := secondary_color) ORDER BY primary_value DESC)",
+        "description": "Ordered allocation rows."
+      },
+      {
+        "alias": "periodMetrics",
+        "path": "data.periodMetrics",
+        "required": false,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(label := metric_label, value := metric_value, delta := delta_text, note := note_text, tone := tone_color) ORDER BY metric_index)",
+        "description": "Optional headline metrics."
+      },
+      {
+        "alias": "valueFormat",
+        "path": "data.valueFormat",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "valueFormat",
+        "description": "currency, number or compact-number."
+      },
+      {
+        "alias": "primaryMetricLabel",
+        "path": "data.primaryMetricLabel",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "primaryMetricLabel",
+        "description": "Primary metric label, e.g. yearly or weekly."
+      },
+      {
+        "alias": "secondaryMetricLabel",
+        "path": "data.secondaryMetricLabel",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "secondaryMetricLabel",
+        "description": "Secondary metric label, e.g. monthly or daily."
+      }
+    ],
+    "grid_span": "col-span-2 row-span-2"
+  },
+  {
+    "id": "market-evolution",
+    "title": "Market Evolution",
+    "description": "Force graph of nodes and weighted links.",
+    "category": "marketing",
+    "selection_hints": [
+      "network graph",
+      "force layout",
+      "entity interactions"
+    ],
+    "data_requirements": [
+      "channels: Node definitions.",
+      "links: Edge definitions."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "channels",
+        "path": "data.channels",
+        "required": true,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(name := node_name, color := color_hex, value := node_value, synergy := tier_label) ORDER BY node_order)",
+        "description": "Node definitions."
+      },
+      {
+        "alias": "links",
+        "path": "data.links",
+        "required": true,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(source := source_name, target := target_name, value := edge_weight) ORDER BY edge_order)",
+        "description": "Edge definitions."
+      }
+    ],
+    "grid_span": "col-span-2 row-span-2"
+  },
+  {
+    "id": "creative-quadrant",
+    "title": "Creative Quadrant",
+    "description": "Scatter quadrant with configurable axes and zone labels.",
+    "category": "marketing",
+    "selection_hints": [
+      "2x2 comparison",
+      "quadrant analysis",
+      "precision vs value"
+    ],
+    "data_requirements": [
+      "creatives: Scatter rows as [x_value, y_value, label, type]."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "creatives",
+        "path": "data.creatives",
+        "required": true,
+        "sql_type": "array[]",
+        "expression_hint": "list([x_metric, y_metric, entity_name, entity_type] ORDER BY score DESC)",
+        "description": "Scatter rows as [x_value, y_value, label, type]."
+      },
+      {
+        "alias": "axisMetricLabels",
+        "path": "data.axisMetricLabels",
+        "required": false,
+        "sql_type": "object",
+        "expression_hint": "axisMetricLabels",
+        "description": "Optional custom axis metric labels."
+      },
+      {
+        "alias": "axisMetricFormats",
+        "path": "data.axisMetricFormats",
+        "required": false,
+        "sql_type": "object",
+        "expression_hint": "axisMetricFormats",
+        "description": "Optional formatting config."
+      },
+      {
+        "alias": "axisLabels",
+        "path": "data.axisLabels",
+        "required": false,
+        "sql_type": "object",
+        "expression_hint": "axisLabels",
+        "description": "Optional low/high labels per axis."
+      },
+      {
+        "alias": "quadrantLabels",
+        "path": "data.quadrantLabels",
+        "required": false,
+        "sql_type": "object",
+        "expression_hint": "quadrantLabels",
+        "description": "Optional quadrant copy overrides."
+      },
+      {
+        "alias": "listItemLabel",
+        "path": "data.listItemLabel",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "listItemLabel",
+        "description": "Optional table label override."
+      }
+    ],
+    "grid_span": "row-span-2"
+  },
+  {
+    "id": "funnel",
+    "title": "Funnel",
+    "description": "Hero funnel with summary headline and stage marker pills.",
+    "category": "marketing",
+    "selection_hints": [
+      "stage drop-off",
+      "journey funnel",
+      "hero conversion flow"
+    ],
+    "data_requirements": [
+      "stageColumns: Three stage markers for the visual envelope."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "summaryLabel",
+        "path": "data.summaryLabel",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "summaryLabel",
+        "description": "Headline label."
+      },
+      {
+        "alias": "summaryValue",
+        "path": "data.summaryValue",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "summaryValue",
+        "description": "Headline value."
+      },
+      {
+        "alias": "summaryDelta",
+        "path": "data.summaryDelta",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "summaryDelta",
+        "description": "Headline delta."
+      },
+      {
+        "alias": "summaryCompare",
+        "path": "data.summaryCompare",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "summaryCompare",
+        "description": "Supporting comparison text."
+      },
+      {
+        "alias": "stageColumns",
+        "path": "data.stageColumns",
+        "required": true,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(top := stage_label, metric := stage_value, bottom := stage_note) ORDER BY stage_index)",
+        "description": "Three stage markers for the visual envelope."
+      }
+    ],
+    "grid_span": "col-span-2"
+  },
+  {
+    "id": "real-mapbox",
+    "title": "Mapbox / Globe",
+    "description": "Map or globe view fed by a list of geographic points and optional projection config.",
+    "category": "geospatial",
+    "selection_hints": [
+      "geo distribution",
+      "global map",
+      "regional hotspots"
+    ],
+    "data_requirements": [
+      "locations: List of map points with name and coordinates."
+    ],
+    "sql_aliases": [
+      {
+        "alias": "locations",
+        "path": "data.locations",
+        "required": true,
+        "sql_type": "object[]",
+        "expression_hint": "list(struct_pack(name := label_col, address := address_col, longitude := lon_col, latitude := lat_col, intensity := score_col) ORDER BY score_col DESC)",
+        "description": "List of map points with name and coordinates."
+      },
+      {
+        "alias": "mapProjection",
+        "path": "data.mapProjection",
+        "required": false,
+        "sql_type": "string",
+        "expression_hint": "mapProjection",
+        "description": "mercator or globe."
+      },
+      {
+        "alias": "mapCenter",
+        "path": "data.mapCenter",
+        "required": false,
+        "sql_type": "number[]",
+        "expression_hint": "mapCenter",
+        "description": "Optional [lon, lat] center."
+      },
+      {
+        "alias": "mapZoom",
+        "path": "data.mapZoom",
+        "required": false,
+        "sql_type": "number",
+        "expression_hint": "mapZoom",
+        "description": "Optional zoom."
+      },
+      {
+        "alias": "mapPitch",
+        "path": "data.mapPitch",
+        "required": false,
+        "sql_type": "number",
+        "expression_hint": "mapPitch",
+        "description": "Optional pitch."
+      },
+      {
+        "alias": "mapBearing",
+        "path": "data.mapBearing",
+        "required": false,
+        "sql_type": "number",
+        "expression_hint": "mapBearing",
+        "description": "Optional bearing."
+      },
+      {
+        "alias": "mapAutoRotate",
+        "path": "data.mapAutoRotate",
+        "required": false,
+        "sql_type": "boolean",
+        "expression_hint": "mapAutoRotate",
+        "description": "Enable globe rotation."
+      },
+      {
+        "alias": "mapRotationSpeed",
+        "path": "data.mapRotationSpeed",
+        "required": false,
+        "sql_type": "number",
+        "expression_hint": "mapRotationSpeed",
+        "description": "Rotation speed when auto-rotate is enabled."
+      },
+      {
+        "alias": "mapFitBounds",
+        "path": "data.mapFitBounds",
+        "required": false,
+        "sql_type": "boolean",
+        "expression_hint": "mapFitBounds",
+        "description": "Auto-fit markers."
+      }
+    ],
+    "grid_span": "col-span-2 row-span-2"
+  }
+]

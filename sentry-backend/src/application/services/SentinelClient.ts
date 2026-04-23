@@ -79,7 +79,13 @@ export class SentinelClient {
         }
 
         try {
-            console.log(`[SentinelClient] Aligning execution score for project ${projectId}`);
+            console.log(`[SentinelClient] Aligning execution score for project ${projectId}...`);
+            console.log(`[PNE -> Sentinel] Alignment Proposal Fingerprint: ${executionScore.metadata.source_fingerprint}`);
+            
+            if (process.env.VERBOSE_LOGGING === 'true') {
+                console.log('[PNE -> Sentinel] Full Proposal:', JSON.stringify(executionScore, null, 2));
+            }
+
             const response = await fetch(this.resolveApiUrl('align_execution_score'), {
                 method: 'POST',
                 headers: {
@@ -99,7 +105,7 @@ export class SentinelClient {
             }
 
             const data = await response.json();
-            return {
+            const result: SentinelAlignmentResponse = {
                 status: data.status || 'aligned',
                 aligned: data.aligned !== false,
                 shouldReplan: data.should_replan === true,
@@ -107,6 +113,16 @@ export class SentinelClient {
                 executionScore: data.execution_score || executionScore,
                 details: data.details
             };
+
+            console.log(`[Sentinel -> PNE] Alignment Decision: ${result.status.toUpperCase()} (Aligned: ${result.aligned})`);
+            if (result.reasons.length > 0) {
+                console.log(`[Sentinel -> PNE] Reasons: ${result.reasons.join(', ')}`);
+            }
+            if (process.env.VERBOSE_LOGGING === 'true' && result.details) {
+                console.log('[Sentinel -> PNE] Model Signals:', JSON.stringify(result.details, null, 2));
+            }
+
+            return result;
         } catch (error) {
             console.error(`[SentinelClient] Error aligning execution score:`, error);
             return this.buildFallbackAlignment(executionScore, 'sentinel_unavailable');

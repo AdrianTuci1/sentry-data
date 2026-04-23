@@ -14,12 +14,19 @@ from .tabular import train_coverage_ranker, train_interaction_policy_model, trai
 def ensure_bundle(config: TrainingConfig, bundle_r2_uri: Optional[str] = None) -> Dict[str, object]:
     bundle_dir = Path(config.bundle_dir)
     manifest_path = bundle_dir / "metadata" / "training_bundle_manifest.json"
-    if manifest_path.exists():
-        return {"source": "local", "manifest_path": str(manifest_path)}
-
+    
+    # Industrial Upgrade: If an R2 URI is provided, we FORCE a refresh to avoid stale volume bugs
     if bundle_r2_uri:
+        if bundle_dir.exists():
+            print(f"🔄 Force-refreshing bundle directory from R2: {bundle_r2_uri}")
+            shutil.rmtree(bundle_dir)
+        
+        bundle_dir.mkdir(parents=True, exist_ok=True)
         downloaded = download_r2_prefix(bundle_r2_uri, bundle_dir)
         return {"source": "r2", "uri": bundle_r2_uri, "downloaded_files": len(downloaded)}
+
+    if manifest_path.exists():
+        return {"source": "local", "manifest_path": str(manifest_path)}
 
     from datasets.generator.bundle import materialize_training_bundle
 

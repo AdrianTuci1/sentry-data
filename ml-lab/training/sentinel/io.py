@@ -104,6 +104,23 @@ def upload_directory_to_r2_uri(local_dir: Path, target_uri: str) -> Dict[str, st
     return upload_directory_to_r2(local_dir=local_dir, bucket=bucket, prefix=prefix)
 
 
+def delete_prefix_in_r2(bucket: str, prefix: str) -> int:
+    client = r2_client()
+    paginator = client.get_paginator("list_objects_v2")
+    deleted_count = 0
+    
+    for page in paginator.paginate(Bucket=bucket, Prefix=f"{prefix.rstrip('/')}/"):
+        keys = [item["Key"] for item in page.get("Contents", [])]
+        if keys:
+            client.delete_objects(
+                Bucket=bucket,
+                Delete={"Objects": [{"Key": k} for k in keys]}
+            )
+            deleted_count += len(keys)
+            
+    return deleted_count
+
+
 def download_r2_prefix(source_uri: str, target_dir: Path) -> Dict[str, str]:
     bucket, prefix = parse_s3_uri(source_uri)
     client = r2_client()

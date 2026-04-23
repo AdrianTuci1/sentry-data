@@ -12,6 +12,7 @@ from .sources import (
     generate_healthcare_capacity_data,
     generate_healthcare_operations_data,
     generate_iot_telemetry,
+    generate_logistics_data,
     generate_marketing_data,
     generate_observability_data,
     generate_procurement_ops_data,
@@ -134,22 +135,13 @@ SOURCE_BLUEPRINTS = [
         "join_keys": ["timestamp", "line_id"],
     },
     {
-        "source_name": "banking_core_ledger",
-        "domain": "banking_finance",
+        "source_name": "logistics_fleet_ops",
+        "domain": "logistics",
         "grain": "day",
-        "description": "Deposits, exposures, liquidity, and fraud pressure across retail banking.",
-        "generator": generate_banking_core_data,
+        "description": "Shipping performance, carrier reliability, and transit efficiency.",
+        "generator": generate_logistics_data,
         "inject_anomalies": True,
-        "join_keys": ["timestamp", "branch_id"],
-    },
-    {
-        "source_name": "banking_aml_alerts",
-        "domain": "banking_finance",
-        "grain": "day",
-        "description": "AML and sanctions investigation workload with suspicious transaction pressure.",
-        "generator": generate_banking_aml_alerts,
-        "inject_anomalies": True,
-        "join_keys": ["timestamp", "corridor"],
+        "join_keys": ["timestamp", "warehouse_id"],
     },
     {
         "source_name": "enterprise_erp_finance",
@@ -213,16 +205,16 @@ ROLE_PRIORITY = [
     ("entity_id", ["_id", "tenant_id", "workspace_id", "account_id", "customer_id", "line_id", "branch_id", "facility_id"]),
     ("cost_metric", ["cloud_cost", "compute_cost", "storage_cost", "cost_per_request", "actual_spend", "budget"]),
     ("marketing_spend", ["spend", "cost", "cac", "cpc"]),
-    ("financial_metric", ["revenue", "mrr", "arr", "margin", "value", "aov", "order_value", "balance", "exposure", "interest", "deposit", "arpu", "savings"]),
+    ("financial_metric", ["revenue", "mrr", "arr", "margin", "value", "aov", "order_value", "arpu", "savings"]),
     ("conversion_metric", ["conversions", "orders", "signups", "sqls", "meetings", "opportunities", "tickets"]),
     ("traffic_metric", ["sessions", "page_views", "impressions", "clicks", "request_count"]),
     ("adoption_metric", ["active", "adoption", "activation", "retention", "usage", "seats", "engaged"]),
-    ("performance_metric", ["latency", "duration", "cycle_days", "resolution_time", "throughput", "wait", "repair", "lead_time", "delay", "outage"]),
+    ("performance_metric", ["latency", "duration", "cycle_days", "resolution_time", "throughput", "wait", "repair", "lead_time", "delay", "outage", "transit_time"]),
     ("reliability_metric", ["error_rate", "incident", "burn", "backlog", "availability", "packet_loss"]),
-    ("security_metric", ["failed_logins", "suspicious_ips", "privileged_actions", "threat", "bytes_out", "fraud", "aml", "sanction"]),
+    ("security_metric", ["failed_logins", "suspicious_ips", "privileged_actions", "threat", "bytes_out", "damage_claim"]),
     ("sensor_metric", ["temperature", "vibration", "energy"]),
-    ("quality_metric", ["bounce_rate", "csat", "churn_rate", "return_rate", "defect_rate", "win_rate", "delinquency", "readmission", "denial", "delivery_rate", "no_show"]),
-    ("dimension", ["plan_name", "channel", "region", "tier", "segment", "cluster", "service_name", "cloud_region", "auth_region", "business_unit", "supplier_tier", "tower_cluster", "care_unit", "corridor", "subscriber_segment"]),
+    ("quality_metric", ["bounce_rate", "csat", "churn_rate", "return_rate", "defect_rate", "win_rate", "readmission", "denial", "delivery_rate", "no_show", "on_time"]),
+    ("dimension", ["plan_name", "channel", "region", "tier", "segment", "cluster", "service_name", "cloud_region", "auth_region", "business_unit", "supplier_tier", "tower_cluster", "care_unit", "subscriber_segment", "warehouse_id", "carrier_name"]),
 ]
 
 
@@ -320,6 +312,8 @@ WIDGET_BLUEPRINTS = [
     {"id": "source_quality_lineage", "title": "Source Quality Lineage", "family": "network", "domains": ["rl_control", "observability", "customer_support"], "required_roles": ["reliability_metric", "dimension"], "optional_roles": ["quality_metric"], "grain": "day"},
     {"id": "schema_drift_radar", "title": "Schema Drift Radar", "family": "radar", "domains": ["rl_control", "observability", "cybersecurity"], "required_roles": ["reliability_metric", "dimension"], "optional_roles": ["security_metric", "adoption_metric"], "grain": "week"},
     {"id": "executive_mixed_signal_wall", "title": "Executive Mixed Signal Wall", "family": "scorecard-grid", "domains": ["saas_metrics", "marketing_attribution", "customer_support", "observability", "finops"], "required_roles": ["financial_metric", "performance_metric"], "optional_roles": ["marketing_spend", "quality_metric", "adoption_metric"], "grain": "week"},
+    {"id": "logistics_fleet_health", "title": "Logistics & Fleet Health", "family": "scorecard-grid", "domains": ["logistics"], "required_roles": ["performance_metric", "quality_metric"], "optional_roles": ["cost_metric", "security_metric"], "grain": "day"},
+    {"id": "carrier_performance_matrix", "title": "Carrier Performance Matrix", "family": "heatmap", "domains": ["logistics"], "required_roles": ["performance_metric", "quality_metric"], "optional_roles": ["dimension"], "grain": "week"},
 ]
 
 
@@ -373,10 +367,10 @@ PROJECT_BLUEPRINTS = [
         "focus": "Adjust widget policies when user cohorts collectively drift toward new analytical priorities.",
     },
     {
-        "project_slug": "banking_risk_and_liquidity_command",
-        "domains": ["banking_finance", "cybersecurity", "enterprise_bi"],
-        "sources": ["banking_core_ledger", "banking_aml_alerts", "enterprise_erp_finance", "security_events"],
-        "focus": "Unify liquidity, delinquency, AML pressure, and executive finance controls for banking workflows.",
+        "project_slug": "priority_sentinel_core",
+        "domains": ["saas_metrics", "commerce", "logistics", "marketing_attribution", "cybersecurity"],
+        "sources": ["saas_billing", "ecommerce_orders", "logistics_fleet_ops", "meta_ads", "security_events"],
+        "focus": "Integrated training for priority verticals: SaaS growth, Ecommerce margins, Logistics efficiency, Marketing ROI, and Cybersecurity threat surface.",
     },
     {
         "project_slug": "enterprise_portfolio_operating_system",
@@ -409,7 +403,7 @@ FOCUS_MODES = [
 
 
 DOMAIN_COMPATIBILITY_MAP = {
-    "banking_finance": {"banking_finance", "enterprise_bi", "saas_metrics", "sales_pipeline", "cybersecurity"},
+    "logistics": {"logistics", "commerce", "enterprise_bi", "iot_operations"},
     "enterprise_bi": {"enterprise_bi", "sales_pipeline", "commerce", "finops", "customer_support"},
     "telecom_network": {"telecom_network", "observability", "customer_support", "iot_operations"},
     "healthcare_operations": {"healthcare_operations", "customer_support", "enterprise_bi", "observability"},
@@ -474,11 +468,11 @@ RL_CLUSTER_BLUEPRINTS = [
         "preferred_widgets": ["inventory_pressure_matrix", "anomaly_investigation_panel", "support_burden_heatmap", "demand_forecast_ribbon"],
     },
     {
-        "cluster_id": "banking_risk_navigators",
-        "dominant_domains": ["banking_finance", "cybersecurity", "enterprise_bi"],
-        "dominant_objectives": ["liquidity control", "fraud containment", "executive governance"],
-        "tracked_fields": ["liquidity_coverage_ratio", "delinquency_rate", "aml_alert_count", "fraud_loss_usd"],
-        "preferred_widgets": ["revenue_growth_waterfall", "security_threat_surface", "privileged_access_watchtower", "executive_mixed_signal_wall"],
+        "cluster_id": "logistics_orchestrators",
+        "dominant_domains": ["logistics", "commerce"],
+        "dominant_objectives": ["on-time delivery", "cost optimization", "transit stability"],
+        "tracked_fields": ["on_time_delivery_rate", "shipping_cost_usd", "avg_transit_time_days", "shipments_dispatched"],
+        "preferred_widgets": ["logistics_fleet_health", "carrier_performance_matrix", "inventory_pressure_matrix"],
     },
     {
         "cluster_id": "enterprise_planning_stewards",

@@ -609,6 +609,38 @@ def generate_healthcare_capacity_data(rows: int = 365, inject_anomalies: bool = 
     )
 
 
+def generate_logistics_data(rows: int = 365, inject_anomalies: bool = False, seed: int = DEFAULT_SEED + 19) -> pd.DataFrame:
+    """Mock logistics and fleet operations data."""
+    rng = _rng(seed)
+    dates = _time_index(rows, "D")
+
+    shipments = 2400 + np.linspace(0, 600, rows) + _series_wave(rows, 320, 7) + rng.normal(0, 110, rows)
+    avg_transit_time = 3.2 + _series_wave(rows, 0.4, 5) + rng.normal(0, 0.15, rows)
+    shipping_cost = shipments * (12.5 + rng.normal(0, 0.8, rows))
+    on_time_rate = _clip(0.91 + _series_wave(rows, 0.04, 5, 0.3) + rng.normal(0, 0.015, rows), 0.65, 0.995)
+    damage_claim_rate = _clip(0.018 + _series_wave(rows, 0.006, 6, 0.8) + rng.normal(0, 0.002, rows), 0.002, 0.08)
+    return_logistics_vol = shipments * _clip(0.06 + _series_wave(rows, 0.015, 4) + rng.normal(0, 0.005, rows), 0.02, 0.15)
+
+    if inject_anomalies:
+        avg_transit_time[200:230] += 1.8
+        on_time_rate[200:230] -= 0.15
+        shipping_cost[200:230] *= 1.25
+
+    return pd.DataFrame(
+        {
+            "timestamp": dates,
+            "warehouse_id": rng.choice(["wh_east", "wh_west", "wh_central"], size=rows, p=[0.42, 0.33, 0.25]),
+            "carrier_name": rng.choice(["fedex", "ups", "dhl", "local_fleet"], size=rows),
+            "shipments_dispatched": np.round(_clip(shipments, 500, 10000)).astype(int),
+            "avg_transit_time_days": np.round(_clip(avg_transit_time, 0.5, 20.0), 2),
+            "shipping_cost_usd": np.round(_clip(shipping_cost, 4000, 250000), 2),
+            "on_time_delivery_rate": np.round(on_time_rate, 4),
+            "damage_claim_rate": np.round(damage_claim_rate, 5),
+            "return_logistics_volume": np.round(_clip(return_logistics_vol, 10, 2000)).astype(int),
+        }
+    )
+
+
 def generate_failed_transformations(rows: int = 180, seed: int = DEFAULT_SEED + 11) -> pd.DataFrame:
     """Simulates transformation failures and schema-scale regressions."""
     rng = _rng(seed)
@@ -646,6 +678,7 @@ SOURCE_GENERATORS = {
     "generate_healthcare_capacity_data": generate_healthcare_capacity_data,
     "generate_healthcare_operations_data": generate_healthcare_operations_data,
     "generate_iot_telemetry": generate_iot_telemetry,
+    "generate_logistics_data": generate_logistics_data,
     "generate_marketing_data": generate_marketing_data,
     "generate_observability_data": generate_observability_data,
     "generate_procurement_ops_data": generate_procurement_ops_data,
