@@ -250,6 +250,39 @@ export class R2StorageService {
         };
     }
 
+    public async saveBuffer(tenantId: string, projectId: string, layer: string, buffer: Buffer, contentType: string, ...parts: string[]): Promise<{ key: string; uri: string }> {
+        const key = this.getS3Key(tenantId, projectId, layer, ...parts);
+        await this.client.send(new PutObjectCommand({
+            Bucket: this.dataBucket,
+            Key: key,
+            Body: buffer,
+            ContentType: contentType
+        }));
+
+        return {
+            key,
+            uri: `s3://${this.dataBucket}/${key}`
+        };
+    }
+
+    public async deleteObjects(prefix: string): Promise<void> {
+        const { DeleteObjectsCommand } = await import('@aws-sdk/client-s3');
+        const keys = await this.listAllUnder(prefix);
+        if (keys.length === 0) return;
+
+        // S3 can delete max 1000 objects per call
+        for (let i = 0; i < keys.length; i += 1000) {
+            const chunk = keys.slice(i, i + 1000);
+            await this.client.send(new DeleteObjectsCommand({
+                Bucket: this.dataBucket,
+                Delete: {
+                    Objects: chunk.map(Key => ({ Key }))
+                }
+            }));
+        }
+        console.log(`[R2StorageService] Deleted ${keys.length} objects under ${prefix}`);
+    }
+
     private getDatePartition(): string {
         return new Date().toISOString().split('T')[0];
     }

@@ -10,10 +10,12 @@
     "deploy:widgets": "ts-node scripts/sync_widgets.ts",
     "refresh:check": "ts-node scripts/check_source_updates.ts",
     "seed": "ts-node scripts/seed_test_data.ts",
-    "clean": "ts-node scripts/full_cleanup.ts",
+    "clean": "ts-node scripts/cleanup_runtime_findings.ts",
+    "clean:all": "ts-node scripts/full_cleanup.ts",
     "clean:preserve-system": "PRESERVE_R2_SYSTEM=true ts-node scripts/full_cleanup.ts",
+    "clean:runtime-findings": "ts-node scripts/cleanup_runtime_findings.ts",
     "runtime": "ts-node scripts/test_runtime.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "ts-node scripts/test_runtime.ts"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.556.0",

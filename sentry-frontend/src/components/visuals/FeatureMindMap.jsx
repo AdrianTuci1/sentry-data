@@ -385,6 +385,7 @@ const ActionNode = ({ store, viewModel }) => {
 const GoldNode = ({ store, viewModel }) => {
     const { node, description, childIds, isClickableCategory, hasIncoming, hasOutgoing } = viewModel;
     const columns = node.data?.columns || [];
+    const highlightedFields = new Set(viewModel.highlightedFields || []);
 
     return (
         <div
@@ -419,15 +420,25 @@ const GoldNode = ({ store, viewModel }) => {
                                 {description}
                             </div>
                         )}
+                        {highlightedFields.size > 0 && (
+                            <div className="mt-2 text-[10px] font-medium uppercase tracking-[0.14em] text-emerald-200/75">
+                                Used In Active Trace
+                            </div>
+                        )}
                         {columns.length > 0 && (
-                            <div className="mt-2 text-[11px] leading-relaxed">
+                            <div className="mt-2 flex flex-wrap gap-1.5 text-[11px] leading-relaxed">
                                 {columns.map((column, index) => (
-                                    <React.Fragment key={`${node.id}-${column.id || column.name}-${index}`}>
-                                        <span className={COLUMN_STATUS_TEXT_TONES[column.status] || COLUMN_STATUS_TEXT_TONES.ok}>
+                                    <span
+                                        key={`${node.id}-${column.id || column.name}-${index}`}
+                                        className={clsx(
+                                            'rounded-md px-1.5 py-0.5 transition-all duration-200',
+                                            highlightedFields.has(String(column.name || '').trim().toLowerCase())
+                                                ? 'border border-emerald-300/30 bg-emerald-400/[0.14] text-emerald-50 shadow-[0_0_0_1px_rgba(110,231,183,0.08)]'
+                                                : COLUMN_STATUS_TEXT_TONES[column.status] || COLUMN_STATUS_TEXT_TONES.ok
+                                        )}
+                                    >
                                             {column.title || column.name}
-                                        </span>
-                                        {index < columns.length - 1 && <span className="text-[#6F7A86]">, </span>}
-                                    </React.Fragment>
+                                    </span>
                                 ))}
                             </div>
                         )}

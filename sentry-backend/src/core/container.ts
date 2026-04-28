@@ -21,7 +21,7 @@ import { ParrotNeuralEngineService } from '../application/services/ParrotNeuralE
 import { ParrotProgressService } from '../application/services/ParrotProgressService';
 import { ReverseEtlHeadService } from '../application/services/ReverseEtlHeadService';
 import { ParrotRuntimeService } from '../application/services/ParrotRuntimeService';
-import { SentinelClient } from '../application/services/SentinelClient';
+// SentinelClient removed from imports
 import { BronzeDiscoveryService } from '../application/services/BronzeDiscoveryService';
 import { MindMapManifestService } from '../application/services/MindMapManifestService';
 import { WorkloadPlannerService } from '../application/services/WorkloadPlannerService';
@@ -88,7 +88,7 @@ export function initContainer() {
     const widgetService = new WidgetService(r2StorageService);
     const widgetRenderer = new WidgetRenderer(r2StorageService);
     const analyticsService = new AnalyticsService(projectRepo, sourceRepo, widgetService, widgetRenderer, objectStorageService, r2StorageService);
-    const sentinelClient = new SentinelClient();
+    // SentinelClient instance removed from here
     const parrotNeuralEngineService = new ParrotNeuralEngineService();
     const parrotProgressService = new ParrotProgressService(r2StorageService);
     const reverseEtlHeadService = new ReverseEtlHeadService();
@@ -110,7 +110,6 @@ export function initContainer() {
         parrotNeuralEngineService,
         parrotProgressService,
         reverseEtlHeadService,
-        sentinelClient,
         projectRepo,
         sseManager
     );

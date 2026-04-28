@@ -64,7 +64,12 @@ export class SentinelClient {
                 return null;
             }
 
-            const data = await response.json();
+            const data = await response.json().catch(() => ({}));
+            if (data.status === 'error') {
+                console.error(`[SentinelClient] Remote Sentinel Internal Error (evaluate_node): ${data.message}`);
+                if (data.traceback) console.error(data.traceback);
+                return null;
+            }
             return data as SentinelGoalResponse;
         } catch (error) {
             console.error(`[SentinelClient] Error calling Sentinel API:`, error);
@@ -104,7 +109,13 @@ export class SentinelClient {
                 return this.buildFallbackAlignment(executionScore, `sentinel_http_${response.status}`);
             }
 
-            const data = await response.json();
+            const data = await response.json().catch(() => ({}));
+            if (data.status === 'error') {
+                console.error(`[SentinelClient] Remote Sentinel Alignment Error: ${data.message}`);
+                if (data.traceback) console.error(data.traceback);
+                return this.buildFallbackAlignment(executionScore, 'sentinel_internal_error');
+            }
+
             const result: SentinelAlignmentResponse = {
                 status: data.status || 'aligned',
                 aligned: data.aligned !== false,
@@ -160,6 +171,11 @@ export class SentinelClient {
                 });
 
                 const data = await response.json().catch(() => ({}));
+                if (data.status === 'error') {
+                    console.error(`[SentinelClient] Remote Sentinel Runtime Evaluation Error: ${data.message}`);
+                    if (data.traceback) console.error(data.traceback);
+                    throw new Error(data.message);
+                }
                 if (Array.isArray(data.sentinel_model_signals)) {
                     this.lastModelSignals = data.sentinel_model_signals as ParrotSentinelModelSignal[];
                 }

@@ -3,9 +3,14 @@ import os
 from pathlib import Path
 from typing import Optional
 
-import torch
-import torch.nn as nn
-
+try:
+    import torch
+    import torch.nn as nn
+except ImportError:
+    # Safe fallback for local Modal CLI inspection
+    torch = None
+    class nn:
+        class Module: pass
 
 class LSTMDriftModel(nn.Module):
     """PyTorch LSTM used by trained Sentinel drift checkpoints."""

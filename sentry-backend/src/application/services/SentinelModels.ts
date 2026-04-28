@@ -293,11 +293,125 @@ export class InteractionPolicyModel {
     }
 }
 
+export class BusinessRelevanceModel {
+    private readonly businessKeywords = [
+        'revenue', 'gmv', 'sales', 'aov', 'ltv', 'roas', 'cac', 'margin', 'profit',
+        'order', 'orders', 'delivery', 'review', 'reviews', 'retention', 'conversion',
+        'refund', 'return', 'customer', 'cohort', 'churn', 'repeat', 'status', 'category'
+    ];
+
+    private readonly lowSignalPatterns = [
+        /row[_\s-]*count/i,
+        /freshness/i,
+        /snapshot/i,
+        /name[_\s-]*lenght/i,
+        /name[_\s-]*length/i,
+        /description[_\s-]*lenght/i,
+        /description[_\s-]*length/i,
+        /\blength\b/i,
+        /\btotal rows?\b/i
+    ];
+
+    public evaluate(querySpecs: ParrotQuerySpec[] = [], sourceProfiles: ParrotSourceProfile[] = []): SentinelRuntimeEvaluation {
+        const hints: ParrotInvalidationHint[] = [];
+        const signals: ParrotSentinelModelSignal[] = [];
+        const createdAt = new Date().toISOString();
+        const sourceById = new Map(sourceProfiles.map((profile) => [profile.sourceId, profile]));
+
+        for (const querySpec of querySpecs) {
+            const source = sourceById.get(querySpec.sourceId);
+            const haystack = [
+                querySpec.queryId,
+                querySpec.title,
+                querySpec.widgetId,
+                querySpec.widgetType,
+                querySpec.sql,
+                ...(querySpec.dependencies?.columns || []),
+                source?.sourceName || '',
+                ...(source?.metricCandidates || []),
+                ...(source?.entityKeyCandidates || []),
+                ...(source?.timestampCandidates || [])
+            ].join(' ');
+
+            const matchedPatterns = this.lowSignalPatterns
+                .filter((pattern) => pattern.test(haystack))
+                .map((pattern) => pattern.source);
+            const hasBusinessKeyword = this.businessKeywords.some((keyword) => haystack.toLowerCase().includes(keyword));
+            const isOperationalWidget = ['technical-health', 'weather'].includes(querySpec.widgetType);
+            const isGenericKpi = querySpec.widgetType === 'metric-trend'
+                && /\b(total|average|avg)\b/i.test(querySpec.title)
+                && !hasBusinessKeyword;
+
+            let score = 0.82;
+            const reasons: string[] = [];
+
+            if (isOperationalWidget) {
+                score = Math.min(score, 0.18);
+                reasons.push('operational_widget_not_for_primary_dashboard');
+            }
+
+            if (matchedPatterns.length > 0) {
+                score = Math.min(score, 0.22);
+                reasons.push('schema_profiling_metric_detected');
+            }
+
+            if (isGenericKpi) {
+                score = Math.min(score, 0.34);
+                reasons.push('generic_kpi_without_business_context');
+            }
+
+            if (hasBusinessKeyword && matchedPatterns.length === 0 && !isOperationalWidget) {
+                score = Math.max(score, 0.9);
+            }
+
+            const severity: ParrotSentinelModelSignal['severity'] = score < 0.35 ? 'warning' : 'info';
+            const reason = reasons[0] || 'business_relevance_ok';
+
+            signals.push({
+                signalId: `business-relevance-${querySpec.queryId}`,
+                modelName: 'BusinessRelevanceModel',
+                targetType: 'query',
+                targetId: querySpec.queryId,
+                sourceId: querySpec.sourceId,
+                score,
+                severity,
+                reason,
+                features: {
+                    title: querySpec.title,
+                    widgetType: querySpec.widgetType,
+                    sourceName: source?.sourceName,
+                    matchedPatterns,
+                    hasBusinessKeyword,
+                    dependencyColumns: querySpec.dependencies?.columns || []
+                },
+                createdAt
+            });
+
+            if (score < 0.35) {
+                hints.push({
+                    id: `sentinel-${querySpec.queryId}-low-business-relevance`,
+                    scope: 'query',
+                    targetId: querySpec.queryId,
+                    sourceId: querySpec.sourceId,
+                    reason: 'low_business_relevance',
+                    severity: 'warning',
+                    invalidates: ['query', 'widget'],
+                    recommendedAction: 'Keep this query out of the primary dashboard and prefer business-facing metrics or comparisons.',
+                    createdAt
+                });
+            }
+        }
+
+        return { hints, signals };
+    }
+}
+
 export class SentinelModelSuite {
     private readonly coverageRanker = new CoverageRanker();
     private readonly driftClassifier = new DriftClassifier();
     private readonly queryRiskModel = new QueryRiskModel();
     private readonly interactionPolicyModel = new InteractionPolicyModel();
+    private readonly businessRelevanceModel = new BusinessRelevanceModel();
 
     public evaluateRuntime(input: {
         sourceProfiles: ParrotSourceProfile[];
@@ -323,14 +437,19 @@ export class SentinelModelSuite {
             input.querySpecs || [],
             input.mlRecommendations || []
         );
+        const businessRelevance = this.businessRelevanceModel.evaluate(
+            input.querySpecs || [],
+            input.sourceProfiles
+        );
 
         return {
-            hints: [...drift.hints, ...queryRisk.hints],
+            hints: [...drift.hints, ...queryRisk.hints, ...businessRelevance.hints],
             signals: [
                 ...drift.signals,
                 ...queryRisk.signals,
                 ...coverageSignals,
-                ...interactionSignals
+                ...interactionSignals,
+                ...businessRelevance.signals
             ]
         };
     }

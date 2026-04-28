@@ -10,6 +10,7 @@ const DEFAULT_NODE_HEIGHTS = {
 };
 
 const COLUMN_NODE_GAP = 26;
+const normalizeFieldName = (value = '') => String(value || '').trim().toLowerCase();
 
 export class FeatureMindMapUIStore {
     root;
@@ -456,6 +457,60 @@ export class FeatureMindMapUIStore {
         return { nodes: visitedNodes, edges: visitedEdges };
     }
 
+    get activeFieldHighlights() {
+        if (!this.hoveredNodeId) {
+            return null;
+        }
+
+        const hoveredNode = this.root.data.nodeMap.get(this.hoveredNodeId);
+        if (!hoveredNode || (hoveredNode.type !== 'card' && hoveredNode.type !== 'group')) {
+            return null;
+        }
+
+        const insights = hoveredNode.type === 'card'
+            ? [this.root.data.insight.find((entry) => entry.id === hoveredNode.id)].filter(Boolean)
+            : this.root.data.insight.filter((entry) => entry.group_id === hoveredNode.data?.id);
+
+        if (insights.length === 0) {
+            return null;
+        }
+
+        const byGoldId = new Map();
+
+        insights.forEach((insight) => {
+            const lineageEntries = insight?.lineage?.gold_fields?.length
+                ? insight.lineage.gold_fields
+                : (insight?.lineage?.source_keys || []).map((sourceKey) => ({
+                    source_key: sourceKey,
+                    columns: insight.adjusted_data_columns || []
+                }));
+
+            lineageEntries.forEach((entry) => {
+                const goldId = entry?.source_key;
+                if (!goldId) {
+                    return;
+                }
+
+                if (!byGoldId.has(goldId)) {
+                    byGoldId.set(goldId, new Set());
+                }
+
+                (entry?.columns || []).forEach((columnName) => {
+                    const normalizedName = normalizeFieldName(columnName);
+                    if (normalizedName) {
+                        byGoldId.get(goldId).add(normalizedName);
+                    }
+                });
+            });
+        });
+
+        return byGoldId.size > 0 ? byGoldId : null;
+    }
+
+    getHighlightedFieldsForGold(goldId) {
+        return this.activeFieldHighlights?.get(goldId) || new Set();
+    }
+
     isEdgeDimmed(edge) {
         return this.activeTrace ? !this.activeTrace.edges.has(edge.id) : false;
     }
@@ -482,10 +537,17 @@ export class FeatureMindMapUIStore {
 
     get nodeViewModels() {
         return this.positionedNodes
-            .map((node) => this.root.data.buildNodeViewModel(node, {
-                isDimmed: this.isNodeDimmed(node),
-                isTraceActive: this.activeTrace ? this.activeTrace.nodes.has(node.id) : false
-            }));
+            .map((node) => {
+                const highlightedFields = node.type === 'category'
+                    ? Array.from(this.getHighlightedFieldsForGold(node.data?.id || ''))
+                    : [];
+
+                return this.root.data.buildNodeViewModel(node, {
+                    isDimmed: this.isNodeDimmed(node),
+                    isTraceActive: this.activeTrace ? this.activeTrace.nodes.has(node.id) : false,
+                    highlightedFields
+                });
+            });
     }
 
     get pendingPreview() {

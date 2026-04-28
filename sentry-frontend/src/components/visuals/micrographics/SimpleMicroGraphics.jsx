@@ -1,5 +1,43 @@
 import React from 'react';
 
+const coerceArray = (value) => {
+    if (Array.isArray(value)) {
+        return value;
+    }
+
+    if (value && typeof value === 'object') {
+        if (Array.isArray(value.items)) {
+            return value.items;
+        }
+
+        if (Array.isArray(value.values)) {
+            return value.values;
+        }
+
+        return [value];
+    }
+
+    if (typeof value === 'string') {
+        const trimmed = value.trim();
+        if (!trimmed) {
+            return [];
+        }
+
+        try {
+            const parsed = JSON.parse(trimmed);
+            return coerceArray(parsed);
+        } catch {
+            return trimmed
+                .split(',')
+                .map((entry) => entry.trim())
+                .filter(Boolean)
+                .map((entry) => ({ value: entry }));
+        }
+    }
+
+    return [];
+};
+
 export const WeatherMicro = ({ data }) => (
     <div className="micro-weather-card">
         <div className="weather-value-wrapper">
@@ -47,21 +85,25 @@ export const ColorSliderMicro = ({ data }) => (
     </div>
 );
 
-export const CampaignListMicro = ({ data }) => (
-    <div className="micro-campaign-list">
-        {data.campaigns?.map((camp, i) => (
+export const CampaignListMicro = ({ data }) => {
+    const campaigns = coerceArray(data?.campaigns);
+
+    return (
+        <div className="micro-campaign-list">
+            {campaigns.map((camp, i) => (
             <div key={i} className="campaign-item">
                 <div className="camp-info">
-                    <span className="camp-name">{camp.name}</span>
-                    <span className={`camp-trend ${camp.trend === '+' ? 'positive' : 'negative'}`}>
-                        {camp.trend === '+' ? '▲' : '▼'}
+                    <span className="camp-name">{camp?.name || camp?.label || `Campaign ${i + 1}`}</span>
+                    <span className={`camp-trend ${camp?.trend === '+' ? 'positive' : 'negative'}`}>
+                        {camp?.trend === '+' ? '▲' : '▼'}
                     </span>
                 </div>
-                <div className="camp-val">{camp.value}</div>
+                <div className="camp-val">{camp?.value ?? camp?.metric ?? ''}</div>
             </div>
-        ))}
-    </div>
-);
+            ))}
+        </div>
+    );
+};
 
 export const RedGradientMicro = ({ data }) => (
     <div className="micro-red-card">
@@ -75,13 +117,13 @@ export const RedGradientMicro = ({ data }) => (
 export const ProductivityMicro = ({ data }) => (
     <div className="micro-productivity">
         <div className="dots-container">
-            {data.dataPoints?.map((val, i) => (
+            {coerceArray(data?.dataPoints).map((val, i, values) => (
                 <div
                     key={i}
                     className="prod-dot"
                     style={{
-                        height: `${val * 3}px`,
-                        opacity: 0.3 + (i / data.dataPoints.length) * 0.7
+                        height: `${Number(val?.value ?? val ?? 0) * 3}px`,
+                        opacity: 0.3 + (i / Math.max(values.length, 1)) * 0.7
                     }}
                 ></div>
             ))}

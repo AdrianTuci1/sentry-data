@@ -7,8 +7,93 @@ const defaultBenchmarks = [
     { label: 'CodeEval', score: 48.6, target: 47, delta: '+0.9' },
 ];
 
+const toFiniteNumber = (value, fallback = 0) => {
+    if (typeof value === 'number') {
+        return Number.isFinite(value) ? value : fallback;
+    }
+
+    if (typeof value === 'string') {
+        const numericValue = Number(value.trim());
+        return Number.isFinite(numericValue) ? numericValue : fallback;
+    }
+
+    return fallback;
+};
+
+const coerceArray = (value) => {
+    if (Array.isArray(value)) {
+        return value;
+    }
+
+    if (Array.isArray(value?.items)) {
+        return value.items;
+    }
+
+    if (Array.isArray(value?.values)) {
+        return value.values;
+    }
+
+    if (value && typeof value === 'object') {
+        return [value];
+    }
+
+    if (typeof value === 'string') {
+        const trimmed = value.trim();
+        if (!trimmed) {
+            return [];
+        }
+
+        try {
+            const parsed = JSON.parse(trimmed);
+            return coerceArray(parsed);
+        } catch {
+            return trimmed
+                .split(',')
+                .map((entry) => entry.trim())
+                .filter(Boolean)
+                .map((entry, index) => ({ label: `Benchmark ${index + 1}`, value: entry }));
+        }
+    }
+
+    return [];
+};
+
+const normalizeDelta = (value, score, target) => {
+    if (typeof value === 'string' && value.trim()) {
+        return value.trim();
+    }
+
+    const difference = score - target;
+    if (!Number.isFinite(difference) || difference === 0) {
+        return '0.0';
+    }
+
+    return `${difference >= 0 ? '+' : ''}${difference.toFixed(1)}`;
+};
+
+const normalizeBenchmarks = (value) => {
+    const normalized = coerceArray(value)
+        .map((entry, index) => {
+            const score = toFiniteNumber(entry?.score ?? entry?.value ?? entry?.metric, NaN);
+            if (!Number.isFinite(score)) {
+                return null;
+            }
+
+            const target = toFiniteNumber(entry?.target ?? entry?.goal ?? entry?.threshold, score);
+            return {
+                label: entry?.label || entry?.name || entry?.benchmark || `Benchmark ${index + 1}`,
+                score,
+                target,
+                delta: normalizeDelta(entry?.delta, score, target),
+            };
+        })
+        .filter(Boolean);
+
+    return normalized.length > 0 ? normalized : defaultBenchmarks;
+};
+
 const MatplotlibBenchmarkBars = ({ data = {} }) => {
-    const benchmarks = data.benchmarks || defaultBenchmarks;
+    const benchmarks = normalizeBenchmarks(data.benchmarks);
     const passed = benchmarks.filter((item) => item.score >= item.target).length;
 
     return (
@@ -56,7 +141,7 @@ const MatplotlibBenchmarkBars = ({ data = {} }) => {
                         </div>
                         <div style={{ textAlign: 'right' }}>
                             <div style={{ color: '#fff', fontSize: '0.92rem', fontWeight: 700 }}>{item.score.toFixed(1)}</div>
-                            <div style={{ color: item.delta.startsWith('-') ? '#ff7c7c' : '#27f4a2', fontSize: '0.68rem', fontWeight: 700 }}>{item.delta}</div>
+                            <div style={{ color: String(item.delta).startsWith('-') ? '#ff7c7c' : '#27f4a2', fontSize: '0.68rem', fontWeight: 700 }}>{item.delta}</div>
                         </div>
                     </div>
                 ))}

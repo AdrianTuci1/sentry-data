@@ -1,8 +1,37 @@
 import React from 'react';
 import ReactECharts from 'echarts-for-react';
 
+const coercePlatforms = (value) => {
+    if (Array.isArray(value)) {
+        return value;
+    }
+
+    if (value && typeof value === 'object') {
+        if (Array.isArray(value.platforms)) {
+            return value.platforms;
+        }
+
+        if (Array.isArray(value.items)) {
+            return value.items;
+        }
+
+        return [value];
+    }
+
+    if (typeof value === 'string') {
+        try {
+            const parsed = JSON.parse(value);
+            return coercePlatforms(parsed);
+        } catch {
+            return [];
+        }
+    }
+
+    return [];
+};
+
 const SemiCircleDonut = ({ data }) => {
-    const platforms = data?.platforms || [
+    const platforms = coercePlatforms(data?.platforms).length > 0 ? coercePlatforms(data?.platforms) : [
         { name: 'Google', value: 45, color: '#4285F4' },
         { name: 'Meta', value: 30, color: '#0668E1' },
         { name: 'LinkedIn', value: 15, color: '#0A66C2' },

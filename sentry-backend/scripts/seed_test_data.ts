@@ -10,7 +10,7 @@ import { TenantRepository } from '../src/infrastructure/repositories/TenantRepos
 import { ProjectRepository } from '../src/infrastructure/repositories/ProjectRepository';
 import { SourceRepository } from '../src/infrastructure/repositories/SourceRepository';
 import { v4 as uuidv4 } from 'uuid';
-import { deployWidgetsToR2 } from './lib/widget_deploy';
+import { deployR2System } from './lib/widget_deploy';
 import { REPO_ROOT, SENTINEL_TRAINING_BUNDLE_PREFIX, uploadDirectory } from './lib/r2_artifacts';
 
 // ═══════════════════════════════════════════════════════════
@@ -139,10 +139,10 @@ async function seed() {
             createdAt: new Date().toISOString()
         });
 
-        // ── STEP 2: UPLOAD DISCOVERY WIDGETS ────────────────
+        // ── STEP 2: UPLOAD R2 SYSTEM ────────────────
 
-        console.log('\n[R2] Uploading discovery widgets...');
-        await deployWidgetsToR2({ s3Client });
+        console.log('\n[R2] Uploading R2 system...');
+        await deployR2System({ s3Client });
 
         console.log('\n[R2] Uploading Sentinel training data...');
         await seedSentinelTrainingBundle(s3Client);

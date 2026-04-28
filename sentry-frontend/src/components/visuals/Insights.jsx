@@ -89,6 +89,40 @@ const moveIdToIndex = (orderedIds, sourceId, targetIndex) => {
     return nextOrder;
 };
 
+const normalizeDashboardWidgets = (widgets = []) => {
+    const seenIds = new Map();
+
+    return widgets.map((widget, index) => {
+        const baseId = String(
+            widget?.id
+            || widget?.widgetInstanceId
+            || widget?.runtimeWidgetId
+            || widget?.type
+            || widget?.widget_type
+            || `widget-${index + 1}`
+        ).trim();
+        const duplicateCount = (seenIds.get(baseId) || 0) + 1;
+        seenIds.set(baseId, duplicateCount);
+
+        if (duplicateCount === 1) {
+            return {
+                ...widget,
+                id: baseId,
+                runtimeWidgetId: widget?.runtimeWidgetId || baseId,
+                widgetInstanceId: widget?.widgetInstanceId || baseId,
+            };
+        }
+
+        const uniqueId = `${baseId}--${duplicateCount}`;
+        return {
+            ...widget,
+            id: uniqueId,
+            runtimeWidgetId: widget?.runtimeWidgetId || baseId,
+            widgetInstanceId: uniqueId,
+        };
+    });
+};
+
 const getWidgetGridSize = (widget, columnCount) => {
     const gridSpan = widget?.gridSpan || '';
     const requestedColumns = gridSpan.includes('col-span-3') ? 3 : gridSpan.includes('col-span-2') ? 2 : 1;
@@ -182,15 +216,16 @@ const Insights = observer(() => {
             try {
                 const res = await ProjectService.getAnalytics(projectId);
                 const dashboards = res?.data?.dashboards || res?.dashboards || [];
+                const normalizedDashboards = normalizeDashboardWidgets(dashboards);
 
-                if (dashboards.length > 0) {
-                    setAnalyticsData(dashboards);
+                if (normalizedDashboards.length > 0) {
+                    setAnalyticsData(normalizedDashboards);
                 } else {
-                    setAnalyticsData(fallbackAnalyticsData);
+                    setAnalyticsData(normalizeDashboardWidgets(fallbackAnalyticsData));
                 }
             } catch (error) {
                 console.warn("[Insights] Failed to fetch analytics from backend.", error);
-                setAnalyticsData(fallbackAnalyticsData);
+                setAnalyticsData(normalizeDashboardWidgets(fallbackAnalyticsData));
             } finally {
                 setIsLoading(false);
             }

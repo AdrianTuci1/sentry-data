@@ -1,240 +1,297 @@
-import hashlib
 import json
 import os
+import traceback
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 import modal
-from fastapi import FastAPI, Header, HTTPException
-from pydantic import BaseModel, Field
+from fastapi import FastAPI, Header, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
+from pne_core.config import INTERNAL_SECRET, PROMPT_DIR, REPO_ROOT, TRANSLATOR_VERSION, WIDGETS_DIR, logger
+from pne_core.models import CompileProjectionPlanRequest, CompileScoreRequest
+from pne_core.policy import align_score_logic
+from pne_core.planner import build_projection_plan_logic
 
-PROMPT_DIR = "/root/r2-system/prompts/runtime"
-TRANSLATOR_VERSION = "pne-modal-v1"
-INTERNAL_SECRET = os.getenv("INTERNAL_API_SECRET", "secret")
-REPO_ROOT = Path(__file__).resolve().parents[1]
-
+# Modal image for the API runtime and Gemini/worker integrations.
 image = (
-    modal.Image.debian_slim()
-    .pip_install("fastapi[standard]", "pydantic", "duckdb", "pyyaml")
+    modal.Image.debian_slim(python_version="3.11")
+    .pip_install(
+        "fastapi[standard]", 
+        "pydantic", 
+        "pyyaml", 
+        "google-genai",
+        "requests",
+        "boto3",
+        "torch==2.1.1", 
+        "numpy==1.26.2", 
+        "scikit-learn==1.3.2", 
+        "pandas",
+        "joblib"
+    )
     .add_local_dir(str(REPO_ROOT / "r2-system" / "prompts" / "runtime"), remote_path=PROMPT_DIR)
+    .add_local_dir(str(REPO_ROOT / "r2-system" / "widgets"), remote_path=WIDGETS_DIR)
+    .add_local_dir(str(REPO_ROOT / "modal_apps" / "_archive" / "sentinel_legacy"), remote_path="/root/sentinel_legacy")
+    .add_local_python_source("pne_core")
 )
 
 app = modal.App("statsparrot-pne")
 web_app = FastAPI(title="StatsParrot Parrot Neural Engine")
+OBSERVABILITY_DIR = Path(os.getenv("PNE_OBSERVABILITY_DIR", "/tmp/pne-observability"))
 
 
-class RuntimeContextPayload(BaseModel):
-    tenantId: str
-    projectId: str
-    rawSourceUris: List[str] = Field(default_factory=list)
-    sourceNames: List[str] = Field(default_factory=list)
-    runtimeMode: Optional[str] = None
+def log_human_checkpoint(label: str, route_name: str, request_id: Optional[str], message: str, **context: Any) -> None:
+    details = {"route": route_name, "requestId": request_id, **context}
+    log_fn = logger.info
+    if label == "[WARN]":
+        log_fn = logger.warning
+    elif label == "[FAIL]":
+        log_fn = logger.error
+    log_fn("%s %s | context=%s", label, message, json.dumps(details, default=str))
 
 
-class DnsTxtVerificationPayload(BaseModel):
-    required: bool = True
-    recordName: str
-    domain: Optional[str] = None
-    verified: bool = False
-    verifiedAt: Optional[str] = None
-    status: str
+def verify_internal_secret(secret: Optional[str]):
+    if secret != INTERNAL_SECRET:
+        raise HTTPException(status_code=403, detail="Invalid internal secret")
+
+def log_route_start(route_name: str, request_id: Optional[str], **context: Any) -> None:
+    details = {"route": route_name, "requestId": request_id, **context}
+    logger.info("Handling PNE request: %s", json.dumps(details, default=str))
+    log_human_checkpoint("[OK]", route_name, request_id, f"PNE request received for {route_name}.", **context)
 
 
-class ReverseEtlLimitsPayload(BaseModel):
-    maxUnverifiedVms: int = 2
-    stopOnErrors: List[str] = Field(default_factory=list)
-    consecutiveErrorThreshold: int = 3
-    requireManualVerificationAfterLimit: bool = True
+def log_route_success(route_name: str, request_id: Optional[str], **context: Any) -> None:
+    details = {"route": route_name, "requestId": request_id, **context}
+    logger.info("Completed PNE request: %s", json.dumps(details, default=str))
+    log_human_checkpoint("[OK]", route_name, request_id, f"PNE request completed for {route_name}.", **context)
 
 
-class ReverseEtlPayload(BaseModel):
-    enabled: bool = True
-    vmMode: str = "user_owned"
-    dnsTxtVerification: DnsTxtVerificationPayload
-    deliveryTargets: List[str] = Field(default_factory=list)
-    limits: ReverseEtlLimitsPayload
-    activeVmCount: int = 0
-    status: str
+def log_runtime_exception(route_name: str, request_id: Optional[str], error: Exception, **context: Any) -> None:
+    details = {"route": route_name, "requestId": request_id, **context}
+    logger.exception("PNE route failed: %s | context=%s", error, json.dumps(details, default=str))
+    log_human_checkpoint("[FAIL]", route_name, request_id, f"PNE request failed for {route_name}: {error}", **context)
 
 
-class CompileExecutionScoreRequest(BaseModel):
-    requestId: str
-    context: RuntimeContextPayload
-    reverseEtl: ReverseEtlPayload
-
-
-def verify_internal_secret(x_internal_secret: Optional[str]) -> None:
-    if x_internal_secret != INTERNAL_SECRET:
-        raise HTTPException(status_code=401, detail="Unauthorized. Invalid internal secret.")
-
-
-def load_prompt(filename: str) -> str:
-    return Path(PROMPT_DIR, filename).read_text(encoding="utf-8")
-
-
-def model_to_dict(model: BaseModel) -> Dict[str, Any]:
-    if hasattr(model, "model_dump"):
-        return model.model_dump()
-    return model.dict()
-
-
-def compute_source_fingerprint(raw_source_uris: List[str], source_names: List[str]) -> str:
-    payload = json.dumps({"uris": raw_source_uris, "sourceNames": source_names}, sort_keys=True)
-    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
-
-
-def infer_source_type(raw_source_uris: List[str]) -> str:
-    if not raw_source_uris:
-        return "unknown"
-    if all(uri.endswith(".parquet") or "parquet" in uri for uri in raw_source_uris):
-        return "s3_parquet"
-    if all(uri.startswith("s3://") for uri in raw_source_uris):
-        return "s3_object"
-    return "multi_source" if len(raw_source_uris) > 1 else "direct_source"
-
-
-def build_execution_score(request: CompileExecutionScoreRequest) -> Dict[str, Any]:
-    ctx = request.context
-    reverse_etl = request.reverseEtl
-    source_fingerprint = compute_source_fingerprint(ctx.rawSourceUris, ctx.sourceNames)
-    created_at = os.getenv("PARROT_CREATED_AT") or datetime.now(timezone.utc).isoformat()
-    prompt_text = load_prompt("pne_compile_execution_score.md")
-
+def build_observability_payload(route_name: str, request_id: str, result: Dict[str, Any]) -> Dict[str, Any]:
+    projection_plan = result.get("projection_plan", {}) if isinstance(result, dict) else {}
+    summary = result.get("summary", {}) if isinstance(result, dict) else {}
+    summary_details = summary.get("details", {}) if isinstance(summary, dict) else {}
     return {
-        "metadata": {
-            "request_id": request.requestId,
-            "priority": "high",
-            "target_latency_ms": 45000,
-            "runtime_mode": "parrot_os",
-            "translator_version": TRANSLATOR_VERSION,
-            "source_fingerprint": source_fingerprint,
-            "created_at": created_at,
-        },
-        "source": {
-            "type": infer_source_type(ctx.rawSourceUris),
-            "uri": ctx.rawSourceUris[0] if ctx.rawSourceUris else "",
-            "uris": ctx.rawSourceUris,
-            "source_names": ctx.sourceNames,
-            "schema_discovery": "dynamic",
-            "sampling_rate": 0.05,
-        },
-        "pnc_logic": {
-            "virtual_silver": [
-                {
-                    "op": "schema_harmonize",
-                    "strategy": "dynamic_inference",
-                    "inputs": ctx.sourceNames if ctx.sourceNames else ctx.rawSourceUris,
-                    "sentinel_verify": True,
-                },
-                {
-                    "op": "null_policy",
-                    "strategy": "adaptive_imputation",
-                    "sentinel_verify": True,
-                },
-                {
-                    "op": "type_cast",
-                    "strategy": "best_effort_semantic_cast",
-                    "sentinel_verify": True,
-                },
-            ],
-            "virtual_gold_features": [
-                {
-                    "op": "derive_business_features",
-                    "strategy": "adaptive_feature_bundle",
-                    "engine": "daft_vectorized",
-                },
-                {
-                    "op": "segment_entities",
-                    "strategy": "source_aware_segmentation",
-                    "engine": "daft_vectorized",
-                },
-                {
-                    "op": "prepare_query_views",
-                    "targets": ["insights", "dashboards", "reverse_etl"],
-                    "engine": "daft_vectorized",
-                },
-            ],
-        },
-        "analysis_goal": {
-            "type": "segmentation_and_insight",
-            "group_by": ["source_name", "freshness_bucket"],
-            "metrics": ["count(*)", "count(distinct entity_id)", "freshness_score"],
-            "transformers_options": {
-                "use_cross_attention": True,
-                "latent_dim": 128,
-                "prompt_reference": "pne_compile_execution_score.md",
-            },
-        },
-        "sentinel_constraints": {
-            "max_null_ratio": 0.02,
-            "allow_outliers": False,
-            "expected_distribution": "adaptive",
-            "fail_on_anomaly": "trigger_llm_replan",
-        },
-        "infrastructure": {
-            "engine": "modal_compat",
-            "worker_type": "modal_sandbox",
-            "min_workers": 1,
-            "max_workers": 16,
-            "auto_scale": True,
-        },
-        "output_streams": {
-            "reverse_etl": {
-                "enabled": reverse_etl.enabled,
-                "vm_mode": reverse_etl.vmMode,
-                "dns_txt_verification": {
-                    "required": reverse_etl.dnsTxtVerification.required,
-                    "record_name": reverse_etl.dnsTxtVerification.recordName,
-                    "domain": reverse_etl.dnsTxtVerification.domain,
-                    "verified": reverse_etl.dnsTxtVerification.verified,
-                },
-                "delivery_targets": reverse_etl.deliveryTargets,
-                "limits": model_to_dict(reverse_etl.limits),
-                "active_vm_count": reverse_etl.activeVmCount,
-                "status": reverse_etl.status,
-            }
-        },
-        "details": {
-            "prompt_file": "pne_compile_execution_score.md",
-            "prompt_preview": prompt_text.splitlines()[:8],
-            "steps": [
-                "fingerprint_sources",
-                "compile_virtual_silver",
-                "compile_virtual_gold",
-                "apply_reverse_etl_policy",
-                "emit_execution_score",
-            ],
+        "route": route_name,
+        "requestId": request_id,
+        "createdAt": datetime.now(timezone.utc).isoformat(),
+        "status": result.get("status"),
+        "summary": summary,
+        "rejectionReport": summary_details.get("rejectionReport", {}),
+        "planningTrace": result.get("planningTrace", []),
+        "coverage": projection_plan.get("coverage", {}),
+        "projectionPlanMeta": {
+            "version": projection_plan.get("version"),
+            "translatorVersion": projection_plan.get("translatorVersion"),
+            "projectionCount": len(projection_plan.get("projectionSpecs", []) or []),
+            "queryCount": len(projection_plan.get("querySpecs", []) or []),
         },
     }
 
+
+def save_observability_to_r2(tenant_id: str, project_id: str, request_id: str, payload: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    endpoint = os.getenv("R2_ENDPOINT") or os.getenv("R2_ENDPOINT_URL")
+    access_key = os.getenv("R2_ACCESS_KEY_ID")
+    secret_key = os.getenv("R2_SECRET_ACCESS_KEY")
+    bucket = os.getenv("R2_BUCKET_DATA") or "statsparrot-data"
+
+    if not endpoint or not access_key or not secret_key:
+        logger.warning(
+            "[WARN] Observability R2 upload skipped. context=%s",
+            json.dumps(
+                {
+                    "requestId": request_id,
+                    "tenantId": tenant_id,
+                    "projectId": project_id,
+                    "reason": "r2_credentials_missing",
+                },
+                default=str,
+            ),
+        )
+        return None
+
+    try:
+        import boto3
+
+        key = f"tenants/{tenant_id}/projects/{project_id}/runtime/requests/{request_id}/observability.json"
+        client = boto3.client(
+            "s3",
+            endpoint_url=endpoint,
+            aws_access_key_id=access_key,
+            aws_secret_access_key=secret_key,
+            region_name=os.getenv("R2_REGION", "auto"),
+        )
+        client.put_object(
+            Bucket=bucket,
+            Key=key,
+            Body=json.dumps(payload, indent=2, ensure_ascii=False).encode("utf-8"),
+            ContentType="application/json",
+        )
+        uri = f"s3://{bucket}/{key}"
+        logger.info(
+            "[OK] Observability uploaded to R2. context=%s",
+            json.dumps(
+                {
+                    "requestId": request_id,
+                    "tenantId": tenant_id,
+                    "projectId": project_id,
+                    "bucket": bucket,
+                    "key": key,
+                    "uri": uri,
+                },
+                default=str,
+            ),
+        )
+        return {
+            "bucket": bucket,
+            "key": key,
+            "uri": uri,
+            "storage": "r2",
+        }
+    except Exception as error:
+        logger.exception(
+            "[FAIL] Observability R2 upload failed. context=%s",
+            json.dumps(
+                {
+                    "requestId": request_id,
+                    "tenantId": tenant_id,
+                    "projectId": project_id,
+                    "error": str(error),
+                },
+                default=str,
+            ),
+        )
+        return None
+
+
+def write_observability_file(route_name: str, request_id: str, result: Dict[str, Any], tenant_id: str, project_id: str) -> Dict[str, Any]:
+    payload = build_observability_payload(route_name, request_id, result)
+    OBSERVABILITY_DIR.mkdir(parents=True, exist_ok=True)
+    target_path = OBSERVABILITY_DIR / f"{request_id}.json"
+    target_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+    r2_location = save_observability_to_r2(tenant_id, project_id, request_id, payload)
+    logger.info(
+        "[OK] Observability file written. context=%s",
+        json.dumps({"route": route_name, "requestId": request_id, "path": str(target_path)}, default=str),
+    )
+    return {
+        "path": str(target_path),
+        "storage": "container_local",
+        "payload": payload,
+        "r2": r2_location,
+    }
+
+@web_app.exception_handler(RequestValidationError)
+async def request_validation_exception_handler(request: Request, exc: RequestValidationError):
+    body = (await request.body()).decode("utf-8", errors="replace")
+    logger.error(
+        "PNE request validation failed on %s: errors=%s body=%s",
+        request.url.path,
+        json.dumps(exc.errors(), default=str),
+        body[:4000],
+    )
+    return JSONResponse(
+        status_code=422,
+        content={
+            "status": "error",
+            "error": "validation_error",
+            "detail": exc.errors(),
+        },
+    )
+
+# --- Routes ---
+@web_app.post("/api/v1/compile_projection_plan")
+def compile_projection_plan(req: CompileProjectionPlanRequest, x_internal_secret: Optional[str] = Header(None)):
+    try:
+        log_route_start(
+            "compile_projection_plan",
+            req.requestId,
+            source_count=len(req.sourceProfiles),
+            compiled_at=req.compiledAt,
+        )
+        verify_internal_secret(x_internal_secret)
+        result = build_projection_plan_logic(req)
+        observability = write_observability_file("compile_projection_plan", req.requestId, result, req.tenantId, req.projectId)
+        result["observability"] = observability["payload"]
+        result["observabilityFile"] = {
+            "path": observability["path"],
+            "storage": observability["storage"],
+        }
+        if observability.get("r2"):
+            result["observabilityFile"]["r2"] = observability["r2"]
+            result["observabilityR2"] = observability["r2"]
+        if isinstance(result.get("projection_plan"), dict):
+            result["projection_plan"]["observabilityFile"] = result["observabilityFile"]
+        projection_plan = result.get("projection_plan", {})
+        summary_details = projection_plan.get("summary", {}).get("details", {})
+        log_route_success(
+            "compile_projection_plan",
+            req.requestId,
+            source_count=summary_details.get("sourceCount"),
+            projection_count=summary_details.get("projectionCount"),
+            query_count=summary_details.get("queryCount"),
+            accepted_candidates=summary_details.get("acceptedCandidateCount"),
+            rejected_candidates=summary_details.get("rejectedCandidateCount"),
+        )
+        return result
+    except Exception as error:
+        log_runtime_exception("compile_projection_plan", getattr(req, "requestId", None), error)
+        raise HTTPException(status_code=500, detail={"error": str(error), "trace": traceback.format_exc()})
 
 @web_app.post("/api/v1/compile_execution_score")
-def compile_execution_score(request: CompileExecutionScoreRequest, x_internal_secret: Optional[str] = Header(None)):
-    verify_internal_secret(x_internal_secret)
-    execution_score = build_execution_score(request)
-    return {
-        "status": "compiled",
-        "translator_version": TRANSLATOR_VERSION,
-        "execution_score": execution_score,
-        "details": execution_score["details"],
-    }
+def compile_execution_score(req: CompileScoreRequest, x_internal_secret: Optional[str] = Header(None)):
+    try:
+        log_route_start("compile_execution_score", req.requestId)
+        verify_internal_secret(x_internal_secret)
+        # Fast placeholder score
+        result = {
+            "status": "ok",
+            "execution_score": {
+                "metadata": {"request_id": req.requestId, "created_at": datetime.now(timezone.utc).isoformat()},
+                "source": {"uris": req.context.get("rawSourceUris", [])},
+                "pnc_logic": {"virtual_silver": [{"op": "harmonize"}]},
+                "analysis_goal": {"metrics": ["count"]},
+                "infrastructure": {"engine": "modal", "min_workers": 1, "max_workers": 24}
+            }
+        }
+        log_route_success("compile_execution_score", req.requestId, source_uri_count=len(req.context.get("rawSourceUris", [])))
+        return result
+    except Exception as error:
+        log_runtime_exception("compile_execution_score", getattr(req, "requestId", None), error)
+        raise HTTPException(status_code=500, detail=str(error))
 
+@web_app.post("/api/v1/align_execution_score")
+def align_execution_score(req: Dict[str, Any], x_internal_secret: Optional[str] = Header(None)):
+    try:
+        request_id = req.get("requestId") or req.get("executionScore", {}).get("metadata", {}).get("request_id")
+        log_route_start("align_execution_score", request_id)
+        verify_internal_secret(x_internal_secret)
+        result = align_score_logic(req.get("executionScore", {}))
+        log_route_success("align_execution_score", request_id, aligned=result.get("aligned"), should_replan=result.get("shouldReplan"))
+        return result
+    except Exception as error:
+        request_id = req.get("requestId") or req.get("executionScore", {}).get("metadata", {}).get("request_id")
+        log_runtime_exception("align_execution_score", request_id, error)
+        raise HTTPException(status_code=500, detail=str(error))
 
 @web_app.get("/health")
 def health():
-    return {"status": "ok", "service": "statsparrot-pne", "translator_version": TRANSLATOR_VERSION}
+    return {"status": "ok", "version": TRANSLATOR_VERSION}
 
-
-@app.function(image=image, timeout=300)
+@app.function(
+    image=image, 
+    cpu=4.0,
+    memory=16384,
+    secrets=[modal.Secret.from_name("sentry-r2-secrets")], 
+    timeout=300
+)
 @modal.asgi_app()
 def fastapi_app():
     return web_app
-
-
-@app.local_entrypoint()
-def main():
-    print("StatsParrot PNE is ready.")
-    print("Deploy: modal deploy modal_apps/pne.py")
-    print("Serve:  modal serve modal_apps/pne.py")

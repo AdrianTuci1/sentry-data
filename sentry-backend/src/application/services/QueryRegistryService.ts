@@ -127,17 +127,27 @@ export class QueryRegistryService {
 
     public async loadRegistry(tenantId: string, projectId: string): Promise<QueryRegistryDocument> {
         const key = this.r2StorageService.getS3Key(tenantId, projectId, 'queries', 'registry.json');
+        const parsed = await this.r2StorageService.getJsonIfExists<QueryRegistryDocument>(key);
+
+        if (!parsed) {
+            console.info(
+                `[QueryRegistryService] No query registry found for ${tenantId}/${projectId}. Creating a new registry on this run.`
+            );
+            return this.buildEmptyRegistry();
+        }
 
         try {
-            const content = await this.r2StorageService.getFileContent(key);
-            const parsed = JSON.parse(content) as QueryRegistryDocument;
             return {
                 version: 1,
                 updatedAt: parsed.updatedAt || new Date().toISOString(),
                 lastRequestId: parsed.lastRequestId || '',
                 queries: parsed.queries || {}
             };
-        } catch {
+        } catch (error) {
+            console.warn(
+                `[QueryRegistryService] Query registry for ${tenantId}/${projectId} is invalid. Rebuilding it on this run.`,
+                error
+            );
             return this.buildEmptyRegistry();
         }
     }

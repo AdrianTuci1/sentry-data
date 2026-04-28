@@ -55,7 +55,7 @@ def _run_training_job(
     sys.path.insert(0, "/root/ml-lab")
 
     from sentinel_training import TrainingConfig, train, upload_directory_to_r2
-    from training.sentinel.io import default_model_bundle_uri, default_r2_bucket, default_training_bundle_uri, parse_s3_uri
+    from training.sentinel.io import default_model_bundle_uri, default_r2_bucket, default_training_bundle_uri, parse_s3_uri, delete_prefix_in_r2
 
     bundle_dir = "/checkpoints/training_bundle"
     output_dir = "/checkpoints/sentinel"
@@ -104,6 +104,17 @@ def _run_training_job(
             )
             result["r2"] = uploaded
             result["model_bundle_uri"] = f"s3://{bucket}/{prefix}"
+
+            # Industrial Upgrade: Update the 'latest' pointer in R2
+            latest_prefix = f"{os.path.dirname(prefix)}/latest"
+            print(f"Updating 'latest' model pointer at s3://{bucket}/{latest_prefix}...")
+            delete_prefix_in_r2(bucket, latest_prefix)
+            upload_directory_to_r2(
+                local_dir=Path(result["artifact_dir"]),
+                bucket=bucket,
+                prefix=latest_prefix,
+            )
+            result["latest_bundle_uri"] = f"s3://{bucket}/{latest_prefix}"
 
     volume.commit()
     print(result)

@@ -82,6 +82,45 @@ export class AnalyticsService {
         };
     }
 
+    private normalizeWidgetPayload(mappedData: any, rawRows: any[] = []): { data: any; results: any[] } {
+        if (mappedData && typeof mappedData === 'object' && !Array.isArray(mappedData)) {
+            return {
+                data: mappedData.data !== undefined ? mappedData.data : mappedData,
+                results: Array.isArray(mappedData.results) ? mappedData.results : rawRows
+            };
+        }
+
+        return {
+            data: mappedData,
+            results: rawRows
+        };
+    }
+
+    private normalizeDashboardInstances(widgets: any[] = []): any[] {
+        const seenIds = new Map<string, number>();
+
+        return widgets.map((widget: any, index: number) => {
+            const baseId = String(
+                widget?.id
+                || widget?.widgetInstanceId
+                || widget?.runtimeWidgetId
+                || widget?.type
+                || widget?.widget_type
+                || `widget-${index + 1}`
+            ).trim();
+            const duplicateCount = (seenIds.get(baseId) || 0) + 1;
+            seenIds.set(baseId, duplicateCount);
+            const instanceId = duplicateCount === 1 ? baseId : `${baseId}--${duplicateCount}`;
+
+            return {
+                ...widget,
+                id: instanceId,
+                runtimeWidgetId: widget?.runtimeWidgetId || baseId,
+                widgetInstanceId: widget?.widgetInstanceId || instanceId
+            };
+        });
+    }
+
     /**
      * The core orchestration method (Global snapshot).
      */
@@ -98,7 +137,7 @@ export class AnalyticsService {
         try {
             const workerResult = await this.executeQueriesWithCache(tenantId, project, project.queryConfigs);
             const rawMetadata = project.discoveryMetadata?.insight || project.discoveryMetadata?.dashboards || [];
-            const metadataDashboards = WidgetDataMapper.unmarshall(rawMetadata) || [];
+            const metadataDashboards = this.normalizeDashboardInstances(WidgetDataMapper.unmarshall(rawMetadata) || []);
 
             if (Array.isArray(metadataDashboards)) {
                 console.log(`[AnalyticsService] Found ${metadataDashboards.length} insight widgets. Types: ${metadataDashboards.map((w: any) => w?.type || w?.widget_type || 'NO_TYPE').join(', ')}`);
@@ -112,7 +151,8 @@ export class AnalyticsService {
 
             const enrichedDashboards = await Promise.all(metadataDashboards.map(async (widget: any) => {
                 if (!widget) return { id: 'err', title: 'Error', isMock: true };
-                const result = workerResult?.results?.find((r: any) => r?.widgetId === widget.id);
+                const runtimeWidgetId = widget.runtimeWidgetId || widget.id;
+                const result = workerResult?.results?.find((r: any) => r?.widgetId === runtimeWidgetId);
 
                 // Resolve widget type: insights may use `type` or `widget_type`
                 const widgetType = widget.type || widget.widget_type || widget.id;
@@ -136,11 +176,13 @@ export class AnalyticsService {
                     };
                 }
 
-                const mappedData = WidgetDataMapper.map(widgetType, result.data);
+                const mappedData = WidgetDataMapper.map(widgetType, result.data, definition);
+                const normalizedPayload = this.normalizeWidgetPayload(mappedData, result.data);
 
                 return {
                     ...baseWidget,
-                    data: mappedData,
+                    data: normalizedPayload.data,
+                    results: normalizedPayload.results,
                     isMock: false,
                     latency: result.latency_ms,
                     cache: {
@@ -240,16 +282,19 @@ export class AnalyticsService {
 
         if (!definition) {
             console.warn(`[AnalyticsService] Definition NOT FOUND for type: ${widgetType}`);
-            const mappedData = WidgetDataMapper.map(widgetType, result?.data || []);
+            const mappedData = WidgetDataMapper.map(widgetType, result?.data || [], undefined);
+            const normalizedPayload = this.normalizeWidgetPayload(mappedData, result?.data || []);
             const meta = (widgetMetadata || {}) as any;
             return {
                 ...this.buildWidgetShell(meta),
-                data: mappedData,
+                data: normalizedPayload.data,
+                results: normalizedPayload.results,
                 isMock: Array.isArray(result?.data) && result.data.length === 0
             };
         }
 
-        const mappedData = WidgetDataMapper.map(widgetType, result.data);
+        const mappedData = WidgetDataMapper.map(widgetType, result.data, definition);
+        const normalizedPayload = this.normalizeWidgetPayload(mappedData, result.data);
 
         return {
             id: widgetMetadata.id,
@@ -257,7 +302,8 @@ export class AnalyticsService {
             title: widgetMetadata.title || definition.title || widgetType,
             gridSpan: widgetMetadata.grid_span || widgetMetadata.gridSpan || definition.grid_span || 'col-span-1',
             colorTheme: widgetMetadata.color_theme || widgetMetadata.colorTheme || definition.color_theme || 'theme-productivity',
-            data: mappedData,
+            data: normalizedPayload.data,
+            results: normalizedPayload.results,
             isMock: (Array.isArray(result.data) && result.data.length === 0),
             cache: {
                 hit: result.cache_hit === true,

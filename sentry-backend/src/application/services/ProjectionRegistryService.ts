@@ -165,24 +165,38 @@ export class ProjectionRegistryService {
 
     public async loadRegistry(tenantId: string, projectId: string): Promise<ProjectionRegistryDocument> {
         const key = this.r2StorageService.getS3Key(tenantId, projectId, 'projections', 'registry.json');
+        const parsed = await this.r2StorageService.getJsonIfExists<ProjectionRegistryDocument>(key);
+
+        if (!parsed) {
+            console.info(
+                `[ProjectionRegistryService] No projection registry found for ${tenantId}/${projectId}. Creating a new registry on this run.`
+            );
+            return this.buildEmptyRegistry();
+        }
 
         try {
-            const content = await this.r2StorageService.getFileContent(key);
-            const parsed = JSON.parse(content) as ProjectionRegistryDocument;
             return {
                 version: 1,
                 updatedAt: parsed.updatedAt || new Date().toISOString(),
                 lastRequestId: parsed.lastRequestId || '',
                 projections: parsed.projections || {},
             };
-        } catch {
-            return {
-                version: 1,
-                updatedAt: new Date().toISOString(),
-                lastRequestId: '',
-                projections: {},
-            };
+        } catch (error) {
+            console.warn(
+                `[ProjectionRegistryService] Projection registry for ${tenantId}/${projectId} is invalid. Rebuilding it on this run.`,
+                error
+            );
+            return this.buildEmptyRegistry();
         }
+    }
+
+    private buildEmptyRegistry(): ProjectionRegistryDocument {
+        return {
+            version: 1,
+            updatedAt: new Date().toISOString(),
+            lastRequestId: '',
+            projections: {},
+        };
     }
 
     private findInvalidation(projectionSpec: ParrotProjectionSpec, invalidationHints: ParrotInvalidationHint[]): ParrotInvalidationHint | undefined {

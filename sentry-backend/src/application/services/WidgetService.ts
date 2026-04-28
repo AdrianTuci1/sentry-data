@@ -28,7 +28,7 @@ export class WidgetService {
     private cache: Map<string, WidgetDefinition> = new Map();
     private catalogPromise: Promise<void> | null = null;
 
-    constructor(private r2Storage: R2StorageService) {}
+    constructor(private r2Storage: R2StorageService) { }
 
     /**
      * Clears the internal cache, forcing a re-discovery on the next request.
@@ -51,7 +51,7 @@ export class WidgetService {
             try {
                 // Flat listing of EVERYTHING under system/r2-system/widgets/
                 const allKeys = await this.r2Storage.listAllUnder(this.r2Prefix);
-                
+
                 // We search for manifests: .../widgets/{category}/{id}/manifest.yml
                 const manifestKeys = allKeys.filter(key => key.endsWith('manifest.yml'));
                 console.log(`[WidgetService] Found ${manifestKeys.length} potential manifest files.`);
@@ -61,19 +61,19 @@ export class WidgetService {
                         // Extract category and ID from path
                         const relativePath = key.replace(this.r2Prefix, '');
                         const parts = relativePath.split('/');
-                        
-                        if (parts.length < 3) continue; 
-                        
+
+                        if (parts.length < 3) continue;
+
                         const cat = parts[0];
                         const widgetId = parts[1];
 
                         const contentStr = await this.r2Storage.getFileContent(key);
                         if (contentStr) {
                             const content = yaml.load(contentStr) as any;
-                            const definition: WidgetDefinition = { 
-                                id: widgetId, 
-                                category: cat, 
-                                ...content 
+                            const definition: WidgetDefinition = {
+                                id: widgetId,
+                                category: cat,
+                                ...content
                             };
                             this.cache.set(widgetId, definition);
                             console.log(`[WidgetService] Cached: [${cat}] ${widgetId}`);

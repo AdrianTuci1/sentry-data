@@ -1,7 +1,7 @@
 import { S3Client } from '@aws-sdk/client-s3';
 import { execFileSync } from 'child_process';
 import path from 'path';
-import { createR2Client, Logger, REPO_ROOT, uploadDirectory, WIDGETS_BUCKET_PREFIX } from './r2_artifacts';
+import { createR2Client, Logger, REPO_ROOT, uploadDirectory, R2_SYSTEM_PREFIX, WIDGETS_BUCKET_PREFIX } from './r2_artifacts';
 
 interface DeployWidgetsOptions {
     s3Client?: S3Client;
@@ -9,7 +9,8 @@ interface DeployWidgetsOptions {
     generateArtifacts?: boolean;
 }
 
-const WIDGETS_LOCAL_DIR = path.join(REPO_ROOT, 'r2-system', 'widgets');
+const R2_SYSTEM_LOCAL_DIR = path.join(REPO_ROOT, 'r2-system');
+const WIDGETS_LOCAL_DIR = path.join(R2_SYSTEM_LOCAL_DIR, 'widgets');
 const WIDGET_ARTIFACT_SCRIPT = path.join(WIDGETS_LOCAL_DIR, 'generate-artifacts.mjs');
 
 export function generateWidgetArtifacts(logger: Logger = console): void {
@@ -32,8 +33,21 @@ export async function deployWidgetsToR2(options: DeployWidgetsOptions = {}): Pro
     await uploadDirectory(WIDGETS_LOCAL_DIR, WIDGETS_BUCKET_PREFIX, s3Client, logger);
 }
 
+export async function deployR2System(options: DeployWidgetsOptions = {}): Promise<void> {
+    const logger = options.logger || console;
+    const s3Client = options.s3Client || createR2Client();
+
+    if (options.generateArtifacts !== false) {
+        generateWidgetArtifacts(logger);
+    }
+
+    logger.log(`[R2 System] Uploading ${path.relative(REPO_ROOT, R2_SYSTEM_LOCAL_DIR)} to ${R2_SYSTEM_PREFIX}...`);
+    await uploadDirectory(R2_SYSTEM_LOCAL_DIR, R2_SYSTEM_PREFIX, s3Client, logger);
+}
+
 export {
     REPO_ROOT,
+    R2_SYSTEM_PREFIX,
     WIDGETS_BUCKET_PREFIX,
     WIDGETS_LOCAL_DIR,
     WIDGET_ARTIFACT_SCRIPT,

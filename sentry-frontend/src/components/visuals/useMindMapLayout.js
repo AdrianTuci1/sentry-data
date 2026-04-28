@@ -19,6 +19,30 @@ const COLUMN_GAPS = {
     groupToCard: 110
 };
 
+const normalizeFieldName = (value = '') => String(value || '').trim().toLowerCase();
+
+const getInsightFieldUsage = (insightEntry = {}) => {
+    const lineageEntries = insightEntry.lineage?.gold_fields || [];
+
+    if (lineageEntries.length > 0) {
+        return lineageEntries
+            .map((entry) => ({
+                sourceKey: entry?.source_key,
+                columns: Array.from(new Set((entry?.columns || []).filter(Boolean)))
+            }))
+            .filter((entry) => entry.sourceKey && entry.columns.length > 0);
+    }
+
+    const fallbackColumns = Array.from(new Set((insightEntry.adjusted_data_columns || []).filter(Boolean)));
+    return (insightEntry.lineage?.source_keys || [])
+        .filter(Boolean)
+        .map((sourceKey) => ({
+            sourceKey,
+            columns: fallbackColumns
+        }))
+        .filter((entry) => entry.columns.length > 0);
+};
+
 export const calculateMindMapStats = ({
     connector = [],
     actionType = [],
@@ -238,11 +262,12 @@ export const buildMindMapLayout = ({
                 target: { x: X_INSIGHT, y: insightNode.y }
             });
 
-            (insightEntry.adjusted_data_columns || []).forEach((adjustedColumnName) => {
+            getInsightFieldUsage(insightEntry).forEach((usage) => {
+                const usageColumns = new Set(usage.columns.map((columnName) => normalizeFieldName(columnName)));
                 const categoryNode = nodes.find((node) => (
                     node.type === 'category'
-                    && (insightEntry.lineage?.source_keys || []).some((sourceId) => node.id === `adj-${sourceId}`)
-                    && (node.data?.columns || []).some((column) => column.name === adjustedColumnName)
+                    && node.id === `adj-${usage.sourceKey}`
+                    && (node.data?.columns || []).some((column) => usageColumns.has(normalizeFieldName(column.name)))
                 ));
 
                 if (!categoryNode) {

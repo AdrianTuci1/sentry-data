@@ -5,7 +5,7 @@ from pathlib import Path
 # Adăugăm ml-lab la path pentru a putea importa modulele interne
 sys.path.insert(0, str(Path(__file__).parent))
 
-from training.sentinel.io import default_r2_bucket, delete_prefix_in_r2, upload_directory_to_r2
+from training.sentinel.io import default_r2_bucket, delete_prefix_in_r2, upload_directory_to_r2, DEFAULT_TRAINING_BUNDLE_PREFIX
 try:
     from dotenv import load_dotenv
     load_dotenv()
@@ -13,10 +13,10 @@ except ImportError:
     pass
 
 # Configurație
-LOCAL_BUNDLE_DIR = Path(".generated/golden_bundle")
+LOCAL_BUNDLE_DIR = Path(".generated/training_bundle")
 # Preluăm bucket-ul corect din .env (R2_BUCKET_DATA)
 BUCKET = default_r2_bucket() or "statsparrot-data"
-PREFIX = "training-bundles/golden-bundle-v1"
+PREFIX = DEFAULT_TRAINING_BUNDLE_PREFIX
 
 def main():
     if not LOCAL_BUNDLE_DIR.exists():

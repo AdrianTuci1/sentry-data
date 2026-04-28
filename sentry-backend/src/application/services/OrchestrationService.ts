@@ -1,5 +1,6 @@
 import { ProjectRepository } from '../../infrastructure/repositories/ProjectRepository';
 import { SSEManager } from '../../services/sse/SSEManager';
+import { ParrotProjectionPlan, ParrotQuerySpec, ParrotSentinelModelSignal } from '../../types/parrot';
 import { RuntimeContext, RuntimeVitals } from '../../types/runtime';
 import { ParrotRuntimeService } from './ParrotRuntimeService';
 import { BronzeDiscoveryService } from './BronzeDiscoveryService';
@@ -171,6 +172,7 @@ export class OrchestrationService {
             );
             projectionPlan.invalidationHints = fullInvalidationHints;
             projectionPlan.sentinelModelSignals = this.parrotRuntimeService.getLastSentinelModelSignals();
+            this.applySentinelBusinessRelevanceFilter(projectionPlan);
             this.emitRuntimeMindmapPartial(tenantId, parrotBootstrap.requestId, 'projection_plan', {
                 ...this.buildRuntimeMindmapPatch(sourceProfiles, projectionPlan),
                 projectionPlanPreview: {
@@ -364,6 +366,92 @@ export class OrchestrationService {
     }
 
     private buildRuntimeMindmapPatch(sourceProfiles: any[], projectionPlan?: any): any {
+        const isMlEligible = (profile: any) => (
+            (profile.metricCandidates?.length || 0) > 0
+            && (((profile.entityKeyCandidates?.length || 0) > 0) || ((profile.timestampCandidates?.length || 0) > 0))
+        );
+        const isReverseEtlEligible = (profile: any) => (
+            (profile.metricCandidates?.length || 0) > 0
+            && (profile.entityKeyCandidates?.length || 0) > 0
+        );
+        const dedupeStrings = (values: any[]) => Array.from(new Set((values || []).filter(Boolean)));
+        const getOperationalGroupId = (sourceId: string) => `grp-${sourceId}-operational`;
+        const getMlGroupId = (sourceId: string) => `grp-${sourceId}-ml-recommended`;
+        const getReverseGroupId = (sourceId: string) => `grp-${sourceId}-reverse-etl-recommended`;
+        const getPrimaryViewId = (profile: any) => (
+            (profile.goldViews || []).find((view: any) => String(view.id || '').endsWith('-core'))?.id
+            || (profile.goldViews || [])[0]?.id
+        );
+        const getMetricViewId = (profile: any) => (
+            (profile.goldViews || []).find((view: any) => String(view.id || '').endsWith('-metrics'))?.id
+            || getPrimaryViewId(profile)
+        );
+        const getViewColumns = (view: any) => (
+            (view?.columns || []).map((column: any) => column?.name).filter(Boolean)
+        );
+        const resolveBestViewId = (profile: any, columns: string[] = [], preferredViewId?: string) => {
+            const cleanedColumns = dedupeStrings(columns);
+            const preferredView = (profile.goldViews || []).find((view: any) => view.id === preferredViewId);
+            if (cleanedColumns.length === 0) {
+                return preferredView?.id || getPrimaryViewId(profile);
+            }
+
+            const scoredViews = (profile.goldViews || [])
+                .map((view: any) => {
+                    const viewColumns = new Set(getViewColumns(view));
+                    const overlapCount = cleanedColumns.filter((column) => viewColumns.has(column)).length;
+                    return {
+                        view,
+                        overlapCount,
+                        isFullMatch: cleanedColumns.every((column) => viewColumns.has(column)),
+                        columnCount: viewColumns.size
+                    };
+                })
+                .filter((entry: any) => entry.overlapCount > 0);
+
+            const fullMatches = scoredViews
+                .filter((entry: any) => entry.isFullMatch)
+                .sort((left: any, right: any) => left.columnCount - right.columnCount || String(left.view.id).localeCompare(String(right.view.id)));
+
+            if (fullMatches.length > 0) {
+                if (preferredView && fullMatches.some((entry: any) => entry.view.id === preferredView.id)) {
+                    return preferredView.id;
+                }
+
+                return fullMatches[0].view.id;
+            }
+
+            if (preferredView) {
+                return preferredView.id;
+            }
+
+            const bestPartialMatch = scoredViews
+                .sort((left: any, right: any) => right.overlapCount - left.overlapCount || left.columnCount - right.columnCount)[0];
+
+            return bestPartialMatch?.view?.id || getPrimaryViewId(profile);
+        };
+        const resolveLineage = (sourceId: string | undefined, preferredViewId: string | undefined, columns: string[] = []) => {
+            const cleanedColumns = dedupeStrings(columns);
+            const profile = sourceProfiles.find((entry: any) => entry.sourceId === sourceId)
+                || sourceProfiles.find((entry: any) => (entry.goldViews || []).some((view: any) => view.id === preferredViewId));
+
+            if (!profile) {
+                return {
+                    sourceKey: preferredViewId,
+                    columns: cleanedColumns
+                };
+            }
+
+            const sourceKey = resolveBestViewId(profile, cleanedColumns, preferredViewId);
+            const resolvedView = (profile.goldViews || []).find((view: any) => view.id === sourceKey);
+            const resolvedColumns = cleanedColumns.filter((column) => getViewColumns(resolvedView).includes(column));
+
+            return {
+                sourceKey,
+                columns: resolvedColumns.length > 0 ? resolvedColumns : cleanedColumns
+            };
+        };
+
         const connector = sourceProfiles.map((profile) => ({
             id: profile.sourceId,
             name: profile.sourceName,
@@ -397,68 +485,149 @@ export class OrchestrationService {
             }))
         })));
 
-        const queryGroup = projectionPlan?.querySpecs?.length
-            ? [{
-                id: 'runtime-query-insights',
-                name: 'Runtime query insights',
-                title: 'Runtime query insights',
-                status: 'ok',
-                color: 'default',
-                activation_mode: 'automatic',
-                adjusted_data_ids: projectionPlan.projectionSpecs?.map((spec: any) => spec.projectionId) || []
-            }]
-            : [];
+        const queryInsights = (projectionPlan?.querySpecs || []).map((querySpec: any) => {
+            const resolvedLineage = resolveLineage(
+                querySpec.sourceId,
+                querySpec.projectionId,
+                querySpec.dependencies?.columns || []
+            );
 
-        const mlGroup = projectionPlan?.mlRecommendations?.length
-            ? [{
-                id: 'runtime-ml-recommendations',
-                name: 'ML recommendations',
-                title: 'ML recommendations',
+            return {
+                id: querySpec.widgetId || querySpec.queryId,
+                title: querySpec.title,
+                type: querySpec.widgetType,
+                widget_type: querySpec.widgetType,
+                group_id: getOperationalGroupId(querySpec.sourceId),
+                status: querySpec.status === 'active' ? 'ok' : 'warning',
+                activationMode: 'automatic',
+                adjusted_data_columns: resolvedLineage.columns,
+                lineage: {
+                    source_keys: [resolvedLineage.sourceKey || querySpec.projectionId].filter(Boolean),
+                    gold_fields: resolvedLineage.sourceKey
+                        ? [{
+                            source_key: resolvedLineage.sourceKey,
+                            columns: resolvedLineage.columns
+                        }]
+                        : []
+                },
+                query: querySpec.sql,
+                sql: querySpec.sql,
+                grid_span: querySpec.gridSpan || 'col-span-1',
+                color_theme: querySpec.colorTheme || querySpec.color_theme || 'theme-audience',
+                footerText: querySpec.executionPolicy?.mode || 'runtime',
+                footerBottom: 'Projection query'
+            };
+        });
+
+        const mlInsights = (projectionPlan?.mlRecommendations || []).map((recommendation: any) => {
+            const resolvedLineage = resolveLineage(
+                recommendation.sourceId,
+                recommendation.projectionId,
+                [
+                    ...(recommendation.targetColumn ? [recommendation.targetColumn] : []),
+                    ...(recommendation.featureColumns || [])
+                ]
+            );
+
+            return {
+                id: recommendation.recommendationId,
+                title: recommendation.title,
+                type: recommendation.taskType,
+                widget_type: 'predictive',
+                group_id: getMlGroupId(recommendation.sourceId),
                 status: 'warning',
-                color: 'blue',
-                activation_mode: 'manual',
-                adjusted_data_ids: projectionPlan.mlRecommendations.map((recommendation: any) => recommendation.projectionId)
-            }]
-            : [];
+                activationMode: 'manual',
+                adjusted_data_columns: resolvedLineage.columns,
+                lineage: {
+                    source_keys: [resolvedLineage.sourceKey || recommendation.projectionId].filter(Boolean),
+                    gold_fields: resolvedLineage.sourceKey
+                        ? [{
+                            source_key: resolvedLineage.sourceKey,
+                            columns: resolvedLineage.columns
+                        }]
+                        : []
+                },
+                color_theme: recommendation.colorTheme || recommendation.color_theme || 'theme-productivity',
+                footerText: 'Manual approval',
+                footerBottom: recommendation.scaffoldId || 'ML scaffold'
+            };
+        });
 
-        const queryInsights = (projectionPlan?.querySpecs || []).map((querySpec: any) => ({
-            id: querySpec.widgetId || querySpec.queryId,
-            title: querySpec.title,
-            type: querySpec.widgetType,
-            widget_type: querySpec.widgetType,
-            group_id: 'runtime-query-insights',
-            status: querySpec.status === 'active' ? 'ok' : 'warning',
-            activationMode: 'automatic',
-            adjusted_data_columns: querySpec.dependencies?.columns || [],
-            query: querySpec.sql,
-            sql: querySpec.sql,
-            grid_span: 'col-span-1',
-            color_theme: 'theme-audience',
-            footerText: querySpec.executionPolicy?.mode || 'runtime',
-            footerBottom: 'Projection query'
-        }));
+        const group = sourceProfiles.flatMap((profile) => {
+            const sourceQueries = (projectionPlan?.querySpecs || []).filter((querySpec: any) => querySpec.sourceId === profile.sourceId);
+            const sourceRecommendations = (projectionPlan?.mlRecommendations || []).filter((recommendation: any) => recommendation.sourceId === profile.sourceId);
+            const sourceGroups: any[] = [];
 
-        const mlInsights = (projectionPlan?.mlRecommendations || []).map((recommendation: any) => ({
-            id: recommendation.recommendationId,
-            title: recommendation.title,
-            type: recommendation.taskType,
-            widget_type: 'predictive',
-            group_id: 'runtime-ml-recommendations',
-            status: 'warning',
-            activationMode: 'manual',
-            adjusted_data_columns: recommendation.featureColumns || [],
-            grid_span: 'col-span-1',
-            color_theme: 'theme-productivity',
-            footerText: 'Manual approval',
-            footerBottom: recommendation.scaffoldId || 'ML scaffold'
-        }));
+            if (!projectionPlan || sourceQueries.length > 0) {
+                const adjustedIds = sourceQueries.length > 0
+                    ? dedupeStrings(sourceQueries.map((querySpec: any) => resolveLineage(
+                        querySpec.sourceId,
+                        querySpec.projectionId,
+                        querySpec.dependencies?.columns || []
+                    ).sourceKey))
+                    : (profile.goldViews || []).map((view: any) => view.id);
+
+                sourceGroups.push({
+                    id: getOperationalGroupId(profile.sourceId),
+                    name: `${profile.sourceId}-operational`,
+                    title: `${profile.sourceName} Operational`,
+                    status: 'ok',
+                    color: 'default',
+                    activation_mode: 'automatic',
+                    adjusted_data_ids: adjustedIds
+                });
+            }
+
+            if ((!projectionPlan && isMlEligible(profile)) || sourceRecommendations.length > 0) {
+                const adjustedIds = sourceRecommendations.length > 0
+                    ? dedupeStrings(sourceRecommendations.map((recommendation: any) => resolveLineage(
+                        recommendation.sourceId,
+                        recommendation.projectionId,
+                        [
+                            ...(recommendation.targetColumn ? [recommendation.targetColumn] : []),
+                            ...(recommendation.featureColumns || [])
+                        ]
+                    ).sourceKey))
+                    : dedupeStrings([getMetricViewId(profile)]);
+
+                sourceGroups.push({
+                    id: getMlGroupId(profile.sourceId),
+                    name: `${profile.sourceId}-ml-recommended`,
+                    title: `${profile.sourceName} ML Recommended`,
+                    status: 'warning',
+                    color: 'blue',
+                    activation_mode: 'manual',
+                    adjusted_data_ids: adjustedIds
+                });
+            }
+
+            if (isReverseEtlEligible(profile)) {
+                sourceGroups.push({
+                    id: getReverseGroupId(profile.sourceId),
+                    name: `${profile.sourceId}-reverse-etl-recommended`,
+                    title: `${profile.sourceName} Reverse ETL Recommended`,
+                    status: 'warning',
+                    color: 'blue',
+                    activation_mode: 'manual',
+                    adjusted_data_ids: dedupeStrings([
+                        resolveBestViewId(
+                            profile,
+                            (profile.entityKeyCandidates || []).concat(profile.metricCandidates || []).slice(0, 4),
+                            getMetricViewId(profile)
+                        )
+                    ])
+                });
+            }
+
+            return sourceGroups;
+        });
 
         return {
             connector,
             actionType,
             origin: [],
             adjustedData,
-            group: [...queryGroup, ...mlGroup],
+            group,
             insight: [...queryInsights, ...mlInsights]
         };
     }
@@ -471,8 +640,19 @@ export class OrchestrationService {
             return;
         }
 
+        const compactDiscovery = this.buildCompactDiscoverySnapshot(discovery, project.parrotRuntime);
+        const compactDiscoverySize = this.estimateJsonSizeBytes(compactDiscovery);
+        console.log(
+            `[Orchestrator] Compact discovery snapshot size for ${projectId}: ${compactDiscoverySize} bytes`
+        );
+        if (compactDiscoverySize > 250_000) {
+            console.warn(
+                `[Orchestrator] Compact discovery snapshot for ${projectId} is approaching DynamoDB limits: ${compactDiscoverySize} bytes`
+            );
+        }
+
         // Build queryConfigs from insights discovery
-        const insights = discovery.insight || [];
+        const insights = compactDiscovery.insight || [];
         project.queryConfigs = insights
             .map((db: any) => ({
                 widgetId: db.id,
@@ -486,7 +666,7 @@ export class OrchestrationService {
 
         // Update Project Entity with discovery metadata while keeping user-authored overrides.
         project.discoveryMetadata = {
-            ...discovery,
+            ...compactDiscovery,
             decisionOverrides: preservedOverrides
         };
         project.status = 'active';
@@ -514,5 +694,99 @@ export class OrchestrationService {
         this.sseManager.broadcastToTenant(project.tenantId, 'discovery_updated', {
             projectId: project.projectId
         });
+    }
+
+    private applySentinelBusinessRelevanceFilter(projectionPlan: ParrotProjectionPlan): void {
+        const signals: ParrotSentinelModelSignal[] = Array.isArray(projectionPlan?.sentinelModelSignals)
+            ? projectionPlan.sentinelModelSignals
+            : [];
+        const filteredQueryIds = new Set(
+            signals
+                .filter((signal: ParrotSentinelModelSignal) =>
+                    signal.modelName === 'BusinessRelevanceModel'
+                    && signal.targetType === 'query'
+                    && signal.score < 0.35
+                )
+                .map((signal: ParrotSentinelModelSignal) => signal.targetId)
+        );
+
+        if (filteredQueryIds.size === 0) {
+            return;
+        }
+
+        projectionPlan.querySpecs = (projectionPlan.querySpecs || []).filter((querySpec: ParrotQuerySpec) => !filteredQueryIds.has(querySpec.queryId));
+
+        const details = (projectionPlan.summary?.details || {}) as Record<string, unknown>;
+        const existingWarnings = Array.isArray(details.warnings) ? details.warnings.map((warning) => String(warning)) : [];
+        if (!existingWarnings.includes(`sentinel_filtered_queries:${filteredQueryIds.size}`)) {
+            existingWarnings.push(`sentinel_filtered_queries:${filteredQueryIds.size}`);
+        }
+
+        if (projectionPlan.summary) {
+            projectionPlan.summary.details = {
+                ...details,
+                queryCount: projectionPlan.querySpecs.length,
+                warnings: existingWarnings,
+                sentinelFilteredQueryCount: filteredQueryIds.size,
+                sentinelFilteredQueryIds: [...filteredQueryIds]
+            };
+
+            projectionPlan.summary.text = [
+                projectionPlan.summary.text,
+                `Sentinel filtered ${filteredQueryIds.size} low-relevance dashboard query${filteredQueryIds.size === 1 ? '' : 'ies'}.`
+            ].join(' ');
+        }
+    }
+
+    private buildCompactDiscoverySnapshot(discovery: any, runtimeMetadata?: any): any {
+        const sourceMetadata = Array.isArray(discovery?.sourceMetadata)
+            ? discovery.sourceMetadata.map((profile: any) => ({
+                sourceId: profile.sourceId,
+                sourceName: profile.sourceName,
+                sourceType: profile.sourceType,
+                connectorId: profile.connectorId,
+                iconPath: profile.iconPath,
+                uri: profile.uri,
+                metadataUri: profile.metadataUri,
+                fingerprint: profile.fingerprint,
+                entityKeyCandidates: profile.entityKeyCandidates || [],
+                timestampCandidates: profile.timestampCandidates || [],
+                metricCandidates: profile.metricCandidates || [],
+                transformations: profile.transformations || [],
+                goldViews: profile.goldViews || []
+            }))
+            : [];
+
+        return {
+            connector: discovery?.connector || [],
+            actionType: discovery?.actionType || [],
+            origin: discovery?.origin || [],
+            adjustedData: discovery?.adjustedData || [],
+            group: discovery?.group || [],
+            insight: discovery?.insight || [],
+            sourceMetadata,
+            projectionSpecs: discovery?.projectionSpecs || discovery?.projectionPlan?.projectionSpecs || [],
+            querySpecs: discovery?.querySpecs || discovery?.projectionPlan?.querySpecs || [],
+            mlRecommendations: discovery?.mlRecommendations || discovery?.projectionPlan?.mlRecommendations || [],
+            invalidationHints: discovery?.invalidationHints || discovery?.projectionPlan?.invalidationHints || [],
+            sentinelModelSignals: discovery?.sentinelModelSignals || discovery?.projectionPlan?.sentinelModelSignals || [],
+            sentinelPolicyState: discovery?.sentinelPolicyState,
+            metadataArtifacts: discovery?.metadataArtifacts || {
+                requestId: runtimeMetadata?.lastRequestId,
+                mindmapYamlUri: runtimeMetadata?.mindmapYamlUri,
+                mindmapManifestUri: runtimeMetadata?.mindmapManifestUri,
+                projectionPlanUri: runtimeMetadata?.projectionPlanUri,
+                queryRegistryUri: runtimeMetadata?.queryRegistryUri,
+                projectionRegistryUri: runtimeMetadata?.projectionRegistryUri
+            }
+        };
+    }
+
+    private estimateJsonSizeBytes(value: unknown): number {
+        try {
+            return Buffer.byteLength(JSON.stringify(value ?? {}), 'utf8');
+        } catch {
+            return 0;
+        }
     }
 }

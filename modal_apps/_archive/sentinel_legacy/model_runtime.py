@@ -1,16 +1,23 @@
 import json
 import os
 import pickle
+import zlib
+import numpy as np
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from .config import MODEL_DOWNLOAD_DIR, MODEL_VOLUME_DIR
 from .drift_model import RNNDriftPredictor
 
-_drift_predictor = None
-_drift_predictor_details: Dict[str, Any] = {"status": "not_loaded"}
 _sentinel_models: Dict[str, Any] = {}
-_sentinel_model_details: Dict[str, Any] = {"status": "not_loaded", "models": {}}
+_sentinel_model_details: Dict[str, Any] = {}
+_drift_predictor = None
+_drift_predictor_details: Dict[str, Any] = {}
+
+# Dynamic Semantic Mappings (populated from manifest)
+_role_to_idx: Dict[str, float] = {}
+_family_to_idx: Dict[str, float] = {}
 
 
 def parse_s3_uri(uri: str) -> tuple[str, str]:
@@ -101,7 +108,7 @@ def drift_predictor_details() -> Dict[str, Any]:
 def hash_bucket(value: object, buckets: int = 997) -> float:
     if value is None:
         return 0.0
-    return (sum(ord(character) for character in str(value)) % buckets) / float(buckets)
+    return (zlib.adler32(str(value).encode("utf-8")) % buckets) / float(buckets)
 
 
 def numeric(value: object, default: float = 0.0) -> float:
@@ -113,25 +120,21 @@ def numeric(value: object, default: float = 0.0) -> float:
         return default
 
 
-def source_coverage_features(profile: Dict[str, Any]) -> List[float]:
-    schema = profile.get("schema") or []
+def source_coverage_features(source: Dict[str, Any]) -> List[float]:
+    schema = source.get("schema") or []
     schema_rows = schema if isinstance(schema, list) else []
     names = [str(column.get("name", "")).lower() for column in schema_rows if isinstance(column, dict)]
-    dtypes = [str(column.get("dtype") or column.get("type") or "").lower() for column in schema_rows if isinstance(column, dict)]
-    null_ratios = [numeric(column.get("nullable_ratio") or column.get("nullableRatio")) for column in schema_rows if isinstance(column, dict)]
-    metrics = profile.get("metricCandidates") or profile.get("metric_candidates") or []
-    timestamps = profile.get("timestampCandidates") or profile.get("timestamp_candidates") or []
-    entity_keys = profile.get("entityKeyCandidates") or profile.get("entity_key_candidates") or []
-    metric_count = len(metrics) or sum(any(token in name for token in ["revenue", "cost", "count", "rate", "score", "latency", "amount", "usage", "mrr", "arr"]) for name in names)
-    temporal_count = len(timestamps) or sum(any(token in name for token in ["date", "time", "timestamp", "created", "updated"]) for name in names)
-    entity_count = len(entity_keys) or sum(any(token in name for token in ["id", "account", "customer", "user", "tenant", "device"]) for name in names)
-    numeric_count = sum(any(token in dtype for token in ["int", "float", "double", "number", "bool"]) for dtype in dtypes)
-    storage_metrics = profile.get("storageMetrics") or profile.get("storage_metrics") or {}
-    row_count = storage_metrics.get("rowCountEstimate") or storage_metrics.get("row_count_estimate") or len(profile.get("sampleRows") or profile.get("sample_rows") or [])
-    avg_null = float(sum(null_ratios) / len(null_ratios)) if null_ratios else safe_null_ratio(profile.get("sampleRows") or profile.get("sample_rows") or [])
-    max_null = max(null_ratios) if null_ratios else avg_null
+    dtypes = [str(column.get("dtype", "")).lower() for column in schema_rows if isinstance(column, dict)]
+    null_ratios = [numeric(column.get("nullable_ratio")) for column in schema_rows if isinstance(column, dict)]
+    metric_count = sum(any(token in name for token in ["revenue", "cost", "count", "rate", "score", "latency", "amount", "usage", "mrr", "arr"]) for name in names)
+    temporal_count = sum(any(token in name for token in ["date", "time", "timestamp", "created", "updated"]) for name in names)
+    entity_count = sum(any(token in name for token in ["id", "account", "customer", "user", "tenant", "device"]) for name in names)
+    numeric_count = sum(any(token in dtype for token in ["int", "float", "double", "bool"]) for dtype in dtypes)
+    avg_null = float(sum(null_ratios) / len(null_ratios)) if null_ratios else 0.0
+    max_null = max(null_ratios) if null_ratios else 0.0
+    
     return [
-        numeric(row_count) / 1000.0,
+        numeric(source.get("row_count") or (source.get("storageMetrics") or {}).get("rowCountEstimate")) / 1000.0,
         len(schema_rows) / 100.0,
         metric_count / 20.0,
         temporal_count / 10.0,
@@ -139,14 +142,18 @@ def source_coverage_features(profile: Dict[str, Any]) -> List[float]:
         numeric_count / 50.0,
         avg_null,
         max_null,
-        hash_bucket(profile.get("domain") or profile.get("sourceType") or profile.get("source_type")),
-        hash_bucket(profile.get("grain")),
+        0.0, # Placeholder for freshness
+        0.0, # Placeholder for availability
     ]
 
 
 def query_risk_features(query: Dict[str, Any]) -> List[float]:
     sql = str(query.get("sql") or query.get("instruction") or "").lower()
-    risky_tokens = ["drop", "delete", "update", "insert", "copy", "httpfs_secret", "pragma", "attach", "union"]
+    risky_tokens = [
+        "drop", "delete", "update", "insert", "copy", "httpfs_secret", 
+        "pragma", "attach", "union", "limit 0", "cross join", 
+        "pg_sleep", "sleep(", "system.", "information_schema", "benchmark"
+    ]
     return [
         len(sql) / 4000.0,
         sum(token in sql for token in risky_tokens) / len(risky_tokens),
@@ -163,24 +170,33 @@ def query_risk_features(query: Dict[str, Any]) -> List[float]:
 
 def interaction_policy_features(payload: Dict[str, Any], policy_state: Optional[Dict[str, Any]] = None) -> List[float]:
     policy_state = policy_state or {}
+    policy_adjustment = payload.get("policy_adjustment") if isinstance(payload.get("policy_adjustment"), dict) else {}
     feature_columns = payload.get("featureColumns") or payload.get("feature_columns") or []
     domains = payload.get("detected_domains") or payload.get("domains") or []
+    
+    field_role = payload.get("field_role") or "dimension"
+    widget_family = payload.get("widget_family") or "table"
+    is_hinted = 1.0 if payload.get("is_hinted_match") else 0.0
+    
     return [
         numeric(policy_state.get("eventCount") or policy_state.get("event_count")) / 100.0,
         len(feature_columns) / 100.0 if isinstance(feature_columns, list) else 0.0,
         1.0 if payload.get("targetColumn") or payload.get("target_column") else 0.0,
         hash_bucket(payload.get("taskType") or payload.get("task_type")),
         hash_bucket(payload.get("scaffoldId") or payload.get("scaffold_id")),
+        _role_to_idx.get(field_role, 0.99),
+        _family_to_idx.get(widget_family, 0.99),
+        is_hinted,
         hash_bucket(payload.get("selected_widget")),
         hash_bucket(payload.get("tracked_field")),
         len(domains) / 10.0 if isinstance(domains, list) else 0.0,
-        0.0,
-        0.0,
+        numeric(policy_adjustment.get("field_weight_shift")),
+        numeric(policy_adjustment.get("widget_rerank_bonus")),
     ]
 
 
 def load_sentinel_models() -> Dict[str, Any]:
-    global _sentinel_models, _sentinel_model_details
+    global _sentinel_models, _sentinel_model_details, _role_to_idx, _family_to_idx
     if _sentinel_models:
         return _sentinel_models
 
@@ -191,6 +207,17 @@ def load_sentinel_models() -> Dict[str, Any]:
         return {}
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    
+    # Populate dynamic mappings from manifest metadata
+    meta = manifest.get("metadata") or {}
+    roles = meta.get("roles") or []
+    families = meta.get("families") or []
+    
+    if roles:
+        _role_to_idx = {r: i / len(roles) for i, r in enumerate(roles)}
+    if families:
+        _family_to_idx = {f: i / len(families) for i, f in enumerate(families)}
+
     loaded: Dict[str, Any] = {}
     details: Dict[str, Any] = {}
     for model_name, model_info in (manifest.get("models") or {}).items():

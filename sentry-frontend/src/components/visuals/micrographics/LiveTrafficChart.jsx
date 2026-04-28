@@ -23,6 +23,60 @@ const formatCompactNumber = (value) => new Intl.NumberFormat('en-US').format(Mat
 
 const formatSignedPercent = (value) => `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
 
+const coerceSeries = (value) => {
+    if (Array.isArray(value)) {
+        return value.map((entry) => {
+            if (entry === null || entry === undefined || entry === '') return null;
+            const numericValue = typeof entry === 'number' ? entry : Number(entry);
+            return Number.isFinite(numericValue) ? numericValue : null;
+        });
+    }
+
+    if (Array.isArray(value?.series)) {
+        return coerceSeries(value.series);
+    }
+
+    if (Array.isArray(value?.values)) {
+        return coerceSeries(value.values);
+    }
+
+    if (typeof value === 'string') {
+        const parsed = value
+            .split(',')
+            .map((entry) => entry.trim())
+            .filter(Boolean);
+        return parsed.length ? coerceSeries(parsed) : [];
+    }
+
+    return [];
+};
+
+const coerceLabels = (value, seriesLength) => {
+    if (Array.isArray(value) && value.length > 0) {
+        return value.map((entry, index) => String(entry || `D${index + 1}`));
+    }
+
+    if (typeof value === 'string') {
+        const parsed = value
+            .split(',')
+            .map((entry) => entry.trim())
+            .filter(Boolean);
+        if (parsed.length > 0) {
+            return parsed;
+        }
+    }
+
+    return buildSequentialLabels(seriesLength, 'D');
+};
+
+const coerceMetricCards = (value, series = []) => {
+    if (Array.isArray(value) && value.length > 0) {
+        return value;
+    }
+
+    return buildTrafficMetrics(series);
+};
+
 const buildTrafficMetrics = (series = []) => {
     const numericSeries = series.filter((value) => Number.isFinite(value));
     if (!numericSeries.length) {
@@ -70,18 +124,19 @@ const buildSequentialLabels = (length, prefix = 'T') => (
 );
 
 const LiveTrafficChart = ({ data = {} }) => {
-    const values = data.chartSeries || defaultSeries;
-    const labels = data.chartLabels || buildSequentialLabels(values.length, 'D');
-    const metricCards = data.metricCards || buildTrafficMetrics(values);
+    const values = coerceSeries(data.chartSeries);
+    const safeValues = values.length > 0 ? values : defaultSeries;
+    const labels = coerceLabels(data.chartLabels, safeValues.length);
+    const metricCards = coerceMetricCards(data.metricCards, safeValues);
     const description = data.description || 'Concurrent traffic over the last 5 minutes with live session peaks and load shifts.';
-    const ticks = buildTrafficTicks(values, data.chartMin, data.chartMax);
+    const ticks = buildTrafficTicks(safeValues, data.chartMin, data.chartMax);
     const chartMin = data.chartMin ?? ticks[0];
     const chartMax = data.chartMax ?? ticks[ticks.length - 1];
-    const lastVisibleIndex = values.reduce((accumulator, value, index) => (Number.isFinite(value) ? index : accumulator), 0);
+    const lastVisibleIndex = safeValues.reduce((accumulator, value, index) => (Number.isFinite(value) ? index : accumulator), 0);
     const annotation = data.annotation || {
         index: lastVisibleIndex,
         label: 'ACTIVE USERS',
-        value: formatCompactNumber(values[lastVisibleIndex] || 0),
+        value: formatCompactNumber(safeValues[lastVisibleIndex] || 0),
     };
 
     const option = {
@@ -138,7 +193,7 @@ const LiveTrafficChart = ({ data = {} }) => {
         series: [
             {
                 type: 'line',
-                data: values,
+                data: safeValues,
                 smooth: false,
                 symbol: 'none',
                 z: 2,
@@ -155,8 +210,8 @@ const LiveTrafficChart = ({ data = {} }) => {
                     symbol: 'circle',
                     symbolSize: 18,
                     data: [{
-                        coord: [labels[annotation.index], values[annotation.index]],
-                        value: values[annotation.index],
+                        coord: [labels[annotation.index], safeValues[annotation.index]],
+                        value: safeValues[annotation.index],
                     }],
                     itemStyle: {
                         color: '#090909',

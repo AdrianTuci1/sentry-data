@@ -1,4 +1,37 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.R2StorageService = void 0;
 const client_s3_1 = require("@aws-sdk/client-s3");
@@ -90,6 +123,21 @@ class R2StorageService {
         }
         catch (error) {
             console.error(`Failed to fetch ${key} from R2:`, error.message);
+            throw error;
+        }
+    }
+    async getJsonIfExists(key) {
+        try {
+            const result = await this.client.send(new client_s3_1.GetObjectCommand({ Bucket: this.dataBucket, Key: key }));
+            const str = await result.Body?.transformToString();
+            if (!str)
+                return null;
+            return JSON.parse(str);
+        }
+        catch (error) {
+            if (error.name === 'NoSuchKey' || error.name === 'NotFound' || error.$metadata?.httpStatusCode === 404) {
+                return null;
+            }
             throw error;
         }
     }
@@ -203,6 +251,36 @@ class R2StorageService {
             key,
             uri: `s3://${this.dataBucket}/${key}`
         };
+    }
+    async saveBuffer(tenantId, projectId, layer, buffer, contentType, ...parts) {
+        const key = this.getS3Key(tenantId, projectId, layer, ...parts);
+        await this.client.send(new client_s3_1.PutObjectCommand({
+            Bucket: this.dataBucket,
+            Key: key,
+            Body: buffer,
+            ContentType: contentType
+        }));
+        return {
+            key,
+            uri: `s3://${this.dataBucket}/${key}`
+        };
+    }
+    async deleteObjects(prefix) {
+        const { DeleteObjectsCommand } = await Promise.resolve().then(() => __importStar(require('@aws-sdk/client-s3')));
+        const keys = await this.listAllUnder(prefix);
+        if (keys.length === 0)
+            return;
+        // S3 can delete max 1000 objects per call
+        for (let i = 0; i < keys.length; i += 1000) {
+            const chunk = keys.slice(i, i + 1000);
+            await this.client.send(new DeleteObjectsCommand({
+                Bucket: this.dataBucket,
+                Delete: {
+                    Objects: chunk.map(Key => ({ Key }))
+                }
+            }));
+        }
+        console.log(`[R2StorageService] Deleted ${keys.length} objects under ${prefix}`);
     }
     getDatePartition() {
         return new Date().toISOString().split('T')[0];

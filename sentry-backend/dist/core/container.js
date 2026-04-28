@@ -23,7 +23,7 @@ const ParrotNeuralEngineService_1 = require("../application/services/ParrotNeura
 const ParrotProgressService_1 = require("../application/services/ParrotProgressService");
 const ReverseEtlHeadService_1 = require("../application/services/ReverseEtlHeadService");
 const ParrotRuntimeService_1 = require("../application/services/ParrotRuntimeService");
-const SentinelClient_1 = require("../application/services/SentinelClient");
+// SentinelClient removed from imports
 const BronzeDiscoveryService_1 = require("../application/services/BronzeDiscoveryService");
 const MindMapManifestService_1 = require("../application/services/MindMapManifestService");
 const WorkloadPlannerService_1 = require("../application/services/WorkloadPlannerService");
@@ -33,8 +33,12 @@ const RayDaftExecutionProvider_1 = require("../application/execution/RayDaftExec
 const RuntimeOrchestratorService_1 = require("../application/services/RuntimeOrchestratorService");
 const ObjectStorageService_1 = require("../application/services/ObjectStorageService");
 const ProjectionRegistryService_1 = require("../application/services/ProjectionRegistryService");
+const QueryRegistryService_1 = require("../application/services/QueryRegistryService");
 const SourceUpdateMonitorService_1 = require("../application/services/SourceUpdateMonitorService");
 const ConnectorCatalogService_1 = require("../application/services/ConnectorCatalogService");
+const MLExecutorClient_1 = require("../application/services/MLExecutorClient");
+const SentinelFeedbackService_1 = require("../application/services/SentinelFeedbackService");
+const DecisionOverrideService_1 = require("../application/services/DecisionOverrideService");
 const UserRepository_1 = require("../infrastructure/repositories/UserRepository");
 const WorkspaceRepository_1 = require("../infrastructure/repositories/WorkspaceRepository");
 const WorkspaceMembershipRepository_1 = require("../infrastructure/repositories/WorkspaceMembershipRepository");
@@ -70,8 +74,8 @@ function initContainer() {
     const controlPlaneService = new ControlPlaneService_1.ControlPlaneService(tenantRepo, userRepo, workspaceRepo, workspaceMembershipRepo, workspaceInvitationRepo, auditEventRepo, projectRepo, projectAccessRepo, projectShareRepo);
     const widgetService = new WidgetService_1.WidgetService(r2StorageService);
     const widgetRenderer = new WidgetRenderer_1.WidgetRenderer(r2StorageService);
-    const analyticsService = new AnalyticsService_1.AnalyticsService(projectRepo, sourceRepo, widgetService, widgetRenderer, objectStorageService);
-    const sentinelClient = new SentinelClient_1.SentinelClient();
+    const analyticsService = new AnalyticsService_1.AnalyticsService(projectRepo, sourceRepo, widgetService, widgetRenderer, objectStorageService, r2StorageService);
+    // SentinelClient instance removed from here
     const parrotNeuralEngineService = new ParrotNeuralEngineService_1.ParrotNeuralEngineService();
     const parrotProgressService = new ParrotProgressService_1.ParrotProgressService(r2StorageService);
     const reverseEtlHeadService = new ReverseEtlHeadService_1.ReverseEtlHeadService();
@@ -79,14 +83,18 @@ function initContainer() {
     const mindMapManifestService = new MindMapManifestService_1.MindMapManifestService();
     const workloadPlannerService = new WorkloadPlannerService_1.WorkloadPlannerService();
     const projectionRegistryService = new ProjectionRegistryService_1.ProjectionRegistryService(r2StorageService);
+    const queryRegistryService = new QueryRegistryService_1.QueryRegistryService(r2StorageService);
+    const mlExecutorClient = new MLExecutorClient_1.MLExecutorClient();
+    const sentinelFeedbackService = new SentinelFeedbackService_1.SentinelFeedbackService(r2StorageService);
+    const decisionOverrideService = new DecisionOverrideService_1.DecisionOverrideService();
     const modalExecutionProvider = new ModalExecutionProvider_1.ModalExecutionProvider();
     const rayDaftExecutionProvider = new RayDaftExecutionProvider_1.RayDaftExecutionProvider();
     const executionPlaneService = new ExecutionPlaneService_1.ExecutionPlaneService([
         modalExecutionProvider,
         rayDaftExecutionProvider
     ]);
-    const parrotRuntimeService = new ParrotRuntimeService_1.ParrotRuntimeService(parrotNeuralEngineService, parrotProgressService, reverseEtlHeadService, sentinelClient, projectRepo, sseManager);
-    const orchestrationService = new OrchestrationService_1.OrchestrationService(projectRepo, sseManager, parrotRuntimeService, bronzeDiscoveryService, mindMapManifestService, parrotProgressService, workloadPlannerService, executionPlaneService, projectionRegistryService);
+    const parrotRuntimeService = new ParrotRuntimeService_1.ParrotRuntimeService(parrotNeuralEngineService, parrotProgressService, reverseEtlHeadService, projectRepo, sseManager);
+    const orchestrationService = new OrchestrationService_1.OrchestrationService(projectRepo, sseManager, parrotRuntimeService, bronzeDiscoveryService, mindMapManifestService, parrotProgressService, workloadPlannerService, executionPlaneService, projectionRegistryService, queryRegistryService, sentinelFeedbackService);
     const runtimeOrchestratorService = new RuntimeOrchestratorService_1.RuntimeOrchestratorService(orchestrationService, sourceRepo);
     const sourceUpdateMonitorService = new SourceUpdateMonitorService_1.SourceUpdateMonitorService(sourceRepo, objectStorageService, orchestrationService);
     // 4. Initialize Controllers
@@ -98,7 +106,7 @@ function initContainer() {
     const publicAccessController = new PublicAccessController_1.PublicAccessController(authService, controlPlaneService, analyticsService);
     const sseController = new SSEController_1.SSEController(sseManager, authService);
     const webhookController = new WebhookController_1.WebhookController(runtimeOrchestratorService);
-    const projectController = new ProjectController_1.ProjectController(orchestrationService, analyticsService, authService, projectRepo, sourceRepo, objectStorageService, sourceUpdateMonitorService, connectorCatalogService, controlPlaneService);
+    const projectController = new ProjectController_1.ProjectController(orchestrationService, analyticsService, authService, projectRepo, sourceRepo, objectStorageService, sourceUpdateMonitorService, connectorCatalogService, controlPlaneService, mlExecutorClient, sentinelFeedbackService, decisionOverrideService);
     const controllers = [
         healthController,
         accountController,
@@ -147,6 +155,10 @@ function initContainer() {
             workloadPlannerService,
             executionPlaneService,
             projectionRegistryService,
+            queryRegistryService,
+            mlExecutorClient,
+            sentinelFeedbackService,
+            decisionOverrideService,
             sourceUpdateMonitorService
         }
     };

@@ -97,6 +97,9 @@ export interface ParrotWidgetContractRef {
     requiredFields: string[];
     alignmentMode: 'strict' | 'best_effort';
     source: 'catalog_manifest' | 'runtime_contract';
+    manifestPath?: string;
+    dataRoot?: string;
+    sqlShape?: string;
 }
 
 export type ParrotArtifactStatus = 'active' | 'stale' | 'invalidated' | 'draft';
@@ -115,7 +118,7 @@ export interface ParrotInvalidationHint {
     createdAt: string;
 }
 
-export type ParrotSentinelModelName = 'CoverageRanker' | 'DriftClassifier' | 'QueryRiskModel' | 'InteractionPolicyModel';
+export type ParrotSentinelModelName = 'CoverageRanker' | 'DriftClassifier' | 'QueryRiskModel' | 'InteractionPolicyModel' | 'BusinessRelevanceModel';
 
 export interface ParrotSentinelModelSignal {
     signalId: string;
@@ -241,6 +244,8 @@ export interface ParrotQuerySpec {
         rowCount?: number;
     };
     widgetContract?: ParrotWidgetContractRef;
+    gridSpan?: string;
+    colorTheme?: string;
     compiledAt: string;
     invalidationReason?: string;
 }
@@ -304,6 +309,31 @@ export interface ParrotProjectionPlan {
         generated: string[];
         warnings: string[];
     };
+    summary?: {
+        text: string;
+        details?: Record<string, unknown>;
+    };
+    planningTrace?: Array<{
+        sourceId: string;
+        sourceName: string;
+        projectionIds: string[];
+        steps: Array<{
+            stage: string;
+            status: string;
+            details?: Record<string, unknown>;
+        }>;
+        candidates: Array<{
+            queryId?: string;
+            widgetId?: string;
+            title?: string;
+            widgetType?: string;
+            candidateSource?: 'baseline' | 'gemini';
+            status: 'accepted' | 'rejected';
+            reasons: string[];
+            requiredFields?: string[];
+            sqlPreview?: string;
+        }>;
+    }>;
     invalidationHints: ParrotInvalidationHint[];
     sentinelModelSignals?: ParrotSentinelModelSignal[];
 }
@@ -389,11 +419,17 @@ export interface ParrotMindMapInsight {
     logic: ParrotEditableLogic;
     lineage: {
         source_keys: string[];
+        gold_fields?: Array<{
+            source_key: string;
+            columns: string[];
+        }>;
     };
     editMode: 'intent' | 'code';
     suggestions?: ParrotMindMapSuggestion[];
     validation?: ParrotValidationState;
     widgetContract?: ParrotWidgetContractRef;
+    grid_span?: string;
+    color_theme?: string;
     querySpec?: ParrotQuerySpec;
     mlRecommendation?: ParrotMLRecommendation;
 }

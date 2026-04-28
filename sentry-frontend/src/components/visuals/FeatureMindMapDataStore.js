@@ -660,6 +660,10 @@ export class FeatureMindMapDataStore {
         }
 
         if (node.type === 'card') {
+            const lineageGoldFields = (details?.lineage?.gold_fields || [])
+                .map((entry) => `${entry.source_key}: [${(entry.columns || []).join(', ')}]`)
+                .join('; ');
+
             return [{
                 id: `${node.id}-card-contract`,
                 title: 'Widget Contract',
@@ -670,8 +674,10 @@ export class FeatureMindMapDataStore {
                     `title: ${details?.title || node.label}`,
                     `widget_type: ${details?.widget_type || details?.type || 'unknown'}`,
                     `activation_mode: ${details?.activationMode || 'automatic'}`,
-                    `columns: [${(details?.adjusted_data_columns || []).join(', ')}]`
+                    `columns: [${(details?.adjusted_data_columns || []).join(', ')}]`,
+                    lineageGoldFields ? `gold_fields: { ${lineageGoldFields} }` : ''
                 ].join('\n')
+                    .trim()
             }];
         }
 
@@ -1083,6 +1089,8 @@ export class FeatureMindMapDataStore {
             sentinelSummary,
             isDimmed: interactionState.isDimmed || false,
             isTraceActive: interactionState.isTraceActive || false,
+            highlightedFields: interactionState.highlightedFields || [],
+            highlightedFieldCount: interactionState.highlightedFields?.length || 0,
             isSelected: this.workspaceUI.selectedItems.has(node.id),
             isRecommended,
             accepted,

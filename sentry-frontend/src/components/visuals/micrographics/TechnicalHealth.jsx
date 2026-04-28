@@ -1,7 +1,36 @@
 import React from 'react';
 
+const coerceMetrics = (value) => {
+    if (Array.isArray(value)) {
+        return value;
+    }
+
+    if (value && typeof value === 'object') {
+        if (Array.isArray(value.metrics)) {
+            return value.metrics;
+        }
+
+        if (Array.isArray(value.items)) {
+            return value.items;
+        }
+
+        return [value];
+    }
+
+    if (typeof value === 'string') {
+        try {
+            const parsed = JSON.parse(value);
+            return coerceMetrics(parsed);
+        } catch {
+            return [];
+        }
+    }
+
+    return [];
+};
+
 const TechnicalHealth = ({ data }) => {
-    const metrics = data?.metrics || [];
+    const metrics = coerceMetrics(data?.metrics);
 
     return (
         <div style={{

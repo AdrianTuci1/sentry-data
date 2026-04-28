@@ -4,7 +4,7 @@ import { RuntimeContext, RuntimeVitals } from '../../types/runtime';
 import { ParrotNeuralEngineService } from './ParrotNeuralEngineService';
 import { ParrotProgressService } from './ParrotProgressService';
 import { ReverseEtlHeadService } from './ReverseEtlHeadService';
-import { SentinelClient } from './SentinelClient';
+// SentinelClient removed from here
 import {
     ParrotBootstrapResult,
     ParrotInteractionPolicyState,
@@ -16,16 +16,20 @@ import {
     ParrotRuntimeMetadata,
     ParrotRuntimeState,
     ParrotSentinelReport,
+    ParrotSentinelModelSignal,
     ParrotSourceProfile
 } from '../../types/parrot';
 import { ProjectionRegistryDocument } from './ProjectionRegistryService';
+import { SentinelModelSuite } from './SentinelModels';
 
 export class ParrotRuntimeService {
+    private readonly sentinelModelSuite = new SentinelModelSuite();
+    private lastSentinelModelSignals: ParrotSentinelModelSignal[] = [];
+
     constructor(
         private readonly parrotNeuralEngine: ParrotNeuralEngineService,
         private readonly parrotProgressService: ParrotProgressService,
         private readonly reverseEtlHeadService: ReverseEtlHeadService,
-        private readonly sentinelClient: SentinelClient,
         private readonly projectRepo: ProjectRepository,
         private readonly sseManager: SSEManager
     ) {}
@@ -54,7 +58,7 @@ export class ParrotRuntimeService {
             requestId
         });
 
-        const alignment = await this.sentinelClient.alignExecutionScore(ctx.tenantId, ctx.projectId, executionScore);
+        const alignment = await this.parrotNeuralEngine.alignExecutionScore(ctx.tenantId, ctx.projectId, executionScore);
         const alignedExecutionScore = alignment.executionScore || executionScore;
         const sentinelReport: ParrotSentinelReport = {
             status: alignment.status,
@@ -147,20 +151,20 @@ export class ParrotRuntimeService {
         mlRecommendations: ParrotMLRecommendation[] = [],
         policyState?: ParrotInteractionPolicyState
     ): Promise<ParrotInvalidationHint[]> {
-        return this.sentinelClient.buildInvalidationHints(
-            tenantId,
-            projectId,
+        const evaluation = this.sentinelModelSuite.evaluateRuntime({
             sourceProfiles,
             previousProjectionRegistry,
             invalidatedSources,
             querySpecs,
             mlRecommendations,
             policyState
-        );
+        });
+        this.lastSentinelModelSignals = evaluation.signals;
+        return evaluation.hints;
     }
 
     public getLastSentinelModelSignals() {
-        return this.sentinelClient.getLastModelSignals();
+        return Array.isArray(this.lastSentinelModelSignals) ? this.lastSentinelModelSignals : [];
     }
 
     public async compileProjectionPlan(runtimeState: ParrotRuntimeState): Promise<ParrotProjectionPlan> {

@@ -7,7 +7,8 @@ from typing import Dict, Optional
 
 from .config import TrainingConfig
 from .drift import train_drift_classifier
-from .io import download_r2_prefix, upload_directory_to_r2
+from .features import FAMILIES, ROLES
+from .io import download_r2_prefix, upload_directory_to_r2, delete_prefix_in_r2
 from .tabular import train_coverage_ranker, train_interaction_policy_model, train_query_risk_model
 
 
@@ -61,6 +62,10 @@ def train(config: TrainingConfig, bundle_r2_uri: Optional[str] = None) -> Dict[s
         "bundle_manifest": str(bundle_dir / "metadata" / "training_bundle_manifest.json"),
         "bundle_source": bundle_info,
         "checkpoint": "drift_lstm.pth",
+        "metadata": {
+            "roles": ROLES,
+            "families": FAMILIES,
+        },
         "models": models,
     }
     manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
@@ -91,5 +96,17 @@ def train_and_upload(config: TrainingConfig, bucket: str, prefix: str, bundle_r2
         prefix=f"{prefix.rstrip('/')}/{config.version}",
     )
     result["r2"] = uploaded
+    
+    # Industrial Upgrade: Update the 'latest' pointer in R2
+    latest_prefix = f"{prefix.rstrip('/')}/latest"
+    print(f"Updating 'latest' model pointer at s3://{bucket}/{latest_prefix}...")
+    delete_prefix_in_r2(bucket, latest_prefix)
+    upload_directory_to_r2(
+        local_dir=Path(result["artifact_dir"]),
+        bucket=bucket,
+        prefix=latest_prefix,
+    )
+    
     result["model_bundle_uri"] = f"s3://{bucket}/{prefix.rstrip('/')}/{config.version}"
+    result["latest_bundle_uri"] = f"s3://{bucket}/{latest_prefix}"
     return result

@@ -18,13 +18,31 @@ export interface MindMapDiscoveryPackage {
 }
 
 export class MindMapManifestService {
+    private buildLineage(sourceKeys: string[], goldFields: Array<{ source_key: string; columns: string[] }> = []) {
+        return {
+            source_keys: sourceKeys,
+            gold_fields: goldFields.filter((entry) => entry.source_key && entry.columns.length > 0)
+        };
+    }
+
+    private buildGoldFieldUsage(sourceKey: string | undefined, columns: string[] = []) {
+        if (!sourceKey) {
+            return [];
+        }
+
+        return [{
+            source_key: sourceKey,
+            columns: Array.from(new Set(columns.filter(Boolean)))
+        }];
+    }
+
     public build(
         sourceProfiles: ParrotSourceProfile[],
         reverseEtl: ReverseEtlStreamPlan,
         executionPlan: ParrotExecutionPlan,
         projectionPlan?: ParrotProjectionPlan
     ): MindMapDiscoveryPackage {
-        const groups = this.buildGroups(sourceProfiles);
+        const groups = this.buildGroups(sourceProfiles, projectionPlan);
         const insights = projectionPlan
             ? this.buildInsightsFromProjectionPlan(sourceProfiles, groups, reverseEtl, projectionPlan)
             : this.buildInsights(sourceProfiles, groups, reverseEtl);
@@ -110,104 +128,282 @@ export class MindMapManifestService {
         };
     }
 
-    private buildGroups(sourceProfiles: ParrotSourceProfile[]): ParrotMindMapGroup[] {
-        const allAdjustedIds = sourceProfiles.flatMap((profile) => profile.goldViews.map((view) => view.id));
-        const allSourceIds = sourceProfiles.map((profile) => profile.sourceId);
+    private getPrimaryGoldView(profile: ParrotSourceProfile): ParrotSourceProfile['goldViews'][number] | undefined {
+        return profile.goldViews.find((view) => view.id.endsWith('-core')) || profile.goldViews[0];
+    }
 
-        return [
-            {
-                id: 'grp-operational',
-                name: 'operational',
-                title: 'Operational Intelligence',
-                status: 'active',
-                color: 'default',
-                activationMode: 'automatic',
-                sourceIds: allSourceIds,
-                adjusted_data_ids: allAdjustedIds,
-                editMode: 'intent',
-                logic: {
-                    intent: 'Combine validated gold views into the default operational lens for the project.'
-                },
-                suggestions: [
-                    {
-                        id: 'suggest-group-operational-pne',
-                        source: 'pne',
-                        mode: 'intent',
-                        title: 'Keep operational group always on',
-                        rationale: 'This group should remain the baseline layer that powers the first useful insights automatically.',
-                        proposedIntent: 'Activate operational insights automatically once source and gold validation passes.'
-                    }
-                ],
-                validation: {
-                    status: 'active',
-                    checks: [
-                        { name: 'lineage', status: 'passed', message: 'Operational group only references validated gold views.' },
-                        { name: 'safety', status: 'passed', message: 'Automatic activation is limited to non-destructive analytical outputs.' }
-                    ]
-                }
-            },
-            {
-                id: 'grp-ml-recommended',
-                name: 'ml-recommended',
-                title: 'ML Recommended',
-                status: 'recommended',
-                color: 'blue',
-                activationMode: 'manual',
-                sourceIds: allSourceIds,
-                adjusted_data_ids: allAdjustedIds,
-                editMode: 'intent',
-                logic: {
-                    intent: 'Recommend candidate ML workloads, but never start training or inference automatically.'
-                },
-                suggestions: [
-                    {
-                        id: 'suggest-group-ml-sentinel',
-                        source: 'sentinel',
-                        mode: 'intent',
-                        title: 'Gate ML behind manual activation',
-                        rationale: 'ML must remain a reviewed recommendation until the user approves a target, feature set, and objective.',
-                        proposedIntent: 'Surface ML proposals with rationale, contract, and expected metrics, then require manual launch.'
-                    }
-                ],
-                validation: {
-                    status: 'draft',
-                    checks: [
-                        { name: 'schema', status: 'passed', message: 'ML recommendations are only emitted when metric and entity candidates are present.' },
-                        { name: 'safety', status: 'passed', message: 'Automatic model launch is disabled by policy.' }
-                    ]
-                }
-            },
-            {
-                id: 'grp-reverse-etl-recommended',
-                name: 'reverse-etl-recommended',
-                title: 'Reverse ETL Recommended',
-                status: 'recommended',
-                color: 'blue',
-                activationMode: 'manual',
-                sourceIds: allSourceIds,
-                adjusted_data_ids: allAdjustedIds,
-                editMode: 'intent',
-                logic: {
-                    intent: 'Recommend output streams only after ownership and rate-limit checks pass.'
-                },
-                suggestions: [
-                    {
-                        id: 'suggest-group-reverse-etl-sentinel',
-                        source: 'sentinel',
-                        mode: 'intent',
-                        title: 'Require DNS ownership before activation',
-                        rationale: 'Reverse ETL recommendations should stay manual until ownership and platform guardrails pass.',
-                        proposedIntent: 'Create Reverse ETL suggestions, but block activation until DNS TXT verification and safety limits are satisfied.'
-                    }
-                ],
-                validation: {
-                    status: 'draft',
-                    checks: [
-                        { name: 'safety', status: 'passed', message: 'Reverse ETL remains manual and guarded by DNS verification plus error thresholds.' }
-                    ]
-                }
+    private getMetricGoldView(profile: ParrotSourceProfile): ParrotSourceProfile['goldViews'][number] | undefined {
+        return profile.goldViews.find((view) => view.id.endsWith('-metrics')) || this.getPrimaryGoldView(profile);
+    }
+
+    private dedupeStrings(values: Array<string | undefined | null>): string[] {
+        return Array.from(new Set(values.filter((value): value is string => Boolean(value))));
+    }
+
+    private getOperationalGroupId(sourceId: string): string {
+        return `grp-${sourceId}-operational`;
+    }
+
+    private getMlGroupId(sourceId: string): string {
+        return `grp-${sourceId}-ml-recommended`;
+    }
+
+    private getReverseGroupId(sourceId: string): string {
+        return `grp-${sourceId}-reverse-etl-recommended`;
+    }
+
+    private getGoldViewColumns(view?: ParrotSourceProfile['goldViews'][number]): string[] {
+        return (view?.columns || [])
+            .map((column) => column?.name)
+            .filter((name): name is string => Boolean(name));
+    }
+
+    private resolveBestGoldView(
+        profile: ParrotSourceProfile,
+        columns: string[] = [],
+        preferredViewId?: string
+    ): ParrotSourceProfile['goldViews'][number] | undefined {
+        const cleanedColumns = this.dedupeStrings(columns);
+        const goldViews = profile.goldViews || [];
+        const preferredView = preferredViewId
+            ? goldViews.find((view) => view.id === preferredViewId)
+            : undefined;
+
+        if (cleanedColumns.length === 0) {
+            return preferredView || this.getPrimaryGoldView(profile);
+        }
+
+        const scoredViews = goldViews
+            .map((view) => {
+                const viewColumns = new Set(this.getGoldViewColumns(view));
+                const overlapCount = cleanedColumns.filter((column) => viewColumns.has(column)).length;
+                return {
+                    view,
+                    overlapCount,
+                    isFullMatch: cleanedColumns.every((column) => viewColumns.has(column)),
+                    columnCount: viewColumns.size
+                };
+            })
+            .filter((entry) => entry.overlapCount > 0);
+
+        const fullMatches = scoredViews
+            .filter((entry) => entry.isFullMatch)
+            .sort((left, right) => left.columnCount - right.columnCount || left.view.id.localeCompare(right.view.id));
+
+        if (fullMatches.length > 0) {
+            if (preferredView && fullMatches.some((entry) => entry.view.id === preferredView.id)) {
+                return preferredView;
             }
-        ];
+
+            return fullMatches[0].view;
+        }
+
+        if (preferredView) {
+            return preferredView;
+        }
+
+        const bestPartialMatch = scoredViews
+            .sort((left, right) => right.overlapCount - left.overlapCount || left.columnCount - right.columnCount)[0];
+
+        return bestPartialMatch?.view || this.getPrimaryGoldView(profile);
+    }
+
+    private resolveLineageTarget(
+        sourceProfiles: ParrotSourceProfile[],
+        sourceId: string | undefined,
+        preferredViewId: string | undefined,
+        columns: string[] = []
+    ): { sourceKey?: string; columns: string[] } {
+        const cleanedColumns = this.dedupeStrings(columns);
+        const profile = sourceProfiles.find((entry) => entry.sourceId === sourceId)
+            || sourceProfiles.find((entry) => entry.goldViews.some((view) => view.id === preferredViewId));
+
+        if (!profile) {
+            return {
+                sourceKey: preferredViewId,
+                columns: cleanedColumns
+            };
+        }
+
+        const resolvedView = this.resolveBestGoldView(profile, cleanedColumns, preferredViewId);
+        const resolvedViewColumns = this.getGoldViewColumns(resolvedView);
+        const resolvedColumns = cleanedColumns.filter((column) => resolvedViewColumns.includes(column));
+
+        return {
+            sourceKey: resolvedView?.id || preferredViewId,
+            columns: resolvedColumns.length > 0 ? resolvedColumns : cleanedColumns
+        };
+    }
+
+    private isMlEligible(profile: ParrotSourceProfile): boolean {
+        return profile.metricCandidates.length > 0 && (
+            profile.entityKeyCandidates.length > 0
+            || profile.timestampCandidates.length > 0
+        );
+    }
+
+    private isReverseEtlEligible(profile: ParrotSourceProfile): boolean {
+        return profile.entityKeyCandidates.length > 0 && profile.metricCandidates.length > 0;
+    }
+
+    private getMlAdjustedIds(sourceProfiles: ParrotSourceProfile[]): string[] {
+        return sourceProfiles
+            .filter((profile) => this.isMlEligible(profile))
+            .map((profile) => this.getMetricGoldView(profile)?.id)
+            .filter(Boolean) as string[];
+    }
+
+    private getReverseAdjustedIds(sourceProfiles: ParrotSourceProfile[]): string[] {
+        return sourceProfiles
+            .filter((profile) => this.isReverseEtlEligible(profile))
+            .map((profile) => this.getMetricGoldView(profile)?.id)
+            .filter(Boolean) as string[];
+    }
+
+    private buildGroups(sourceProfiles: ParrotSourceProfile[], projectionPlan?: ParrotProjectionPlan): ParrotMindMapGroup[] {
+        const groups: ParrotMindMapGroup[] = [];
+
+        sourceProfiles.forEach((profile) => {
+            const sourceQueries = projectionPlan?.querySpecs?.filter((querySpec) => querySpec.sourceId === profile.sourceId) || [];
+            const sourceRecommendations = projectionPlan?.mlRecommendations?.filter((recommendation) => recommendation.sourceId === profile.sourceId) || [];
+
+            if (!projectionPlan || sourceQueries.length > 0) {
+                const operationalAdjustedIds = sourceQueries.length > 0
+                    ? this.dedupeStrings(sourceQueries.map((querySpec) => (
+                        this.resolveLineageTarget(
+                            sourceProfiles,
+                            querySpec.sourceId,
+                            querySpec.projectionId,
+                            querySpec.dependencies.columns
+                        ).sourceKey
+                    )))
+                    : profile.goldViews.map((view) => view.id);
+
+                groups.push({
+                    id: this.getOperationalGroupId(profile.sourceId),
+                    name: `${profile.sourceId}-operational`,
+                    title: `${profile.sourceName} Operational`,
+                    status: 'active',
+                    color: 'default',
+                    activationMode: 'automatic',
+                    sourceIds: [profile.sourceId],
+                    adjusted_data_ids: operationalAdjustedIds,
+                    editMode: 'intent',
+                    logic: {
+                        intent: sourceQueries.length > 0
+                            ? `Activate the ${sourceQueries.length} compiled operational widget queries for ${profile.sourceName}.`
+                            : `Expose the validated operational views for ${profile.sourceName}.`
+                    },
+                    suggestions: [
+                        {
+                            id: `suggest-group-${profile.sourceId}-operational-pne`,
+                            source: 'pne',
+                            mode: 'intent',
+                            title: 'Keep operational group always on',
+                            rationale: 'Operational insights should remain the default live lens for each connected source.',
+                            proposedIntent: `Activate ${profile.sourceName} operational insights automatically once source and gold validation passes.`
+                        }
+                    ],
+                    validation: {
+                        status: 'active',
+                        checks: [
+                            { name: 'lineage', status: 'passed', message: 'Operational group only references validated gold views.' },
+                            { name: 'safety', status: 'passed', message: 'Automatic activation is limited to non-destructive analytical outputs.' }
+                        ]
+                    }
+                });
+            }
+
+            if ((!projectionPlan && this.isMlEligible(profile)) || sourceRecommendations.length > 0) {
+                const mlAdjustedIds = sourceRecommendations.length > 0
+                    ? this.dedupeStrings(sourceRecommendations.map((recommendation) => (
+                        this.resolveLineageTarget(
+                            sourceProfiles,
+                            recommendation.sourceId,
+                            recommendation.projectionId,
+                            [
+                                ...(recommendation.targetColumn ? [recommendation.targetColumn] : []),
+                                ...recommendation.featureColumns
+                            ]
+                        ).sourceKey
+                    )))
+                    : this.getMlAdjustedIds([profile]);
+
+                groups.push({
+                    id: this.getMlGroupId(profile.sourceId),
+                    name: `${profile.sourceId}-ml-recommended`,
+                    title: `${profile.sourceName} ML Recommended`,
+                    status: 'recommended',
+                    color: 'blue',
+                    activationMode: 'manual',
+                    sourceIds: [profile.sourceId],
+                    adjusted_data_ids: mlAdjustedIds,
+                    editMode: 'intent',
+                    logic: {
+                        intent: sourceRecommendations.length > 0
+                            ? `Recommend ${sourceRecommendations.length} candidate ML workloads for ${profile.sourceName}, but never start training or inference automatically.`
+                            : `Recommend candidate ML workloads for ${profile.sourceName}, but never start training or inference automatically.`
+                    },
+                    suggestions: [
+                        {
+                            id: `suggest-group-${profile.sourceId}-ml-sentinel`,
+                            source: 'sentinel',
+                            mode: 'intent',
+                            title: 'Gate ML behind manual activation',
+                            rationale: 'ML must remain a reviewed recommendation until the user approves a target, feature set, and objective.',
+                            proposedIntent: `Surface ML proposals for ${profile.sourceName} with rationale, contract, and expected metrics, then require manual launch.`
+                        }
+                    ],
+                    validation: {
+                        status: 'draft',
+                        checks: [
+                            { name: 'schema', status: 'passed', message: 'ML recommendations are only emitted when metric and entity candidates are present.' },
+                            { name: 'safety', status: 'passed', message: 'Automatic model launch is disabled by policy.' }
+                        ]
+                    }
+                });
+            }
+
+            if (this.isReverseEtlEligible(profile)) {
+                const reverseColumns = profile.entityKeyCandidates.concat(profile.metricCandidates).slice(0, 4);
+                const reverseAdjustedIds = this.dedupeStrings([
+                    this.resolveBestGoldView(profile, reverseColumns, this.getMetricGoldView(profile)?.id)?.id
+                ]);
+
+                groups.push({
+                    id: this.getReverseGroupId(profile.sourceId),
+                    name: `${profile.sourceId}-reverse-etl-recommended`,
+                    title: `${profile.sourceName} Reverse ETL Recommended`,
+                    status: 'recommended',
+                    color: 'blue',
+                    activationMode: 'manual',
+                    sourceIds: [profile.sourceId],
+                    adjusted_data_ids: reverseAdjustedIds,
+                    editMode: 'intent',
+                    logic: {
+                        intent: `Recommend output streams for ${profile.sourceName} only after ownership and rate-limit checks pass.`
+                    },
+                    suggestions: [
+                        {
+                            id: `suggest-group-${profile.sourceId}-reverse-etl-sentinel`,
+                            source: 'sentinel',
+                            mode: 'intent',
+                            title: 'Require DNS ownership before activation',
+                            rationale: 'Reverse ETL recommendations should stay manual until ownership and platform guardrails pass.',
+                            proposedIntent: `Create Reverse ETL suggestions for ${profile.sourceName}, but block activation until DNS TXT verification and safety limits are satisfied.`
+                        }
+                    ],
+                    validation: {
+                        status: 'draft',
+                        checks: [
+                            { name: 'safety', status: 'passed', message: 'Reverse ETL remains manual and guarded by DNS verification plus error thresholds.' }
+                        ]
+                    }
+                });
+            }
+        });
+
+        return groups;
     }
 
     private buildInsights(
@@ -215,17 +411,21 @@ export class MindMapManifestService {
         groups: ParrotMindMapGroup[],
         reverseEtl: ReverseEtlStreamPlan
     ): ParrotMindMapInsight[] {
-        const operationalGroup = groups.find((group) => group.id === 'grp-operational')!;
-        const mlGroup = groups.find((group) => group.id === 'grp-ml-recommended')!;
-        const reverseGroup = groups.find((group) => group.id === 'grp-reverse-etl-recommended')!;
-
         const insights: ParrotMindMapInsight[] = [];
 
         sourceProfiles.forEach((profile) => {
-            const primaryGoldView = profile.goldViews[0];
+            const primaryGoldView = this.getPrimaryGoldView(profile);
+            const metricGoldView = this.getMetricGoldView(profile);
             const timestampColumn = profile.timestampCandidates[0];
+            const operationalGroup = groups.find((group) => group.id === this.getOperationalGroupId(profile.sourceId));
+            const mlGroup = groups.find((group) => group.id === this.getMlGroupId(profile.sourceId));
+            const reverseGroup = groups.find((group) => group.id === this.getReverseGroupId(profile.sourceId));
+            if (!primaryGoldView) {
+                return;
+            }
 
-            insights.push({
+            if (operationalGroup) {
+                insights.push({
                 id: `ins-${profile.sourceId}-volume`,
                 title: `${profile.sourceName} Volume`,
                 type: 'technical-health',
@@ -242,9 +442,10 @@ export class MindMapManifestService {
                     compiled_code: `SELECT COUNT(*) AS total_rows FROM read_parquet('${this.escapeSqlString(profile.uri)}')`,
                     effective_query: `SELECT COUNT(*) AS total_rows FROM read_parquet('${this.escapeSqlString(profile.uri)}')`
                 },
-                lineage: {
-                    source_keys: [primaryGoldView.id]
-                },
+                lineage: this.buildLineage(
+                    [primaryGoldView.id],
+                    this.buildGoldFieldUsage(primaryGoldView.id, profile.schema.map((column) => column.name).slice(0, 6))
+                ),
                 editMode: 'code',
                 suggestions: [
                     {
@@ -264,9 +465,10 @@ export class MindMapManifestService {
                     alignmentMode: 'strict',
                     source: 'catalog_manifest'
                 }
-            });
+                });
+            }
 
-            if (timestampColumn) {
+            if (timestampColumn && operationalGroup) {
                 insights.push({
                     id: `ins-${profile.sourceId}-freshness`,
                     title: `${profile.sourceName} Freshness`,
@@ -284,9 +486,10 @@ export class MindMapManifestService {
                         compiled_code: `SELECT MAX(${this.quoteIdentifier(timestampColumn)}) AS latest_event_at FROM read_parquet('${this.escapeSqlString(profile.uri)}')`,
                         effective_query: `SELECT MAX(${this.quoteIdentifier(timestampColumn)}) AS latest_event_at FROM read_parquet('${this.escapeSqlString(profile.uri)}')`
                     },
-                    lineage: {
-                        source_keys: [primaryGoldView.id]
-                    },
+                    lineage: this.buildLineage(
+                        [primaryGoldView.id],
+                        this.buildGoldFieldUsage(primaryGoldView.id, [timestampColumn])
+                    ),
                     editMode: 'code',
                     suggestions: [
                         {
@@ -309,109 +512,122 @@ export class MindMapManifestService {
                 });
             }
 
-            insights.push({
-                id: `ins-${profile.sourceId}-ml-recommendation`,
-                title: `Recommend ML for ${profile.sourceName}`,
-                type: 'predictive',
-                widget_type: 'predictive',
-                group_id: mlGroup.id,
-                status: 'recommended',
-                activationMode: 'manual',
-                adjusted_data_columns: profile.metricCandidates.slice(0, 4),
-                logic: {
-                    intent: `Recommend an ML model for ${profile.sourceName} but do not launch it automatically. Show the user the proposed target, features, and training rationale first.`,
-                    code: 'ml_model.launch = manual_only',
-                    compiled_code: JSON.stringify({
-                        executor: 'modal_ml_executor',
-                        launch: 'manual_only',
-                        source_profile: profile.sourceId,
-                        proposed_target: profile.metricCandidates[0] || null,
-                        proposed_features: profile.metricCandidates.slice(0, 6)
-                    }, null, 2)
-                },
-                lineage: {
-                    source_keys: [primaryGoldView.id]
-                },
-                editMode: 'intent',
-                suggestions: [
-                    {
-                        id: `suggest-${profile.sourceId}-ml-objective`,
-                        source: 'sentinel',
-                        mode: 'intent',
-                        title: 'Propose an objective, not an auto-run',
-                        rationale: 'Sentinel should recommend candidate models from metadata, then wait for approval.',
-                        proposedIntent: `Suggest a supervised or unsupervised model for ${profile.sourceName}, expose features and metrics, and require manual launch.`
-                    }
-                ],
-                validation: {
-                    status: 'draft',
-                    checks: [
-                        { name: 'schema', status: 'passed', message: 'Recommendation is based on profiled entity, metric, and timestamp candidates.' },
-                        { name: 'safety', status: 'passed', message: 'Model execution stays manual until a reviewed launch is requested.' }
-                    ]
-                },
-                widgetContract: {
-                    widgetType: 'predictive',
-                    expectedShape: 'table',
-                    requiredFields: ['model_id', 'metrics'],
-                    alignmentMode: 'best_effort',
-                    source: 'runtime_contract'
-                }
-            });
-
-            insights.push({
-                id: `ins-${profile.sourceId}-reverse-etl-recommendation`,
-                title: `Recommend Reverse ETL for ${profile.sourceName}`,
-                type: 'trend-spotter',
-                widget_type: 'trend-spotter',
-                group_id: reverseGroup.id,
-                status: 'recommended',
-                activationMode: 'manual',
-                adjusted_data_columns: profile.entityKeyCandidates.concat(profile.metricCandidates).slice(0, 4),
-                logic: {
-                    intent: reverseEtl.dnsTxtVerification.verified
-                        ? `Prepare a user-owned Reverse ETL VM for ${profile.sourceName}, but wait for manual approval before launching.`
-                        : `DNS TXT verification is still required before Reverse ETL can be launched for ${profile.sourceName}.`,
-                    code: 'reverse_etl.launch = manual_only',
-                    compiled_code: JSON.stringify({
-                        launch: 'manual_only',
-                        dns_verified: reverseEtl.dnsTxtVerification.verified,
-                        active_vm_count: reverseEtl.activeVmCount,
-                        stop_on_errors: reverseEtl.limits.stopOnErrors
-                    }, null, 2)
-                },
-                lineage: {
-                    source_keys: [primaryGoldView.id]
-                },
-                editMode: 'intent',
-                suggestions: [
-                    {
-                        id: `suggest-${profile.sourceId}-reverse-targets`,
-                        source: 'pne',
-                        mode: 'intent',
-                        title: 'Expose delivery targets clearly',
-                        rationale: 'Reverse ETL suggestions should tell the user exactly which systems would receive live outputs.',
-                        proposedIntent: `Recommend Reverse ETL targets for ${profile.sourceName}, but block activation until ownership, limits, and destination errors are acceptable.`
-                    }
-                ],
-                validation: {
-                    status: reverseEtl.dnsTxtVerification.verified ? 'validated' : 'draft',
-                    checks: [
+            if (this.isMlEligible(profile) && mlGroup) {
+                const mlColumns = profile.metricCandidates.slice(0, 4);
+                const mlLineageView = this.resolveBestGoldView(profile, mlColumns, metricGoldView?.id);
+                insights.push({
+                    id: `ins-${profile.sourceId}-ml-recommendation`,
+                    title: `Recommend ML for ${profile.sourceName}`,
+                    type: 'predictive',
+                    widget_type: 'predictive',
+                    group_id: mlGroup.id,
+                    status: 'recommended',
+                    activationMode: 'manual',
+                    adjusted_data_columns: mlColumns,
+                    logic: {
+                        intent: `Recommend an ML model for ${profile.sourceName} but do not launch it automatically. Show the user the proposed target, features, and training rationale first.`,
+                        code: 'ml_model.launch = manual_only',
+                        compiled_code: JSON.stringify({
+                            executor: 'modal_ml_executor',
+                            launch: 'manual_only',
+                            source_profile: profile.sourceId,
+                            proposed_target: profile.metricCandidates[0] || null,
+                            proposed_features: profile.metricCandidates.slice(0, 6)
+                        }, null, 2)
+                    },
+                    lineage: this.buildLineage(
+                        [mlLineageView?.id || metricGoldView?.id || primaryGoldView.id],
+                        this.buildGoldFieldUsage(mlLineageView?.id || metricGoldView?.id || primaryGoldView.id, mlColumns)
+                    ),
+                    editMode: 'intent',
+                    suggestions: [
                         {
-                            name: 'safety',
-                            status: 'passed',
-                            message: `Reverse ETL is guarded by DNS verification, a ${reverseEtl.limits.consecutiveErrorThreshold}-error threshold, and VM ownership limits.`
+                            id: `suggest-${profile.sourceId}-ml-objective`,
+                            source: 'sentinel',
+                            mode: 'intent',
+                            title: 'Propose an objective, not an auto-run',
+                            rationale: 'Sentinel should recommend candidate models from metadata, then wait for approval.',
+                            proposedIntent: `Suggest a supervised or unsupervised model for ${profile.sourceName}, expose features and metrics, and require manual launch.`
                         }
-                    ]
-                },
-                widgetContract: {
-                    widgetType: 'trend-spotter',
-                    expectedShape: 'table',
-                    requiredFields: ['target', 'status'],
-                    alignmentMode: 'best_effort',
-                    source: 'runtime_contract'
-                }
-            });
+                    ],
+                    validation: {
+                        status: 'draft',
+                        checks: [
+                            { name: 'schema', status: 'passed', message: 'Recommendation is based on profiled entity, metric, and timestamp candidates.' },
+                            { name: 'safety', status: 'passed', message: 'Model execution stays manual until a reviewed launch is requested.' }
+                        ]
+                    },
+                    widgetContract: {
+                        widgetType: 'predictive',
+                        expectedShape: 'table',
+                        requiredFields: ['model_id', 'metrics'],
+                        alignmentMode: 'best_effort',
+                        source: 'runtime_contract'
+                    }
+                });
+            }
+
+            if (this.isReverseEtlEligible(profile) && reverseGroup) {
+                const reverseColumns = profile.entityKeyCandidates.concat(profile.metricCandidates).slice(0, 4);
+                const reverseLineageView = this.resolveBestGoldView(profile, reverseColumns, metricGoldView?.id);
+                insights.push({
+                    id: `ins-${profile.sourceId}-reverse-etl-recommendation`,
+                    title: `Recommend Reverse ETL for ${profile.sourceName}`,
+                    type: 'trend-spotter',
+                    widget_type: 'trend-spotter',
+                    group_id: reverseGroup.id,
+                    status: 'recommended',
+                    activationMode: 'manual',
+                    adjusted_data_columns: reverseColumns,
+                    logic: {
+                        intent: reverseEtl.dnsTxtVerification.verified
+                            ? `Prepare a user-owned Reverse ETL VM for ${profile.sourceName}, but wait for manual approval before launching.`
+                            : `DNS TXT verification is still required before Reverse ETL can be launched for ${profile.sourceName}.`,
+                        code: 'reverse_etl.launch = manual_only',
+                        compiled_code: JSON.stringify({
+                            launch: 'manual_only',
+                            dns_verified: reverseEtl.dnsTxtVerification.verified,
+                            active_vm_count: reverseEtl.activeVmCount,
+                            stop_on_errors: reverseEtl.limits.stopOnErrors
+                        }, null, 2)
+                    },
+                    lineage: this.buildLineage(
+                        [reverseLineageView?.id || metricGoldView?.id || primaryGoldView.id],
+                        this.buildGoldFieldUsage(
+                            reverseLineageView?.id || metricGoldView?.id || primaryGoldView.id,
+                            reverseColumns
+                        )
+                    ),
+                    editMode: 'intent',
+                    suggestions: [
+                        {
+                            id: `suggest-${profile.sourceId}-reverse-targets`,
+                            source: 'pne',
+                            mode: 'intent',
+                            title: 'Expose delivery targets clearly',
+                            rationale: 'Reverse ETL suggestions should tell the user exactly which systems would receive live outputs.',
+                            proposedIntent: `Recommend Reverse ETL targets for ${profile.sourceName}, but block activation until ownership, limits, and destination errors are acceptable.`
+                        }
+                    ],
+                    validation: {
+                        status: reverseEtl.dnsTxtVerification.verified ? 'validated' : 'draft',
+                        checks: [
+                            {
+                                name: 'safety',
+                                status: 'passed',
+                                message: `Reverse ETL is guarded by DNS verification, a ${reverseEtl.limits.consecutiveErrorThreshold}-error threshold, and VM ownership limits.`
+                            }
+                        ]
+                    },
+                    widgetContract: {
+                        widgetType: 'trend-spotter',
+                        expectedShape: 'table',
+                        requiredFields: ['target', 'status'],
+                        alignmentMode: 'best_effort',
+                        source: 'runtime_contract'
+                    }
+                });
+            }
         });
 
         return insights;
@@ -423,19 +639,37 @@ export class MindMapManifestService {
         reverseEtl: ReverseEtlStreamPlan,
         projectionPlan: ParrotProjectionPlan
     ): ParrotMindMapInsight[] {
-        const operationalGroup = groups.find((group) => group.id === 'grp-operational')!;
-        const mlGroup = groups.find((group) => group.id === 'grp-ml-recommended')!;
         const reverseInsights = this.buildInsights(sourceProfiles, groups, reverseEtl)
-            .filter((insight) => insight.group_id === 'grp-reverse-etl-recommended');
+            .filter((insight) => insight.group_id.endsWith('-reverse-etl-recommended'));
 
-        const queryInsights = projectionPlan.querySpecs.map((querySpec) => this.buildQueryInsight(querySpec, operationalGroup.id));
-        const mlInsights = projectionPlan.mlRecommendations.map((recommendation) => this.buildMlInsight(recommendation, mlGroup.id));
+        const queryInsights = projectionPlan.querySpecs.map((querySpec) => {
+            const groupId = groups.find((group) => group.id === this.getOperationalGroupId(querySpec.sourceId))?.id
+                || groups.find((group) => group.name.endsWith('-operational'))?.id
+                || this.getOperationalGroupId(querySpec.sourceId);
+            return this.buildQueryInsight(sourceProfiles, querySpec, groupId);
+        });
+        const mlInsights = projectionPlan.mlRecommendations.map((recommendation) => {
+            const groupId = groups.find((group) => group.id === this.getMlGroupId(recommendation.sourceId))?.id
+                || groups.find((group) => group.name.endsWith('-ml-recommended'))?.id
+                || this.getMlGroupId(recommendation.sourceId);
+            return this.buildMlInsight(sourceProfiles, recommendation, groupId);
+        });
 
         return [...queryInsights, ...mlInsights, ...reverseInsights];
     }
 
-    private buildQueryInsight(querySpec: ParrotQuerySpec, groupId: string): ParrotMindMapInsight {
+    private buildQueryInsight(
+        sourceProfiles: ParrotSourceProfile[],
+        querySpec: ParrotQuerySpec,
+        groupId: string
+    ): ParrotMindMapInsight {
         const isActive = querySpec.status === 'active';
+        const resolvedLineage = this.resolveLineageTarget(
+            sourceProfiles,
+            querySpec.sourceId,
+            querySpec.projectionId,
+            querySpec.dependencies.columns
+        );
         return {
             id: querySpec.widgetId,
             title: querySpec.title,
@@ -453,9 +687,10 @@ export class MindMapManifestService {
                 compiled_code: querySpec.sql,
                 effective_query: querySpec.sql
             },
-            lineage: {
-                source_keys: [querySpec.projectionId]
-            },
+            lineage: this.buildLineage(
+                [resolvedLineage.sourceKey || querySpec.projectionId].filter(Boolean),
+                this.buildGoldFieldUsage(resolvedLineage.sourceKey, resolvedLineage.columns)
+            ),
             editMode: 'code',
             suggestions: [
                 {
@@ -476,11 +711,26 @@ export class MindMapManifestService {
                     ]
                 },
             widgetContract: querySpec.widgetContract,
+            grid_span: querySpec.gridSpan,
+            color_theme: querySpec.colorTheme,
             querySpec
         };
     }
 
-    private buildMlInsight(recommendation: ParrotMLRecommendation, groupId: string): ParrotMindMapInsight {
+    private buildMlInsight(
+        sourceProfiles: ParrotSourceProfile[],
+        recommendation: ParrotMLRecommendation,
+        groupId: string
+    ): ParrotMindMapInsight {
+        const resolvedLineage = this.resolveLineageTarget(
+            sourceProfiles,
+            recommendation.sourceId,
+            recommendation.projectionId,
+            [
+                ...(recommendation.targetColumn ? [recommendation.targetColumn] : []),
+                ...recommendation.featureColumns
+            ]
+        );
         return {
             id: `ins-${recommendation.recommendationId}`,
             title: recommendation.title,
@@ -498,9 +748,10 @@ export class MindMapManifestService {
                 code: 'ml_model.launch = manual_approval',
                 compiled_code: JSON.stringify(recommendation, null, 2)
             },
-            lineage: {
-                source_keys: [recommendation.projectionId]
-            },
+            lineage: this.buildLineage(
+                [resolvedLineage.sourceKey || recommendation.projectionId].filter(Boolean),
+                this.buildGoldFieldUsage(resolvedLineage.sourceKey, resolvedLineage.columns)
+            ),
             editMode: 'intent',
             suggestions: [
                 {
@@ -584,8 +835,8 @@ export class MindMapManifestService {
             insight: insights.map((insight) => ({
                 ...insight,
                 status: insight.status === 'recommended' ? 'warning' : 'ok',
-                grid_span: 'col-span-1',
-                color_theme: insight.status === 'recommended' ? 'theme-productivity' : 'theme-audience',
+                grid_span: insight.grid_span || 'col-span-1',
+                color_theme: insight.color_theme || (insight.status === 'recommended' ? 'theme-productivity' : 'theme-audience'),
                 footerText: insight.activationMode === 'manual' ? 'Manual activation' : 'Auto',
                 footerBottom: insight.editMode === 'code' ? 'Editable as code' : 'Editable as intent'
             })),

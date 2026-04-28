@@ -70,7 +70,15 @@ def evaluate_node(request: EvaluationRequest, x_internal_secret: Optional[str] =
 @web_app.post("/api/v1/evaluate_runtime")
 def evaluate_runtime(request: RuntimeEvaluationRequest, x_internal_secret: Optional[str] = Header(None)):
     verify_internal_secret(x_internal_secret)
-    return evaluate_runtime_policy(request)
+    try:
+        return evaluate_runtime_policy(request)
+    except Exception as e:
+        import traceback
+        return {
+            "status": "error",
+            "message": str(e),
+            "traceback": traceback.format_exc()
+        }
 
 
 @web_app.get("/health")
@@ -85,7 +93,15 @@ def health():
     }
 
 
-@app.function(image=image, volumes={"/sentinel-models": model_volume}, timeout=300)
+@app.function(
+    image=image,
+    volumes={"/sentinel-models": model_volume},
+    secrets=[modal.Secret.from_name("sentry-r2-secrets")],
+    env={
+        "SENTINEL_MODEL_BUNDLE_URI": "s3://statsparrot-data/system/r2-system/models/sentinel/latest"
+    },
+    timeout=300
+)
 @modal.asgi_app()
 def fastapi_app():
     return web_app
