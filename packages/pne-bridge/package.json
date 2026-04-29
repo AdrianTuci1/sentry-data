@@ -1,0 +1,26 @@
+{
+  "name": "@statsparrot/pne",
+  "version": "0.1.2",
+  "description": "Universal PNE bridge for CLI, MCP, local HTTP and hosted warehouse intelligence workflows.",
+  "engines": {
+    "node": ">=18"
+  },
+  "bin": {
+    "pne": "./bin/pne.mjs"
+  },
+  "scripts": {
+    "build:vendor": "node ./scripts/prepare-vendor.mjs",
+    "prepack": "node ./scripts/prepare-vendor.mjs",
+    "pack:local": "npm pack"
+  },
+  "files": [
+    "bin",
+    "vendor",
+    "widgets",
+    "scripts",
+    "install.sh",
+    "README.md"
+  ],
+  "license": "UNLICENSED",
+  "type": "module"
+}

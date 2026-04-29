@@ -15,6 +15,7 @@ import { ControlPlaneService } from '../../application/services/ControlPlaneServ
 import { MLExecutorClient, MLTrainRequest } from '../../application/services/MLExecutorClient';
 import { SentinelFeedbackService } from '../../application/services/SentinelFeedbackService';
 import { DecisionOverrideService } from '../../application/services/DecisionOverrideService';
+import { ParrotProgressService } from '../../application/services/ParrotProgressService';
 import { AppError } from '../middlewares/errorHandler';
 import { ProjectMemberInput } from '../../types/controlPlane';
 import {
@@ -39,7 +40,8 @@ export class ProjectController implements IController {
         private readonly controlPlaneService: ControlPlaneService,
         private readonly mlExecutorClient: MLExecutorClient,
         private readonly sentinelFeedbackService: SentinelFeedbackService,
-        private readonly decisionOverrideService: DecisionOverrideService
+        private readonly decisionOverrideService: DecisionOverrideService,
+        private readonly parrotProgressService: ParrotProgressService
     ) {
         this.initRoutes();
     }
@@ -69,6 +71,9 @@ export class ProjectController implements IController {
         this.router.get('/:projectId', auth, this.getProjectById);
         this.router.post('/:projectId/runtime/run', auth, this.runRuntime);
         this.router.post('/:projectId/runtime/check-updates', auth, this.checkRuntimeUpdates);
+        this.router.get('/:projectId/runtime/requests', auth, this.listRuntimeRequests);
+        this.router.get('/:projectId/runtime/requests/:requestId', auth, this.getRuntimeRequestStatus);
+        this.router.get('/:projectId/runtime/requests/:requestId/artifacts', auth, this.getRuntimeRequestArtifacts);
 
         this.router.get('/:projectId/lineage', auth, this.getLineage);
         this.router.get('/:projectId/analytics', auth, this.getAnalytics);
@@ -456,6 +461,80 @@ export class ProjectController implements IController {
             res.status(200).json({
                 status: 'success',
                 data: result
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    private listRuntimeRequests = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const authContext = this.getAuthContext(req);
+            const { projectId } = req.params;
+            const { project } = await this.controlPlaneService.assertProjectAccess(authContext, projectId);
+            const requestIds = await this.parrotProgressService.listRuntimeRequestIds(authContext.tenantId, projectId);
+
+            res.status(200).json({
+                status: 'success',
+                data: {
+                    projectId,
+                    requestIds,
+                    runtimeVitals: project.runtimeVitals || null,
+                    parrotRuntime: project.parrotRuntime || null
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    private getRuntimeRequestStatus = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const authContext = this.getAuthContext(req);
+            const { projectId, requestId } = req.params;
+            const { project } = await this.controlPlaneService.assertProjectAccess(authContext, projectId);
+            const progressFile = await this.parrotProgressService.loadProgressFile(authContext.tenantId, projectId, requestId);
+
+            if (!progressFile) {
+                res.status(404).json({ error: 'Runtime request not found' });
+                return;
+            }
+
+            const terminal = progressFile.status === 'completed' || progressFile.status === 'error';
+
+            res.status(200).json({
+                status: 'success',
+                data: {
+                    projectId,
+                    requestId,
+                    terminal,
+                    progressFile,
+                    runtimeVitals: project.runtimeVitals || null,
+                    parrotRuntime: project.parrotRuntime || null
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    private getRuntimeRequestArtifacts = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const authContext = this.getAuthContext(req);
+            const { projectId, requestId } = req.params;
+            await this.controlPlaneService.assertProjectAccess(authContext, projectId);
+            const progressFile = await this.parrotProgressService.loadProgressFile(authContext.tenantId, projectId, requestId);
+
+            if (!progressFile) {
+                res.status(404).json({ error: 'Runtime request not found' });
+                return;
+            }
+
+            const artifacts = await this.parrotProgressService.loadRequestArtifacts(authContext.tenantId, projectId, requestId);
+
+            res.status(200).json({
+                status: 'success',
+                data: artifacts
             });
         } catch (error) {
             next(error);

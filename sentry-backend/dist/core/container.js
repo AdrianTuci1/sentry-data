@@ -106,7 +106,7 @@ function initContainer() {
     const publicAccessController = new PublicAccessController_1.PublicAccessController(authService, controlPlaneService, analyticsService);
     const sseController = new SSEController_1.SSEController(sseManager, authService);
     const webhookController = new WebhookController_1.WebhookController(runtimeOrchestratorService);
-    const projectController = new ProjectController_1.ProjectController(orchestrationService, analyticsService, authService, projectRepo, sourceRepo, objectStorageService, sourceUpdateMonitorService, connectorCatalogService, controlPlaneService, mlExecutorClient, sentinelFeedbackService, decisionOverrideService);
+    const projectController = new ProjectController_1.ProjectController(orchestrationService, analyticsService, authService, projectRepo, sourceRepo, objectStorageService, sourceUpdateMonitorService, connectorCatalogService, controlPlaneService, mlExecutorClient, sentinelFeedbackService, decisionOverrideService, parrotProgressService);
     const controllers = [
         healthController,
         accountController,

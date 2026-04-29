@@ -1,0 +1,18 @@
+{
+  "name": "@statsparrot/codex-adapter",
+  "version": "0.1.0",
+  "description": "Conversation adapter for using PNE from Codex-style developer workflows.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@statsparrot/pne-core": "file:../pne-core"
+  },
+  "license": "UNLICENSED",
+  "type": "commonjs",
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}

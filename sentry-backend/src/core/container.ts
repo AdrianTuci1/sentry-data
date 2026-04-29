@@ -152,7 +152,8 @@ export function initContainer() {
         controlPlaneService,
         mlExecutorClient,
         sentinelFeedbackService,
-        decisionOverrideService
+        decisionOverrideService,
+        parrotProgressService
     );
 
     const controllers = [

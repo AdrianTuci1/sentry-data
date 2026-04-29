@@ -1,0 +1,47 @@
+{
+  "name": "pne-warehouse-intelligence",
+  "version": "0.1.0",
+  "description": "Connect AI coding agents to PNE for warehouse-native analysis, SQL planning, Sentinel review and evidence-backed answers.",
+  "author": {
+    "name": "StatsParrot",
+    "email": "support@statsparrot.local",
+    "url": "https://statsparrot.local"
+  },
+  "homepage": "https://statsparrot.local/docs/pne-warehouse-intelligence",
+  "repository": "https://github.com/statsparrot/pne-warehouse-intelligence",
+  "license": "UNLICENSED",
+  "keywords": [
+    "warehouse",
+    "pne",
+    "sentinel",
+    "mcp",
+    "analytics"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "PNE Warehouse Intelligence",
+    "shortDescription": "Ask your warehouse through PNE from agent tools.",
+    "longDescription": "PNE Warehouse Intelligence connects agent surfaces to a hosted or local PNE runtime. It sends warehouse context, asks PNE for analysis plans, routes generated SQL through Sentinel review, and returns evidence, caveats and follow-up questions.",
+    "developerName": "StatsParrot",
+    "category": "Data",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "MCP",
+      "CLI"
+    ],
+    "websiteURL": "https://statsparrot.local/",
+    "privacyPolicyURL": "https://statsparrot.local/privacy",
+    "termsOfServiceURL": "https://statsparrot.local/terms",
+    "defaultPrompt": [
+      "Check whether this workspace already has projects and analyzed artifacts.",
+      "Inspect whether a project has sources, projections, query specs and runtime outputs.",
+      "Can we compute LTV or ROAS from these tables?"
+    ],
+    "brandColor": "#2563EB",
+    "composerIcon": "./assets/icon.svg",
+    "logo": "./assets/logo.svg",
+    "screenshots": []
+  }
+}

@@ -82,7 +82,8 @@ async function run() {
         const DATASETS = [
             { name: 'Olist Orders', file: 'orders.parquet' },
             { name: 'Olist Products', file: 'products.parquet' },
-            { name: 'Olist Reviews', file: 'reviews.parquet' }
+            { name: 'Olist Reviews', file: 'reviews.parquet' },
+            { name: 'Olist Order Items', file: 'order_items.parquet' }
         ];
 
         const datarobotDir = path.join(process.cwd(), 'scripts', 'datarobot', 'parquets');

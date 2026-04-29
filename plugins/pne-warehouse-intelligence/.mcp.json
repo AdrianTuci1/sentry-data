@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "pne-warehouse-intelligence": {
+      "command": "node",
+      "args": [
+        "./packages/pne-bridge/bin/pne.mjs",
+        "mcp"
+      ],
+      "env": {
+        "PNE_ENDPOINT": "${PNE_ENDPOINT}",
+        "PNE_API_KEY": "${PNE_API_KEY}"
+      }
+    }
+  }
+}

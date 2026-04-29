@@ -35,12 +35,12 @@ const DATASETS: DatasetConfig[] = [
         type: 'parquet',
         cronSchedule: '0 2 * * *',
     },
-    // {
-    //     name: 'Olist Order Items',
-    //     localFile: 'order_items.parquet',
-    //     type: 'parquet',
-    //     cronSchedule: '0 2 * * *',
-    // },
+    {
+        name: 'Olist Order Items',
+        localFile: 'order_items.parquet',
+        type: 'parquet',
+        cronSchedule: '0 2 * * *',
+    },
     {
         name: 'Olist Products',
         localFile: 'products.parquet',

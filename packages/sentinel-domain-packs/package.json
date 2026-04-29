@@ -1,0 +1,15 @@
+{
+  "name": "@statsparrot/sentinel-domain-packs",
+  "version": "0.1.0",
+  "description": "Optional semantic packs for Sentinel review and business relevance scoring.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "license": "UNLICENSED",
+  "type": "commonjs",
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}

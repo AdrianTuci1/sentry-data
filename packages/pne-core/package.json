@@ -1,0 +1,20 @@
+{
+  "name": "@statsparrot/pne-core",
+  "version": "0.1.0",
+  "description": "Portable planning contracts for warehouse-native PNE analysis.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@statsparrot/connector-sdk": "file:../connector-sdk",
+    "@statsparrot/observability": "file:../observability",
+    "@statsparrot/sentinel-core": "file:../sentinel-core"
+  },
+  "license": "UNLICENSED",
+  "type": "commonjs",
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}

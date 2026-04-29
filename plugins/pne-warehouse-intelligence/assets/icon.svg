@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="PNE Warehouse Intelligence icon">
+  <rect width="64" height="64" rx="12" fill="#2563eb"/>
+  <path d="M16 19h32v8H16zM16 31h32v8H16zM16 43h32v4H16z" fill="#dbeafe"/>
+  <path d="M20 23h6M20 35h14M20 45h22" stroke="#0f172a" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="45" cy="35" r="7" fill="#22c55e"/>
+  <path d="M42 35l2 2 4-5" stroke="#052e16" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

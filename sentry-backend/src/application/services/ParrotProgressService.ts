@@ -15,6 +15,12 @@ import {
 export class ParrotProgressService {
     constructor(private readonly r2StorageService: R2StorageService) {}
 
+    public async listRuntimeRequestIds(tenantId: string, projectId: string): Promise<string[]> {
+        const prefix = this.r2StorageService.getS3Key(tenantId, projectId, 'runtime', 'requests/');
+        const requestIds = await this.r2StorageService.listPrefixGroups(prefix);
+        return requestIds.sort().reverse();
+    }
+
     public buildArtifactUris(tenantId: string, projectId: string, requestId: string): ParrotArtifactUris {
         return {
             executionScoreUri: this.r2StorageService.getS3Uri(tenantId, projectId, 'runtime', 'requests', requestId, 'execution-score.json'),
@@ -117,6 +123,53 @@ export class ParrotProgressService {
         );
 
         return { uri: result.uri };
+    }
+
+    public async loadProgressFile(tenantId: string, projectId: string, requestId: string): Promise<ParrotProgressFile | null> {
+        const key = this.r2StorageService.getS3Key(tenantId, projectId, 'runtime', 'requests', requestId, 'progress.json');
+        return this.r2StorageService.getJsonIfExists<ParrotProgressFile>(key);
+    }
+
+    public async loadRequestArtifacts(tenantId: string, projectId: string, requestId: string): Promise<Record<string, unknown>> {
+        const loadJson = async (filename: string) => {
+            const key = this.r2StorageService.getS3Key(tenantId, projectId, 'runtime', 'requests', requestId, filename);
+            return this.r2StorageService.getJsonIfExists(key);
+        };
+
+        const [
+            progressFile,
+            executionScore,
+            executionPlan,
+            executionSubmission,
+            projectionPlan,
+            sentinelReport,
+            outputManifest,
+            reverseEtlReceipts,
+            mindmapManifest
+        ] = await Promise.all([
+            loadJson('progress.json'),
+            loadJson('execution-score.json'),
+            loadJson('execution-plan.json'),
+            loadJson('execution-submission.json'),
+            loadJson('projection-plan.json'),
+            loadJson('sentinel-report.json'),
+            loadJson('output-manifest.json'),
+            loadJson('reverse-etl-receipts.json'),
+            loadJson('mindmap-manifest.json')
+        ]);
+
+        return {
+            requestId,
+            progressFile,
+            executionScore,
+            executionPlan,
+            executionSubmission,
+            projectionPlan,
+            sentinelReport,
+            outputManifest,
+            reverseEtlReceipts,
+            mindmapManifest
+        };
     }
 
     public markProgress(

@@ -1,0 +1,18 @@
+{
+  "name": "@statsparrot/powerbi-adapter",
+  "version": "0.1.0",
+  "description": "PowerBI-facing query and dataset adapter for PNE contracts.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@statsparrot/widget-contracts": "file:../widget-contracts"
+  },
+  "license": "UNLICENSED",
+  "type": "commonjs",
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}
