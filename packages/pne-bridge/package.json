@@ -1,6 +1,6 @@
 {
   "name": "@statsparrot/pne",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Universal PNE bridge for CLI, MCP, local HTTP and hosted warehouse intelligence workflows.",
   "engines": {
     "node": ">=18"

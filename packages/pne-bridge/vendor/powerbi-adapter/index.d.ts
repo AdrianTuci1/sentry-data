@@ -77,3 +77,27 @@ export declare const buildPowerBIDatasetDefinition: (input: {
     relationships?: PowerBIRelationshipDefinition[];
     bridgeUrl?: string;
 }) => PowerBIDatasetDefinition;
+export interface PowerBiApiPayload {
+    name: string;
+    defaultMode: 'Push' | 'Streaming' | 'PushStreaming';
+    tables: Array<{
+        name: string;
+        columns: Array<{
+            name: string;
+            dataType: string;
+        }>;
+        measures?: Array<{
+            name: string;
+            expression: string;
+        }>;
+    }>;
+    relationships?: Array<{
+        name: string;
+        fromTable: string;
+        fromColumn: string;
+        toTable: string;
+        toColumn: string;
+        crossFilteringBehavior: string;
+    }>;
+}
+export declare const toPowerBiApiPayload: (dataset: PowerBIDatasetDefinition) => PowerBiApiPayload;

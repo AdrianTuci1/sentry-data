@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.buildPowerBIDatasetDefinition = exports.buildPowerBIQueryDefinition = void 0;
+exports.toPowerBiApiPayload = exports.buildPowerBIDatasetDefinition = exports.buildPowerBIQueryDefinition = void 0;
 const normalizeSqlType = (value) => {
     const normalized = String(value || '').toLowerCase();
     if (normalized.includes('bool'))
@@ -128,3 +128,38 @@ const buildPowerBIDatasetDefinition = (input) => {
     };
 };
 exports.buildPowerBIDatasetDefinition = buildPowerBIDatasetDefinition;
+const toPowerBiApiPayload = (dataset) => {
+    const mapDataType = (pneType) => {
+        switch (pneType) {
+            case 'number': return 'Double';
+            case 'boolean': return 'Boolean';
+            case 'datetime': return 'DateTime';
+            case 'text': return 'string';
+            default: return 'string';
+        }
+    };
+    return {
+        name: dataset.datasetName,
+        defaultMode: 'Push',
+        tables: dataset.tables.map((t) => ({
+            name: t.name,
+            columns: t.query.columns.map((c) => ({
+                name: c.name,
+                dataType: mapDataType(c.type)
+            })),
+            measures: t.query.measures.map((m) => ({
+                name: m.name,
+                expression: m.expression
+            }))
+        })),
+        relationships: dataset.relationships.map((r, idx) => ({
+            name: `rel_${idx}`,
+            fromTable: r.fromTable,
+            fromColumn: r.fromColumn,
+            toTable: r.toTable,
+            toColumn: r.toColumn,
+            crossFilteringBehavior: r.crossFilteringBehavior || 'oneDirection'
+        }))
+    };
+};
+exports.toPowerBiApiPayload = toPowerBiApiPayload;

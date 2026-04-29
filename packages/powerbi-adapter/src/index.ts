@@ -210,3 +210,56 @@ export const buildPowerBIDatasetDefinition = (input: {
   };
 };
 
+export interface PowerBiApiPayload {
+  name: string;
+  defaultMode: 'Push' | 'Streaming' | 'PushStreaming';
+  tables: Array<{
+    name: string;
+    columns: Array<{ name: string; dataType: string }>;
+    measures?: Array<{ name: string; expression: string }>;
+  }>;
+  relationships?: Array<{
+    name: string;
+    fromTable: string;
+    fromColumn: string;
+    toTable: string;
+    toColumn: string;
+    crossFilteringBehavior: string;
+  }>;
+}
+
+export const toPowerBiApiPayload = (dataset: PowerBIDatasetDefinition): PowerBiApiPayload => {
+  const mapDataType = (pneType: PowerBIColumnDefinition['type']): string => {
+    switch (pneType) {
+      case 'number': return 'Double';
+      case 'boolean': return 'Boolean';
+      case 'datetime': return 'DateTime';
+      case 'text': return 'string';
+      default: return 'string';
+    }
+  };
+
+  return {
+    name: dataset.datasetName,
+    defaultMode: 'Push',
+    tables: dataset.tables.map((t) => ({
+      name: t.name,
+      columns: t.query.columns.map((c) => ({
+        name: c.name,
+        dataType: mapDataType(c.type)
+      })),
+      measures: t.query.measures.map((m) => ({
+        name: m.name,
+        expression: m.expression
+      }))
+    })),
+    relationships: dataset.relationships.map((r, idx) => ({
+      name: `rel_${idx}`,
+      fromTable: r.fromTable,
+      fromColumn: r.fromColumn,
+      toTable: r.toTable,
+      toColumn: r.toColumn,
+      crossFilteringBehavior: r.crossFilteringBehavior || 'oneDirection'
+    }))
+  };
+};

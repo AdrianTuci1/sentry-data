@@ -2,7 +2,8 @@
 
 import { createRequire } from 'node:module';
 import { spawn, spawnSync } from 'node:child_process';
-import { createServer } from 'node:http';
+import { createServer, request as httpRequest } from 'node:http';
+import { request as httpsRequest } from 'node:https';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -83,7 +84,8 @@ const {
 } = loadPackage('@statsparrot/ml-contracts', 'ml-contracts');
 const {
   buildPowerBIQueryDefinition,
-  buildPowerBIDatasetDefinition
+  buildPowerBIDatasetDefinition,
+  toPowerBiApiPayload
 } = loadPackage('@statsparrot/powerbi-adapter', 'powerbi-adapter');
 
 const PNE_HOME = process.env.PNE_HOME || join(homedir(), '.pne');
@@ -488,6 +490,30 @@ const runCommand = (command, input) => new Promise((resolvePromise, reject) => {
     resolvePromise(out);
   });
   child.stdin.end(input ? JSON.stringify(input) : '');
+});
+
+const postToPowerBi = (url, body, accessToken) => new Promise((resolvePromise, reject) => {
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`
+    }
+  };
+  const req = httpsRequest(url, options, (res) => {
+    let data = '';
+    res.on('data', (chunk) => { data += chunk; });
+    res.on('end', () => {
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        resolvePromise(data ? JSON.parse(data) : { status: 'success' });
+      } else {
+        reject(new Error(`PowerBI API Error (${res.statusCode}): ${data}`));
+      }
+    });
+  });
+  req.on('error', reject);
+  req.write(JSON.stringify(body));
+  req.end();
 });
 
 const runExecutable = (command, args = [], input, extraEnv = {}) => new Promise((resolvePromise, reject) => {
@@ -1227,6 +1253,7 @@ const getBridgeCapabilities = (connectorConfig) => ({
       'pne_resolve_widget_contract',
       'pne_build_powerbi_query',
       'pne_build_powerbi_dataset',
+      'pne_push_powerbi_dataset',
       'pne_get_account_snapshot',
       'pne_get_environment_status',
       'pne_get_connector_catalog',
@@ -1802,6 +1829,21 @@ const executeToolCall = async (toolName, payload = {}, connectorOverride, defaul
       mode: payload.mode || 'live_bridge',
       queries: definitions
     });
+  }
+
+  if (toolName === 'pne_push_powerbi_dataset') {
+    const dataset = payload.dataset;
+    if (!dataset) throw new Error('Missing dataset for pne_push_powerbi_dataset.');
+    const workspaceId = payload.workspaceId;
+    const accessToken = payload.accessToken || process.env.POWERBI_ACCESS_TOKEN;
+    if (!accessToken) throw new Error('Missing accessToken for pne_push_powerbi_dataset. Provide it in payload or POWERBI_ACCESS_TOKEN env.');
+
+    const apiPayload = toPowerBiApiPayload(dataset);
+    const url = workspaceId
+      ? `https://api.powerbi.com/v1.0/myorg/groups/${workspaceId}/datasets`
+      : 'https://api.powerbi.com/v1.0/myorg/datasets';
+
+    return postToPowerBi(url, apiPayload, accessToken);
   }
 
   if (toolName === 'pne_export_contract') {
@@ -2928,6 +2970,19 @@ const commandMcp = async () => {
           queries: { type: 'array', items: { type: 'object', additionalProperties: true } }
         },
         required: ['queries']
+      }
+    },
+    {
+      name: 'pne_push_powerbi_dataset',
+      description: 'Push a PowerBI dataset definition to the Power BI Service via REST API.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          dataset: { type: 'object', additionalProperties: true },
+          workspaceId: { type: 'string' },
+          accessToken: { type: 'string' }
+        },
+        required: ['dataset']
       }
     },
     {
