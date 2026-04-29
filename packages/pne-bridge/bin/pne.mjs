@@ -3589,22 +3589,28 @@ const usage = () => {
   const pkg = JSON.parse(readFileSync(resolve(__dirname, '..', 'package.json'), 'utf8'));
   console.log(`pne v${pkg.version} - Universal StatsParrot Bridge
 
+AGENT ONBOARDING GUIDE:
+1. Run 'pne version' to verify the installation and Python/DuckDB dependencies.
+2. Run 'pne tool pne_get_setup_guide' to understand the current configuration.
+3. Run 'pne tool pne_list_sources' to see available data tables.
+4. Use 'pne tool pne_analyze_question' to answer data/business questions.
+
 Usage:
   pne init
   pne version
+  pne setup (Repair dependencies)
   pne connect profile --id demo --file ./warehouse-profile.json
   pne connect custom --id local --profile-file ./warehouse-profile.json --query-cmd "./run-query.sh"
   pne connect hosted --id hosted --endpoint https://your-pne-host/analyze
-  pne connect bigquery --id bq --project my-project --dataset ecommerce
-  pne connect snowflake --id snow --connection analytics --database RAW --schema PUBLIC
-  pne connect duckdb --id local-duck --database ./warehouse.duckdb
-  pne connect duckdb-r2 --id r2 --database ./.pne/pne-r2.duckdb --table raw_data --uri "s3://bucket/path/**/*.parquet"
-  pne connect duckdb-r2 --id r2 --tables-json '[{"table":"olist_orders","uri":"s3://bucket/orders/**/*.parquet"},{"table":"olist_reviews","uri":"s3://bucket/reviews/**/*.parquet"}]'
-  pne connect postgres --id app-db --connection-string postgresql://user:pass@host:5432/db
+  pne connect bigquery --id bq --project p --dataset d
+  pne connect snowflake --id sn --account a --warehouse w --database d --schema s
+  pne connect duckdb --id local-db --database ./data.duckdb
+  pne connect duckdb-r2 --id olist-r2 --endpoint https://... --access-key-id ... --secret-access-key ...
+  pne connect postgres --id pg --host h --port p --database d --user u --password p
   pne capabilities [--connector id]
   pne sources [--connector id]
   pne resources [--connector id]
-  pne tool pne_get_capabilities
+  pne tool pne_get_setup_guide
   pne tool pne_get_setup_guide
   pne tool pne_get_widget_catalog
   pne tool pne_resolve_widget_contract
@@ -3675,6 +3681,40 @@ const main = async () => {
   if (command === 'version' || command === '--version') {
     const pkg = JSON.parse(readFileSync(resolve(__dirname, '..', 'package.json'), 'utf8'));
     console.log(`pne v${pkg.version}`);
+    const hasPython = commandExists('python3');
+    console.log(`python3: ${hasPython ? '✅' : '❌'}`);
+    if (hasPython) {
+      try {
+        execSync('python3 -c "import duckdb"', { stdio: 'ignore' });
+        console.log('duckdb: ✅');
+      } catch (e) {
+        console.log('duckdb: ❌ (Run "pne setup" to fix)');
+      }
+    }
+    return;
+  }
+  if (command === 'setup') {
+    console.log('Checking PNE bridge prerequisites...');
+    const hasPython = commandExists('python3');
+    if (!hasPython) {
+      console.error('❌ python3 not found. Please install Python 3.');
+      process.exit(1);
+    }
+    console.log('✅ python3 found.');
+    try {
+      execSync('python3 -c "import duckdb"', { stdio: 'ignore' });
+      console.log('✅ duckdb module found.');
+    } catch (e) {
+      console.log('⚠️ duckdb module missing. Attempting to install...');
+      try {
+        execSync('python3 -m pip install duckdb', { stdio: 'inherit' });
+        console.log('✅ duckdb module installed.');
+      } catch (err) {
+        console.error('❌ Failed to install duckdb. Please run: pip install duckdb');
+        process.exit(1);
+      }
+    }
+    console.log('✅ PNE bridge setup complete.');
     return;
   }
   usage();
