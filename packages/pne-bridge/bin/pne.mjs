@@ -3586,8 +3586,12 @@ const commandCache = (subcommand) => {
 };
 
 const usage = () => {
-  console.log(`Usage:
+  const pkg = JSON.parse(readFileSync(resolve(__dirname, '..', 'package.json'), 'utf8'));
+  console.log(`pne v${pkg.version} - Universal StatsParrot Bridge
+
+Usage:
   pne init
+  pne version
   pne connect profile --id demo --file ./warehouse-profile.json
   pne connect custom --id local --profile-file ./warehouse-profile.json --query-cmd "./run-query.sh"
   pne connect hosted --id hosted --endpoint https://your-pne-host/analyze
@@ -3668,6 +3672,11 @@ const main = async () => {
   if (command === 'serve') return commandServe(parseArgs([subcommand, ...rest].filter(Boolean)));
   if (command === 'mcp') return commandMcp();
   if (command === 'cache') return commandCache(subcommand);
+  if (command === 'version' || command === '--version') {
+    const pkg = JSON.parse(readFileSync(resolve(__dirname, '..', 'package.json'), 'utf8'));
+    console.log(`pne v${pkg.version}`);
+    return;
+  }
   usage();
 };
 
