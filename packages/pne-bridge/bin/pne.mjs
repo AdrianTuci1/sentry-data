@@ -1782,10 +1782,8 @@ const executeToolCall = async (toolName, payload = {}, connectorOverride, defaul
     });
     const query = payload.query || {};
     const nativeSql = payload.sql || query.sql;
-    if (!nativeSql) {
-      throw new Error('Missing sql or query.sql for pne_build_powerbi_query.');
-    }
     return buildPowerBIQueryDefinition({
+      mode: payload.mode || 'live_bridge',
       queryName: payload.queryName || query.title || query.queryId || widgetContract.widget.id,
       nativeSql,
       bridgeUrl: payload.bridgeUrl,
@@ -1801,6 +1799,7 @@ const executeToolCall = async (toolName, payload = {}, connectorOverride, defaul
     }
     return buildPowerBIDatasetDefinition({
       datasetName: payload.datasetName || 'PNE Dataset',
+      mode: payload.mode || 'live_bridge',
       queries: definitions
     });
   }
@@ -2903,12 +2902,13 @@ const commandMcp = async () => {
     },
     {
       name: 'pne_build_powerbi_query',
-      description: 'Build a PowerBI-friendly query definition, including Power Query M, from a SQL query and widget contract.',
+      description: 'Build a PowerBI-friendly query definition (Model, Layout or Live Bridge) from a SQL query and widget contract.',
       inputSchema: {
         type: 'object',
         properties: {
           connectorId: { type: 'string' },
           queryName: { type: 'string' },
+          mode: { type: 'string', enum: ['model_only', 'model_layout', 'live_bridge'], default: 'live_bridge' },
           sql: { type: 'string' },
           widgetType: { type: 'string' },
           contract: { type: 'object', additionalProperties: true },
@@ -2919,11 +2919,12 @@ const commandMcp = async () => {
     },
     {
       name: 'pne_build_powerbi_dataset',
-      description: 'Build a PowerBI dataset definition from one or more PowerBI query definitions.',
+      description: 'Build a PowerBI dataset definition (Model, Layout or Live Bridge) from one or more PowerBI query definitions.',
       inputSchema: {
         type: 'object',
         properties: {
           datasetName: { type: 'string' },
+          mode: { type: 'string', enum: ['model_only', 'model_layout', 'live_bridge'], default: 'live_bridge' },
           queries: { type: 'array', items: { type: 'object', additionalProperties: true } }
         },
         required: ['queries']

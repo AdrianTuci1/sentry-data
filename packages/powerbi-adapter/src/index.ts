@@ -1,38 +1,74 @@
 import { WidgetQueryContract } from '@statsparrot/widget-contracts';
 
+export type PowerBIMode = 'model_only' | 'model_layout' | 'live_bridge';
+
+export interface PowerBIMeasureDefinition {
+  name: string;
+  expression: string; // DAX expression
+  formatString?: string;
+  displayFolder?: string;
+  description?: string;
+}
+
+export interface PowerBIRelationshipDefinition {
+  fromTable: string;
+  fromColumn: string;
+  toTable: string;
+  toColumn: string;
+  crossFilteringBehavior?: 'oneDirection' | 'bothDirections';
+}
+
 export interface PowerBIColumnDefinition {
   name: string;
   type: 'text' | 'number' | 'datetime' | 'boolean' | 'any';
   role: 'dimension' | 'measure' | 'time' | 'identifier' | 'unknown';
+  isHidden?: boolean;
+}
+
+export interface PowerBIVisualDefinition {
+  visualId: string;
+  type: string; // PowerBI visual type (e.g., 'card', 'lineChart')
+  title: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  bindings: Record<string, string[]>; // e.g., { 'Values': ['total_revenue'], 'Axis': ['date'] }
+}
+
+export interface PowerBIPageDefinition {
+  name: string;
+  displayName: string;
+  visuals: PowerBIVisualDefinition[];
 }
 
 export interface PowerBIQueryDefinition {
-  version: 1;
+  version: 2;
+  mode: PowerBIMode;
   queryName: string;
-  sourceMode: 'pne-http' | 'native-sql';
-  nativeSql: string;
-  powerQueryM: string;
+  nativeSql?: string;
+  powerQueryM?: string;
   columns: PowerBIColumnDefinition[];
-  widgetBinding?: {
-    visualType: 'card' | 'lineChart' | 'clusteredBarChart' | 'table';
-    suggestedFields: string[];
-  };
+  measures: PowerBIMeasureDefinition[];
   notes: string[];
 }
 
 export interface PowerBIDatasetDefinition {
-  version: 1;
+  version: 2;
   datasetName: string;
+  mode: PowerBIMode;
   tables: Array<{
     name: string;
     query: PowerBIQueryDefinition;
   }>;
-  relationships: Array<{
-    fromTable: string;
-    fromColumn: string;
-    toTable: string;
-    toColumn: string;
-  }>;
+  relationships: PowerBIRelationshipDefinition[];
+  pages: PowerBIPageDefinition[];
+  bridgeConfig?: {
+    endpoint: string;
+    authType: 'none' | 'api-key' | 'service-principal';
+    timeoutMs: number;
+    enableCaching: boolean;
+  };
 }
 
 const normalizeSqlType = (value?: string): PowerBIColumnDefinition['type'] => {
@@ -53,24 +89,21 @@ const inferRole = (alias: string, type: PowerBIColumnDefinition['type']): PowerB
   return 'unknown';
 };
 
-const suggestVisual = (contract?: WidgetQueryContract): PowerBIQueryDefinition['widgetBinding'] => {
-  const widgetId = contract?.widget.id || '';
-  const category = contract?.widget.category || '';
-  if (widgetId === 'metric-trend' || widgetId === 'weather' || widgetId === 'natural') {
-    return { visualType: 'card', suggestedFields: contract?.requiredAliases || [] };
+const generateDaxMeasure = (alias: string, widgetId?: string): string => {
+  const normalized = alias.toLowerCase();
+  if (normalized.includes('revenue') || normalized.includes('price') || normalized.includes('amount')) {
+    return `SUM('${alias}')`;
   }
-  if (widgetId === 'sparkline-stat' || widgetId === 'live-traffic') {
-    return { visualType: 'lineChart', suggestedFields: contract?.requiredAliases || [] };
+  if (normalized.includes('count') || normalized.includes('total')) {
+    return `COUNT('${alias}')`;
   }
-  if (widgetId === 'campaign-list' || widgetId === 'mpl-benchmark-bars' || category === 'lists') {
-    return { visualType: 'clusteredBarChart', suggestedFields: contract?.requiredAliases || [] };
-  }
-  return { visualType: 'table', suggestedFields: contract?.requiredAliases || [] };
+  return `AVERAGE('${alias}')`;
 };
 
 export const buildPowerBIQueryDefinition = (input: {
+  mode: PowerBIMode;
   queryName: string;
-  nativeSql: string;
+  nativeSql?: string;
   bridgeUrl?: string;
   connectorId?: string;
   widgetContract?: WidgetQueryContract;
@@ -83,52 +116,97 @@ export const buildPowerBIQueryDefinition = (input: {
       role: inferRole(alias.alias, type)
     };
   });
-  const bridgeUrl = input.bridgeUrl || 'http://127.0.0.1:8765';
-  const requestBody = JSON.stringify({
-    toolName: 'pne_execute_sql',
-    connectorId: input.connectorId,
-    arguments: {
+
+  const measures: PowerBIMeasureDefinition[] = columns
+    .filter((col) => col.role === 'measure')
+    .map((col) => ({
+      name: `Total ${col.name}`,
+      expression: generateDaxMeasure(col.name, input.widgetContract?.widget.id)
+    }));
+
+  let powerQueryM: string | undefined;
+  if (input.mode === 'live_bridge') {
+    const bridgeUrl = input.bridgeUrl || 'http://127.0.0.1:8765';
+    const requestBody = JSON.stringify({
+      toolName: 'pne_execute_sql',
       connectorId: input.connectorId,
-      sql: input.nativeSql
-    }
-  });
-  const powerQueryM = [
-    'let',
-    `    Source = Json.Document(Web.Contents("${bridgeUrl}", [`,
-    '        RelativePath = "/tool",',
-    '        Headers = [#"Content-Type" = "application/json"],',
-    `        Content = Text.ToBinary(${JSON.stringify(requestBody)})`,
-    '    ])),',
-    '    Rows = if Record.HasFields(Source, "rows") then Source[rows] else {},',
-    '    Output = if Value.Is(Rows, type list) then Table.FromRecords(Rows) else #table({}, {})',
-    'in',
-    '    Output'
-  ].join('\n');
+      arguments: {
+        connectorId: input.connectorId,
+        sql: input.nativeSql
+      }
+    });
+    powerQueryM = [
+      'let',
+      `    Source = Json.Document(Web.Contents("${bridgeUrl}", [`,
+      '        RelativePath = "/tool",',
+      '        Headers = [#"Content-Type" = "application/json"],',
+      `        Content = Text.ToBinary(${JSON.stringify(requestBody)})`,
+      '    ])),',
+      '    Rows = if Record.HasFields(Source, "rows") then Source[rows] else {},',
+      '    Output = if Value.Is(Rows, type list) then Table.FromRecords(Rows) else #table({}, {})',
+      'in',
+      '    Output'
+    ].join('\n');
+  }
 
   return {
-    version: 1,
+    version: 2,
+    mode: input.mode,
     queryName: input.queryName,
-    sourceMode: 'pne-http',
     nativeSql: input.nativeSql,
     powerQueryM,
     columns,
-    widgetBinding: suggestVisual(input.widgetContract),
+    measures,
     notes: [
-      'This definition expects the PNE bridge HTTP server to be reachable by PowerBI.',
-      'Once projections and serving tables are materialized, the BI layer can switch to native warehouse SQL and stop routing through the LLM.'
+      `Mode: ${input.mode}`,
+      input.mode === 'live_bridge' ? 'Route queries through PNE Bridge.' : 'Native warehouse connection.'
     ]
   };
 };
 
 export const buildPowerBIDatasetDefinition = (input: {
   datasetName: string;
+  mode: PowerBIMode;
   queries: PowerBIQueryDefinition[];
-}): PowerBIDatasetDefinition => ({
-  version: 1,
-  datasetName: input.datasetName,
-  tables: input.queries.map((query) => ({
-    name: query.queryName,
-    query
-  })),
-  relationships: []
-});
+  relationships?: PowerBIRelationshipDefinition[];
+  bridgeUrl?: string;
+}): PowerBIDatasetDefinition => {
+  const visuals: PowerBIVisualDefinition[] = input.queries.map((q, idx) => ({
+    visualId: `visual_${idx}`,
+    type: q.measures.length > 0 ? 'card' : 'table',
+    title: q.queryName,
+    x: (idx % 2) * 400,
+    y: Math.floor(idx / 2) * 300,
+    width: 380,
+    height: 280,
+    bindings: {
+      'Values': q.measures.map((m) => m.name),
+      'Columns': q.columns.filter((c) => c.role !== 'measure').map((c) => c.name)
+    }
+  }));
+
+  return {
+    version: 2,
+    datasetName: input.datasetName,
+    mode: input.mode,
+    tables: input.queries.map((query) => ({
+      name: query.queryName,
+      query
+    })),
+    relationships: input.relationships || [],
+    pages: [
+      {
+        name: 'main_page',
+        displayName: 'PNE Analysis Overview',
+        visuals
+      }
+    ],
+    bridgeConfig: input.mode === 'live_bridge' ? {
+      endpoint: input.bridgeUrl || 'http://127.0.0.1:8765',
+      authType: 'none',
+      timeoutMs: 30000,
+      enableCaching: true
+    } : undefined
+  };
+};
+

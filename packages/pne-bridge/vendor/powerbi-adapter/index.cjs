@@ -25,19 +25,15 @@ const inferRole = (alias, type) => {
         return 'dimension';
     return 'unknown';
 };
-const suggestVisual = (contract) => {
-    const widgetId = contract?.widget.id || '';
-    const category = contract?.widget.category || '';
-    if (widgetId === 'metric-trend' || widgetId === 'weather' || widgetId === 'natural') {
-        return { visualType: 'card', suggestedFields: contract?.requiredAliases || [] };
+const generateDaxMeasure = (alias, widgetId) => {
+    const normalized = alias.toLowerCase();
+    if (normalized.includes('revenue') || normalized.includes('price') || normalized.includes('amount')) {
+        return `SUM('${alias}')`;
     }
-    if (widgetId === 'sparkline-stat' || widgetId === 'live-traffic') {
-        return { visualType: 'lineChart', suggestedFields: contract?.requiredAliases || [] };
+    if (normalized.includes('count') || normalized.includes('total')) {
+        return `COUNT('${alias}')`;
     }
-    if (widgetId === 'campaign-list' || widgetId === 'mpl-benchmark-bars' || category === 'lists') {
-        return { visualType: 'clusteredBarChart', suggestedFields: contract?.requiredAliases || [] };
-    }
-    return { visualType: 'table', suggestedFields: contract?.requiredAliases || [] };
+    return `AVERAGE('${alias}')`;
 };
 const buildPowerBIQueryDefinition = (input) => {
     const columns = (input.widgetContract?.widget.sqlAliases || []).map((alias) => {
@@ -48,49 +44,87 @@ const buildPowerBIQueryDefinition = (input) => {
             role: inferRole(alias.alias, type)
         };
     });
-    const bridgeUrl = input.bridgeUrl || 'http://127.0.0.1:8765';
-    const requestBody = JSON.stringify({
-        toolName: 'pne_execute_sql',
-        connectorId: input.connectorId,
-        arguments: {
+    const measures = columns
+        .filter((col) => col.role === 'measure')
+        .map((col) => ({
+        name: `Total ${col.name}`,
+        expression: generateDaxMeasure(col.name, input.widgetContract?.widget.id)
+    }));
+    let powerQueryM;
+    if (input.mode === 'live_bridge') {
+        const bridgeUrl = input.bridgeUrl || 'http://127.0.0.1:8765';
+        const requestBody = JSON.stringify({
+            toolName: 'pne_execute_sql',
             connectorId: input.connectorId,
-            sql: input.nativeSql
-        }
-    });
-    const powerQueryM = [
-        'let',
-        `    Source = Json.Document(Web.Contents("${bridgeUrl}", [`,
-        '        RelativePath = "/tool",',
-        '        Headers = [#"Content-Type" = "application/json"],',
-        `        Content = Text.ToBinary(${JSON.stringify(requestBody)})`,
-        '    ])),',
-        '    Rows = if Record.HasFields(Source, "rows") then Source[rows] else {},',
-        '    Output = if Value.Is(Rows, type list) then Table.FromRecords(Rows) else #table({}, {})',
-        'in',
-        '    Output'
-    ].join('\n');
+            arguments: {
+                connectorId: input.connectorId,
+                sql: input.nativeSql
+            }
+        });
+        powerQueryM = [
+            'let',
+            `    Source = Json.Document(Web.Contents("${bridgeUrl}", [`,
+            '        RelativePath = "/tool",',
+            '        Headers = [#"Content-Type" = "application/json"],',
+            `        Content = Text.ToBinary(${JSON.stringify(requestBody)})`,
+            '    ])),',
+            '    Rows = if Record.HasFields(Source, "rows") then Source[rows] else {},',
+            '    Output = if Value.Is(Rows, type list) then Table.FromRecords(Rows) else #table({}, {})',
+            'in',
+            '    Output'
+        ].join('\n');
+    }
     return {
-        version: 1,
+        version: 2,
+        mode: input.mode,
         queryName: input.queryName,
-        sourceMode: 'pne-http',
         nativeSql: input.nativeSql,
         powerQueryM,
         columns,
-        widgetBinding: suggestVisual(input.widgetContract),
+        measures,
         notes: [
-            'This definition expects the PNE bridge HTTP server to be reachable by PowerBI.',
-            'Once projections and serving tables are materialized, the BI layer can switch to native warehouse SQL and stop routing through the LLM.'
+            `Mode: ${input.mode}`,
+            input.mode === 'live_bridge' ? 'Route queries through PNE Bridge.' : 'Native warehouse connection.'
         ]
     };
 };
 exports.buildPowerBIQueryDefinition = buildPowerBIQueryDefinition;
-const buildPowerBIDatasetDefinition = (input) => ({
-    version: 1,
-    datasetName: input.datasetName,
-    tables: input.queries.map((query) => ({
-        name: query.queryName,
-        query
-    })),
-    relationships: []
-});
+const buildPowerBIDatasetDefinition = (input) => {
+    const visuals = input.queries.map((q, idx) => ({
+        visualId: `visual_${idx}`,
+        type: q.measures.length > 0 ? 'card' : 'table',
+        title: q.queryName,
+        x: (idx % 2) * 400,
+        y: Math.floor(idx / 2) * 300,
+        width: 380,
+        height: 280,
+        bindings: {
+            'Values': q.measures.map((m) => m.name),
+            'Columns': q.columns.filter((c) => c.role !== 'measure').map((c) => c.name)
+        }
+    }));
+    return {
+        version: 2,
+        datasetName: input.datasetName,
+        mode: input.mode,
+        tables: input.queries.map((query) => ({
+            name: query.queryName,
+            query
+        })),
+        relationships: input.relationships || [],
+        pages: [
+            {
+                name: 'main_page',
+                displayName: 'PNE Analysis Overview',
+                visuals
+            }
+        ],
+        bridgeConfig: input.mode === 'live_bridge' ? {
+            endpoint: input.bridgeUrl || 'http://127.0.0.1:8765',
+            authType: 'none',
+            timeoutMs: 30000,
+            enableCaching: true
+        } : undefined
+    };
+};
 exports.buildPowerBIDatasetDefinition = buildPowerBIDatasetDefinition;
