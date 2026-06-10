@@ -12,6 +12,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
+      '@': path.resolve(__dirname, './src'),
       '@widgets': path.resolve(__dirname, '../r2-system/widgets'),
       '@graphics': path.resolve(__dirname, '../r2-system/widgets/micrographics'),
       'react': path.resolve(__dirname, 'node_modules/react'),
