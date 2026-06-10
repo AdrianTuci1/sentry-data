@@ -150,21 +150,21 @@
 
 .hero-card-sessions {
   top: 0;
-  left: 300px;
+  left: 294px;
   width: 580px;
   height: 280px;
 }
 
 .hero-card-funnel {
-  top: 300px;
+  top: 294px;
   left: 0;
   width: 580px;
   height: 280px;
 }
 
 .hero-card-activity {
-  top: 300px;
-  left: 600px;
+  top: 294px;
+  left: 588px;
   width: 280px;
   height: 580px;
 }
@@ -177,8 +177,8 @@
 }
 
 .hero-card-creative {
-  top: 600px;
-  left: 300px;
+  top: 588px;
+  left: 294px;
   width: 280px;
   height: 280px;
 }

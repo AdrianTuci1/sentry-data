@@ -11,9 +11,8 @@ from .sentinel_tools import (
     check_interaction_policy,
     check_schema_coverage,
     check_sql_risk,
-    consult_sentinel_internal,
 )
-from .widget_tools import inspect_manifest, inspect_manifests, lookup_catalog
+from .widget_tools import inspect_category, inspect_manifest, inspect_manifests, list_widget_categories, lookup_catalog
 from .worker_tools import execute_worker_query
 from .widgets import build_widget_contract, build_widget_presentation, resolve_widget_type
 
@@ -109,11 +108,12 @@ def parse_query_specs_from_text(
 
 def get_tool_dispatch() -> Dict[str, Callable[..., Any]]:
     return {
+        "list_widget_categories": list_widget_categories,
+        "inspect_category": inspect_category,
         "lookup_catalog": lookup_catalog,
         "inspect_manifest": inspect_manifest,
         "inspect_manifests": inspect_manifests,
         "analyze_data_health": analyze_data_health,
-        "consult_sentinel_internal": consult_sentinel_internal,
         "check_schema_coverage": check_schema_coverage,
         "check_sql_risk": check_sql_risk,
         "check_data_drift": check_data_drift,
@@ -159,22 +159,32 @@ def run_gemini_reasoning(
     entity_candidates = ", ".join(profile.entityKeyCandidates[:6]) or "none"
     system_instruction = (
         "You are the Parrot Neural Engine. "
-        "You may call tools to inspect the widget index, widget catalog, manifests, worker data, and safety checks. "
-        "First shortlist canonical widget ids from the catalog or index, then inspect the manifest for every widget you plan to emit. "
+        "Your task is to plan dashboard widgets for a data source. "
+        "\n\n=== DISCOVERY ===\n"
+        "Always start by calling list_widget_categories() to see the full catalog. "
+        "Then inspect 2-3 promising categories with inspect_category() to find widgets that fit the data. "
+        "Finally inspect the manifest of every widget you plan to emit with inspect_manifest(). "
+        "\n\n=== DIVERSITY ===\n"
+        "Never emit two widgets from the same category unless the data genuinely requires it. "
+        "Cover at least 3 different categories in your output. "
+        "Generate at most 3 high-signal widgets per source beyond the deterministic baseline. "
+        "Prefer one meaningful trend, one ranked breakdown, and at most one compact KPI. "
+        "Avoid repetitive count-only widgets when a richer trend or ranked list is possible. "
+        "Avoid emitting one widget per discrete bucket or score value. "
+        "\n\n=== OUTPUT FORMAT ===\n"
         "When you answer, return only a JSON array. "
         "Each item must contain at least: queryId, widgetId, title, widgetType, and sql. "
         "Every widgetType must be a canonical catalog widget id, not a generic label like line_chart or table. "
+        "Use descriptive stable ids such as source_metric_trend, never bare integers like 1 or 2. "
+        "\n\n=== SQL REQUIREMENTS ===\n"
         "Your SQL must return exactly the aliases required by the manifest with the correct runtime shape. "
+        "The manifest's sql_aliases and sql_shape fields are the source of truth. "
         "Prefer one final row per widget payload and package nested arrays or objects with DuckDB list/struct aggregations. "
         "Round non-count numeric outputs to at most 2 decimal places unless the metric is naturally an integer count. "
-        "Generate at most 3 high-signal widgets per source beyond the deterministic baseline. "
-        "Prefer one meaningful trend, one ranked breakdown, and at most one compact KPI. "
-        "Avoid emitting one widget per discrete bucket or score value. "
-        "Avoid repetitive count-only widgets when a richer trend or ranked list is possible. "
-        "Use descriptive stable ids such as source_metric_trend, never bare integers like 1 or 2. "
-        "Favor business insights, comparisons, and movement over raw totals unless the total is genuinely important. "
         "Use SQL directly executable by the analytics worker. "
-        f"For source queries, use this base relation exactly: {sql_source}. "
+        "Favor business insights, comparisons, and movement over raw totals unless the total is genuinely important. "
+        f"\n\n=== DATA CONTEXT ===\n"
+        f"Base relation: {sql_source}. "
         f"Schema: {schema_fmt}. "
         f"Timestamp candidates: {timestamp_candidates}. "
         f"Metric candidates: {metric_candidates}. "
@@ -185,11 +195,12 @@ def run_gemini_reasoning(
     client = genai.Client(api_key=api_key)
 
     tools = [
+        list_widget_categories,
+        inspect_category,
         lookup_catalog,
         inspect_manifest,
         inspect_manifests,
         analyze_data_health,
-        consult_sentinel_internal,
         execute_worker_query,
         check_schema_coverage,
         check_sql_risk,
@@ -210,7 +221,7 @@ def run_gemini_reasoning(
     )
 
     # Keep the tool loop bounded so a noisy model session cannot block the endpoint.
-    for _ in range(5):
+    for _ in range(8):
         function_calls = getattr(response, "function_calls", None) or []
         if not function_calls:
             break

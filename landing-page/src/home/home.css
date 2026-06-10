@@ -160,22 +160,22 @@
 }
 
 .home-card-scene .hero-card-sessions {
-  top: 600px;
+  top: 588px;
   left: 0;
   width: 580px;
   height: 280px;
 }
 
 .home-card-scene .hero-card-funnel {
-  top: 300px;
+  top: 294px;
   left: 0;
   width: 580px;
   height: 280px;
 }
 
 .home-card-scene .hero-card-activity {
-  top: 300px;
-  left: 600px;
+  top: 294px;
+  left: 588px;
   width: 280px;
   height: 580px;
 }
@@ -189,14 +189,14 @@
 
 .home-card-scene .hero-card-infra {
   top: 0;
-  left: 300px;
+  left: 294px;
   width: 280px;
   height: 280px;
 }
 
 .home-card-scene .hero-card-creative {
   top: 0;
-  left: 600px;
+  left: 588px;
   width: 280px;
   height: 280px;
 }

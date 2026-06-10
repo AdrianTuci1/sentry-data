@@ -127,6 +127,11 @@ def _required_manifest_aliases(widget_type: str) -> List[str]:
     ]
 
 
+def required_manifest_aliases(widget_type: str) -> List[str]:
+    """Public wrapper for _required_manifest_aliases."""
+    return _required_manifest_aliases(widget_type)
+
+
 def _sql_mentions_alias(sql: str, alias: str) -> bool:
     normalized_sql = str(sql or "").lower()
     normalized_alias = str(alias or "").strip().lower()

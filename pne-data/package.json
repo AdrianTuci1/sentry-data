@@ -1,0 +1,21 @@
+{
+  "name": "@pne/data-hub",
+  "version": "1.0.0",
+  "description": "Core data and logic packages for PNE ecosystem",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w packages/*",
+    "test": "npm test -w packages/*"
+  },
+  "keywords": [
+    "pne",
+    "data",
+    "sentinel",
+    "core"
+  ],
+  "author": "",
+  "license": "ISC"
+}

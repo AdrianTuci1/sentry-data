@@ -1,7 +1,7 @@
 import os
 import re
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Optional
 
 from .config import TRANSLATOR_VERSION, logger
 from .gemini import run_gemini_reasoning
@@ -372,6 +372,20 @@ def evaluate_query_candidate_quality(
     return reasons
 
 
+def is_source_invalidated(source_id: str, hints: Optional[List[Dict[str, Any]]], force_rediscover: bool) -> bool:
+    if force_rediscover:
+        return True
+    if not hints:
+        return False
+    for hint in hints:
+        hint_source_id = hint.get("sourceId") or (hint.get("targetId") if hint.get("scope") == "source" else None)
+        if hint_source_id == source_id:
+            invalidates = hint.get("invalidates") or []
+            if any(item in invalidates for item in ["source", "query", "widget"]):
+                return True
+    return False
+
+
 def build_projection_plan_logic(req: CompileProjectionPlanRequest) -> Dict[str, Any]:
     request_id = req.requestId
     source_profiles = req.sourceProfiles
@@ -413,6 +427,93 @@ def build_projection_plan_logic(req: CompileProjectionPlanRequest) -> Dict[str, 
             )
         )
         log_checkpoint(request_id, "projection_specs", "completed", source_trace["steps"][-1]["details"], profile.sourceId)
+
+        source_id = profile.sourceId
+        reused_queries = []
+        is_valid = False
+
+        if req.previousQueryRegistry and not is_source_invalidated(source_id, req.invalidationHints, bool(req.forceRediscover)):
+            registry_queries = req.previousQueryRegistry.get("queries", {}) or {}
+            for q_id, q_entry in registry_queries.items():
+                if q_entry.get("sourceId") == source_id and q_entry.get("status") == "active":
+                    reused_queries.append({
+                        "queryId": q_entry.get("queryId"),
+                        "widgetId": q_entry.get("widgetId"),
+                        "projectionId": q_entry.get("projectionId"),
+                        "sourceId": q_entry.get("sourceId"),
+                        "title": q_entry.get("title"),
+                        "widgetType": q_entry.get("widgetType"),
+                        "sql": q_entry.get("latestSql"),
+                        "status": q_entry.get("status"),
+                        "queryHash": q_entry.get("latestQueryHash"),
+                        "inputFingerprint": q_entry.get("inputFingerprint"),
+                        "dependencies": q_entry.get("dependencies"),
+                        "executionPolicy": q_entry.get("executionPolicy"),
+                        "widgetContract": q_entry.get("widgetContract"),
+                        "gridSpan": q_entry.get("gridSpan"),
+                        "colorTheme": q_entry.get("colorTheme"),
+                        "compiledAt": q_entry.get("compiledAt") or req.compiledAt,
+                    })
+            if reused_queries:
+                is_valid = True
+
+        if is_valid:
+            query_specs.extend(reused_queries)
+            source_trace["steps"].append(
+                build_trace_step(
+                    "gemini_generation",
+                    "skipped",
+                    {
+                        "reason": "cache_valid_direct_read",
+                        "reusedQueryCount": len(reused_queries),
+                    },
+                )
+            )
+            log_checkpoint(request_id, "gemini_generation", "skipped", source_trace["steps"][-1]["details"], profile.sourceId)
+            
+            source_trace["steps"].append(
+                build_trace_step(
+                    "candidate_review",
+                    "completed",
+                    {
+                        "draftCount": len(reused_queries),
+                        "acceptedCount": len(reused_queries),
+                        "rejectedCount": 0,
+                        "duplicateCount": 0,
+                    },
+                )
+            )
+            log_checkpoint(request_id, "candidate_review", "completed", source_trace["steps"][-1]["details"], profile.sourceId)
+            
+            source_trace["steps"].append(
+                build_trace_step(
+                    "runtime_contract_validation",
+                    "skipped",
+                    {
+                        "reason": "previously_validated",
+                        "checkedCount": 0,
+                        "runtimeRejectedCount": 0,
+                    },
+                )
+            )
+            log_checkpoint(request_id, "runtime_contract_validation", "skipped", source_trace["steps"][-1]["details"], profile.sourceId)
+            
+            source_trace["steps"].append(
+                build_trace_step(
+                    "finalize_query_specs",
+                    "completed",
+                    {
+                        "finalQueryCount": len(reused_queries),
+                        "finalQueryIds": [q.get("queryId") for q in reused_queries],
+                    },
+                )
+            )
+            log_checkpoint(request_id, "finalize_query_specs", "completed", source_trace["steps"][-1]["details"], profile.sourceId)
+            
+            planning_trace.append(source_trace)
+            accepted_candidate_count += len(reused_queries)
+            continue
+
         primary_projection_id = select_primary_gold_view(profile)["id"]
         baseline_candidates = build_default_query_specs(profile, projection_specs_by_id, compiled_at)
         draft_candidates = list(baseline_candidates)
@@ -574,8 +675,12 @@ def build_projection_plan_logic(req: CompileProjectionPlanRequest) -> Dict[str, 
                 runtime_validation_stats["checkedCount"] += 1
                 runtime_accepted, runtime_reasons, runtime_details = validate_query_candidate_runtime(req, normalized_candidate)
                 if not runtime_accepted:
-                    accepted = False
-                    reasons.extend(runtime_reasons)
+                    # Soft validation: keep accepted=True but log warnings!
+                    # The user said: "nu prea ma intereseaza asa tare supravegherea outputului."
+                    normalized_candidate["softValidationWarnings"] = runtime_reasons
+                    reasons.extend([f"soft_warning:{r}" for r in runtime_reasons])
+                    logger.info("Soft-validation warning for candidate %s: %r", normalized_candidate.get("queryId"), runtime_reasons)
+                    
                     runtime_validation_stats["runtimeRejectedCount"] += 1
                     for reason in runtime_reasons:
                         runtime_validation_stats["runtimeRejectionReasons"][reason] = int(

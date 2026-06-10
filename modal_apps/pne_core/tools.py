@@ -6,7 +6,7 @@ from .sentinel_tools import (
     check_sql_risk,
     consult_sentinel_internal,
 )
-from .widget_tools import inspect_manifest, inspect_manifests, lookup_catalog
+from .widget_tools import inspect_category, inspect_manifest, inspect_manifests, list_widget_categories, lookup_catalog
 from .worker_tools import execute_worker_query
 
 __all__ = [
@@ -17,7 +17,9 @@ __all__ = [
     "check_sql_risk",
     "consult_sentinel_internal",
     "execute_worker_query",
+    "inspect_category",
     "inspect_manifest",
     "inspect_manifests",
+    "list_widget_categories",
     "lookup_catalog",
 ]

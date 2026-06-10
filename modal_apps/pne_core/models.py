@@ -84,6 +84,11 @@ class CompileProjectionPlanRequest(BaseModel):
     workerSecret: Optional[str] = None
     compiledAt: str
     context: Optional[Dict[str, Any]] = None
+    previousQueryRegistry: Optional[Dict[str, Any]] = None
+    previousProjectionRegistry: Optional[Dict[str, Any]] = None
+    invalidationHints: Optional[List[Dict[str, Any]]] = None
+    forceRediscover: Optional[bool] = None
+    invalidatedSources: Optional[List[str]] = None
 
 
 class CompileScoreRequest(BaseModel):
