@@ -1,0 +1,31 @@
+default_environment: dev
+project_id: 019ccb2b-2af9-76fa-b15a-61517eb78439
+environments:
+- name: dev
+- name: staging
+- name: prod
+
+plugins:
+  extractors:
+  - name: tap-stripe
+    variant: meltanolabs
+    pip_url: meltanolabs-tap-stripe
+  - name: tap-postgres
+    variant: meltanolabs
+    pip_url: meltanolabs-tap-postgres
+  - name: tap-mysql
+    variant: meltanolabs
+    pip_url: meltanolabs-tap-mysql
+  - name: tap-googleads
+    variant: meltanolabs
+    pip_url: meltanolabs-tap-googleads
+  - name: tap-google-analytics-4
+    variant: meltanolabs
+    pip_url: meltano-tap-google-analytics-4
+  - name: tap-facebook
+    variant: meltanolabs
+    pip_url: meltanolabs-tap-facebook
+  loaders:
+  - name: target-parquet
+    variant: estrategiagi
+    pip_url: target-parquet

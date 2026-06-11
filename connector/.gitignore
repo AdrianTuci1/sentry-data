@@ -1,0 +1,18 @@
+# Core Meltano
+.meltano/
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.env/
+
+# Logs and databases
+*.log
+sqlite.db
+analyze/superset/
+nodes/

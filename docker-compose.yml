@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - JWT_SECRET=${JWT_SECRET}
+      - GCP_PROJECT_ID=${GCP_PROJECT_ID}
+      - GCP_REGION=${GCP_REGION:-europe-west1}
+      - GCS_BUCKET_NAME=${GCS_BUCKET_NAME:-sentry-platform-data}
+      - API_PREFIX=${API_PREFIX:-/api/v1}
+      - CORS_ORIGIN=${CORS_ORIGIN:-*}
+      - CHAT_SERVICE_URL=${CHAT_SERVICE_URL:-http://chat:8080}
+      - HARNESS_SERVICE_URL=${HARNESS_SERVICE_URL:-http://harness:8081}
+      - INTERNAL_TOKEN=${INTERNAL_TOKEN}
+      - ENABLE_MODAL_AGENTS=false
+      - ENABLE_BIGQUERY_ANALYTICS=${ENABLE_BIGQUERY_ANALYTICS:-true}
+    depends_on:
+      - chat
+      - harness
+    restart: unless-stopped
+
+  chat:
+    build: ./services/chat
+    environment:
+      - PORT=8080
+      - LLM_PROVIDER=${LLM_PROVIDER:-gemini}
+      - LLM_API_KEY=${LLM_API_KEY}
+      - LLM_MODEL=${LLM_MODEL:-gemini-2.5-flash}
+      - BACKEND_URL=${BACKEND_URL:-http://backend:3000/api/v1}
+      - INTERNAL_TOKEN=${INTERNAL_TOKEN}
+    restart: unless-stopped
+
+  harness:
+    build: ./services/harness
+    environment:
+      - PORT=8081
+      - LLM_PROVIDER=${LLM_PROVIDER:-gemini}
+      - LLM_API_KEY=${LLM_API_KEY}
+      - LLM_MODEL=${LLM_MODEL:-gemini-2.5-flash}
+      - GCS_BUCKET=${GCS_BUCKET_NAME:-sentry-platform-data}
+      - INTERNAL_TOKEN=${INTERNAL_TOKEN}
+      - GOOGLE_APPLICATION_CREDENTIALS=/secrets/gcp-key.json
+    volumes:
+      - ${GCP_KEY_PATH:-~/.config/gcloud/application_default_credentials.json}:/secrets/gcp-key.json:ro
+    restart: unless-stopped

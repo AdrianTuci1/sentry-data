@@ -1,0 +1,7 @@
+modal==0.63.0
+google-cloud-storage==2.14.0
+google-cloud-bigquery==3.14.1
+google-auth==2.25.2
+openai==1.6.1
+anthropic==0.8.1
+requests==2.31.0
