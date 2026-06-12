@@ -126,7 +126,7 @@ export class MeltanoService {
       ],
       // Telemetry reporting endpoint
       telemetry: {
-        endpoint: `${config.apiUrl || ''}/api/v1/organizations/${orgId}/projects/${projectId}/integrations/${integrationId}/sync`,
+        endpoint: `${config.meltanoApiUrl || ''}/api/v1/organizations/${orgId}/projects/${projectId}/integrations/${integrationId}/sync`,
         secret: config.meltanoWebhookSecret,
       },
     };

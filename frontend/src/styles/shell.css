@@ -23,6 +23,7 @@
 
 /* Main layout wrapper holding navbar and active view */
 .app-main-layout {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100% !important;
@@ -120,6 +121,38 @@
 .view-frame-content {
   min-height: 0;
   flex: 1;
+}
+
+.view-loading-state {
+  display: flex;
+  width: 100%;
+  min-height: 100%;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.view-loading-spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 2px solid rgba(168, 199, 250, 0.18);
+  border-top-color: #a8c7fa;
+  animation: viewLoadingSpin 0.8s linear infinite;
+}
+
+.view-loading-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: #8e918f;
+  letter-spacing: 0.02em;
+}
+
+@keyframes viewLoadingSpin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Flat content container for views inside ViewFrame (e.g. ChatView) */

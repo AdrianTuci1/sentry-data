@@ -6,7 +6,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 8px 16px 24px 16px;
+  padding: 0 0 24px 0;
   color: #E3E3E3;
   width: 100%;
   min-height: 100%;
@@ -18,6 +18,7 @@
   grid-template-columns: 2.8fr 1.2fr;
   gap: 16px;
   align-items: start;
+  padding: 0 8px 8px;
 }
 
 /* Responsive Column layout */
@@ -127,6 +128,28 @@
 
 .financial-metric-col:last-child {
   border-right: none;
+}
+
+@media (max-width: 768px) {
+  .financial-dashboard {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .financial-metrics-card {
+    grid-template-columns: minmax(0, 1fr);
+    height: auto !important;
+  }
+
+  .financial-metric-col {
+    padding: 18px 18px 16px;
+    border-right: none;
+    border-bottom: 1px solid #25282C;
+  }
+
+  .financial-metric-col:last-child {
+    border-bottom: none;
+  }
 }
 
 .financial-metric-label {

@@ -6,17 +6,41 @@ import { agentService } from '@/services/AgentService';
 import { integrationService } from '@/services/IntegrationService';
 import { authService } from '@/services/AuthService';
 
+const transientOrganizationSections = new Set(['create-project']);
+
+function slugify(value = '') {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function normalizeWorkspace(workspace) {
+  const slug = workspace.slug || slugify(workspace.name || 'project');
+  return {
+    ...workspace,
+    slug,
+    domain: workspace.domain || `${slug}.workspace`,
+    status: workspace.status || 'Healthy',
+    monthlyEvents: workspace.monthlyEvents ?? String(workspace.stats?.sessionsCount ?? 0),
+    dataConsumption: workspace.dataConsumption || '0 GB',
+    lastUpdated: workspace.lastUpdated || 'just now',
+    connectors: Array.isArray(workspace.connectors) ? workspace.connectors : [],
+  };
+}
+
 const mockOrganizations = [
-  { id: 'efferd-org', name: 'Efferd', slug: 'efferd', owner: 'Adrian.tucicovenco@gmail.com', plan: 'Agency' },
+  { id: 'nexa-org', name: 'Nexa', slug: 'nexa', owner: 'admin@nexahub.io', plan: 'Agency' },
   { id: 'staticlabs-org', name: 'Staticlabs', slug: 'staticlabs', owner: 'ops@staticlabs.ro', plan: 'Growth' },
   { id: 'octomus-org', name: 'Octomus', slug: 'octomus', owner: 'team@octomus.dev', plan: 'Scale' },
 ];
 
 const mockWorkspaces = [
-  { id: 'pixtooth', organizationId: 'efferd-org', name: 'Pixtooth', slug: 'pixtooth', domain: 'pixtooth.com', status: 'Healthy', monthlyEvents: '13K', dataConsumption: '612 GB', lastUpdated: '4 min ago', connectors: ['Stripe', 'PostHog', 'HubSpot'] },
+  { id: 'pixtooth', organizationId: 'nexa-org', name: 'Pixtooth', slug: 'pixtooth', domain: 'pixtooth.com', status: 'Healthy', monthlyEvents: '13K', dataConsumption: '612 GB', lastUpdated: '4 min ago', connectors: ['Stripe', 'PostHog', 'HubSpot'] },
   { id: 'octomus', organizationId: 'octomus-org', name: 'Octomus', slug: 'octomus', domain: 'octomus.dev', status: 'Healthy', monthlyEvents: '2.7K', dataConsumption: '421 GB', lastUpdated: '11 min ago', connectors: ['Stripe', 'Sentry', 'GA4'] },
   { id: 'staticlabs', organizationId: 'staticlabs-org', name: 'Staticlabs', slug: 'staticlabs', domain: 'staticlabs.ro', status: 'Monitoring', monthlyEvents: '1.9K', dataConsumption: '286 GB', lastUpdated: '18 min ago', connectors: ['Shopify', 'Klaviyo', 'PostHog'] },
-  { id: 'tuci', organizationId: 'efferd-org', name: 'Tuci', slug: 'tuci', domain: 'tuci.dev', status: 'Healthy', monthlyEvents: '334', dataConsumption: '92 GB', lastUpdated: '42 min ago', connectors: ['HubSpot', 'BigQuery', 'Slack'] },
+  { id: 'nexa', organizationId: 'nexa-org', name: 'Nexa', slug: 'nexa', domain: 'nexa.dev', status: 'Healthy', monthlyEvents: '0', dataConsumption: '0 GB', lastUpdated: 'just now', connectors: [] },
 ];
 
 const mockMetrics = {
@@ -297,7 +321,7 @@ export const useAppStore = create((set, get) => ({
   organizations: config.devMode ? mockOrganizations : [emptyOrg],
   currentOrganization: config.devMode ? mockOrganizations[0] : emptyOrg,
   currentWorkspace: null,
-  workspaces: config.devMode ? mockWorkspaces : [],
+  workspaces: config.devMode ? mockWorkspaces.map(normalizeWorkspace) : [],
 
   // Only two visual scopes: 'organization' and 'project'
   activeScope: 'organization',
@@ -321,7 +345,10 @@ export const useAppStore = create((set, get) => ({
   setActiveSection: (section) =>
     set((state) => ({
       activeSection: section,
-      activeOrganizationSection: state.activeScope === 'organization' ? section : state.activeOrganizationSection,
+      activeOrganizationSection:
+        state.activeScope === 'organization' && !transientOrganizationSections.has(section)
+          ? section
+          : state.activeOrganizationSection,
       activeProjectSection: state.activeScope === 'project' ? section : state.activeProjectSection,
     })),
 
@@ -334,7 +361,11 @@ export const useAppStore = create((set, get) => ({
     set((state) => ({
       demoMode: newDemoMode,
       organizations: newDemoMode ? mockOrganizations : state.organizationsData.length > 0 ? state.organizationsData : [emptyOrg],
-      workspaces: newDemoMode ? mockWorkspaces : state.projectsData.length > 0 ? state.projectsData : [],
+      workspaces: newDemoMode
+        ? mockWorkspaces.map(normalizeWorkspace)
+        : state.projectsData.length > 0
+          ? state.projectsData.map(normalizeWorkspace)
+          : [],
       currentOrganization: newDemoMode ? mockOrganizations[0] : state.organizationsData[0] || emptyOrg,
       currentWorkspace: null, activeScope: 'organization',
       organizationMetrics: newDemoMode ? mockMetrics : emptyMetrics,
@@ -363,11 +394,11 @@ export const useAppStore = create((set, get) => ({
 
   logout: () => {
     authService.logout();
-    set({ currentUser: null, organizationsData: [], projectsData: [], agentsData: [], integrationsData: [], analyticsData: null, organizations: get().devMode ? mockOrganizations : [emptyOrg], workspaces: get().devMode ? mockWorkspaces : [], currentOrganization: get().devMode ? mockOrganizations[0] : emptyOrg, currentWorkspace: null, activeScope: 'organization' });
+    set({ currentUser: null, organizationsData: [], projectsData: [], agentsData: [], integrationsData: [], analyticsData: null, organizations: get().devMode ? mockOrganizations : [emptyOrg], workspaces: get().devMode ? mockWorkspaces.map(normalizeWorkspace) : [], currentOrganization: get().devMode ? mockOrganizations[0] : emptyOrg, currentWorkspace: null, activeScope: 'organization' });
   },
 
   fetchOrganizations: async () => { if (get().devMode) return; set({ isLoading: true }); try { const orgs = await organizationService.list(); set({ organizationsData: orgs, organizations: orgs, isLoading: false }); if (orgs.length > 0 && !get().currentOrganization) set({ currentOrganization: orgs[0] }); } catch (err) { set({ error: err.message, isLoading: false }); } },
-  fetchProjects: async (orgId) => { if (get().devMode) return; set({ isLoading: true }); try { const projects = await projectService.list(orgId); set({ projectsData: projects, workspaces: projects, isLoading: false }); } catch (err) { set({ error: err.message, isLoading: false }); } },
+  fetchProjects: async (orgId) => { if (get().devMode) return; set({ isLoading: true }); try { const projects = (await projectService.list(orgId)).map(normalizeWorkspace); set({ projectsData: projects, workspaces: projects, isLoading: false }); } catch (err) { set({ error: err.message, isLoading: false }); } },
   fetchAgents: async (orgId, projectId) => { if (get().devMode) return; try { set({ agentsData: await agentService.listSessions(orgId, projectId) }); } catch (err) { set({ error: err.message }); } },
   fetchIntegrations: async (orgId, projectId) => { if (get().devMode) return; try { set({ integrationsData: await integrationService.list(orgId, projectId) }); } catch (err) { set({ error: err.message }); } },
 
@@ -402,15 +433,47 @@ export const useAppStore = create((set, get) => ({
     catch (err) { set({ error: err.message, isLoading: false }); throw err; }
   },
 
-  createWorkspace: async (name) => {
+  createWorkspace: async (input) => {
+    const payload = typeof input === 'string' ? { name: input } : (input || {});
+    const name = payload.name?.trim();
+    if (!name) {
+      throw new Error('Project name is required');
+    }
+    const slug = payload.slug?.trim() || slugify(name);
+    const modules = payload.modules || {
+      onboarding: false,
+      analytics: true,
+      integrations: true,
+      graph: true,
+      chat: true,
+    };
+
     if (get().devMode) {
-      const id = `project_${Date.now()}`, slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-      const newWorkspace = { id, slug, organizationId: get().currentOrganization.id, name, domain: `${slug}.workspace`, status: 'Healthy', monthlyEvents: '0', dataConsumption: '0 GB', lastUpdated: 'just now', connectors: [] };
+      const id = `project_${Date.now()}`;
+      const newWorkspace = normalizeWorkspace({
+        id,
+        slug,
+        organizationId: get().currentOrganization.id,
+        name,
+        description: payload.description || '',
+        modules,
+      });
       set((state) => ({ workspaces: [...state.workspaces, newWorkspace], currentWorkspace: newWorkspace, activeScope: 'project', activeSection: state.activeProjectSection || 'analytics' }));
       return newWorkspace;
     }
     set({ isLoading: true });
-    try { const project = await projectService.create(get().currentOrganization.id, { name, slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-') }); set((state) => ({ projectsData: [...state.projectsData, project], workspaces: [...state.workspaces, project], currentWorkspace: project, isLoading: false })); return project; }
+    try {
+      const project = normalizeWorkspace(
+        await projectService.create(get().currentOrganization.id, {
+          name,
+          slug,
+          description: payload.description || '',
+          modules,
+        })
+      );
+      set((state) => ({ projectsData: [...state.projectsData, project], workspaces: [...state.workspaces, project], currentWorkspace: project, isLoading: false }));
+      return project;
+    }
     catch (err) { set({ error: err.message, isLoading: false }); throw err; }
   },
 

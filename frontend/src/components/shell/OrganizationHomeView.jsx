@@ -149,7 +149,7 @@ export function OrganizationHomeView() {
             <div className="organization-activity-list">
               <div className="organization-activity-item">
                 <span className="organization-activity-title">New project created</span>
-                <span className="organization-activity-meta">Tuci workspace added to Efferd</span>
+                <span className="organization-activity-meta">Nexa workspace added to Nexa organization</span>
               </div>
               <div className="organization-activity-item">
                 <span className="organization-activity-title">Connector enabled</span>

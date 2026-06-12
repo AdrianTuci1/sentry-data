@@ -1,9 +1,11 @@
 import { Briefcase, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { ViewFrame } from '@/components/shell/ViewFrame';
 import { useAppStore } from '@/stores/useAppStore';
 
 export function OrganizationProjectsView() {
   const { currentOrganization, workspaces } = useAppStore();
+  const navigate = useNavigate();
   const organizationProjects = workspaces.filter(
     (workspace) => workspace.organizationId === currentOrganization.id
   );
@@ -12,9 +14,12 @@ export function OrganizationProjectsView() {
     <ViewFrame
       title="Projects"
       description="Review every client project, its current usage profile, and the connector footprint behind it."
-      maxWidthClassName="max-w-5xl"
+      maxWidthClassName="max-w-7xl"
       actions={
-        <button className="flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-sm text-text-primary hover:bg-bg-hover transition-colors">
+        <button
+          className="flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-sm text-text-primary hover:bg-bg-hover transition-colors"
+          onClick={() => navigate(`/app/${currentOrganization.slug || currentOrganization.id}/create-project`)}
+        >
           <Plus size={14} />
           New project
         </button>

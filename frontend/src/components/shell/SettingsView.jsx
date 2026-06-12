@@ -18,25 +18,28 @@ export function SettingsView() {
   const { currentOrganization, currentWorkspace, deleteProject } = useAppStore();
   const navigate = useNavigate();
 
-  const [users, setUsers] = useState([
-    { email: "admin@efferd.io", role: "admin", access: "Full Access" },
-    { email: "developer@efferd.io", role: "write", access: "Telemetry Only" },
-    { email: "viewer@efferd.io", role: "read", access: "Read Only" },
-  ]);
 
-  const [generatedLink, setGeneratedLink] = useState("");
-  const [copied, setCopied] = useState(false);
+
+  const [publicShareLink, setPublicShareLink] = useState("");
+  const [copiedPublic, setCopiedPublic] = useState(false);
   const [reanalyzing, setReanalyzing] = useState(false);
 
-  const generateLink = () => {
-    const randomId = Math.random().toString(36).substring(2, 10);
-    setGeneratedLink(`https://app.efferd.io/join/${randomId}`);
+  const generatePublicLink = () => {
+    const slug = currentWorkspace?.slug || "project";
+    const randomId = Math.random().toString(36).substring(2, 8);
+    setPublicShareLink(`https://app.nexahub.io/public/analytics/${slug}-${randomId}`);
   };
 
-  const copyLink = () => {
-    navigator.clipboard.writeText(generatedLink);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const copyPublicLink = () => {
+    if (!publicShareLink) return;
+    navigator.clipboard.writeText(publicShareLink);
+    setCopiedPublic(true);
+    setTimeout(() => setCopiedPublic(false), 2000);
+  };
+
+  const cancelPublicLink = () => {
+    setPublicShareLink("");
+    alert("Public share link has been revoked. Analytics dashboard is no longer accessible publicly.");
   };
 
   const handleReanalyze = () => {
@@ -63,7 +66,7 @@ export function SettingsView() {
     <ViewFrame
       title="Settings"
       description="Manage workspace access permissions, link generation, re-analysis execution, and project removal."
-      maxWidthClassName="max-w-3xl"
+      maxWidthClassName="max-w-7xl"
     >
       <div className="settings-wrapper">
         {/* Section 1: Access Links & Re-analysis */}
@@ -73,26 +76,32 @@ export function SettingsView() {
           </div>
 
           <div className="settings-group-card">
-            {/* Row 1: Generate Access Links */}
+            {/* Row 1: Public Share Link */}
             <div className="settings-group-row" style={{ flexDirection: "column", alignItems: "stretch", gap: "14px" }}>
               <div className="settings-group-row-left">
-                <span className="settings-row-title">Generate Access Links</span>
+                <span className="settings-row-title">Public Analytics sharing</span>
                 <span className="settings-row-desc">
-                  Generate secure invite links for external team members or automated telemetry hooks to integrate Sentry logs.
+                  Generate a public dashboard link to share this project's real-time analytics with external partners without requiring them to log in.
                 </span>
               </div>
-              <div className="settings-action-row" style={{ marginTop: "4px" }}>
-                <button onClick={generateLink} className="settings-btn-secondary">
-                  <LinkIcon size={14} />
-                  Generate New Link
-                </button>
-                {generatedLink && (
-                  <div className="settings-link-display">
-                    <span className="settings-link-text">{generatedLink}</span>
-                    <button onClick={copyLink} className="settings-copy-btn">
-                      {copied ? <Check size={14} style={{ color: "#3b82f6" }} /> : <Copy size={14} />}
+              <div className="settings-action-row" style={{ marginTop: "4px", display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
+                {!publicShareLink ? (
+                  <button onClick={generatePublicLink} className="settings-btn-secondary">
+                    <LinkIcon size={14} />
+                    Generate Public Link
+                  </button>
+                ) : (
+                  <>
+                    <div className="settings-link-display" style={{ flex: 1, minWidth: "240px" }}>
+                      <span className="settings-link-text">{publicShareLink}</span>
+                      <button onClick={copyPublicLink} className="settings-copy-btn" title="Copy Link">
+                        {copiedPublic ? <Check size={14} style={{ color: "#3b82f6" }} /> : <Copy size={14} />}
+                      </button>
+                    </div>
+                    <button onClick={cancelPublicLink} className="settings-btn-danger" style={{ padding: "8px 16px", borderRadius: "8px", fontSize: "12px" }}>
+                      Disable Public Link
                     </button>
-                  </div>
+                  </>
                 )}
               </div>
             </div>
@@ -115,46 +124,7 @@ export function SettingsView() {
           </div>
         </div>
 
-        {/* Section 2: Access Permissions */}
-        <div className="settings-section">
-          <div className="settings-section-header">
-            <h3 className="settings-section-title">Access Permissions</h3>
-            <span className="settings-section-desc" style={{ marginTop: "2px" }}>
-              Configure access controls for active team members. Grant specific view permissions to prevent unauthorized settings modifications.
-            </span>
-          </div>
 
-          <div className="settings-users-list">
-            {users.map((user, idx) => (
-              <div
-                key={user.email}
-                className="settings-user-row"
-                style={{ cursor: "pointer" }}
-                onClick={() => {
-                  const cycle = {
-                    "Full Access": "Telemetry Only",
-                    "Telemetry Only": "Read Only",
-                    "Read Only": "Full Access"
-                  };
-                  const updated = [...users];
-                  updated[idx].access = cycle[user.access];
-                  setUsers(updated);
-                }}
-              >
-                <div className="settings-user-info">
-                  <span className="settings-user-email">
-                    {user.email}
-                    <span className="org-row-role-text">· {user.role}</span>
-                  </span>
-                </div>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <span className="settings-user-access-text">{user.access}</span>
-                  <Pencil size={14} className="settings-hover-pencil" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
 
         {/* Section 3: Danger Zone */}
         <div className="settings-section">

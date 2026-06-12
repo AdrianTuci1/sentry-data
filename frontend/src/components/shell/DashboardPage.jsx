@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AppShell } from "@/components/app-shell";
-import { OnboardingView } from "@/components/shell/OnboardingView";
 import { AnalyticsView } from "@/components/shell/AnalyticsView";
 import { IntegrationsView } from "@/components/shell/IntegrationsView";
 import { GraphView } from "@/components/shell/GraphView";
 import { SettingsView } from "@/components/shell/SettingsView";
 import { ChatView } from "@/components/shell/ChatView";
+import { CreateProjectView } from "@/components/shell/CreateProjectView";
 import { OrganizationHomeView } from "@/components/shell/OrganizationHomeView";
 import { OrganizationOrganizationsView } from "@/components/shell/OrganizationOrganizationsView";
 import { OrganizationAccessView } from "@/components/shell/OrganizationAccessView";
@@ -23,7 +23,7 @@ const sectionComponents = {
   stats: OrganizationStatsView,
   access: OrganizationAccessView,
   "org-settings": OrganizationSettingsView,
-  onboarding: OnboardingView,
+  "create-project": CreateProjectView,
   analytics: AnalyticsView,
   integrations: IntegrationsView,
   graph: GraphView,
@@ -70,6 +70,10 @@ export function DashboardPage() {
       // 4-segment: project
       const proj = workspaces.find((w) => (w.slug || w.id) === projectSlug && w.organizationId === org.id);
       if (proj && proj.id !== currentWorkspace?.id) useAppStore.getState().selectWorkspace(proj.id);
+      if (!projectSections.includes(section)) {
+        navigate(`/app/${orgSlug}/${projectSlug}/analytics`, { replace: true });
+        return;
+      }
       useAppStore.setState({ activeScope: "project" });
       if (section !== activeSection) setActiveSection(section);
     } else if (orgSections.includes(section)) {

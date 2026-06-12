@@ -104,7 +104,7 @@ export function OrganizationOrganizationsView() {
       <ViewFrame
         title={selectedOrg.name}
         description="Edit organization details and settings."
-        maxWidthClassName="max-w-3xl"
+        maxWidthClassName="max-w-7xl"
       >
         <div className="org-detail-shell">
           <button className="org-back-btn" onClick={() => setSelectedOrg(null)}>
@@ -226,7 +226,7 @@ export function OrganizationOrganizationsView() {
       <ViewFrame
         title="New organization"
         description="Set up a new organization for your account."
-        maxWidthClassName="max-w-3xl"
+        maxWidthClassName="max-w-7xl"
       >
         <div className="org-detail-shell">
           <button className="org-back-btn" onClick={() => { setCreating(false); setCreateName(''); setCreatePlan('Starter'); }}>
@@ -281,7 +281,7 @@ export function OrganizationOrganizationsView() {
           </a>
         </span>
       }
-      maxWidthClassName="max-w-4xl"
+      maxWidthClassName="max-w-7xl"
     >
       <div className="org-list-header-row">
         <span className="org-list-select-label">Select an organization</span>
@@ -304,7 +304,7 @@ export function OrganizationOrganizationsView() {
                 <div className="org-card-names-group">
                   <span className="org-card-primary-name">{org.name}</span>
                   <span className="org-card-secondary-name">
-                    {org.owner ? org.owner.split('@')[0] : 'AdrianTuci1'}
+                    {org.owner ? org.owner.split('@')[0] : 'owner'}
                   </span>
                 </div>
               </div>

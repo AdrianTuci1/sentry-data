@@ -46,7 +46,7 @@ router.post('/generate', async (req, res, next) => {
     const { orgId, projectId } = req.params;
     const userId = req.user?.userId || 'system';
 
-    const result = await specService.generateSpec(orgId, projectId, userId);
+    const result = await specService.generateSpec(orgId, projectId);
 
     success(res, {
       message: 'Spec generation started',

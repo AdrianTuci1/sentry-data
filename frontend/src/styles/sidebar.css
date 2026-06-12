@@ -15,6 +15,19 @@
   height: calc(100vh - 16px) !important;
 }
 
+[data-mobile="true"].app-sidebar-container {
+  right: auto !important;
+  overflow: hidden !important;
+  border-radius: 28px !important;
+  border: 1px solid #25282C !important;
+  background-color: #090A0B !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2) !important;
+}
+
+[data-mobile="true"].app-sidebar-container [data-slot="sidebar-inner"] {
+  background-color: #090A0B !important;
+}
+
 /* Header container */
 .sidebar-header-custom {
   background-color: transparent !important;

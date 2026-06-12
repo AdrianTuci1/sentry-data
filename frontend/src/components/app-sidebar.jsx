@@ -33,7 +33,7 @@ export function AppSidebar() {
   const {
     currentOrganization, currentWorkspace, organizations, workspaces,
     activeScope, activeSection,
-    selectOrganization, selectWorkspace, createOrganization, createWorkspace,
+    selectOrganization, selectWorkspace, createOrganization,
     goToOrganizationHome,
     chatSessions, activeChatId, selectChat, createChatSession,
     demoMode, toggleDemoMode,
@@ -88,6 +88,11 @@ export function AppSidebar() {
     navigate(`/app/${oSlug}/stats`);
   };
 
+  const navToCreateProject = () => {
+    const oSlug = currentOrganization?.slug || currentOrganization?.id;
+    navigate(`/app/${oSlug}/create-project`);
+  };
+
   const afterCreateNavigate = (target) => {
     setTimeout(() => {
       const state = useAppStore.getState();
@@ -109,7 +114,7 @@ export function AppSidebar() {
             <SidebarMenuButton size="lg" className="sidebar-logo-button">
               <div className="sidebar-logo-icon-wrapper"><LogoIcon className="h-5 w-5" /></div>
               <div className="sidebar-logo-title-wrapper group-data-[collapsible=icon]:hidden">
-                <span className="sidebar-logo-title-text">Sentry</span>
+                <span className="sidebar-logo-title-text">Parrot</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -145,7 +150,7 @@ export function AppSidebar() {
                       </DropdownMenuItem>
                     ))}
                     <div className="dropdown-section-separator" />
-                    <DropdownMenuItem onClick={() => { const name = prompt("Project name:"); if (name?.trim()) { createWorkspace(name.trim()); afterCreateNavigate("project"); } }}
+                    <DropdownMenuItem onClick={navToCreateProject}
                       className="dropdown-item-custom dropdown-item-create">
                       <div className="dropdown-item-left">
                         <div className="dropdown-workspace-circle dropdown-circle-plus"><Plus size={14} /></div>
@@ -277,7 +282,7 @@ export function AppSidebar() {
                 ))}
                 <SidebarMenuItem>
                   <SidebarMenuButton tooltip="Create project"
-                    onClick={() => { const name = prompt("Project name:"); if (name?.trim()) { createWorkspace(name.trim()); afterCreateNavigate("project"); } }}
+                    onClick={navToCreateProject}
                     className="sidebar-nav-button">
                     <div className="sidebar-nav-left">
                       <div className="sidebar-nav-icon"><Plus size={18} /></div>

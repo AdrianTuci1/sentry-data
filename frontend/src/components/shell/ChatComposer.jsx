@@ -4,7 +4,14 @@ import { useState, useEffect, useCallback } from "react";
  * ChatComposer — sticky bottom input bar.
  * Always visible, pinned at bottom.
  */
-export function ChatComposer({ input, onInputChange, onSend, streaming, placeholder = "Ask Parrot" }) {
+export function ChatComposer({
+  input,
+  onInputChange,
+  onSend,
+  streaming,
+  placeholder = "Ask Parrot",
+  isEmptyMode = false,
+}) {
   const [recording, setRecording] = useState(false);
 
   const toggleRecording = useCallback(() => {
@@ -25,7 +32,9 @@ export function ChatComposer({ input, onInputChange, onSend, streaming, placehol
 
   return (
     <div className="chat-active-input-footer">
-      <div className="chat-centered-composer-wrapper pill-composer">
+      <div
+        className={`chat-centered-composer-wrapper pill-composer ${isEmptyMode ? "chat-centered-composer-empty" : ""}`}
+      >
         <input
           type="text"
           value={input}

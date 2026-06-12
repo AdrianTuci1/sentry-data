@@ -205,6 +205,7 @@ export function ChatView() {
             onInputChange={setInput}
             onSend={handleSend}
             streaming={streaming}
+            isEmptyMode
           />
         </div>
       )}

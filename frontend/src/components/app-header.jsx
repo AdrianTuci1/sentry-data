@@ -160,8 +160,8 @@ export function AppHeader() {
                   <div className="header-user-label">
                     <div className="header-user-avatar-sm">A</div>
                     <div>
-                      <div className="header-user-name">Adrian Tucicovenco</div>
-                      <div className="header-user-email">adrian@efferd.io</div>
+                      <div className="header-user-name">Alex Parker</div>
+                      <div className="header-user-email">alex@nexahub.io</div>
                     </div>
                   </div>
                 </DropdownMenuItem>

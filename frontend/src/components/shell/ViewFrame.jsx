@@ -1,4 +1,6 @@
 import { cn } from "@/lib/utils";
+import { useAppStore } from "@/stores/useAppStore";
+import { ViewLoadingState } from "@/components/shell/ViewLoadingState";
 import "@/styles/shell.css";
 
 export function ViewFrame({
@@ -9,7 +11,11 @@ export function ViewFrame({
   className,
   contentClassName,
   maxWidthClassName = "max-w-7xl",
+  loading,
 }) {
+  const isLoading = useAppStore((state) => state.isLoading);
+  const shouldShowLoading = loading ?? isLoading;
+
   return (
     <section className={cn("view-frame-section", className)}>
       <div className={cn("view-frame-inner", maxWidthClassName)}>
@@ -23,7 +29,9 @@ export function ViewFrame({
           </div>
         )}
 
-        <div className={cn("view-frame-content", contentClassName)}>{children}</div>
+        <div className={cn("view-frame-content", contentClassName)}>
+          {shouldShowLoading ? <ViewLoadingState /> : children}
+        </div>
       </div>
     </section>
   );

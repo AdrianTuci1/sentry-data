@@ -15,6 +15,7 @@ import {
   Undo2,
   Users,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { getNavigationGroups } from '@/components/app-shared';
 import { useAppStore } from '@/stores/useAppStore';
 
@@ -32,6 +33,7 @@ const sectionIcons = {
 };
 
 export function Sidebar() {
+  const navigate = useNavigate();
   const {
     currentOrganization,
     currentWorkspace,
@@ -41,7 +43,6 @@ export function Sidebar() {
     sidebarCollapsed,
     setActiveSection,
     selectWorkspace,
-    createWorkspace,
     goToOrganizationHome,
     toggleSidebar,
   } = useAppStore();
@@ -114,10 +115,7 @@ export function Sidebar() {
                 </button>
 
                 <button
-                  onClick={() => {
-                    const name = prompt('Project name:');
-                    if (name?.trim()) createWorkspace(name.trim());
-                  }}
+                  onClick={() => navigate(`/app/${currentOrganization?.slug || currentOrganization?.id}/create-project`)}
                   className="w-full text-left px-3 py-2.5 text-sm text-text-primary hover:bg-bg-hover transition-colors flex items-center gap-2"
                 >
                   <Plus size={14} />

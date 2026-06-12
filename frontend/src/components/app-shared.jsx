@@ -27,7 +27,6 @@ export const projectNavigationGroups = [
     id: 'project',
     label: null,
     items: [
-      { id: 'onboarding', title: 'Onboarding', icon: 'rocket' },
       { id: 'analytics', title: 'Analytics', icon: 'bar-chart-3' },
       { id: 'integrations', title: 'Integrations', icon: 'plug' },
       { id: 'graph', title: 'Graph', icon: 'git-branch' },
@@ -44,16 +43,26 @@ export const analyticsViews = [
   { id: 'web', label: 'Web' },
 ];
 
+const auxiliarySections = {
+  organization: [
+    { id: 'create-project', title: 'Create Project', icon: 'briefcase' },
+  ],
+  project: [],
+};
+
 export function getNavigationGroups(scope) {
   return scope === 'project' ? projectNavigationGroups : organizationNavigationGroups;
 }
 
 export function findSectionById(scope, sectionId) {
-  return getNavigationGroups(scope).flatMap((g) => g.items).find((item) => item.id === sectionId);
+  return (
+    getNavigationGroups(scope).flatMap((g) => g.items).find((item) => item.id === sectionId) ||
+    auxiliarySections[scope]?.find((item) => item.id === sectionId)
+  );
 }
 
 // Account items (no org in URL): /app/home, /app/organizations, /app/billing
 export const accountSections = ['home', 'organizations', 'billing'];
 // Org items (with org in URL): /app/:orgSlug/stats, etc.
-export const orgSections = ['stats', 'access', 'settings'];
-export const projectSections = ['onboarding', 'analytics', 'integrations', 'graph', 'settings', 'chat'];
+export const orgSections = ['stats', 'access', 'settings', 'create-project'];
+export const projectSections = ['analytics', 'integrations', 'graph', 'settings', 'chat'];

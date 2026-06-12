@@ -1,5 +1,8 @@
 import React from "react";
+import { ViewFrame } from "@/components/shell/ViewFrame";
 import FeatureMindMap from "@/components/mindmap/DetachedMindMap";
+import { ProjectEmptyState, isProjectEmpty } from "@/components/shell/ProjectEmptyState";
+import { useAppStore } from "@/stores/useAppStore";
 
 // --- Combined Topology Data for All Domains ---
 const combinedMindMapData = {
@@ -455,6 +458,16 @@ const combinedMindMapData = {
 };
 
 export function GraphView() {
+  const { currentWorkspace } = useAppStore();
+
+  if (isProjectEmpty(currentWorkspace)) {
+    return (
+      <ViewFrame>
+        <ProjectEmptyState mode="graph" />
+      </ViewFrame>
+    );
+  }
+
   return (
     <div className="flex-1 w-full min-h-0 relative flex flex-col bg-[#0F1012] overflow-hidden">
       {/* MindMap canvas displaying the complete merged architecture topography */}

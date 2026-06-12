@@ -39,7 +39,7 @@ export function OrganizationSettingsView() {
     <ViewFrame
       title="Organization Settings"
       description="Configure account-level defaults, governance rules, and managed infrastructure preferences."
-      maxWidthClassName="max-w-4xl"
+      maxWidthClassName="max-w-7xl"
     >
       <div className="org-metrics-row">
         <div className="org-metric-item">

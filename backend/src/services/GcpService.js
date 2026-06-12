@@ -1,6 +1,7 @@
 import { Firestore } from '@google-cloud/firestore';
 import { Storage } from '@google-cloud/storage';
 import { BigQuery } from '@google-cloud/bigquery';
+import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 import { GoogleAuth } from 'google-auth-library';
 import { config } from '../config/index.js';
 
@@ -21,6 +22,7 @@ class GcpService {
       ...options,
       location: config.bigQueryLocation,
     });
+    this.secretManager = new SecretManagerServiceClient(options);
     this.auth = new GoogleAuth(options);
 
     GcpService.instance = this;
