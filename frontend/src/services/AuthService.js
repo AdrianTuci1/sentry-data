@@ -1,0 +1,29 @@
+import { apiClient } from "./ApiClient.js";
+
+export class AuthService {
+  async register(dto) {
+    const response = await apiClient.post("/auth/register", dto);
+    if (response.data?.token) {
+      apiClient.setToken(response.data.token);
+    }
+    return response.data;
+  }
+
+  async login(dto) {
+    const response = await apiClient.post("/auth/login", dto);
+    if (response.data?.token) {
+      apiClient.setToken(response.data.token);
+    }
+    return response.data;
+  }
+
+  logout() {
+    apiClient.setToken(null);
+  }
+
+  isAuthenticated() {
+    return !!apiClient.token;
+  }
+}
+
+export const authService = new AuthService();

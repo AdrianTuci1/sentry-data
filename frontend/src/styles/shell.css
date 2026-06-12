@@ -1,0 +1,136 @@
+/* ==========================================================================
+   Shell and Layout Styles
+   ========================================================================== */
+
+/* Sidebar Provider variables and container styling */
+.sidebar-provider-container {
+  height: 100vh !important;
+  max-height: 100vh !important;
+  overflow: hidden !important;
+  display: flex;
+  gap: 8px;
+  background-color: #0B0D0E;
+  padding: 8px;
+  --sidebar-width: 17.5rem;
+  --sidebar-width-icon: 4rem;
+  --sidebar: #090A0B;
+  --sidebar-foreground: #E3E3E3;
+  --sidebar-accent: #23262A;
+  --sidebar-accent-foreground: #F3F4F6;
+  --sidebar-border: #25282C;
+  --sidebar-ring: #A8C7FA;
+}
+
+/* Main layout wrapper holding navbar and active view */
+.app-main-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100% !important;
+  min-height: 0 !important;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 28px;
+  border: 1px solid #25282C;
+  background-color: #090A0B;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+  padding: 0 !important; /* Reverted padding to 0 */
+}
+
+/* Content Area inside Main Layout */
+.app-content-wrapper {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.app-content-inner {
+  width: 100%;
+  max-width: 80rem; /* 1280px / 7xl */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* View Frame Container - flat, borderless, scrollable */
+.view-frame-section {
+  display: flex;
+  width: 100%;
+  min-height: 0;
+  flex-direction: column;
+  padding-top: 12px;
+  padding-bottom: 16px;
+  padding-left: 16px; /* aligns perfectly with AppHeader 16px padding */
+  padding-right: 16px; /* aligns perfectly with AppHeader 16px padding */
+  border-radius: 0 !important;
+  overflow: visible !important; /* do not scroll independently */
+}
+
+.view-frame-inner {
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  min-height: 0;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.view-frame-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-left: 4px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.view-frame-title-group {
+  min-width: 0;
+}
+
+.view-frame-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #F3F4F6;
+  margin: 0;
+}
+
+.view-frame-description {
+  margin-top: 4px;
+  font-size: 14px;
+  color: #8E918F;
+  margin-bottom: 0;
+}
+
+.view-frame-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.view-frame-content {
+  min-height: 0;
+  flex: 1;
+}
+
+/* Flat content container for views inside ViewFrame (e.g. ChatView) */
+.flat-content-container {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 0 !important;
+  border: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}

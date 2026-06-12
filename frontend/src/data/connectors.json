@@ -1,0 +1,134 @@
+{
+  "connectedSources": [
+    {
+      "id": "billing",
+      "name": "Stripe",
+      "type": "billing",
+      "status": "connected",
+      "lastSync": "3 min ago",
+      "note": "Subscriptions, invoices, MRR, failed payments, and paid account states."
+    },
+    {
+      "id": "product",
+      "name": "PostHog",
+      "type": "product analytics",
+      "status": "connected",
+      "lastSync": "5 min ago",
+      "note": "Events, active users, cohorts, and free-to-paid activation signals."
+    },
+    {
+      "id": "commerce",
+      "name": "Shopify",
+      "type": "ecommerce",
+      "status": "connected",
+      "lastSync": "8 min ago",
+      "note": "Orders, AOV, repeat purchase rate, refunds, and product-level revenue."
+    },
+    {
+      "id": "observability",
+      "name": "Prometheus",
+      "type": "observability",
+      "status": "connected",
+      "lastSync": "30 sec ago",
+      "note": "Low-latency service metrics used directly for operational dashboards."
+    },
+    {
+      "id": "crm",
+      "name": "HubSpot",
+      "type": "crm",
+      "status": "connected",
+      "lastSync": "11 min ago",
+      "note": "Accounts, lifecycle stages, deal context, and customer enrichment."
+    },
+    {
+      "id": "ads",
+      "name": "Google Ads",
+      "type": "ads",
+      "status": "error",
+      "lastSync": "42 min ago",
+      "note": "Campaign spend sync is paused due to a credentials refresh requirement."
+    }
+  ],
+  "connectedDestinations": [],
+  "sourceCategories": [
+    {
+      "id": "billing-finance",
+      "title": "Billing & Finance",
+      "description": "Recurring revenue, invoices, subscriptions, and payment state.",
+      "icon": "sync",
+      "connectors": ["Stripe", "Chargebee", "Paddle", "Recurly", "Zuora", "QuickBooks", "NetSuite", "Xero"]
+    },
+    {
+      "id": "commerce",
+      "title": "Ecommerce",
+      "description": "Orders, catalog, refunds, repeat purchase rate, and merchandising data.",
+      "icon": "storage",
+      "connectors": ["Shopify", "WooCommerce", "Magento", "BigCommerce"]
+    },
+    {
+      "id": "product-analytics",
+      "title": "Product & Web Analytics",
+      "description": "Behavioral events, retention, cohorts, active users, and attribution context.",
+      "icon": "signal",
+      "connectors": ["PostHog", "Mixpanel", "Amplitude", "GA4", "Segment", "RudderStack"]
+    },
+    {
+      "id": "crm-sales",
+      "title": "CRM & Sales",
+      "description": "Accounts, pipeline, deal stages, lifecycle, and customer enrichment.",
+      "icon": "database",
+      "connectors": ["Salesforce", "HubSpot", "Pipedrive"]
+    },
+    {
+      "id": "ads-lifecycle",
+      "title": "Marketing, Ads & Lifecycle",
+      "description": "Spend, budgets, campaign pacing, acquisition efficiency, and messaging.",
+      "icon": "sync",
+      "connectors": ["Google Ads", "Meta Ads", "LinkedIn Ads", "TikTok Ads", "Klaviyo", "Braze", "Mailchimp"]
+    },
+    {
+      "id": "observability",
+      "title": "Observability & Infra",
+      "description": "Operational metrics, incidents, traces, exceptions, and release impact.",
+      "icon": "signal",
+      "connectors": ["Prometheus", "Sentry", "Datadog", "New Relic", "CloudWatch", "Grafana", "OpenTelemetry"]
+    },
+    {
+      "id": "databases",
+      "title": "Databases & Warehouses",
+      "description": "Operational databases and customer-owned warehouses used as source systems.",
+      "icon": "database",
+      "connectors": ["PostgreSQL", "MySQL", "Snowflake", "BigQuery", "Redshift", "ClickHouse", "Databricks"]
+    },
+    {
+      "id": "streams-files",
+      "title": "Streams & File Feeds",
+      "description": "Event streams, exports, and file-based ingestion when a business runs on raw feeds.",
+      "icon": "storage",
+      "connectors": ["Kafka", "S3", "GCS", "CSV Uploads"]
+    }
+  ],
+  "destinationCategories": [
+    {
+      "id": "collaboration",
+      "title": "Collaboration & Alerts",
+      "description": "Push insights, anomaly alerts, and scheduled summaries into team channels.",
+      "icon": "signal",
+      "connectors": ["Slack", "Microsoft Teams", "Discord", "Email"]
+    },
+    {
+      "id": "crm-activation",
+      "title": "CRM & Customer Ops",
+      "description": "Send segments, health signals, and revenue context back into customer systems.",
+      "icon": "sync",
+      "connectors": ["Salesforce", "HubSpot", "Pipedrive", "Zendesk", "Intercom"]
+    },
+    {
+      "id": "marketing-activation",
+      "title": "Marketing Activation",
+      "description": "Push audiences and lifecycle triggers into campaign and messaging platforms.",
+      "icon": "storage",
+      "connectors": ["Klaviyo", "Braze", "Mailchimp", "Meta Ads", "Google Ads"]
+    }
+  ]
+}
