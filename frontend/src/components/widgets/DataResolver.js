@@ -148,6 +148,9 @@ const DIRECT_SOURCES = ['prometheus', 'api', 'ga4'];
 // Sources that go through BigQuery
 const WAREHOUSE_SOURCES = ['analytics', 'warehouse'];
 
+// Sources that query databases directly (MongoDB, PostgreSQL, MySQL)
+const DATABASE_SOURCES = ['mongodb', 'postgresql', 'mysql'];
+
 // Map query source to connector name for availability check
 const SOURCE_CONNECTOR_MAP = {
   'prometheus': 'Prometheus',
@@ -156,6 +159,9 @@ const SOURCE_CONNECTOR_MAP = {
   'warehouse': 'BigQuery', // always available if project exists
   'ga4': 'GA4',
   'lighthouse': 'GA4',    // web vitals tied to analytics setup
+  'mongodb': 'MongoDB',
+  'postgresql': 'PostgreSQL',
+  'mysql': 'MySQL',
 };
 
 // Multi-connector mapping: a query ID can map to multiple connector-specific queries
@@ -166,6 +172,21 @@ const MULTI_CONNECTOR_QUERIES = {
   'gross-revenue': ['Google Ads', 'Meta Ads', 'TikTok Ads', 'Stripe'],
   'todays-budget': ['Google Ads', 'Meta Ads', 'TikTok Ads'],
   'posts-published': ['Meta Ads', 'TikTok Ads'],
+  'revenue-total': ['Stripe', 'Shopify', 'WooCommerce', 'PostgreSQL', 'MongoDB'],
+  'conversions-total': ['Stripe', 'Shopify', 'WooCommerce', 'PostgreSQL'],
+  'conversion-rate': ['GA4', 'PostHog', 'Shopify', 'PostgreSQL'],
+  'roas': ['Google Ads', 'Meta Ads', 'TikTok Ads', 'Stripe'],
+  'revenue-by-campaign': ['Google Ads', 'Meta Ads', 'TikTok Ads', 'Stripe', 'Shopify'],
+  'funnel-stages': ['GA4', 'PostHog', 'Shopify', 'PostgreSQL', 'MongoDB'],
+  'active-campaigns': ['Google Ads', 'Meta Ads', 'TikTok Ads'],
+  'channel-breakdown': ['Google Ads', 'Meta Ads', 'TikTok Ads', 'GA4', 'PostHog'],
+  'requests': ['Prometheus', 'PostgreSQL', 'MongoDB'],
+  'errors': ['Sentry', 'Prometheus', 'PostgreSQL'],
+  'cpu-time': ['Prometheus', 'PostgreSQL'],
+  'wall-time': ['Prometheus', 'PostgreSQL'],
+  'execution-duration': ['Prometheus', 'PostgreSQL'],
+  'request-duration': ['Prometheus', 'PostgreSQL'],
+  'latency-percentiles': ['Prometheus', 'PostgreSQL'],
 };
 
 function getRequiredConnector(query) {
@@ -292,6 +313,23 @@ export async function resolveWidgetData(spec, widgetType, config, queryRef, cont
         widgetType
       );
     }
+
+    if (DATABASE_SOURCES.includes(query.source)) {
+      // Database direct query path (MongoDB, PostgreSQL, MySQL)
+      if (!orgId || !projectId) {
+        return emptyDataForType(widgetType);
+      }
+      const dbQuery = substituteParams(query.template, query.params || [], { timeRange });
+      const rows = await cacheService.withCache(
+        queryRef,
+        dbQuery,
+        query.refresh || '60s',
+        orgId,
+        projectId,
+        () => analyticsService.queryDatabase(orgId, projectId, query.source, dbQuery)
+      );
+      return transformBigQueryResult(rows, widgetType);
+    }
   } catch (err) {
     console.warn(`Widget query "${queryRef}" (${query.source}) failed:`, err.message);
     return emptyDataForType(widgetType);
@@ -328,6 +366,21 @@ async function executeQueryForConnector(query, connector, context) {
         orgId,
         projectId,
         () => analyticsService.query(orgId, projectId, sql)
+      );
+      return transformBigQueryResult(rows, widgetType);
+    }
+
+    if (DATABASE_SOURCES.includes(query.source)) {
+      // Database direct query for multi-connector aggregation
+      if (!orgId || !projectId) return null;
+      const dbQuery = substituteParams(template, query.params || [], { timeRange });
+      const rows = await cacheService.withCache(
+        `${query.id}-${connector}`,
+        dbQuery,
+        query.refresh || '60s',
+        orgId,
+        projectId,
+        () => analyticsService.queryDatabase(orgId, projectId, query.source, dbQuery)
       );
       return transformBigQueryResult(rows, widgetType);
     }

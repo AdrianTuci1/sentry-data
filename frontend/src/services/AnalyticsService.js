@@ -6,6 +6,11 @@ export class AnalyticsService {
     return response.data;
   }
 
+  async queryDatabase(orgId, projectId, source, query) {
+    const response = await apiClient.post(`/organizations/${orgId}/projects/${projectId}/analytics/database`, { source, query });
+    return response.data;
+  }
+
   async getSchema(orgId, projectId) {
     const response = await apiClient.get(`/organizations/${orgId}/projects/${projectId}/analytics/schema`);
     return response.data;
