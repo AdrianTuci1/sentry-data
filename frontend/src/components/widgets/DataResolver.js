@@ -158,6 +158,16 @@ const SOURCE_CONNECTOR_MAP = {
   'lighthouse': 'GA4',    // web vitals tied to analytics setup
 };
 
+// Multi-connector mapping: a query ID can map to multiple connector-specific queries
+const MULTI_CONNECTOR_QUERIES = {
+  'active-campaigns-total': ['Google Ads', 'Meta Ads', 'TikTok Ads'],
+  'total-reach': ['Google Ads', 'Meta Ads', 'TikTok Ads'],
+  'avg-engagement': ['Google Ads', 'Meta Ads', 'TikTok Ads'],
+  'gross-revenue': ['Google Ads', 'Meta Ads', 'TikTok Ads', 'Stripe'],
+  'todays-budget': ['Google Ads', 'Meta Ads', 'TikTok Ads'],
+  'posts-published': ['Meta Ads', 'TikTok Ads'],
+};
+
 function getRequiredConnector(query) {
   const source = query?.source;
   if (!source) return null;
@@ -170,6 +180,10 @@ function getRequiredConnector(query) {
   if (source === 'api' && query.template?.includes('insights')) {
     return null; // Server-side generated, always available
   }
+  // Special case: campaigns API = marketing connectors
+  if (source === 'api' && query.template?.includes('campaigns')) {
+    return 'Google Ads'; // Primary, but can be multi
+  }
 
   return SOURCE_CONNECTOR_MAP[source] || null;
 }
@@ -178,6 +192,14 @@ function isConnectorAvailable(connectorName, workspace) {
   if (!connectorName) return true; // No specific connector required
   if (!workspace?.connectors) return false;
   return workspace.connectors.includes(connectorName);
+}
+
+function getAvailableConnectorsForQuery(queryRef, workspace) {
+  const multiConnectors = MULTI_CONNECTOR_QUERIES[queryRef];
+  if (!multiConnectors || !workspace?.connectors) {
+    return null; // Not a multi-connector query
+  }
+  return multiConnectors.filter(c => workspace.connectors.includes(c));
 }
 
 /**
@@ -197,7 +219,40 @@ export async function resolveWidgetData(spec, widgetType, config, queryRef, cont
     return generateMockData(widgetType, config, queryRef);
   }
 
-  // Check if required connector is available
+  // Check if this is a multi-connector query
+  const availableConnectors = getAvailableConnectorsForQuery(queryRef, workspace);
+  
+  if (availableConnectors !== null) {
+    // Multi-connector query: aggregate data from all available connectors
+    if (availableConnectors.length === 0) {
+      return {
+        unavailable: true,
+        connector: MULTI_CONNECTOR_QUERIES[queryRef].join(', '),
+        source: query.source,
+      };
+    }
+    
+    // Execute query for each available connector and aggregate
+    const results = [];
+    for (const connector of availableConnectors) {
+      try {
+        const result = await executeQueryForConnector(
+          query, connector, { timeRange, orgId, projectId, widgetType }
+        );
+        if (result) results.push({ connector, data: result });
+      } catch (err) {
+        console.warn(`Query "${queryRef}" failed for ${connector}:`, err.message);
+      }
+    }
+    
+    if (results.length === 0) {
+      return emptyDataForType(widgetType);
+    }
+    
+    return aggregateMultiConnectorResults(results, widgetType, queryRef);
+  }
+
+  // Single connector query
   const requiredConnector = getRequiredConnector(query);
   if (requiredConnector && !isConnectorAvailable(requiredConnector, workspace)) {
     return {
@@ -210,7 +265,6 @@ export async function resolveWidgetData(spec, widgetType, config, queryRef, cont
   // Route based on source type
   try {
     if (WAREHOUSE_SOURCES.includes(query.source)) {
-      // BigQuery path with caching
       if (!orgId || !projectId) {
         return emptyDataForType(widgetType);
       }
@@ -227,7 +281,6 @@ export async function resolveWidgetData(spec, widgetType, config, queryRef, cont
     }
 
     if (DIRECT_SOURCES.includes(query.source)) {
-      // Direct query path (Prometheus, REST API, GA4)
       return await executeDirectQuery(
         query.source,
         query.template,
@@ -246,4 +299,109 @@ export async function resolveWidgetData(spec, widgetType, config, queryRef, cont
 
   // Unknown source — fall back to mock
   return generateMockData(widgetType, config, queryRef);
+}
+
+async function executeQueryForConnector(query, connector, context) {
+  const { timeRange, orgId, projectId, widgetType } = context;
+  
+  // Modify query template to include connector filter
+  let template = query.template;
+  if (template.includes('FROM ')) {
+    // Add connector filter to SQL
+    template = template.replace(
+      /WHERE /i,
+      `WHERE connector = '${connector}' AND `
+    );
+  } else if (template.includes('/api/v1/')) {
+    // Add connector to API path
+    template = template.replace('/api/v1/', `/api/v1/${connector.toLowerCase().replace(' ', '-')}/`);
+  }
+  
+  try {
+    if (WAREHOUSE_SOURCES.includes(query.source)) {
+      if (!orgId || !projectId) return null;
+      const sql = substituteParams(template, query.params || [], { timeRange });
+      const rows = await cacheService.withCache(
+        `${query.id}-${connector}`,
+        sql,
+        query.refresh || '60s',
+        orgId,
+        projectId,
+        () => analyticsService.query(orgId, projectId, sql)
+      );
+      return transformBigQueryResult(rows, widgetType);
+    }
+
+    if (DIRECT_SOURCES.includes(query.source)) {
+      return await executeDirectQuery(
+        query.source,
+        template,
+        query.params || [],
+        { timeRange },
+        widgetType
+      );
+    }
+  } catch (err) {
+    console.warn(`Connector query failed for ${connector}:`, err.message);
+    return null;
+  }
+}
+
+function aggregateMultiConnectorResults(results, widgetType, queryRef) {
+  if (results.length === 1) {
+    return results[0].data;
+  }
+  
+  // Aggregate based on widget type
+  if (widgetType === 'metric') {
+    let totalValue = 0;
+    let totalPrevious = 0;
+    const allSparklines = [];
+    
+    for (const { connector, data } of results) {
+      if (data.value !== undefined) totalValue += Number(data.value) || 0;
+      if (data.previous !== undefined) totalPrevious += Number(data.previous) || 0;
+      if (data.sparklineData) allSparklines.push(...data.sparklineData);
+    }
+    
+    const trend = totalPrevious > 0 
+      ? (((totalValue - totalPrevious) / totalPrevious) * 100).toFixed(1)
+      : '0';
+    
+    return {
+      value: totalValue,
+      previous: totalPrevious || undefined,
+      trend,
+      sparklineData: allSparklines.length > 0 ? allSparklines : undefined,
+      sources: results.map(r => r.connector),
+    };
+  }
+  
+  if (widgetType === 'bar-chart' || widgetType === 'stacked-bar-chart') {
+    // Merge items from all connectors
+    const mergedItems = [];
+    for (const { connector, data } of results) {
+      if (data.items) {
+        mergedItems.push(...data.items.map(item => ({ ...item, source: connector })));
+      }
+    }
+    return { items: mergedItems, sources: results.map(r => r.connector) };
+  }
+  
+  if (widgetType === 'pie-chart') {
+    // Aggregate segments by source
+    const mergedSegments = [];
+    for (const { connector, data } of results) {
+      if (data.segments) {
+        mergedSegments.push(...data.segments.map(s => ({ ...s, source: connector })));
+      }
+    }
+    return { segments: mergedSegments, sources: results.map(r => r.connector) };
+  }
+  
+  // Default: return first result with sources info
+  return {
+    ...results[0].data,
+    sources: results.map(r => r.connector),
+  };
 }

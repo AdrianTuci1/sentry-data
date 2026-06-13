@@ -33,6 +33,22 @@
       "note": "Campaign spend, budgets, pacing, and paid acquisition efficiency."
     },
     {
+      "id": "meta-ads",
+      "name": "Meta Ads",
+      "type": "marketing",
+      "status": "connected",
+      "lastSync": "6 min ago",
+      "note": "Facebook, Instagram, Messenger, and Audience Network campaigns."
+    },
+    {
+      "id": "tiktok-ads",
+      "name": "TikTok Ads",
+      "type": "marketing",
+      "status": "connected",
+      "lastSync": "8 min ago",
+      "note": "TikTok video ads, spark ads, and shopping campaigns."
+    },
+    {
       "id": "commerce",
       "name": "Shopify",
       "type": "ecommerce",
@@ -190,6 +206,18 @@
       "name": "Google Ads",
       "connectorName": "Google Ads",
       "description": "Campaign spend, budgets, pacing, and paid acquisition efficiency.",
+      "flow": "source"
+    },
+    {
+      "name": "Meta Ads",
+      "connectorName": "Meta Ads",
+      "description": "Facebook, Instagram, Messenger, and Audience Network campaigns.",
+      "flow": "source"
+    },
+    {
+      "name": "TikTok Ads",
+      "connectorName": "TikTok Ads",
+      "description": "TikTok video ads, spark ads, and shopping campaigns.",
       "flow": "source"
     },
     {
