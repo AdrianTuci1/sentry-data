@@ -16,13 +16,14 @@ import storageRoutes from './storage.js';
 import healthRoutes from './health.js';
 import preferencesRoutes from './preferences.js';
 import observerRoutes from './observer.js';
+import publicRoutes from './public.js';
 
 const router = Router();
 
 router.use('/health', healthRoutes);
 router.use('/auth', authRoutes);
 router.use('/auth', oauthRoutes);
-router.use('/admin', adminRoutes);
+router.use('/public', publicRoutes);
 router.use('/organizations', orgRoutes);
 router.use('/organizations/:orgId/projects', projectRoutes);
 router.use('/organizations/:orgId/projects/:projectId/agents', agentRoutes);

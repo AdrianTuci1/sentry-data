@@ -933,6 +933,105 @@ export const useAppStore = create((set, get) => ({
     }
   },
 
+  generatePublicLink: async (orgId, projectId) => {
+    if (get().devMode) {
+      const mockToken = 'mock_' + Math.random().toString(36).substring(2, 10);
+      const mockUrl = `${window.location.origin}/p/${mockToken}`;
+      const mockLink = { token: mockToken, url: mockUrl, createdAt: new Date().toISOString() };
+      set({
+        workspaces: get().workspaces.map(w =>
+          w.id === projectId ? { ...w, publicLink: mockLink } : w
+        ),
+        currentWorkspace: get().currentWorkspace?.id === projectId
+          ? { ...get().currentWorkspace, publicLink: mockLink }
+          : get().currentWorkspace,
+      });
+      return mockLink;
+    }
+    set({ isLoading: true });
+    try {
+      const result = await projectService.generatePublicLink(orgId, projectId);
+      set({
+        workspaces: get().workspaces.map(w =>
+          w.id === projectId ? { ...w, publicLink: result } : w
+        ),
+        currentWorkspace: get().currentWorkspace?.id === projectId
+          ? { ...get().currentWorkspace, publicLink: result }
+          : get().currentWorkspace,
+        isLoading: false,
+      });
+      return result;
+    } catch (err) {
+      set({ error: err.message, isLoading: false });
+      throw err;
+    }
+  },
+
+  revokePublicLink: async (orgId, projectId) => {
+    if (get().devMode) {
+      set({
+        workspaces: get().workspaces.map(w =>
+          w.id === projectId ? { ...w, publicLink: null } : w
+        ),
+        currentWorkspace: get().currentWorkspace?.id === projectId
+          ? { ...get().currentWorkspace, publicLink: null }
+          : get().currentWorkspace,
+      });
+      return { revoked: true };
+    }
+    set({ isLoading: true });
+    try {
+      const result = await projectService.revokePublicLink(orgId, projectId);
+      set({
+        workspaces: get().workspaces.map(w =>
+          w.id === projectId ? { ...w, publicLink: null } : w
+        ),
+        currentWorkspace: get().currentWorkspace?.id === projectId
+          ? { ...get().currentWorkspace, publicLink: null }
+          : get().currentWorkspace,
+        isLoading: false,
+      });
+      return result;
+    } catch (err) {
+      set({ error: err.message, isLoading: false });
+      throw err;
+    }
+  },
+
+  regeneratePublicLink: async (orgId, projectId) => {
+    if (get().devMode) {
+      const mockToken = 'mock_' + Math.random().toString(36).substring(2, 10);
+      const mockUrl = `${window.location.origin}/p/${mockToken}`;
+      const mockLink = { token: mockToken, url: mockUrl, createdAt: new Date().toISOString() };
+      set({
+        workspaces: get().workspaces.map(w =>
+          w.id === projectId ? { ...w, publicLink: mockLink } : w
+        ),
+        currentWorkspace: get().currentWorkspace?.id === projectId
+          ? { ...get().currentWorkspace, publicLink: mockLink }
+          : get().currentWorkspace,
+      });
+      return mockLink;
+    }
+    set({ isLoading: true });
+    try {
+      const result = await projectService.regeneratePublicLink(orgId, projectId);
+      set({
+        workspaces: get().workspaces.map(w =>
+          w.id === projectId ? { ...w, publicLink: result } : w
+        ),
+        currentWorkspace: get().currentWorkspace?.id === projectId
+          ? { ...get().currentWorkspace, publicLink: result }
+          : get().currentWorkspace,
+        isLoading: false,
+      });
+      return result;
+    } catch (err) {
+      set({ error: err.message, isLoading: false });
+      throw err;
+    }
+  },
+
   // ═══════════════════════════════════════════════
   // INTEGRATION AUTH & DEPLOY
   // ═══════════════════════════════════════════════

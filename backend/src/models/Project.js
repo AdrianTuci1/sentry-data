@@ -18,6 +18,7 @@ export class Project {
       graph: false,
       chat: true,
     };
+    this.publicLink = data.publicLink || null;
     this.stats = data.stats || {
       sessionsCount: 0,
       dataSourcesCount: 0,
@@ -44,6 +45,7 @@ export class Project {
       status: this.status,
       settings: this.settings,
       modules: this.modules,
+      publicLink: this.publicLink,
       stats: this.stats,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
