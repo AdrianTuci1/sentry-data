@@ -12,10 +12,9 @@ import chatRoutes from './chat.js';
 import serviceAccountRoutes from './serviceAccounts.js';
 import billingRoutes from './billing.js';
 import stripeWebhookRoutes from './stripeWebhook.js';
-
 import storageRoutes from './storage.js';
-
 import healthRoutes from './health.js';
+import preferencesRoutes from './preferences.js';
 
 const router = Router();
 
@@ -32,6 +31,7 @@ router.use('/organizations/:orgId/projects/:projectId/specs', specsRoutes);
 router.use('/organizations/:orgId/projects/:projectId/alerts', alertsRoutes);
 router.use('/organizations/:orgId/projects/:projectId/chat', chatRoutes);
 router.use('/organizations/:orgId/projects/:projectId/storage', storageRoutes);
+router.use('/organizations/:orgId/projects/:projectId/preferences', preferencesRoutes);
 router.use('/organizations/:orgId/service-accounts', serviceAccountRoutes);
 router.use('/organizations/:orgId/billing', billingRoutes);
 router.use('/stripe/webhook', stripeWebhookRoutes);

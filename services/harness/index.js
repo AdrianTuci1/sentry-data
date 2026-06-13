@@ -206,14 +206,72 @@ async function enhanceBindingsWithLlm(dataset, catalog, bindings) {
 
 async function compileProjectArtifacts({ orgId, projectId, dataset, forceFull = false, bindingPatch = null }) {
   const existingBindings = forceFull ? null : await readJsonArtifact(orgId, projectId, 'view_bindings.json');
+  const existingSpecs = forceFull ? null : await readJsonArtifact(orgId, projectId, 'dashboard_specs/servers.json');
+  const preferences = await readJsonArtifact(orgId, projectId, 'preferences.json') || { views: {}, widgets: {}, global: { autoHarness: true } };
   const catalog = await discoverData(dataset);
   await writeJsonArtifact(orgId, projectId, 'data_catalog.json', catalog);
 
-  let bindings = mergeBindings(buildDefaultBindings(catalog), existingBindings);
+  // Detect active sources from catalog
+  const activeSources = new Set();
+  const activeGroups = new Set();
+  for (const table of catalog.tables || []) {
+    const source = inferSource(table);
+    activeSources.add(source.id);
+    activeGroups.add(source.groupId);
+  }
+
+  // If we have existing specs, only add new views for new sources
+  // Don't modify existing views unless autoHarness is true and not blocked
+  let bindings;
+  if (existingBindings && !forceFull) {
+    // Start with existing bindings
+    bindings = existingBindings;
+    
+    // Generate new bindings for new groups
+    const newBindings = buildDefaultBindings(catalog);
+    
+    for (const viewId of VIEW_ORDER) {
+      const template = VIEW_TEMPLATES[viewId];
+      
+      // Skip if view already exists and is blocked
+      if (preferences.views[viewId]?.blocked) {
+        continue;
+      }
+      
+      // Skip if view already exists and autoHarness is false
+      if (bindings.views[viewId] && !preferences.global?.autoHarness) {
+        continue;
+      }
+      
+      // Add new view if this group has data
+      if (activeGroups.has(template.groupId) && !bindings.views[viewId]) {
+        bindings.views[viewId] = newBindings.views[viewId];
+      }
+    }
+  } else {
+    // Fresh start - generate all from catalog
+    bindings = buildDefaultBindings(catalog);
+  }
+  
   bindings = await enhanceBindingsWithLlm(dataset, catalog, bindings);
 
   if (bindingPatch?.views) {
     bindings = mergeBindings(bindings, { version: 1, views: bindingPatch.views });
+  }
+
+  // Apply preferences to bindings
+  for (const [viewId, viewPref] of Object.entries(preferences.views || {})) {
+    if (bindings.views[viewId]) {
+      if (viewPref.title) bindings.views[viewId].title = viewPref.title;
+      if (viewPref.blocked) {
+        // Remove widgets that are not in preferred sources
+        if (viewPref.sources) {
+          bindings.views[viewId].widgets = bindings.views[viewId].widgets.filter(w => {
+            return viewPref.sources.includes(w.sourceId);
+          });
+        }
+      }
+    }
   }
 
   const specs = compileDashboardSpecs(dataset, bindings);
