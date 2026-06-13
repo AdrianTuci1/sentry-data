@@ -46,8 +46,8 @@ const mockOrganizations = [
 ];
 
 const mockWorkspaces = [
-  { id: 'pixtooth', organizationId: 'nexa-org', name: 'Pixtooth', slug: 'pixtooth', domain: 'pixtooth.com', status: 'Healthy', monthlyEvents: '13K', dataConsumption: '612 GB', lastUpdated: '4 min ago', connectors: ['Stripe', 'PostHog', 'HubSpot'] },
-  { id: 'octomus', organizationId: 'octomus-org', name: 'Octomus', slug: 'octomus', domain: 'octomus.dev', status: 'Healthy', monthlyEvents: '2.7K', dataConsumption: '421 GB', lastUpdated: '11 min ago', connectors: ['Stripe', 'Sentry', 'GA4'] },
+  { id: 'pixtooth', organizationId: 'nexa-org', name: 'Pixtooth', slug: 'pixtooth', domain: 'pixtooth.com', status: 'Healthy', monthlyEvents: '13K', dataConsumption: '612 GB', lastUpdated: '4 min ago', connectors: ['Stripe', 'PostHog', 'HubSpot', 'GitHub'] },
+  { id: 'octomus', organizationId: 'octomus-org', name: 'Octomus', slug: 'octomus', domain: 'octomus.dev', status: 'Healthy', monthlyEvents: '2.7K', dataConsumption: '421 GB', lastUpdated: '11 min ago', connectors: ['Stripe', 'Sentry', 'GA4', 'Prometheus'] },
   { id: 'staticlabs', organizationId: 'staticlabs-org', name: 'Staticlabs', slug: 'staticlabs', domain: 'staticlabs.ro', status: 'Monitoring', monthlyEvents: '1.9K', dataConsumption: '286 GB', lastUpdated: '18 min ago', connectors: ['Shopify', 'Klaviyo', 'PostHog'] },
   { id: 'nexa', organizationId: 'nexa-org', name: 'Nexa', slug: 'nexa', domain: 'nexa.dev', status: 'Healthy', monthlyEvents: '0', dataConsumption: '0 GB', lastUpdated: 'just now', connectors: [] },
 ];
@@ -57,11 +57,12 @@ const mockMetrics = {
   activeProjects: { value: '7', detail: '4 billable, 3 internal', trend: '+2 this month' },
   warehouseConsumption: { value: '3.8 TB', detail: 'across raw + modeled layers', trend: '+12.4%' },
   monthlyCompute: { value: '$2.4k', detail: 'BigQuery + orchestration', trend: '-8.1%' },
-  connectedSources: { value: '41', detail: '94.8% healthy', trend: '+7.3%' },
+  connectedSources: { value: '42', detail: '95.2% healthy', trend: '+7.8%' },
   topConnector: { value: 'Stripe', detail: 'used in 6 projects', trend: '62% adoption' },
   connectorUsage: [
     { name: 'Stripe', count: 6, share: 86 }, { name: 'PostHog', count: 5, share: 72 },
-    { name: 'HubSpot', count: 4, share: 58 }, { name: 'BigQuery', count: 3, share: 41 },
+    { name: 'HubSpot', count: 4, share: 58 }, { name: 'GitHub', count: 3, share: 43 },
+    { name: 'BigQuery', count: 3, share: 41 },
   ],
   recentActivity: [
     { title: 'Staticlabs sync latency improved', meta: 'Warehouse jobs down 14% after cache tuning.' },

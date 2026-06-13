@@ -148,11 +148,43 @@ const DIRECT_SOURCES = ['prometheus', 'api', 'ga4'];
 // Sources that go through BigQuery
 const WAREHOUSE_SOURCES = ['analytics', 'warehouse'];
 
+// Map query source to connector name for availability check
+const SOURCE_CONNECTOR_MAP = {
+  'prometheus': 'Prometheus',
+  'api': 'GitHub',        // api deployments come from GitHub
+  'analytics': 'GA4',     // or PostHog - determined by query
+  'warehouse': 'BigQuery', // always available if project exists
+  'ga4': 'GA4',
+  'lighthouse': 'GA4',    // web vitals tied to analytics setup
+};
+
+function getRequiredConnector(query) {
+  const source = query?.source;
+  if (!source) return null;
+
+  // Special case: api source with deployment template = GitHub
+  if (source === 'api' && query.template?.includes('deployments')) {
+    return 'GitHub';
+  }
+  // Special case: api source with insights = generic, no specific connector
+  if (source === 'api' && query.template?.includes('insights')) {
+    return null; // Server-side generated, always available
+  }
+
+  return SOURCE_CONNECTOR_MAP[source] || null;
+}
+
+function isConnectorAvailable(connectorName, workspace) {
+  if (!connectorName) return true; // No specific connector required
+  if (!workspace?.connectors) return false;
+  return workspace.connectors.includes(connectorName);
+}
+
 /**
  * Resolve widget data — the single entry point for all widget data.
  */
 export async function resolveWidgetData(spec, widgetType, config, queryRef, context) {
-  const { timeRange, orgId, projectId, demoMode } = context;
+  const { timeRange, orgId, projectId, demoMode, workspace } = context;
 
   // Demo mode — always use mock data
   if (demoMode) {
@@ -163,6 +195,16 @@ export async function resolveWidgetData(spec, widgetType, config, queryRef, cont
   const query = spec?.queries?.find((q) => q.id === queryRef);
   if (!query) {
     return generateMockData(widgetType, config, queryRef);
+  }
+
+  // Check if required connector is available
+  const requiredConnector = getRequiredConnector(query);
+  if (requiredConnector && !isConnectorAvailable(requiredConnector, workspace)) {
+    return {
+      unavailable: true,
+      connector: requiredConnector,
+      source: query.source,
+    };
   }
 
   // Route based on source type
