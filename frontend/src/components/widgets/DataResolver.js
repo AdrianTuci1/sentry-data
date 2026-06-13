@@ -234,106 +234,106 @@ export async function resolveWidgetData(spec, widgetType, config, queryRef, cont
     return generateMockData(widgetType, config, queryRef);
   }
 
-  // Find the query definition
-  const query = spec?.queries?.find((q) => q.id === queryRef);
-  if (!query) {
+  // Find the query definition(s)
+  const queries = spec?.queries?.filter((q) => q.id === queryRef || q.id.startsWith(`${queryRef}-`));
+  if (!queries || queries.length === 0) {
     return generateMockData(widgetType, config, queryRef);
   }
 
-  // Check if this is a multi-connector query
-  const availableConnectors = getAvailableConnectorsForQuery(queryRef, workspace);
-  
-  if (availableConnectors !== null) {
-    // Multi-connector query: aggregate data from all available connectors
-    if (availableConnectors.length === 0) {
+  // Single query case
+  if (queries.length === 1) {
+    const query = queries[0];
+    
+    // Check if required connector is available
+    const requiredConnector = getRequiredConnector(query);
+    if (requiredConnector && !isConnectorAvailable(requiredConnector, workspace)) {
       return {
         unavailable: true,
-        connector: MULTI_CONNECTOR_QUERIES[queryRef].join(', '),
+        connector: requiredConnector,
         source: query.source,
       };
     }
-    
-    // Execute query for each available connector and aggregate
-    const results = [];
-    for (const connector of availableConnectors) {
-      try {
-        const result = await executeQueryForConnector(
-          query, connector, { timeRange, orgId, projectId, widgetType }
+
+    // Route based on source type
+    try {
+      if (WAREHOUSE_SOURCES.includes(query.source)) {
+        if (!orgId || !projectId) {
+          return emptyDataForType(widgetType);
+        }
+        const sql = substituteParams(query.template, query.params || [], { timeRange });
+        const rows = await cacheService.withCache(
+          queryRef,
+          sql,
+          query.refresh || '60s',
+          orgId,
+          projectId,
+          () => analyticsService.query(orgId, projectId, sql)
         );
-        if (result) results.push({ connector, data: result });
-      } catch (err) {
-        console.warn(`Query "${queryRef}" failed for ${connector}:`, err.message);
+        return transformBigQueryResult(rows, widgetType);
       }
-    }
-    
-    if (results.length === 0) {
+
+      if (DIRECT_SOURCES.includes(query.source)) {
+        return await executeDirectQuery(
+          query.source,
+          query.template,
+          query.params || [],
+          {
+            timeRange,
+            prometheusUrl: config.prometheusUrl,
+          },
+          widgetType
+        );
+      }
+
+      if (DATABASE_SOURCES.includes(query.source)) {
+        if (!orgId || !projectId) {
+          return emptyDataForType(widgetType);
+        }
+        const dbQuery = substituteParams(query.template, query.params || [], { timeRange });
+        const rows = await cacheService.withCache(
+          queryRef,
+          dbQuery,
+          query.refresh || '60s',
+          orgId,
+          projectId,
+          () => analyticsService.queryDatabase(orgId, projectId, query.source, dbQuery)
+        );
+        return transformBigQueryResult(rows, widgetType);
+      }
+    } catch (err) {
+      console.warn(`Widget query "${queryRef}" (${query.source}) failed:`, err.message);
       return emptyDataForType(widgetType);
     }
-    
-    return aggregateMultiConnectorResults(results, widgetType, queryRef);
   }
 
-  // Single connector query
-  const requiredConnector = getRequiredConnector(query);
-  if (requiredConnector && !isConnectorAvailable(requiredConnector, workspace)) {
-    return {
-      unavailable: true,
-      connector: requiredConnector,
-      source: query.source,
-    };
+  // Multi-source case: execute all queries and aggregate
+  const results = [];
+  for (const query of queries) {
+    try {
+      if (WAREHOUSE_SOURCES.includes(query.source)) {
+        if (!orgId || !projectId) continue;
+        const sql = substituteParams(query.template, query.params || [], { timeRange });
+        const rows = await cacheService.withCache(
+          query.id,
+          sql,
+          query.refresh || '60s',
+          orgId,
+          projectId,
+          () => analyticsService.query(orgId, projectId, sql)
+        );
+        const data = transformBigQueryResult(rows, widgetType);
+        if (data) results.push({ source: query.sourceId, data });
+      }
+    } catch (err) {
+      console.warn(`Multi-source query "${query.id}" failed:`, err.message);
+    }
   }
 
-  // Route based on source type
-  try {
-    if (WAREHOUSE_SOURCES.includes(query.source)) {
-      if (!orgId || !projectId) {
-        return emptyDataForType(widgetType);
-      }
-      const sql = substituteParams(query.template, query.params || [], { timeRange });
-      const rows = await cacheService.withCache(
-        queryRef,
-        sql,
-        query.refresh || '60s',
-        orgId,
-        projectId,
-        () => analyticsService.query(orgId, projectId, sql)
-      );
-      return transformBigQueryResult(rows, widgetType);
-    }
-
-    if (DIRECT_SOURCES.includes(query.source)) {
-      return await executeDirectQuery(
-        query.source,
-        query.template,
-        query.params || [],
-        {
-          timeRange,
-          prometheusUrl: config.prometheusUrl,
-        },
-        widgetType
-      );
-    }
-
-    if (DATABASE_SOURCES.includes(query.source)) {
-      // Database direct query path (MongoDB, PostgreSQL, MySQL)
-      if (!orgId || !projectId) {
-        return emptyDataForType(widgetType);
-      }
-      const dbQuery = substituteParams(query.template, query.params || [], { timeRange });
-      const rows = await cacheService.withCache(
-        queryRef,
-        dbQuery,
-        query.refresh || '60s',
-        orgId,
-        projectId,
-        () => analyticsService.queryDatabase(orgId, projectId, query.source, dbQuery)
-      );
-      return transformBigQueryResult(rows, widgetType);
-    }
-  } catch (err) {
-    console.warn(`Widget query "${queryRef}" (${query.source}) failed:`, err.message);
+  if (results.length === 0) {
     return emptyDataForType(widgetType);
   }
+
+  return aggregateMultiSourceResults(results, widgetType);
 
   // Unknown source — fall back to mock
   return generateMockData(widgetType, config, queryRef);
@@ -400,7 +400,7 @@ async function executeQueryForConnector(query, connector, context) {
   }
 }
 
-function aggregateMultiConnectorResults(results, widgetType, queryRef) {
+function aggregateMultiSourceResults(results, widgetType) {
   if (results.length === 1) {
     return results[0].data;
   }
@@ -411,7 +411,7 @@ function aggregateMultiConnectorResults(results, widgetType, queryRef) {
     let totalPrevious = 0;
     const allSparklines = [];
     
-    for (const { connector, data } of results) {
+    for (const { source, data } of results) {
       if (data.value !== undefined) totalValue += Number(data.value) || 0;
       if (data.previous !== undefined) totalPrevious += Number(data.previous) || 0;
       if (data.sparklineData) allSparklines.push(...data.sparklineData);
@@ -426,35 +426,35 @@ function aggregateMultiConnectorResults(results, widgetType, queryRef) {
       previous: totalPrevious || undefined,
       trend,
       sparklineData: allSparklines.length > 0 ? allSparklines : undefined,
-      sources: results.map(r => r.connector),
+      sources: results.map(r => r.source),
     };
   }
   
   if (widgetType === 'bar-chart' || widgetType === 'stacked-bar-chart') {
-    // Merge items from all connectors
+    // Merge items from all sources
     const mergedItems = [];
-    for (const { connector, data } of results) {
+    for (const { source, data } of results) {
       if (data.items) {
-        mergedItems.push(...data.items.map(item => ({ ...item, source: connector })));
+        mergedItems.push(...data.items.map(item => ({ ...item, source })));
       }
     }
-    return { items: mergedItems, sources: results.map(r => r.connector) };
+    return { items: mergedItems, sources: results.map(r => r.source) };
   }
   
   if (widgetType === 'pie-chart') {
     // Aggregate segments by source
     const mergedSegments = [];
-    for (const { connector, data } of results) {
+    for (const { source, data } of results) {
       if (data.segments) {
-        mergedSegments.push(...data.segments.map(s => ({ ...s, source: connector })));
+        mergedSegments.push(...data.segments.map(s => ({ ...s, source })));
       }
     }
-    return { segments: mergedSegments, sources: results.map(r => r.connector) };
+    return { segments: mergedSegments, sources: results.map(r => r.source) };
   }
   
   // Default: return first result with sources info
   return {
     ...results[0].data,
-    sources: results.map(r => r.connector),
+    sources: results.map(r => r.source),
   };
 }
