@@ -13,6 +13,7 @@ import { apiClient } from '@/services/ApiClient';
 import connectorsData from '@/data/connectors.json';
 import { analyticsService } from '@/services/AnalyticsService';
 import { specService } from '@/services/SpecService';
+import { storageService } from '@/services/StorageService';
 
 const transientOrganizationSections = new Set(['create-project']);
 
@@ -343,6 +344,7 @@ export const useAppStore = create((set, get) => ({
   chatSessions: config.devMode ? mockChatSessions : [], activeChatId: null, isChatPanelOpen: true,
   organizationsData: [], projectsData: [], agentsData: [],
   integrationsData: [], analyticsData: null, currentUser: null,
+  storageVolumes: [],
   isLoading: false, error: null,
   organizationMetrics: config.devMode ? mockMetrics : emptyMetrics,
 
@@ -624,6 +626,96 @@ export const useAppStore = create((set, get) => ({
         isLoading: false,
       }));
       return updated;
+    } catch (err) {
+      set({ error: err.message, isLoading: false });
+      throw err;
+    }
+  },
+
+  // ═══════════════════════════════════════════════
+  // STORAGE
+  // ═══════════════════════════════════════════════
+
+  fetchStorageVolumes: async (orgId, projectId) => {
+    if (get().devMode || get().demoMode) return;
+    set({ isLoading: true });
+    try {
+      const volumes = await storageService.listVolumes(orgId, projectId);
+      set({ storageVolumes: volumes, isLoading: false });
+      return volumes;
+    } catch (err) {
+      set({ error: err.message, isLoading: false });
+      throw err;
+    }
+  },
+
+  deleteStorageVolume: async (orgId, projectId, volumeName) => {
+    if (get().devMode || get().demoMode) {
+      set((state) => ({
+        storageVolumes: (state.storageVolumes || []).filter((v) => v.name !== volumeName),
+      }));
+      return;
+    }
+    set({ isLoading: true });
+    try {
+      await storageService.deleteVolume(orgId, projectId, volumeName);
+      set((state) => ({
+        storageVolumes: (state.storageVolumes || []).filter((v) => v.name !== volumeName),
+        isLoading: false,
+      }));
+    } catch (err) {
+      set({ error: err.message, isLoading: false });
+      throw err;
+    }
+  },
+
+  deleteStorageFile: async (orgId, projectId, volumeName, filePath) => {
+    if (get().devMode || get().demoMode) return;
+    set({ isLoading: true });
+    try {
+      await storageService.deleteFile(orgId, projectId, volumeName, filePath);
+      set({ isLoading: false });
+    } catch (err) {
+      set({ error: err.message, isLoading: false });
+      throw err;
+    }
+  },
+
+  createStorageFolder: async (orgId, projectId, volumeName, folderPath) => {
+    if (get().devMode || get().demoMode) return;
+    set({ isLoading: true });
+    try {
+      await storageService.createFolder(orgId, projectId, volumeName, folderPath);
+      set({ isLoading: false });
+    } catch (err) {
+      set({ error: err.message, isLoading: false });
+      throw err;
+    }
+  },
+
+  getStorageUploadUrl: async (orgId, projectId, volumeName, filePath) => {
+    if (get().devMode || get().demoMode) return { url: null };
+    return storageService.getUploadUrl(orgId, projectId, volumeName, filePath);
+  },
+
+  getStorageDownloadUrl: async (orgId, projectId, volumeName, filePath) => {
+    if (get().devMode || get().demoMode) return { url: null };
+    return storageService.getDownloadUrl(orgId, projectId, volumeName, filePath);
+  },
+
+  // ═══════════════════════════════════════════════
+  // CONNECTOR SYNC
+  // ═══════════════════════════════════════════════
+
+  triggerConnectorSync: async (orgId, projectId, integrationId) => {
+    if (get().devMode || get().demoMode) {
+      return { status: 'triggered', message: 'Mock sync triggered' };
+    }
+    set({ isLoading: true });
+    try {
+      const result = await integrationService.triggerSync(orgId, projectId, integrationId);
+      set({ isLoading: false });
+      return result;
     } catch (err) {
       set({ error: err.message, isLoading: false });
       throw err;
