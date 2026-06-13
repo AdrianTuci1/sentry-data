@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { ViewFrame } from "@/components/shell/ViewFrame";
 import FeatureMindMap from "@/components/mindmap/DetachedMindMap";
-import { ProjectEmptyState, isProjectEmpty } from "@/components/shell/ProjectEmptyState";
 import { useAppStore } from "@/stores/useAppStore";
+import { specService } from "@/services/SpecService";
 
 // --- Combined Topology Data for All Domains ---
 const combinedMindMapData = {
@@ -458,29 +457,21 @@ const combinedMindMapData = {
 };
 
 export function GraphView() {
-  const { currentWorkspace, currentOrganization, fetchMindmap, demoMode, devMode } = useAppStore();
+  const { currentWorkspace, currentOrganization, demoMode, devMode } = useAppStore();
   const [mindmapData, setMindmapData] = useState(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!devMode && !demoMode && currentOrganization?.id && currentWorkspace?.id) {
       setLoading(true);
-      fetchMindmap(currentOrganization.id, currentWorkspace.id)
+      specService.getMindmap(currentOrganization.id, currentWorkspace.id)
         .then((data) => {
           if (data) setMindmapData(data);
           setLoading(false);
         })
         .catch(() => setLoading(false));
     }
-  }, [devMode, demoMode, currentOrganization?.id, currentWorkspace?.id, fetchMindmap]);
-
-  if (isProjectEmpty(currentWorkspace)) {
-    return (
-      <ViewFrame>
-        <ProjectEmptyState mode="graph" />
-      </ViewFrame>
-    );
-  }
+  }, [devMode, demoMode, currentOrganization?.id, currentWorkspace?.id]);
 
   return (
     <div className="flex-1 w-full min-h-0 relative flex flex-col bg-[#0F1012] overflow-hidden">
