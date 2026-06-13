@@ -34,7 +34,7 @@ export class GcpIamService {
       { name: 'sentry-backend', displayName: 'Sentry Backend API', description: 'Main backend API service' },
       { name: 'sentry-chat', displayName: 'Sentry Chat AI', description: 'AI chat service' },
       { name: 'sentry-harness', displayName: 'Sentry Harness', description: 'BigQuery discovery and spec generation' },
-      { name: 'sentry-jobs', displayName: 'Sentry Sync Worker', description: 'Multi-tenant data sync worker' },
+      { name: 'sentry-observer', displayName: 'Sentry Observer', description: 'Technical data health observer' },
       { name: 'sentry-compute', displayName: 'Sentry Compute', description: 'Default compute for Cloud Run' },
     ];
 
@@ -164,7 +164,6 @@ export class GcpIamService {
       'secretmanager.googleapis.com',
       'run.googleapis.com',
       'cloudscheduler.googleapis.com',
-      'pubsub.googleapis.com',
       'cloudbuild.googleapis.com',
       'logging.googleapis.com',
       'monitoring.googleapis.com',
@@ -242,7 +241,6 @@ const SERVICE_ACCOUNT_ROLES = {
     'roles/secretmanager.admin',
     'roles/run.admin',
     'roles/cloudscheduler.admin',
-    'roles/pubsub.admin',
     'roles/iam.serviceAccountAdmin',
     'roles/logging.logWriter',
     'roles/monitoring.metricWriter',
@@ -259,17 +257,14 @@ const SERVICE_ACCOUNT_ROLES = {
     'roles/datastore.user',
     'roles/logging.logWriter',
   ],
-  'sentry-jobs': [
-    'roles/secretmanager.secretAccessor',
-    'roles/bigquery.dataEditor',
+  'sentry-observer': [
+    'roles/bigquery.dataViewer',
     'roles/bigquery.jobUser',
-    'roles/datastore.user',
-    'roles/pubsub.publisher',
+    'roles/storage.objectAdmin',
     'roles/logging.logWriter',
   ],
   'sentry-compute': [
     'roles/run.invoker',
-    'roles/cloudscheduler.jobRunner',
   ],
 };
 

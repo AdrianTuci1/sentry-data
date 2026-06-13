@@ -6,15 +6,14 @@
 
 | Resursa | Descriere |
 |-----------|-----------|
-| Service Accounts (5) | backend, chat, harness, jobs, compute |
+| Service Accounts (5) | backend caller, chat, harness, observer, compute |
 | IAM Roles (25+) | Permisiuni pentru fiecare service account |
 | Firestore Database | Native mode, region EU |
 | BigQuery Dataset | `sentry_dataset_prod` |
 | Cloud Storage Bucket | `sentry-platform-data-PROJECT_ID` |
-| Pub/Sub Topics | `sentry-sync-trigger`, `connector-sync-complete` |
 | Secret Manager | 3 secrete (JWT, internal token, LLM key) |
-| Cloud Run Job | Sync worker multi-tenant |
-| Cloud Scheduler | Trigger sync la fiecare 15 min |
+| Cloud Run Services | `chat`, `harness`, `observer` cu IAM privat |
+| Cloud Scheduler API + IAM | Pentru joburile observer create din backend |
 | Cloudflare DNS | Records pentru api, app, www |
 
 ### ❌ Ce trebuie facut MANUAL inainte:
@@ -260,7 +259,7 @@ gh workflow run "💥 Destroy Complete Infrastructure" \
 ✅ Cloud Run services (Chat, Harness)
 ✅ VPS Docker containers
 ✅ Firestore, BigQuery, Storage
-✅ Pub/Sub, Secrets, Service Accounts
+✅ Secrets, Service Accounts
 ✅ Cloudflare DNS records
 ✅ Terraform state
 

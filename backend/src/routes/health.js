@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { config } from '../config/index.js';
 import { gcpService } from '../services/GcpService.js';
+import { internalServiceClient } from '../services/InternalServiceClient.js';
 import { success } from '../utils/response.js';
 
 const router = Router();
@@ -128,9 +129,7 @@ async function runDeepChecks() {
   
   // Chat service check
   try {
-    const chatResponse = await fetch(`${config.chatServiceUrl}/health`, {
-      headers: { 'X-Internal-Token': config.internalToken },
-    });
+    const chatResponse = await internalServiceClient.fetch(`${config.chatServiceUrl}/health`);
     checks.push({ 
       name: 'chat-service', 
       status: chatResponse.ok ? 'healthy' : 'unhealthy',
@@ -142,9 +141,7 @@ async function runDeepChecks() {
   
   // Harness service check
   try {
-    const harnessResponse = await fetch(`${config.harnessServiceUrl}/health`, {
-      headers: { 'X-Internal-Token': config.internalToken },
-    });
+    const harnessResponse = await internalServiceClient.fetch(`${config.harnessServiceUrl}/health`);
     checks.push({ 
       name: 'harness-service', 
       status: harnessResponse.ok ? 'healthy' : 'unhealthy',
@@ -152,6 +149,17 @@ async function runDeepChecks() {
     });
   } catch (err) {
     checks.push({ name: 'harness-service', status: 'unhealthy', error: err.message });
+  }
+
+  try {
+    const observerResponse = await internalServiceClient.fetch(`${config.observerServiceUrl}/health`);
+    checks.push({
+      name: 'observer-service',
+      status: observerResponse.ok ? 'healthy' : 'unhealthy',
+      statusCode: observerResponse.status,
+    });
+  } catch (err) {
+    checks.push({ name: 'observer-service', status: 'unhealthy', error: err.message });
   }
   
   return checks;

@@ -53,11 +53,12 @@ Complete data analytics platform with hierarchical structure: **Account → Orga
 │  │Firestore │  │ BigQuery │  │  Cloud   │  │  Secret  │     │
 │  │ (DB)     │  │(Analytics│  │ Storage  │  │ Manager │     │
 │  └──────────┘  └──────────┘  └──────────┘  └──────────┘     │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐                   │
-│  │ Pub/Sub  │  │ Cloud Run│  │ Cloud    │                   │
-│  │(Events)  │  │ Chat+    │  │ Scheduler│                   │
-│  │           │  │ Harness  │  │          │                   │
-│  └──────────┘  └──────────┘  └──────────┘                   │
+│  ┌──────────┐  ┌──────────┐                                  │
+│  │ Cloud Run│  │ Cloud    │                                  │
+│  │ Chat +   │  │ Scheduler│                                  │
+│  │ Harness +│  │          │                                  │
+│  │ Observer │  │          │                                  │
+│  └──────────┘  └──────────┘                                  │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -87,10 +88,10 @@ Account (Billing & Global Security)
 | **Sync Worker** | Node.js / Cron | Multi-tenant data sync (VPS) |
 | **Chat AI** | Cloud Run + Google Gemini 2.5 Flash | Conversational AI with tools |
 | **Harness** | Cloud Run + Google Gemini 2.5 Flash | Data discovery, spec generation |
+| **Observer** | Cloud Run + BigQuery | Data health, drift detection, query validation |
 | **Firestore** | Google Cloud Firestore | Hierarchical metadata (orgs, projects, users) |
 | **BigQuery** | Google BigQuery | Analytics data storage & querying |
 | **Cloud Storage** | Google Cloud Storage | Files, landing zone, specs, cache |
-| **Pub/Sub** | Google Cloud Pub/Sub | Event streaming between services |
 | **Secret Manager** | Google Cloud Secret Manager | Credentials & API keys |
 | **Auth** | JWT + bcrypt | Authentication + RBAC roles (user/admin/owner) |
 | **Billing** | Stripe | Subscription & invoice management |
@@ -132,14 +133,22 @@ Data discovery and spec generation engine:
 - Runs on Cloud Run (scale-to-zero, min-instances=0)
 - Cost: ~$0.24/month for 10 runs/day
 
-### 4. Sync Worker (`/backend/src/services/ConnectorService.js`)
+### 4. Observer Service (`/services/observer`)
+Technical monitoring agent that runs independently from the harness:
+- Periodic freshness checks and schema drift detection
+- Dry-run validation for warehouse queries stored in dashboard specs
+- Optional auto-heal for broken widget bindings without changing project business identity
+- Writes `monitoring/health_report.json` and `monitoring/schema_snapshot.json` to GCS
+- Can be triggered manually from project settings or scheduled every 2 days
+
+### 5. Sync Worker (`/backend/src/services/ConnectorService.js`)
 Multi-tenant data synchronization:
 - 20+ connectors: Stripe, Sentry, Shopify, WooCommerce, Meta, TikTok, Google Ads, GA4, PostHog, Klaviyo, HubSpot, Salesforce, PostgreSQL, MySQL, MongoDB, Firestore, Facebook, Search Console, YouTube
-- Automated deployment via Cloud Run Job
+- Single multi-tenant worker on the VPS
 - Scheduled sync via Cloud Scheduler (every 5-30 min based on connector)
-- Runs on VPS (Docker container with cron)
+- Firestore queue + periodic local execution on the VPS
 
-### 5. Frontend (`/frontend`)
+### 6. Frontend (`/frontend`)
 React 19 application with Vite:
 - Dashboard with configurable widgets
 - Chart editor (Vega-Lite + Vega-Embed)
@@ -181,11 +190,11 @@ React 19 application with Vite:
 | **Sync Worker** | Contabo VPS | Docker cron container | Included in VPS |
 | **Chat AI** | GCP Cloud Run | Gemini 2.5 Flash | ~$0.08 |
 | **Harness** | GCP Cloud Run | BigQuery + Gemini | ~$0.24 |
+| **Observer** | GCP Cloud Run | BigQuery health checks | ~$0.10 |
 | **Database** | GCP Firestore | NoSQL metadata | $0-5 (free tier) |
 | **Analytics** | GCP BigQuery | Data warehouse | $0-5 (free tier) |
 | **Files** | GCP Cloud Storage | Object storage | $0-5 (free tier) |
 | **Secrets** | GCP Secret Manager | API keys, tokens | $0 |
-| **Events** | GCP Pub/Sub | Event streaming | $0 |
 | **Scheduler** | GCP Cloud Scheduler | Cron triggers | $0.10 |
 | **Total** | | | **~$12-20/month** |
 
@@ -355,7 +364,8 @@ npm run dev
 
 - **JWT** for user authentication
 - **RBAC** with roles: `user`, `admin`, `owner`
-- **X-Internal-Token** for service-to-service communication (backend ↔ Cloud Run)
+- **Google OIDC ID tokens** for backend (Contabo) → private Cloud Run service invocation
+- **X-Internal-Token** as defense-in-depth inside private service-to-service calls
 - **GCS Signed URLs** with limited expiration
 - **BigQuery Isolation** per project (dedicated dataset)
 - **CORS** configured from environment variables
@@ -370,17 +380,26 @@ npm run dev
 
 ### Terraform Resources
 
-All GCP resources are managed via Terraform:
-- 5 Service Accounts (backend, chat, harness, jobs, compute)
+All GCP resources are managed via Terraform and GitHub Actions:
+- 5 Service Accounts (backend, chat, harness, observer, compute)
 - 25+ IAM Roles
 - Firestore Database
 - BigQuery Dataset
 - Cloud Storage Bucket
-- Pub/Sub Topics (2)
 - Secret Manager (3 secrets)
-- Cloud Run Job (Sync Worker)
-- Cloud Scheduler
+- Cloud Run service definitions (chat, harness, observer)
+- Cloud Scheduler API enablement + invoker IAM for observer schedules
 - Cloudflare DNS Records
+
+### Private Cloud Run Invocation
+
+The backend runs on Contabo, while `chat`, `harness`, and `observer` run on private Cloud Run services.
+
+- Backend discovers service URLs from `CHAT_SERVICE_URL`, `HARNESS_SERVICE_URL`, and `OBSERVER_SERVICE_URL`
+- For Cloud Run URLs, backend generates a Google ID token at runtime using ADC / service-account credentials
+- Cloud Run validates the OIDC token at the platform layer
+- The request still carries `X-Internal-Token` for in-app defense-in-depth
+- Cloud Scheduler triggers the observer with OIDC using `CLOUD_SCHEDULER_INVOKER_SERVICE_ACCOUNT_EMAIL`
 
 ### GitHub Actions Workflows
 

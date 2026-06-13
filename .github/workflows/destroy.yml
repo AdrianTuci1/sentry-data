@@ -74,12 +74,21 @@ jobs:
             --region=${{ env.GCP_REGION }} \
             --quiet || echo "Service not found or already deleted"
 
+      - name: 🗑️ Delete Observer Service
+        id: delete_observer
+        run: |
+          echo "Attempting to delete sentry-observer..."
+          gcloud run services delete sentry-observer \
+            --region=${{ env.GCP_REGION }} \
+            --quiet || echo "Service not found or already deleted"
+
       - name: ✅ Set Status
         id: status
         if: always()
         run: |
           if [ "${{ steps.delete_chat.outcome }}" == "success" ] && \
-             [ "${{ steps.delete_harness.outcome }}" == "success" ]; then
+             [ "${{ steps.delete_harness.outcome }}" == "success" ] && \
+             [ "${{ steps.delete_observer.outcome }}" == "success" ]; then
             echo "status=✅ DESTROYED" >> $GITHUB_OUTPUT
           else
             echo "status=⚠️ PARTIAL" >> $GITHUB_OUTPUT
@@ -94,6 +103,7 @@ jobs:
           echo "├─────────────────────────────────────────────────────────────┤"
           echo "│  Delete Chat:     ${{ steps.delete_chat.outcome == 'success' && '✅' || '❌' }}                                        │"
           echo "│  Delete Harness:  ${{ steps.delete_harness.outcome == 'success' && '✅' || '❌' }}                                        │"
+          echo "│  Delete Observer: ${{ steps.delete_observer.outcome == 'success' && '✅' || '❌' }}                                        │"
           echo "│                                                             │"
           echo "│  ${{ steps.status.outputs.status }}                                       │"
           echo "└─────────────────────────────────────────────────────────────┘"
@@ -172,6 +182,17 @@ jobs:
     name: 📦 Destroy GCP Infrastructure
     needs: [destroy-cloud-run-services, destroy-vps]
     runs-on: ubuntu-latest
+    env:
+      TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
+      TF_VAR_region: ${{ env.GCP_REGION }}
+      TF_VAR_environment: ${{ github.event.inputs.environment }}
+      TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      TF_VAR_cloudflare_zone_id: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+      TF_VAR_domain: ${{ env.DOMAIN }}
+      TF_VAR_vps_host: ${{ secrets.VPS_HOST }}
+      TF_VAR_jwt_secret: ${{ secrets.JWT_SECRET }}
+      TF_VAR_internal_token: ${{ secrets.INTERNAL_TOKEN }}
+      TF_VAR_llm_api_key: ${{ secrets.LLM_API_KEY }}
     outputs:
       gcp_status: ${{ steps.status.outputs.status }}
     steps:
@@ -229,8 +250,8 @@ jobs:
           echo "│    ✅ Pub/Sub Topics                                        │"
           echo "│    ✅ Secret Manager Secrets                                │"
           echo "│    ✅ Service Accounts                                      │"
-          echo "│    ✅ Cloud Run Job (Sync Worker)                           │"
-          echo "│    ✅ Cloud Scheduler                                       │"
+          echo "│    ✅ Cloud Run service definitions                         │"
+          echo "│    ✅ Cloud Scheduler API + invoker IAM                     │"
           echo "│    ✅ Cloudflare DNS Records                                │"
           echo "│                                                             │"
           echo "│  ⚠️  Note: Terraform state bucket is preserved               │"

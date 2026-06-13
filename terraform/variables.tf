@@ -32,6 +32,11 @@ variable "domain" {
   default     = "sentrydata.io"
 }
 
+variable "vps_host" {
+  description = "Public IPv4 address or hostname of the Contabo VPS serving api.<domain>"
+  type        = string
+}
+
 variable "jwt_secret" {
   description = "JWT Secret"
   type        = string
@@ -62,18 +67,6 @@ variable "stripe_webhook_secret" {
   type        = string
   sensitive   = true
   default     = ""
-}
-
-variable "backend_min_instances" {
-  description = "Minimum backend instances"
-  type        = number
-  default     = 1
-}
-
-variable "backend_max_instances" {
-  description = "Maximum backend instances"
-  type        = number
-  default     = 5
 }
 
 variable "enable_bigquery_analytics" {

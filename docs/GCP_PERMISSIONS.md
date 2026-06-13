@@ -1,7 +1,7 @@
 # GCP IAM Permissions for Sentry Data Platform
 
 ## Overview
-This document defines all IAM roles and permissions required for the Sentry Data Platform services running in Docker containers (backend, chat, harness) and the Cloud Run Job (sync worker).
+This document defines all IAM roles and permissions required for the Sentry Data Platform backend running on Contabo plus the private Cloud Run services (`chat`, `harness`, `observer`) and connector-managed sync jobs.
 
 ## Service Accounts
 
@@ -237,8 +237,10 @@ JWT_SECRET=your-jwt-secret
 INTERNAL_TOKEN=your-internal-token
 
 # Services
-CHAT_SERVICE_URL=http://chat:8080
-HARNESS_SERVICE_URL=http://harness:8081
+CHAT_SERVICE_URL=https://sentry-chat-xxxxx-ew.a.run.app
+HARNESS_SERVICE_URL=https://sentry-harness-xxxxx-ew.a.run.app
+OBSERVER_SERVICE_URL=https://sentry-observer-xxxxx-ew.a.run.app
+CLOUD_RUN_AUTH_MODE=required
 
 # BigQuery
 BIGQUERY_LOCATION=EU

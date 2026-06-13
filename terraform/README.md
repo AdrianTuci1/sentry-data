@@ -59,6 +59,7 @@ Required variables:
 - `project_id` - GCP project ID
 - `cloudflare_zone_id` - Cloudflare zone ID
 - `cloudflare_api_token` - Cloudflare API token
+- `vps_host` - public IP or hostname for the Contabo API server
 - `jwt_secret` - Generate: `openssl rand -base64 32`
 - `internal_token` - Generate: `openssl rand -base64 16`
 - `llm_api_key` - Gemini API key
@@ -112,13 +113,11 @@ terraform destroy -auto-approve
 ## Resources Created
 
 ### GCP Services
-- **Cloud Run**: 3 services (backend, chat, harness)
-- **Cloud Run Job**: 1 sync worker
-- **Cloud Scheduler**: 1 job (triggers sync every 5 min)
+- **Cloud Run**: 3 services (chat, harness, observer)
+- **Cloud Scheduler API**: enabled for backend-managed observer schedules
 - **Firestore**: Native mode database
 - **BigQuery**: Dataset for analytics
 - **Cloud Storage**: Bucket for files
-- **Pub/Sub**: 2 topics (sync trigger, sync complete)
 - **Secret Manager**: 3 secrets (JWT, internal token, LLM key)
 - **Service Accounts**: 5 accounts with IAM roles
 
@@ -132,10 +131,11 @@ terraform destroy -auto-approve
 ```
 User → Cloudflare (DNS + SSL + CDN)
   → Frontend: Cloudflare Pages (app.sentrydata.io)
-  → API: Cloud Run (api.sentrydata.io)
-    → Chat Service: Cloud Run (internal)
-    → Harness Service: Cloud Run (internal)
-    → Sync Worker: Cloud Run Job (triggered by Scheduler)
+  → API: Contabo VPS (api.sentrydata.io)
+    → Chat Service: Cloud Run (private IAM)
+    → Harness Service: Cloud Run (private IAM)
+    → Observer Service: Cloud Run (private IAM)
+    → VPS scheduler runs one multi-tenant sync worker for all connectors
   → Data:
     - Firestore (metadata, users, orgs)
     - BigQuery (analytics, synced data)
@@ -150,7 +150,6 @@ User → Cloudflare (DNS + SSL + CDN)
 - Firestore: 50K reads/day, 20K writes/day, 1GB storage
 - BigQuery: 1TB query/month
 - Storage: 5GB standard
-- Pub/Sub: 10GB messages/month
 
 ### Estimated Costs
 
@@ -161,7 +160,7 @@ User → Cloudflare (DNS + SSL + CDN)
 | 100 | $50-80 | $0.50-0.80 |
 
 ### Cost Controls
-- Cloud Run: min instances = 1 (backend), 0 (chat, harness)
+- Cloud Run: min instances = 0 (chat, harness, observer)
 - BigQuery: partitioned tables, 90-day expiration
 - GCS: lifecycle policy (30d → Nearline, 90d → Coldline)
 - Firestore: composite indexes, TTL for old data
@@ -196,13 +195,13 @@ terraform apply -auto-approve -debug
 ### Cloud Run service not responding
 ```bash
 # Check logs
-gcloud run services logs read sentry-backend
+gcloud run services logs read sentry-chat
 
 # Check service status
-gcloud run services describe sentry-backend --region=europe-west1
+gcloud run services describe sentry-harness --region=europe-west1
 
-# Redeploy
-gcloud run deploy sentry-backend --image=gcr.io/PROJECT/sentry-backend:latest
+# Check observer too
+gcloud run services describe sentry-observer --region=europe-west1
 ```
 
 ### Frontend not loading

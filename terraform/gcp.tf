@@ -10,7 +10,6 @@ resource "google_project_service" "apis" {
     "secretmanager.googleapis.com",
     "run.googleapis.com",
     "cloudscheduler.googleapis.com",
-    "pubsub.googleapis.com",
     "cloudbuild.googleapis.com",
     "logging.googleapis.com",
     "monitoring.googleapis.com",
@@ -44,10 +43,10 @@ resource "google_service_account" "harness" {
   description  = "BigQuery discovery and spec generation"
 }
 
-resource "google_service_account" "jobs" {
-  account_id   = "sentry-jobs"
-  display_name = "Sentry Sync Worker"
-  description  = "Multi-tenant data sync worker"
+resource "google_service_account" "observer" {
+  account_id   = "sentry-observer"
+  display_name = "Sentry Observer"
+  description  = "Technical data health observer"
 }
 
 resource "google_service_account" "compute" {
@@ -66,7 +65,6 @@ locals {
     "roles/secretmanager.admin",
     "roles/run.admin",
     "roles/cloudscheduler.admin",
-    "roles/pubsub.admin",
     "roles/iam.serviceAccountAdmin",
     "roles/logging.logWriter",
     "roles/monitoring.metricWriter",
@@ -83,17 +81,14 @@ locals {
     "roles/datastore.user",
     "roles/logging.logWriter",
   ]
-  jobs_roles = [
-    "roles/secretmanager.secretAccessor",
-    "roles/bigquery.dataEditor",
+  observer_roles = [
+    "roles/bigquery.dataViewer",
     "roles/bigquery.jobUser",
-    "roles/datastore.user",
-    "roles/pubsub.publisher",
+    "roles/storage.objectAdmin",
     "roles/logging.logWriter",
   ]
   compute_roles = [
     "roles/run.invoker",
-    "roles/cloudscheduler.jobRunner",
   ]
 }
 
@@ -118,11 +113,11 @@ resource "google_project_iam_member" "harness" {
   member   = "serviceAccount:${google_service_account.harness.email}"
 }
 
-resource "google_project_iam_member" "jobs" {
-  for_each = toset(local.jobs_roles)
+resource "google_project_iam_member" "observer" {
+  for_each = toset(local.observer_roles)
   project  = var.project_id
   role     = each.value
-  member   = "serviceAccount:${google_service_account.jobs.email}"
+  member   = "serviceAccount:${google_service_account.observer.email}"
 }
 
 resource "google_project_iam_member" "compute" {
@@ -187,21 +182,6 @@ resource "google_bigquery_dataset" "main" {
   depends_on = [google_project_service.apis["bigquery.googleapis.com"]]
 }
 
-# Pub/Sub Topics
-resource "google_pubsub_topic" "sync_trigger" {
-  name    = "sentry-sync-trigger"
-  project = var.project_id
-
-  depends_on = [google_project_service.apis["pubsub.googleapis.com"]]
-}
-
-resource "google_pubsub_topic" "sync_complete" {
-  name    = "connector-sync-complete"
-  project = var.project_id
-
-  depends_on = [google_project_service.apis["pubsub.googleapis.com"]]
-}
-
 # Secrets
 resource "google_secret_manager_secret" "jwt_secret" {
   secret_id = "jwt-secret"
@@ -247,97 +227,12 @@ resource "google_secret_manager_secret_version" "llm_api_key" {
   secret_data = var.llm_api_key
 }
 
-# Cloud Run - Backend
-resource "google_cloud_run_v2_service" "backend" {
-  name     = "sentry-backend"
-  location = var.region
-  project  = var.project_id
-  ingress  = "INGRESS_TRAFFIC_ALL"
-
-  template {
-    service_account = google_service_account.backend.email
-
-    scaling {
-      min_instances = var.backend_min_instances
-      max_instances = var.backend_max_instances
-    }
-
-    containers {
-      image = "gcr.io/${var.project_id}/sentry-backend:latest"
-
-      resources {
-        limits = {
-          cpu    = "1"
-          memory = "1Gi"
-        }
-      }
-
-      env {
-        name  = "GCP_PROJECT_ID"
-        value = var.project_id
-      }
-      env {
-        name  = "GCP_REGION"
-        value = var.region
-      }
-      env {
-        name  = "GCS_BUCKET_NAME"
-        value = google_storage_bucket.main.name
-      }
-      env {
-        name  = "BIGQUERY_DATASET_PREFIX"
-        value = "sentry_dataset"
-      }
-      env {
-        name  = "BIGQUERY_LOCATION"
-        value = "EU"
-      }
-      env {
-        name = "JWT_SECRET"
-        value_source {
-          secret_key_ref {
-            secret  = google_secret_manager_secret.jwt_secret.secret_id
-            version = "latest"
-          }
-        }
-      }
-      env {
-        name = "INTERNAL_TOKEN"
-        value_source {
-          secret_key_ref {
-            secret  = google_secret_manager_secret.internal_token.secret_id
-            version = "latest"
-          }
-        }
-      }
-      env {
-        name  = "CHAT_SERVICE_URL"
-        value = google_cloud_run_v2_service.chat.uri
-      }
-      env {
-        name  = "HARNESS_SERVICE_URL"
-        value = google_cloud_run_v2_service.harness.uri
-      }
-      env {
-        name  = "ENABLE_BIGQUERY_ANALYTICS"
-        value = var.enable_bigquery_analytics ? "true" : "false"
-      }
-      env {
-        name  = "CORS_ORIGIN"
-        value = "https://app.${var.domain}"
-      }
-    }
-  }
-
-  depends_on = [google_project_service.apis["run.googleapis.com"]]
-}
-
 # Cloud Run - Chat
 resource "google_cloud_run_v2_service" "chat" {
   name     = "sentry-chat"
   location = var.region
   project  = var.project_id
-  ingress  = "INGRESS_TRAFFIC_INTERNAL_ONLY"
+  ingress  = "INGRESS_TRAFFIC_ALL"
 
   template {
     service_account = google_service_account.chat.email
@@ -398,7 +293,7 @@ resource "google_cloud_run_v2_service" "harness" {
   name     = "sentry-harness"
   location = var.region
   project  = var.project_id
-  ingress  = "INGRESS_TRAFFIC_INTERNAL_ONLY"
+  ingress  = "INGRESS_TRAFFIC_ALL"
 
   template {
     service_account = google_service_account.harness.email
@@ -458,47 +353,110 @@ resource "google_cloud_run_v2_service" "harness" {
   depends_on = [google_project_service.apis["run.googleapis.com"]]
 }
 
-# Cloud Run - Allow unauthenticated for backend
-resource "google_cloud_run_v2_service_iam_member" "backend_public" {
-  project  = var.project_id
+resource "google_cloud_run_v2_service" "observer" {
+  name     = "sentry-observer"
   location = var.region
-  name     = google_cloud_run_v2_service.backend.name
-  role     = "roles/run.invoker"
-  member   = "allUsers"
-}
+  project  = var.project_id
+  ingress  = "INGRESS_TRAFFIC_ALL"
 
-# Cloud Scheduler - Sync Worker
-resource "google_cloud_scheduler_job" "sync_worker" {
-  name             = "sentry-sync-worker-trigger"
-  description      = "Trigger sync worker every 5 minutes"
-  schedule         = "*/5 * * * *"
-  time_zone        = "UTC"
-  project          = var.project_id
-  region           = var.region
-  attempt_deadline = "320s"
+  template {
+    service_account = google_service_account.observer.email
 
-  http_target {
-    http_method = "POST"
-    uri         = "${google_cloud_run_v2_service.backend.uri}/api/v1/admin/jobs/trigger-sync"
-
-    headers = {
-      "Authorization" = "Bearer ${var.internal_token}"
+    scaling {
+      min_instances = 0
+      max_instances = 2
     }
 
-    oauth_token {
-      service_account_email = google_service_account.compute.email
+    containers {
+      image = "gcr.io/${var.project_id}/sentry-observer:latest"
+
+      resources {
+        limits = {
+          cpu    = "1"
+          memory = "1Gi"
+        }
+      }
+
+      env {
+        name  = "PORT"
+        value = "8082"
+      }
+      env {
+        name  = "GCS_BUCKET"
+        value = google_storage_bucket.main.name
+      }
+      env {
+        name  = "BACKEND_URL"
+        value = "https://api.${var.domain}/api/v1"
+      }
+      env {
+        name  = "HARNESS_SERVICE_URL"
+        value = google_cloud_run_v2_service.harness.uri
+      }
+      env {
+        name  = "BQ_LOCATION"
+        value = "EU"
+      }
+      env {
+        name = "INTERNAL_TOKEN"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.internal_token.secret_id
+            version = "latest"
+          }
+        }
+      }
     }
   }
 
-  depends_on = [google_project_service.apis["cloudscheduler.googleapis.com"]]
+  depends_on = [google_project_service.apis["run.googleapis.com"]]
 }
 
+resource "google_cloud_run_v2_service_iam_member" "chat_backend_invoker" {
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.chat.name
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:${google_service_account.backend.email}"
+}
+
+resource "google_cloud_run_v2_service_iam_member" "harness_backend_invoker" {
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.harness.name
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:${google_service_account.backend.email}"
+}
+
+resource "google_cloud_run_v2_service_iam_member" "observer_backend_invoker" {
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.observer.name
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:${google_service_account.backend.email}"
+}
+
+resource "google_cloud_run_v2_service_iam_member" "observer_scheduler_invoker" {
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.observer.name
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:${google_service_account.compute.email}"
+}
+
+resource "google_service_account_iam_member" "backend_can_use_scheduler_invoker" {
+  service_account_id = google_service_account.compute.name
+  role               = "roles/iam.serviceAccountUser"
+  member             = "serviceAccount:${google_service_account.backend.email}"
+}
+
+# Cloud Scheduler - Sync Worker
 # Cloudflare DNS Records
 resource "cloudflare_record" "api" {
   zone_id = var.cloudflare_zone_id
   name    = "api"
-  type    = "CNAME"
-  value   = replace(google_cloud_run_v2_service.backend.uri, "https://", "")
+  type    = can(regex("^[0-9.]+$", var.vps_host)) ? "A" : "CNAME"
+  value   = var.vps_host
   proxied = true
   ttl     = 1
 }

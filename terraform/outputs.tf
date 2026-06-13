@@ -24,6 +24,10 @@ output "harness_service_url" {
   value = google_cloud_run_v2_service.harness.uri
 }
 
+output "observer_service_url" {
+  value = google_cloud_run_v2_service.observer.uri
+}
+
 output "gcs_bucket" {
   value = google_storage_bucket.main.name
 }
@@ -34,10 +38,14 @@ output "bigquery_dataset" {
 
 output "service_accounts" {
   value = {
-    backend = google_service_account.backend.email
-    chat    = google_service_account.chat.email
-    harness = google_service_account.harness.email
-    jobs    = google_service_account.jobs.email
-    compute = google_service_account.compute.email
+    backend  = google_service_account.backend.email
+    chat     = google_service_account.chat.email
+    harness  = google_service_account.harness.email
+    observer = google_service_account.observer.email
+    compute  = google_service_account.compute.email
   }
+}
+
+output "scheduler_invoker_service_account_email" {
+  value = google_service_account.compute.email
 }

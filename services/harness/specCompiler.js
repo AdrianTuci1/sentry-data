@@ -266,14 +266,21 @@ export function mergeBindings(templateBindings, existingBindings = null) {
     const templateView = templateBindings.views[viewId];
     const existingView = existingBindings.views[viewId];
     const existingWidgetsById = new Map((existingView?.widgets || []).map((widget) => [widget.id, widget]));
+    const templateWidgets = templateView?.widgets || [];
+    const widgetIds = templateWidgets.length > 0
+      ? templateWidgets.map((widget) => widget.id)
+      : Array.from(existingWidgetsById.keys());
 
     merged.views[viewId] = {
-      title: existingView?.title || templateView.title,
-      widgets: templateView.widgets.map((widget) => ({
-        ...widget,
-        ...existingWidgetsById.get(widget.id),
-        id: widget.id,
-      })),
+      title: existingView?.title || templateView?.title || VIEW_TEMPLATES[viewId].title,
+      widgets: widgetIds.map((widgetId) => {
+        const templateWidget = templateWidgets.find((widget) => widget.id === widgetId) || { id: widgetId };
+        return {
+          ...templateWidget,
+          ...existingWidgetsById.get(widgetId),
+          id: widgetId,
+        };
+      }),
     };
   }
 

@@ -69,6 +69,11 @@ build_images() {
     cd "$PROJECT_ROOT/services/harness"
     docker build -t "gcr.io/$PROJECT_ID/sentry-harness:latest" .
     docker push "gcr.io/$PROJECT_ID/sentry-harness:latest"
+
+    echo "  Building observer service..."
+    cd "$PROJECT_ROOT/services/observer"
+    docker build -t "gcr.io/$PROJECT_ID/sentry-observer:latest" .
+    docker push "gcr.io/$PROJECT_ID/sentry-observer:latest"
     
     echo "✅ Docker images built and pushed"
 }

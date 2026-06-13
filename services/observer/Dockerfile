@@ -5,11 +5,11 @@ WORKDIR /app
 COPY package.json ./
 RUN npm install --production
 
-COPY . ./
+COPY index.js ./
 
-ENV PORT=8081
+ENV PORT=8082
 ENV NODE_ENV=production
 
-EXPOSE 8081
+EXPOSE 8082
 
 CMD ["node", "index.js"]

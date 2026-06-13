@@ -2,9 +2,7 @@ version: '3.8'
 
 services:
   backend:
-    build:
-      context: ../backend
-      dockerfile: Dockerfile
+    image: sentry-backend:latest
     container_name: sentry-backend
     restart: unless-stopped
     ports:
@@ -19,8 +17,11 @@ services:
       - BIGQUERY_LOCATION=${BIGQUERY_LOCATION:-EU}
       - JWT_SECRET=${JWT_SECRET}
       - INTERNAL_TOKEN=${INTERNAL_TOKEN}
-      - CHAT_SERVICE_URL=http://chat:8080
-      - HARNESS_SERVICE_URL=http://harness:8081
+      - CHAT_SERVICE_URL=${CHAT_SERVICE_URL}
+      - HARNESS_SERVICE_URL=${HARNESS_SERVICE_URL}
+      - OBSERVER_SERVICE_URL=${OBSERVER_SERVICE_URL}
+      - CLOUD_RUN_AUTH_MODE=${CLOUD_RUN_AUTH_MODE:-required}
+      - CLOUD_SCHEDULER_INVOKER_SERVICE_ACCOUNT_EMAIL=${CLOUD_SCHEDULER_INVOKER_SERVICE_ACCOUNT_EMAIL}
       - ENABLE_BIGQUERY_ANALYTICS=${ENABLE_BIGQUERY_ANALYTICS:-true}
       - CORS_ORIGIN=${CORS_ORIGIN:-https://app.sentrydata.io}
       - GOOGLE_APPLICATION_CREDENTIALS=/secrets/gcp-key.json
@@ -34,65 +35,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-    depends_on:
-      - chat
-      - harness
-
-  chat:
-    build:
-      context: ../services/chat
-      dockerfile: Dockerfile
-    container_name: sentry-chat
-    restart: unless-stopped
-    ports:
-      - "8080:8080"
-    environment:
-      - NODE_ENV=production
-      - PORT=8080
-      - LLM_PROVIDER=${LLM_PROVIDER:-gemini}
-      - LLM_API_KEY=${LLM_API_KEY}
-      - LLM_MODEL=${LLM_MODEL:-gemini-2.5-flash}
-      - INTERNAL_TOKEN=${INTERNAL_TOKEN}
-      - GOOGLE_APPLICATION_CREDENTIALS=/secrets/gcp-key.json
-    volumes:
-      - ./secrets:/secrets:ro
-    networks:
-      - sentry-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
-  harness:
-    build:
-      context: ../services/harness
-      dockerfile: Dockerfile
-    container_name: sentry-harness
-    restart: unless-stopped
-    ports:
-      - "8081:8081"
-    environment:
-      - NODE_ENV=production
-      - PORT=8081
-      - LLM_PROVIDER=${LLM_PROVIDER:-gemini}
-      - LLM_API_KEY=${LLM_API_KEY}
-      - LLM_MODEL=${LLM_MODEL:-gemini-2.5-flash}
-      - GCS_BUCKET=${GCS_BUCKET_NAME}
-      - INTERNAL_TOKEN=${INTERNAL_TOKEN}
-      - GOOGLE_APPLICATION_CREDENTIALS=/secrets/gcp-key.json
-    volumes:
-      - ./secrets:/secrets:ro
-    networks:
-      - sentry-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
   nginx:
     image: nginx:alpine
     container_name: sentry-nginx
@@ -123,9 +65,7 @@ services:
 
   # Optional: Sync worker (can also be Cloud Run Job)
   sync-worker:
-    build:
-      context: ../backend
-      dockerfile: Dockerfile.worker
+    image: sentry-sync-worker:latest
     container_name: sentry-sync-worker
     restart: unless-stopped
     environment:

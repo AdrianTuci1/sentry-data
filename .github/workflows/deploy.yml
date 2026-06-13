@@ -28,8 +28,23 @@ jobs:
   deploy-gcp-infrastructure:
     name: 📦 Deploy GCP Infrastructure
     runs-on: ubuntu-latest
+    env:
+      TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
+      TF_VAR_region: ${{ env.GCP_REGION }}
+      TF_VAR_environment: ${{ github.event.inputs.environment }}
+      TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      TF_VAR_cloudflare_zone_id: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+      TF_VAR_domain: ${{ env.DOMAIN }}
+      TF_VAR_vps_host: ${{ secrets.VPS_HOST }}
+      TF_VAR_jwt_secret: ${{ secrets.JWT_SECRET }}
+      TF_VAR_internal_token: ${{ secrets.INTERNAL_TOKEN }}
+      TF_VAR_llm_api_key: ${{ secrets.LLM_API_KEY }}
     outputs:
       gcp_status: ${{ steps.status.outputs.status }}
+      chat_url: ${{ steps.outputs.outputs.chat_url }}
+      harness_url: ${{ steps.outputs.outputs.harness_url }}
+      observer_url: ${{ steps.outputs.outputs.observer_url }}
+      scheduler_invoker_sa: ${{ steps.outputs.outputs.scheduler_invoker_sa }}
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v4
@@ -75,6 +90,8 @@ jobs:
           echo "frontend_url=$(terraform output -raw frontend_url)" >> $GITHUB_OUTPUT
           echo "chat_url=$(terraform output -raw chat_service_url)" >> $GITHUB_OUTPUT
           echo "harness_url=$(terraform output -raw harness_service_url)" >> $GITHUB_OUTPUT
+          echo "observer_url=$(terraform output -raw observer_service_url)" >> $GITHUB_OUTPUT
+          echo "scheduler_invoker_sa=$(terraform output -raw scheduler_invoker_service_account_email)" >> $GITHUB_OUTPUT
           echo "gcs_bucket=$(terraform output -raw gcs_bucket)" >> $GITHUB_OUTPUT
           echo "bq_dataset=$(terraform output -raw bigquery_dataset)" >> $GITHUB_OUTPUT
 
@@ -90,11 +107,10 @@ jobs:
             echo "   - Firestore Database"
             echo "   - BigQuery Dataset"
             echo "   - Cloud Storage Bucket"
-            echo "   - Pub/Sub Topics"
             echo "   - Secret Manager"
             echo "   - Service Accounts"
-            echo "   - Cloud Run Job (Sync Worker)"
-            echo "   - Cloud Scheduler"
+            echo "   - Cloud Run service definitions"
+            echo "   - Cloud Scheduler API + invoker IAM"
           else
             echo "status=❌ FAILED" >> $GITHUB_OUTPUT
             echo "❌ GCP Infrastructure deployment failed!"
@@ -116,11 +132,10 @@ jobs:
           echo "│    ✅ Firestore Database                                    │"
           echo "│    ✅ BigQuery Dataset                                      │"
           echo "│    ✅ Cloud Storage Bucket                                  │"
-          echo "│    ✅ Pub/Sub Topics (2)                                    │"
           echo "│    ✅ Secret Manager (3 secrets)                            │"
           echo "│    ✅ Service Accounts (5)                                  │"
-          echo "│    ✅ Cloud Run Job (Sync Worker)                           │"
-          echo "│    ✅ Cloud Scheduler (Sync Trigger)                        │"
+          echo "│    ✅ Cloud Run Services (chat, harness, observer)          │"
+          echo "│    ✅ Cloud Scheduler API + invoker IAM                     │"
           echo "│                                                             │"
           echo "│  ${{ steps.status.outputs.status }}                                       │"
           echo "└─────────────────────────────────────────────────────────────┘"
@@ -194,8 +209,18 @@ jobs:
             LLM_MODEL=gemini-2.5-flash
             ENABLE_BIGQUERY_ANALYTICS=true
             CORS_ORIGIN=https://app.${{ env.DOMAIN }}
+            CHAT_SERVICE_URL=${{ needs.deploy-gcp-infrastructure.outputs.chat_url }}
+            HARNESS_SERVICE_URL=${{ needs.deploy-gcp-infrastructure.outputs.harness_url }}
+            OBSERVER_SERVICE_URL=${{ needs.deploy-gcp-infrastructure.outputs.observer_url }}
+            CLOUD_RUN_AUTH_MODE=required
+            CLOUD_SCHEDULER_INVOKER_SERVICE_ACCOUNT_EMAIL=${{ needs.deploy-gcp-infrastructure.outputs.scheduler_invoker_sa }}
             GOOGLE_APPLICATION_CREDENTIALS=/secrets/gcp-key.json
             ENVFILE
+
+            mkdir -p /opt/sentry-data/secrets
+            cat > /opt/sentry-data/secrets/gcp-key.json << 'GCPKEY'
+            ${{ secrets.GCP_SA_KEY }}
+            GCPKEY
           EOF
           echo "::endgroup::"
 
@@ -314,6 +339,12 @@ jobs:
           docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/sentry-harness:${{ github.sha }} ./services/harness
           docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/sentry-harness:${{ github.sha }}
 
+      - name: 🔨 Build Observer Image
+        id: build_observer
+        run: |
+          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/sentry-observer:${{ github.sha }} ./services/observer
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/sentry-observer:${{ github.sha }}
+
       - name: 🚀 Deploy Chat Service
         id: deploy_chat
         run: |
@@ -329,6 +360,7 @@ jobs:
             --cpu=1 \
             --max-instances=5 \
             --min-instances=0 \
+            --ingress=all \
             --no-allow-unauthenticated \
             --quiet
 
@@ -348,6 +380,27 @@ jobs:
             --cpu=2 \
             --max-instances=3 \
             --min-instances=0 \
+            --ingress=all \
+            --no-allow-unauthenticated \
+            --quiet
+
+      - name: 🚀 Deploy Observer Service
+        id: deploy_observer
+        run: |
+          gcloud run deploy sentry-observer \
+            --image=gcr.io/${{ secrets.GCP_PROJECT_ID }}/sentry-observer:${{ github.sha }} \
+            --region=${{ env.GCP_REGION }} \
+            --service-account=sentry-observer@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com \
+            --set-env-vars=GCS_BUCKET=sentry-platform-data-${{ secrets.GCP_PROJECT_ID }} \
+            --set-env-vars=BACKEND_URL=https://api.${{ env.DOMAIN }}/api/v1 \
+            --set-env-vars=HARNESS_SERVICE_URL=${{ needs.deploy-gcp-infrastructure.outputs.harness_url }} \
+            --set-env-vars=BQ_LOCATION=EU \
+            --set-env-vars=INTERNAL_TOKEN=${{ secrets.INTERNAL_TOKEN }} \
+            --memory=1Gi \
+            --cpu=1 \
+            --max-instances=2 \
+            --min-instances=0 \
+            --ingress=all \
             --no-allow-unauthenticated \
             --quiet
 
@@ -355,13 +408,22 @@ jobs:
         id: health_chat
         run: |
           CHAT_URL=$(gcloud run services describe sentry-chat --region=${{ env.GCP_REGION }} --format='value(status.url)')
-          curl -sf -H "Authorization: Bearer ${{ secrets.INTERNAL_TOKEN }}" $CHAT_URL/health || exit 1
+          TOKEN=$(gcloud auth print-identity-token --audiences="$CHAT_URL")
+          curl -sf -H "Authorization: Bearer $TOKEN" -H "X-Internal-Token: ${{ secrets.INTERNAL_TOKEN }}" $CHAT_URL/health || exit 1
 
       - name: 🏥 Health Check Harness
         id: health_harness
         run: |
           HARNESS_URL=$(gcloud run services describe sentry-harness --region=${{ env.GCP_REGION }} --format='value(status.url)')
-          curl -sf -H "Authorization: Bearer ${{ secrets.INTERNAL_TOKEN }}" $HARNESS_URL/health || exit 1
+          TOKEN=$(gcloud auth print-identity-token --audiences="$HARNESS_URL")
+          curl -sf -H "Authorization: Bearer $TOKEN" -H "X-Internal-Token: ${{ secrets.INTERNAL_TOKEN }}" $HARNESS_URL/health || exit 1
+
+      - name: 🏥 Health Check Observer
+        id: health_observer
+        run: |
+          OBSERVER_URL=$(gcloud run services describe sentry-observer --region=${{ env.GCP_REGION }} --format='value(status.url)')
+          TOKEN=$(gcloud auth print-identity-token --audiences="$OBSERVER_URL")
+          curl -sf -H "Authorization: Bearer $TOKEN" -H "X-Internal-Token: ${{ secrets.INTERNAL_TOKEN }}" $OBSERVER_URL/health || exit 1
 
       - name: ✅ Set Status
         id: status
@@ -369,10 +431,13 @@ jobs:
         run: |
           if [ "${{ steps.build_chat.outcome }}" == "success" ] && \
              [ "${{ steps.build_harness.outcome }}" == "success" ] && \
+             [ "${{ steps.build_observer.outcome }}" == "success" ] && \
              [ "${{ steps.deploy_chat.outcome }}" == "success" ] && \
              [ "${{ steps.deploy_harness.outcome }}" == "success" ] && \
+             [ "${{ steps.deploy_observer.outcome }}" == "success" ] && \
              [ "${{ steps.health_chat.outcome }}" == "success" ] && \
-             [ "${{ steps.health_harness.outcome }}" == "success" ]; then
+             [ "${{ steps.health_harness.outcome }}" == "success" ] && \
+             [ "${{ steps.health_observer.outcome }}" == "success" ]; then
             echo "status=✅ SUCCESS" >> $GITHUB_OUTPUT
           else
             echo "status=❌ FAILED" >> $GITHUB_OUTPUT
@@ -388,14 +453,18 @@ jobs:
           echo "├─────────────────────────────────────────────────────────────┤"
           echo "│  Build Chat:      ${{ steps.build_chat.outcome == 'success' && '✅' || '❌' }}                                        │"
           echo "│  Build Harness:   ${{ steps.build_harness.outcome == 'success' && '✅' || '❌' }}                                        │"
+          echo "│  Build Observer:  ${{ steps.build_observer.outcome == 'success' && '✅' || '❌' }}                                        │"
           echo "│  Deploy Chat:     ${{ steps.deploy_chat.outcome == 'success' && '✅' || '❌' }}                                        │"
           echo "│  Deploy Harness:  ${{ steps.deploy_harness.outcome == 'success' && '✅' || '❌' }}                                        │"
+          echo "│  Deploy Observer: ${{ steps.deploy_observer.outcome == 'success' && '✅' || '❌' }}                                        │"
           echo "│  Health Chat:     ${{ steps.health_chat.outcome == 'success' && '✅' || '❌' }}                                        │"
           echo "│  Health Harness:  ${{ steps.health_harness.outcome == 'success' && '✅' || '❌' }}                                        │"
+          echo "│  Health Observer: ${{ steps.health_observer.outcome == 'success' && '✅' || '❌' }}                                        │"
           echo "│                                                             │"
           echo "│  Services:                                                  │"
           echo "│    ✅ Chat Service (on-demand, pay-per-use)                 │"
           echo "│    ✅ Harness Service (on-demand, pay-per-use)              │"
+          echo "│    ✅ Observer Service (scheduled + manual)                 │"
           echo "│                                                             │"
           echo "│  ${{ steps.status.outputs.status }}                                       │"
           echo "└─────────────────────────────────────────────────────────────┘"

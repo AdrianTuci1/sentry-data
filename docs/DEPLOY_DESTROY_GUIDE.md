@@ -47,11 +47,12 @@
 │  │Firestore │  │ BigQuery │  │  Cloud   │  │  Secret  │     │
 │  │ (DB)     │  │(Analytics│  │ Storage  │  │ Manager │     │
 │  └──────────┘  └──────────┘  └──────────┘  └──────────┘     │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐                   │
-│  │ Pub/Sub  │  │ Cloud Run│  │ Cloud    │                   │
-│  │(Events)  │  │ Chat+    │  │ Scheduler│                   │
-│  │           │  │ Harness  │  │          │                   │
-│  └──────────┘  └──────────┘  └──────────┘                   │
+│  ┌──────────┐  ┌──────────┐                                  │
+│  │ Cloud Run│  │ Cloud    │                                  │
+│  │ Chat +   │  │ Scheduler│                                  │
+│  │ Harness +│  │          │                                  │
+│  │ Observer │  │          │                                  │
+│  └──────────┘  └──────────┘                                  │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -61,15 +62,14 @@
 
 | Resursa | Descriere |
 |---------|-----------|
-| Service Accounts (5) | backend, chat, harness, jobs, compute |
+| Service Accounts (5) | backend caller, chat, harness, observer, compute |
 | IAM Roles (25+) | Permisiuni pentru fiecare service account |
 | Firestore Database | Native mode, region EU |
 | BigQuery Dataset | `sentry_dataset_prod` |
 | Cloud Storage Bucket | `sentry-platform-data-PROJECT_ID` |
-| Pub/Sub Topics | `sentry-sync-trigger`, `connector-sync-complete` |
 | Secret Manager | 3 secrete (JWT, internal token, LLM key) |
-| Cloud Run Job | Sync worker multi-tenant |
-| Cloud Scheduler | Trigger sync la fiecare 15 min |
+| Cloud Run Services | `chat`, `harness`, `observer` cu IAM privat |
+| Cloud Scheduler API + IAM | Pentru joburile observer create din backend |
 | Cloudflare DNS | Records pentru api, app, www |
 
 ### ❌ Ce trebuie facut MANUAL inainte:
@@ -352,11 +352,10 @@ ssh -i ~/.ssh/sentry-vps root@YOUR_VPS_IP
 │    ✅ Firestore Database                                    │
 │    ✅ BigQuery Dataset                                      │
 │    ✅ Cloud Storage Bucket                                  │
-│    ✅ Pub/Sub Topics (2)                                    │
 │    ✅ Secret Manager (3 secrets)                            │
-│    ✅ Service Accounts (5)                                │
-│    ✅ Cloud Run Job (Sync Worker)                         │
-│    ✅ Cloud Scheduler                                       │
+│    ✅ Service Accounts (5)                                  │
+│    ✅ Cloud Run Services (chat, harness, observer)          │
+│    ✅ Cloud Scheduler API + invoker IAM                     │
 │                                                             │
 │  ✅ SUCCESS                                                  │
 └─────────────────────────────────────────────────────────────┘
@@ -375,11 +374,10 @@ ssh -i ~/.ssh/sentry-vps root@YOUR_VPS_IP
 │    ✅ Firestore Database                                    │
 │    ✅ BigQuery Dataset                                      │
 │    ✅ Cloud Storage Bucket                                  │
-│    ✅ Pub/Sub Topics                                        │
 │    ✅ Secret Manager Secrets                                │
 │    ✅ Service Accounts                                      │
-│    ✅ Cloud Run Job (Sync Worker)                           │
-│    ✅ Cloud Scheduler                                       │
+│    ✅ Cloud Run service definitions                         │
+│    ✅ Cloud Scheduler API + invoker IAM                     │
 │    ✅ Cloudflare DNS Records                                │
 │                                                             │
 │  ✅ DESTROYED                                                │
@@ -476,9 +474,20 @@ After deploy, your infrastructure will be:
 - **API**: https://api.sentrydata.io (VPS + Nginx)
 - **Chat**: Internal (Cloud Run)
 - **Harness**: Internal (Cloud Run)
+- **Observer**: Internal (Cloud Run)
 - **Sync Worker**: VPS (cron every 15 min)
 - **Database**: Firestore (GCP)
 - **Analytics**: BigQuery (GCP)
 - **Files**: Cloud Storage (GCP)
 
 **Total cost for 5 users: ~$12-20/month**
+
+## 🔐 Backend → Cloud Run Auth
+
+Backend-ul ruleaza pe Contabo, iar `chat`, `harness` si `observer` ruleaza in Cloud Run privat.
+
+- Backend foloseste `CHAT_SERVICE_URL`, `HARNESS_SERVICE_URL`, `OBSERVER_SERVICE_URL`
+- Pentru URL-uri Cloud Run, backend-ul genereaza un Google ID token la runtime folosind credentialele service account-ului local
+- Cloud Run valideaza token-ul OIDC la nivel de platforma
+- `X-Internal-Token` ramane activ ca verificare suplimentara in aplicatie
+- Observer-ul programat din Cloud Scheduler foloseste `CLOUD_SCHEDULER_INVOKER_SERVICE_ACCOUNT_EMAIL` pentru OIDC
