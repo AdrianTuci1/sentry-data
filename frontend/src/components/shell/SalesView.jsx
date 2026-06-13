@@ -1,6 +1,7 @@
 import { ArrowRight, ChevronDown, Ellipsis, Layers3, ReceiptText, RefreshCw, Search, ShoppingCart, Sparkles, UserRoundPlus } from "lucide-react";
 import { analyticsViews } from "@/components/app-shared";
 import { useAppStore } from "@/stores/useAppStore";
+import { useGeneratedViewData } from "@/components/shell/useGeneratedViewData";
 import { SalesOverviewWidget } from "@/components/widgets/widgets/SalesOverviewWidget";
 import { LeadSourcesWidget } from "@/components/widgets/widgets/LeadSourcesWidget";
 import { CampaignRoiWidget } from "@/components/widgets/widgets/CampaignRoiWidget";
@@ -156,7 +157,104 @@ function NewLeadsCard() {
 
 export function SalesView() {
   const { activeAnalyticsView, setActiveAnalyticsView, timeRange, setTimeRange } = useAppStore();
+  const { widgetMap, widgetDataMap } = useGeneratedViewData("sales");
   const salesTimeRange = ["24h", "7d", "30d", "90d"].includes(timeRange) ? timeRange : "30d";
+
+  const resolvedSalesOverviewData = (() => {
+    const metricDefs = [
+      ["revenue", "revenue"],
+      ["orders-total", "orders"],
+      ["avg-order-value", "aov"],
+      ["conversion-rate", "conversion"],
+    ];
+
+    const metrics = { ...salesOverviewData.metrics };
+    for (const [widgetId, metricKey] of metricDefs) {
+      const widget = widgetMap.get(widgetId);
+      const data = widgetDataMap[widgetId] || {};
+      if (widget) metrics[metricKey] = { ...metrics[metricKey], label: widget.title };
+      if (data.value !== undefined && data.value !== null) {
+        const numericValue = Number(data.value);
+        if (Number.isFinite(numericValue)) {
+          if (metricKey === "revenue" || metricKey === "aov") {
+            metrics[metricKey].value = `$${metricKey === "revenue" ? `${Math.round(numericValue / 1000)}K` : numericValue.toFixed(2)}`;
+          } else if (metricKey === "conversion") {
+            metrics[metricKey].value = `${numericValue.toFixed(2)}%`;
+          } else {
+            metrics[metricKey].value = `${numericValue.toFixed(1)}K`;
+          }
+        }
+      }
+    }
+
+    const overviewItems = widgetDataMap["sales-overview"]?.items || [];
+    const overviewSeries = overviewItems.length
+      ? overviewItems.slice(0, salesOverviewData.labels.length).map((item) => Number(item.value) || 0)
+      : salesOverviewData.timeseries.revenue;
+
+    return {
+      ...salesOverviewData,
+      metrics,
+      timeseries: {
+        revenue: overviewSeries,
+        orders: overviewSeries.map((value) => Math.max(1, Math.round(value / 180))),
+        aov: overviewSeries.map((value) => Math.max(1, Math.round(value / 220))),
+        conversion: overviewSeries.map((value) => Number(((value / Math.max(...overviewSeries, 1)) * 4).toFixed(2))),
+      },
+    };
+  })();
+
+  const resolvedLeadSourcesData = (() => {
+    const widget = widgetMap.get("lead-sources");
+    const items = widgetDataMap["lead-sources"]?.items || [];
+    if (!items.length) return leadSourcesData;
+    const colors = ["#E5E5E5", "#9C9CA1", "#75757A", "#4F4F53", "#313236"];
+    const sources = items.slice(0, 5).map((item, index) => ({
+      label: item.label || `${widget?.title || "Source"} ${index + 1}`,
+      value: Number(item.value) || 0,
+      color: colors[index % colors.length],
+    }));
+    return {
+      totalLeads: sources.reduce((sum, source) => sum + source.value, 0),
+      sources,
+    };
+  })();
+
+  const resolvedCampaignRoiData = (() => {
+    const items = widgetDataMap["campaign-roi"]?.items || [];
+    const revenueMetric = Number(widgetDataMap["revenue"]?.value) || campaignRoiData.revenue;
+    const spend = Number(items[0]?.value) || campaignRoiData.spend;
+    const revenue = revenueMetric;
+    const roas = spend > 0 ? revenue / spend : campaignRoiData.roas;
+    const spendPercent = revenue > 0 ? Math.round((spend / revenue) * 100) : campaignRoiData.spendPercent;
+    return {
+      spend,
+      revenue,
+      roas,
+      spendPercent,
+      returnPercent: Math.max(0, 100 - spendPercent),
+      retained: Math.max(0, revenue - spend),
+    };
+  })();
+
+  const resolvedTransactionsData = (() => {
+    const items = widgetDataMap["sales-transactions"]?.items || [];
+    if (!items.length) return recentTransactionsData;
+    return {
+      transactions: items.slice(0, 10).map((item, index) => {
+        const numericValue = Number(item.value) || 0;
+        return {
+          id: `#${String(5000 + index).padStart(5, "0")}`,
+          customer: item.label || `Customer ${index + 1}`,
+          product: widgetMap.get("sales-transactions")?.title || "Generated Transaction",
+          status: index % 5 === 0 ? "pending" : index % 7 === 0 ? "refunded" : "success",
+          qty: Math.max(1, Math.round(numericValue / 10) || index + 1),
+          unitPrice: `$${Math.max(10, Math.round(numericValue / Math.max(1, index + 1))).toLocaleString()}.00`,
+          totalRevenue: `$${Math.round(numericValue).toLocaleString()}.00`,
+        };
+      }),
+    };
+  })();
 
   return (
     <div className="sales-dashboard">
@@ -200,21 +298,21 @@ export function SalesView() {
       <div className="sales-dashboard-body">
         <section className="widget-card sales-hero-card">
           <div className="widget-content-body sales-hero-card-body">
-            <SalesOverviewWidget data={salesOverviewData} />
+            <SalesOverviewWidget data={resolvedSalesOverviewData} />
           </div>
         </section>
 
         <div className="sales-detail-grid">
-          <SalesCardShell title="Lead Sources Breakdown" icon={Layers3} action="More details">
-            <LeadSourcesWidget data={leadSourcesData} />
+          <SalesCardShell title={widgetMap.get("lead-sources")?.title || "Lead Sources Breakdown"} icon={Layers3} action="More details">
+            <LeadSourcesWidget data={resolvedLeadSourcesData} />
           </SalesCardShell>
 
           <SalesCardShell title="New Leads / Day" icon={UserRoundPlus} action="View leads">
             <NewLeadsCard />
           </SalesCardShell>
 
-          <SalesCardShell title="Campaign ROI Snapshot" icon={ShoppingCart} action="Full Snapshot">
-            <CampaignRoiWidget data={campaignRoiData} />
+          <SalesCardShell title={widgetMap.get("campaign-roi")?.title || "Campaign ROI Snapshot"} icon={ShoppingCart} action="Full Snapshot">
+            <CampaignRoiWidget data={resolvedCampaignRoiData} />
           </SalesCardShell>
         </div>
 
@@ -237,7 +335,7 @@ export function SalesView() {
           </header>
 
           <div className="widget-content-body sales-transactions-shell-body">
-            <SalesTransactionsWidget data={recentTransactionsData} />
+            <SalesTransactionsWidget data={resolvedTransactionsData} />
           </div>
         </section>
       </div>

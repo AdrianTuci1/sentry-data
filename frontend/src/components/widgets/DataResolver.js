@@ -47,8 +47,28 @@ function transformBigQueryResult(rows, widgetType) {
   const firstRow = rows[0];
   const columns = Object.keys(firstRow);
 
+  if (widgetType === 'text-insight') {
+    const preview = rows.slice(0, 3).map((row) => (
+      Object.entries(row)
+        .map(([key, value]) => `${key}: ${value}`)
+        .join(', ')
+    )).join(' • ');
+    return { text: preview || 'No data available.' };
+  }
+
   if (rows.length === 1 && columns.length === 1) {
     return { value: firstRow[columns[0]], trend: '0' };
+  }
+
+  if (widgetType === 'sparkline' && rows.length > 1 && columns.length >= 2) {
+    return {
+      sparklineData: rows.map((row) => Number(row[columns[1]]) || 0),
+      labels: rows.map((row) => String(row[columns[0]] ?? '')),
+      items: rows.map((row) => ({
+        label: row[columns[0]],
+        value: row[columns[1]],
+      })),
+    };
   }
 
   if (rows.length > 1 && columns.length >= 2) {

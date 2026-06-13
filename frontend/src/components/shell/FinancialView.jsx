@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { analyticsViews } from "@/components/app-shared";
 import { useAppStore } from "@/stores/useAppStore";
+import { useGeneratedViewData } from "@/components/shell/useGeneratedViewData";
 import "@/styles/financial.css";
 
 // --- Mock Data ---
@@ -176,7 +177,88 @@ function TotalRevenueGauge({ value }) {
 
 export function FinancialView() {
   const { activeAnalyticsView, setActiveAnalyticsView, timeRange, setTimeRange } = useAppStore();
+  const { widgetMap, widgetDataMap } = useGeneratedViewData("financial");
   const financialTimeRange = ["24h", "7d", "30d", "90d"].includes(timeRange) ? timeRange : "30d";
+
+  const resolvedMetricsData = {
+    repeatPurchase: {
+      ...metricsData.repeatPurchase,
+      label: widgetMap.get("repeat-purchase-rate")?.title || metricsData.repeatPurchase.label,
+      value: widgetDataMap["repeat-purchase-rate"]?.value !== undefined
+        ? `${Number(widgetDataMap["repeat-purchase-rate"].value).toFixed(1)}%`
+        : metricsData.repeatPurchase.value,
+      trend: widgetDataMap["repeat-purchase-rate"]?.trend || metricsData.repeatPurchase.trend,
+    },
+    orders: {
+      ...metricsData.orders,
+      label: widgetMap.get("orders")?.title || metricsData.orders.label,
+      value: widgetDataMap["orders"]?.value !== undefined
+        ? Number(widgetDataMap["orders"].value).toLocaleString("en-US")
+        : metricsData.orders.value,
+      trend: widgetDataMap["orders"]?.trend || metricsData.orders.trend,
+    },
+    aov: {
+      ...metricsData.aov,
+      label: widgetMap.get("aov")?.title || metricsData.aov.label,
+      value: widgetDataMap["aov"]?.value !== undefined
+        ? `$${Number(widgetDataMap["aov"].value).toFixed(2)}`
+        : metricsData.aov.value,
+      trend: widgetDataMap["aov"]?.trend || metricsData.aov.trend,
+    },
+  };
+
+  const mrrItems = widgetDataMap["mrr-overview"]?.items || [];
+  const resolvedMrrChartData = {
+    ...mrrChartData,
+    value: mrrItems.length
+      ? `$${Math.round((Number(mrrItems[mrrItems.length - 1]?.value) || 0) / 1000)}K`
+      : mrrChartData.value,
+    label: widgetMap.get("mrr-overview")?.title || mrrChartData.label,
+    points: mrrItems.length
+      ? Array.from({ length: 13 }).map((_, index) => {
+        const item = mrrItems[index];
+        const fallbackPoint = mrrChartData.points[index] || mrrChartData.points[mrrChartData.points.length - 1];
+        return item
+          ? { x: index, val: Math.max(1, Math.round((Number(item.value) || 0) / 1000)) }
+          : fallbackPoint;
+      })
+      : mrrChartData.points,
+    pointLabels: mrrItems.length
+      ? Array.from({ length: 13 }).map((_, index) => mrrItems[index]?.label || mrrChartData.xLabels[Math.min(index, mrrChartData.xLabels.length - 1)])
+      : mrrChartData.xLabels,
+  };
+
+  const resolvedBudgetUsageData = (() => {
+    const items = widgetDataMap["budget-usage"]?.items || [];
+    if (!items.length) return budgetUsageData;
+    const total = items.reduce((sum, item) => sum + (Number(item.value) || 0), 0) || 1;
+    const labels = ["unused", "used", "reserved"];
+    return {
+      value: `$${Math.round(total).toLocaleString("en-US")}`,
+      segments: items.slice(0, 3).map((item, index) => ({
+        label: `${Math.round(((Number(item.value) || 0) / total) * 100)}%`,
+        percentWidth: Math.round(((Number(item.value) || 0) / total) * 100),
+        status: labels[index] || "used",
+      })),
+    };
+  })();
+
+  const resolvedTotalRevenueValue = widgetDataMap["total-revenue"]?.value !== undefined
+    ? `$${Number(widgetDataMap["total-revenue"].value).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+    : "$284,920.00";
+
+  const resolvedActiveCustomersData = {
+    ...activeCustomersData,
+    label: widgetMap.get("active-customers")?.title || activeCustomersData.label,
+    value: widgetDataMap["active-customers"]?.value !== undefined
+      ? Number(widgetDataMap["active-customers"].value).toLocaleString("en-US")
+      : activeCustomersData.value,
+    percentage: widgetDataMap["active-customers"]?.value !== undefined
+      ? `${Math.min(99, Math.max(1, Math.round((Number(widgetDataMap["active-customers"].value) / 3250) * 100)))}%`
+      : activeCustomersData.percentage,
+  };
+
+  const resolvedAiInsightText = widgetDataMap["financial-ai-insight"]?.text || "Unused budget runway improved by 3.5% this month vs. trailing burn.";
 
   // States
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -198,7 +280,7 @@ export function FinancialView() {
   const mrrDrawW = mrrW - mrrPadL - mrrPadR;
   const mrrDrawH = mrrH - mrrPadT - mrrPadB;
 
-  const mrrPoints = mrrChartData.points.map((p) => {
+  const mrrPoints = resolvedMrrChartData.points.map((p) => {
     const x = mrrPadL + (p.x / 12) * mrrDrawW;
     const y = mrrPadT + (1 - (p.val / 100)) * mrrDrawH;
     return { x, y };
@@ -311,29 +393,29 @@ export function FinancialView() {
           <div className="financial-metrics-card">
             {/* Metric 1 */}
             <div className="financial-metric-col">
-              <span className="financial-metric-label">{metricsData.repeatPurchase.label}</span>
-              <span className="financial-metric-value">{metricsData.repeatPurchase.value}</span>
+              <span className="financial-metric-label">{resolvedMetricsData.repeatPurchase.label}</span>
+              <span className="financial-metric-value">{resolvedMetricsData.repeatPurchase.value}</span>
               <span className="financial-metric-trend trend-up">
                 <TrendingUp size={12} />
-                {metricsData.repeatPurchase.trend} <span style={{ color: "#8E918F", fontWeight: 400 }}>vs prior 30 days</span>
+                {resolvedMetricsData.repeatPurchase.trend} <span style={{ color: "#8E918F", fontWeight: 400 }}>vs prior 30 days</span>
               </span>
             </div>
             {/* Metric 2 */}
             <div className="financial-metric-col">
-              <span className="financial-metric-label">{metricsData.orders.label}</span>
-              <span className="financial-metric-value">{metricsData.orders.value}</span>
+              <span className="financial-metric-label">{resolvedMetricsData.orders.label}</span>
+              <span className="financial-metric-value">{resolvedMetricsData.orders.value}</span>
               <span className="financial-metric-trend trend-up">
                 <TrendingUp size={12} />
-                {metricsData.orders.trend} <span style={{ color: "#8E918F", fontWeight: 400 }}>vs prior 30 days</span>
+                {resolvedMetricsData.orders.trend} <span style={{ color: "#8E918F", fontWeight: 400 }}>vs prior 30 days</span>
               </span>
             </div>
             {/* Metric 3 */}
             <div className="financial-metric-col">
-              <span className="financial-metric-label">{metricsData.aov.label}</span>
-              <span className="financial-metric-value">{metricsData.aov.value}</span>
+              <span className="financial-metric-label">{resolvedMetricsData.aov.label}</span>
+              <span className="financial-metric-value">{resolvedMetricsData.aov.value}</span>
               <span className="financial-metric-trend trend-down">
                 <TrendingDown size={12} />
-                {metricsData.aov.trend} <span style={{ color: "#8E918F", fontWeight: 400 }}>vs prior 30 days</span>
+                {resolvedMetricsData.aov.trend} <span style={{ color: "#8E918F", fontWeight: 400 }}>vs prior 30 days</span>
               </span>
             </div>
           </div>
@@ -343,15 +425,15 @@ export function FinancialView() {
             <div className="financial-mrr-header-block">
               <div className="financial-mrr-title-area">
                 <span className="financial-mrr-value">
-                  {mrrHoverIdx !== null ? `$${mrrChartData.points[mrrHoverIdx].val}K` : mrrChartData.value}
+                  {mrrHoverIdx !== null ? `$${resolvedMrrChartData.points[mrrHoverIdx].val}K` : resolvedMrrChartData.value}
                 </span>
                 <span className="financial-mrr-label">
-                  {mrrHoverIdx !== null ? `Monthly Recurring Revenue (${mrrChartData.xLabels[mrrHoverIdx]})` : mrrChartData.label}
+                  {mrrHoverIdx !== null ? `Monthly Recurring Revenue (${resolvedMrrChartData.pointLabels[mrrHoverIdx]})` : resolvedMrrChartData.label}
                 </span>
               </div>
               <span className="financial-mrr-trend trend-up">
                 <TrendingUp size={13} />
-                {mrrChartData.trend}
+                {resolvedMrrChartData.trend}
               </span>
             </div>
 
@@ -484,7 +566,7 @@ export function FinancialView() {
                   }}
                 >
                   <span style={{ fontSize: "10px", color: "#8E918F", fontWeight: 500 }}>
-                    {mrrChartData.xLabels[mrrHoverIdx]}
+                    {resolvedMrrChartData.pointLabels[mrrHoverIdx]}
                   </span>
                   <span style={{ fontSize: "12px", color: "#FFFFFF", fontWeight: 700 }}>
                     ${mrrChartData.points[mrrHoverIdx].val}K
@@ -501,7 +583,7 @@ export function FinancialView() {
               <header className="financial-card-header">
                 <div className="financial-card-title-wrap">
                   <Sparkles size={14} className="financial-card-title-icon" />
-                  <span className="financial-card-title">AI Insights</span>
+                  <span className="financial-card-title">{widgetMap.get("financial-ai-insight")?.title || "AI Insights"}</span>
                 </div>
                 <button className="financial-card-action-btn" type="button">
                   <MessageSquare size={13} />
@@ -510,7 +592,7 @@ export function FinancialView() {
               </header>
               <div className="financial-ai-insights-body">
                 <p className="financial-ai-insights-text">
-                  Unused budget runway improved by <span className="highlight">3.5% this month</span> vs. trailing burn.
+                  {resolvedAiInsightText}
                 </p>
               </div>
             </div>
@@ -519,17 +601,17 @@ export function FinancialView() {
             <div className="financial-card financial-budget-card">
               <header className="financial-card-header">
                 <div className="financial-card-title-wrap">
-                  <span className="financial-card-title">Budget Usage</span>
+                  <span className="financial-card-title">{widgetMap.get("budget-usage")?.title || "Budget Usage"}</span>
                 </div>
                 <button className="financial-card-action-btn" type="button">
                   <Layers size={13} />
                   <span>Manage Budget</span>
                 </button>
               </header>
-              <span className="financial-budget-value">{budgetUsageData.value}</span>
+              <span className="financial-budget-value">{resolvedBudgetUsageData.value}</span>
               <div className="financial-budget-bar-section">
                 <div className="financial-budget-bar-row">
-                  {budgetUsageData.segments.map((seg, idx) => (
+                  {resolvedBudgetUsageData.segments.map((seg, idx) => (
                     <div
                       key={idx}
                       className="financial-budget-bar-col"
@@ -712,16 +794,16 @@ export function FinancialView() {
         {/* Right Narrow Column */}
         <div className="financial-right-column">
           {/* Widget 1: Total Revenue Semicircle Gauge */}
-          <TotalRevenueGauge value="$284,920.00" />
+          <TotalRevenueGauge value={resolvedTotalRevenueValue} />
 
           {/* Widget 2: Active Customers Card */}
           <div className="financial-card financial-active-customers-card">
             <div className="financial-active-customers-header">
               <div>
-                <div className="financial-active-customers-label">{activeCustomersData.label}</div>
-                <div className="financial-active-customers-value">{activeCustomersData.value}</div>
+                <div className="financial-active-customers-label">{resolvedActiveCustomersData.label}</div>
+                <div className="financial-active-customers-value">{resolvedActiveCustomersData.value}</div>
               </div>
-              <div className="financial-active-customers-percentage">{activeCustomersData.percentage}</div>
+              <div className="financial-active-customers-percentage">{resolvedActiveCustomersData.percentage}</div>
             </div>
 
             <div className="financial-active-customers-bar-row">
