@@ -53,32 +53,72 @@ const mockWorkspaces = [
 ];
 
 const mockMetrics = {
-  managedOrganizations: { value: '18', detail: '6 active, 12 monitored', trend: '+3 this quarter' },
-  activeProjects: { value: '7', detail: '4 billable, 3 internal', trend: '+2 this month' },
-  warehouseConsumption: { value: '3.8 TB', detail: 'across raw + modeled layers', trend: '+12.4%' },
-  monthlyCompute: { value: '$2.4k', detail: 'BigQuery + orchestration', trend: '-8.1%' },
-  connectedSources: { value: '42', detail: '95.2% healthy', trend: '+7.8%' },
-  topConnector: { value: 'Stripe', detail: 'used in 6 projects', trend: '62% adoption' },
-  connectorUsage: [
-    { name: 'Stripe', count: 6, share: 86 }, { name: 'PostHog', count: 5, share: 72 },
-    { name: 'HubSpot', count: 4, share: 58 }, { name: 'GitHub', count: 3, share: 43 },
-    { name: 'BigQuery', count: 3, share: 41 },
+  // Account-level metrics (for OrganizationHomeView)
+  organizations: 3,
+  totalProjects: 4,
+  healthyProjects: 3,
+  totalEvents: 17600,
+  totalStorage: 1319,
+  uniqueConnectors: 12,
+  connectors: ['Stripe', 'PostHog', 'HubSpot', 'GitHub', 'MongoDB', 'Sentry', 'GA4', 'Prometheus', 'PostgreSQL', 'Shopify', 'Klaviyo', 'Meta Ads', 'TikTok Ads'],
+  orgsList: [
+    { id: 'nexa-org', name: 'Nexa', slug: 'nexa', plan: 'Agency', projectCount: 2 },
+    { id: 'staticlabs-org', name: 'Staticlabs', slug: 'staticlabs', plan: 'Growth', projectCount: 1 },
+    { id: 'octomus-org', name: 'Octomus', slug: 'octomus', plan: 'Scale', projectCount: 1 },
   ],
   recentActivity: [
-    { title: 'Staticlabs sync latency improved', meta: 'Warehouse jobs down 14% after cache tuning.' },
-    { title: 'Octomus enabled Salesforce push', meta: 'Destination activation is now live for deal health alerts.' },
-    { title: 'Pixtooth added two new sources', meta: 'GA4 and Sentry were connected in the last 24 hours.' },
+    { title: 'Project updated', meta: 'Pixtooth in Nexa' },
+    { title: 'Connector active', meta: 'Stripe connected to Pixtooth' },
+    { title: 'New project created', meta: 'Nexa added to Nexa' },
+  ],
+  // Org-level metrics (for OrganizationStatsView) - default for first org
+  org: { id: 'nexa-org', name: 'Nexa', slug: 'nexa', plan: 'Agency' },
+  projects: { total: 2, healthy: 1, monitoring: 1 },
+  events: { total: 13000, formatted: '13K' },
+  storage: { total: 612, formatted: '612 GB' },
+  compute: { value: '30.6 GB', detail: 'BigQuery + orchestration', trend: '-8.1%' },
+  connectedSources: { value: '5', detail: 'Stripe most used', trend: '+12%' },
+  topConnector: { value: 'Stripe', detail: '2 projects', trend: '+5%' },
+  connectorUsage: [
+    { name: 'Stripe', count: 2, share: 100 },
+    { name: 'PostHog', count: 1, share: 50 },
+    { name: 'HubSpot', count: 1, share: 50 },
+    { name: 'GitHub', count: 1, share: 50 },
+    { name: 'MongoDB', count: 1, share: 50 },
+  ],
+  projectList: [
+    { id: 'pixtooth', name: 'Pixtooth', slug: 'pixtooth', domain: 'pixtooth.com', status: 'Healthy', monthlyEvents: '13K', dataConsumption: '612 GB', connectors: ['Stripe', 'PostHog', 'HubSpot', 'GitHub', 'MongoDB'] },
+    { id: 'nexa', name: 'Nexa', slug: 'nexa', domain: 'nexa.dev', status: 'Healthy', monthlyEvents: '0', dataConsumption: '0 GB', connectors: [] },
+  ],
+  recentActivity: [
+    { title: 'Project updated', meta: 'Pixtooth configuration changed' },
+    { title: 'Connector synced', meta: 'Stripe data refreshed' },
+    { title: 'Project created', meta: 'Nexa added to organization' },
   ],
 };
 
 const emptyMetrics = {
-  managedOrganizations: { value: '0', detail: '', trend: '' },
-  activeProjects: { value: '0', detail: '', trend: '' },
-  warehouseConsumption: { value: '0', detail: '', trend: '' },
-  monthlyCompute: { value: '$0', detail: '', trend: '' },
+  // Account-level
+  organizations: 0,
+  totalProjects: 0,
+  healthyProjects: 0,
+  totalEvents: 0,
+  totalStorage: 0,
+  uniqueConnectors: 0,
+  connectors: [],
+  orgsList: [],
+  recentActivity: [],
+  // Org-level
+  org: { id: '', name: '', slug: '', plan: 'Starter' },
+  projects: { total: 0, healthy: 0, monitoring: 0 },
+  events: { total: 0, formatted: '0' },
+  storage: { total: 0, formatted: '0 GB' },
+  compute: { value: '0 GB', detail: '', trend: '' },
   connectedSources: { value: '0', detail: '', trend: '' },
   topConnector: { value: '-', detail: '', trend: '' },
-  connectorUsage: [], recentActivity: [],
+  connectorUsage: [],
+  projectList: [],
+  recentActivity: [],
 };
 
 function getOrganizationNameFromEmail(email) {
