@@ -14,7 +14,9 @@ export class Project {
     this.modules = data.modules || {
       onboarding: true,
       analytics: true,
-      integrations: true,
+      sources: true,
+      destinations: true,
+      storage: true,
       graph: false,
       chat: true,
     };
