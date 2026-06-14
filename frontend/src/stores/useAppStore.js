@@ -805,12 +805,26 @@ export const useAppStore = create((set, get) => ({
 
   fetchAccountMetrics: async () => {
     if (get().devMode) return get().organizationMetrics;
+    set({ isLoading: true });
     try {
-      const response = await apiClient.get('/organizations/account/metrics');
-      set({ accountMetrics: response.data });
-      return response.data;
+      const metrics = await analyticsService.getAccountMetrics();
+      set({ accountMetrics: metrics, isLoading: false });
+      return metrics;
     } catch (err) {
-      set({ error: err.message });
+      set({ error: err.message, isLoading: false });
+      return null;
+    }
+  },
+
+  fetchOrgMetrics: async (orgId) => {
+    if (get().devMode) return get().organizationMetrics;
+    set({ isLoading: true });
+    try {
+      const metrics = await analyticsService.getOrgMetrics(orgId);
+      set({ organizationMetrics: metrics, isLoading: false });
+      return metrics;
+    } catch (err) {
+      set({ error: err.message, isLoading: false });
       return null;
     }
   },

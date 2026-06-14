@@ -21,6 +21,16 @@ export class AnalyticsService {
     return response.data;
   }
 
+  async getAccountMetrics() {
+    const response = await apiClient.get('/organizations/account/metrics');
+    return response.data;
+  }
+
+  async getOrgMetrics(orgId) {
+    const response = await apiClient.get(`/organizations/${orgId}/metrics`);
+    return response.data;
+  }
+
   async createTable(orgId, projectId, tableId, schema) {
     const response = await apiClient.post(`/organizations/${orgId}/projects/${projectId}/analytics/tables`, { tableId, schema });
     return response.data;
