@@ -26,6 +26,7 @@ env:
 
 jobs:
   deploy-gcp-infrastructure:
+    if: github.event_name == 'workflow_dispatch'
     name: 📦 Deploy GCP Infrastructure
     runs-on: ubuntu-latest
     env:
@@ -142,6 +143,7 @@ jobs:
           echo "::endgroup::"
 
   deploy-vps-backend:
+    if: github.event_name == 'workflow_dispatch'
     name: 🖥️ Deploy Backend to VPS
     needs: deploy-gcp-infrastructure
     runs-on: ubuntu-latest
@@ -304,6 +306,7 @@ jobs:
           rm -f backend-image.tar sync-worker-image.tar
 
   deploy-cloud-run-services:
+    if: github.event_name == 'workflow_dispatch'
     name: ☁️ Deploy Cloud Run Services
     needs: deploy-gcp-infrastructure
     runs-on: ubuntu-latest
@@ -471,6 +474,7 @@ jobs:
           echo "::endgroup::"
 
   deploy-frontend:
+    if: github.event_name == 'workflow_dispatch'
     name: 🌐 Deploy Frontend
     needs: deploy-vps-backend
     runs-on: ubuntu-latest
@@ -537,7 +541,7 @@ jobs:
   final-summary:
     name: 📊 Final Summary
     needs: [deploy-gcp-infrastructure, deploy-vps-backend, deploy-cloud-run-services, deploy-frontend]
-    if: always()
+    if: always() && github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: 📊 Generate Summary
