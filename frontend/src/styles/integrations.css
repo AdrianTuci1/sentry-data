@@ -574,3 +574,425 @@
     width: 100%;
   }
 }
+
+/* ==========================================================================
+   Destinations View Styles (shared with Sources/Integrations)
+   ========================================================================== */
+
+.integrations-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.available-integrations-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f2f3f5;
+  margin: 0;
+}
+
+.integrations-add-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: #1e1f20;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.integrations-add-btn:hover {
+  background: #2f3136;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.integrations-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.integrations-empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #8e918f;
+}
+
+.integrations-empty-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: #f2f3f5;
+  margin: 0;
+}
+
+.integrations-empty-desc {
+  font-size: 13px;
+  color: #8e918f;
+  margin: 0;
+  max-width: 400px;
+  line-height: 1.5;
+}
+
+.integrations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.integration-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.integration-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.integration-card-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.integration-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #f2f3f5;
+  flex-shrink: 0;
+}
+
+.integration-card-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.integration-card-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #f2f3f5;
+  line-height: 1.3;
+}
+
+.integration-card-type {
+  font-size: 12px;
+  color: #8e918f;
+  line-height: 1.3;
+}
+
+.integration-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.integration-card-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(74, 222, 128, 0.1);
+  color: #4ade80;
+}
+
+.integration-card-status.connected {
+  background: rgba(74, 222, 128, 0.1);
+  color: #4ade80;
+}
+
+.integration-card-status.disconnected {
+  background: rgba(248, 113, 113, 0.1);
+  color: #f87171;
+}
+
+.integration-card-sync {
+  font-size: 12px;
+  color: #8e918f;
+}
+
+.integration-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.integration-card-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #8e918f;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.integration-card-action-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #f2f3f5;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.integration-card-action-btn.danger {
+  padding: 6px;
+  border: none;
+  background: transparent;
+}
+
+.integration-card-action-btn.danger:hover {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.1);
+}
+
+.integration-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.integration-tile:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.integration-tile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.integration-tile-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #f2f3f5;
+}
+
+.integration-tile-category {
+  font-size: 11px;
+  color: #8e918f;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.integration-tile-desc {
+  font-size: 12px;
+  color: #8e918f;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.integration-tile-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.integration-tile-flow {
+  font-size: 11px;
+  font-weight: 500;
+  color: #8e918f;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Modal Styles */
+.integration-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(7, 8, 10, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.integration-modal {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  border: 1px solid #25282C;
+  border-radius: 14px;
+  background: #111214;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.42);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.integration-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.integration-modal-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #f2f3f5;
+  margin: 0;
+}
+
+.integration-modal-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  color: #8e918f;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.integration-modal-close:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #f2f3f5;
+}
+
+.integration-modal-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.integration-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.integration-form-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #C7C9CC;
+}
+
+.integration-form-select,
+.integration-form-input,
+.integration-form-textarea {
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 11px;
+  border-radius: 10px;
+  border: 1px solid #2B2D30;
+  background: #17181A;
+  color: #E3E3E3;
+  font-size: 13px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.integration-form-textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.integration-form-select:focus,
+.integration-form-input:focus,
+.integration-form-textarea:focus {
+  outline: none;
+  border-color: #A8C7FA;
+  box-shadow: 0 0 0 3px rgba(168, 199, 250, 0.16);
+}
+
+.integration-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.integration-modal-secondary,
+.integration-modal-primary {
+  min-width: 120px;
+  height: 38px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.integration-modal-secondary {
+  border: 1px solid #2B2D30;
+  background: #17181A;
+  color: #D7D9DD;
+}
+
+.integration-modal-secondary:hover {
+  border-color: #3B3E43;
+  background: #1D1F22;
+}
+
+.integration-modal-primary {
+  background: #A8C7FA;
+  color: #0E1116;
+  border: none;
+}
+
+.integration-modal-primary:hover {
+  background: #9BBEFA;
+}
+
+.integration-modal-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
