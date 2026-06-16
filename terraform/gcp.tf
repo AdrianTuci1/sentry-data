@@ -253,10 +253,6 @@ resource "google_cloud_run_v2_service" "chat" {
       }
 
       env {
-        name  = "PORT"
-        value = "8080"
-      }
-      env {
         name  = "LLM_PROVIDER"
         value = var.llm_provider
       }
@@ -321,10 +317,6 @@ resource "google_cloud_run_v2_service" "harness" {
         }
       }
 
-      env {
-        name  = "PORT"
-        value = "8081"
-      }
       env {
         name  = "LLM_PROVIDER"
         value = var.llm_provider
@@ -393,10 +385,6 @@ resource "google_cloud_run_v2_service" "observer" {
         }
       }
 
-      env {
-        name  = "PORT"
-        value = "8082"
-      }
       env {
         name  = "GCS_BUCKET"
         value = google_storage_bucket.main.name
@@ -495,14 +483,5 @@ resource "cloudflare_record" "www" {
   ttl     = 1
 }
 
-# Cloudflare Page Rule - HTTPS Redirect
-resource "cloudflare_page_rule" "https_redirect" {
-  zone_id = var.cloudflare_zone_id
-  target  = "*${var.domain}/*"
-  priority = 1
-
-  actions {
-    ssl = "strict"
-    always_use_https = true
-  }
-}
+# Cloudflare HTTPS redirect — configure manually in dashboard:
+#   SSL/TLS → Edge Certificates → Always Use HTTPS = ON
