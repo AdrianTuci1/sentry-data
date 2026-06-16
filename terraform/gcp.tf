@@ -52,7 +52,7 @@ resource "google_service_account" "observer" {
 resource "google_service_account" "compute" {
   account_id   = "sentry-compute"
   display_name = "Sentry Compute"
-  description  = "Default compute for Cloud Run"
+  description  = "Default compute service account"
 }
 
 # IAM Roles
@@ -226,9 +226,6 @@ resource "google_secret_manager_secret_version" "llm_api_key" {
   secret      = google_secret_manager_secret.llm_api_key.id
   secret_data = var.llm_api_key != "" ? var.llm_api_key : "placeholder-change-me"
 }
-
-# Cloud Run services are created by deploy-cloud-run-services job (gcloud CLI).
-# IAM invoker bindings are applied there too.
 
 # Cloudflare DNS Records
 resource "cloudflare_record" "api" {

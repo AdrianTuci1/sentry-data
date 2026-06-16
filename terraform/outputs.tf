@@ -38,14 +38,3 @@ output "scheduler_invoker_service_account_email" {
   value = google_service_account.compute.email
 }
 
-output "chat_service_url" {
-  value = "https://sentry-chat-${var.project_id}.eu.a.run.app"
-}
-
-output "harness_service_url" {
-  value = "https://sentry-harness-${var.project_id}.eu.a.run.app"
-}
-
-output "observer_service_url" {
-  value = "https://sentry-observer-${var.project_id}.eu.a.run.app"
-}
