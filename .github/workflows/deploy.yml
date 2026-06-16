@@ -95,10 +95,10 @@ jobs:
           cd terraform
           echo "backend_url=$(terraform output -raw backend_url)" >> $GITHUB_OUTPUT
           echo "frontend_url=$(terraform output -raw frontend_url)" >> $GITHUB_OUTPUT
-          echo "chat_url=$(terraform output -raw chat_service_url)" >> $GITHUB_OUTPUT
-          echo "harness_url=$(terraform output -raw harness_service_url)" >> $GITHUB_OUTPUT
-          echo "observer_url=$(terraform output -raw observer_service_url)" >> $GITHUB_OUTPUT
           echo "scheduler_invoker_sa=$(terraform output -raw scheduler_invoker_service_account_email)" >> $GITHUB_OUTPUT
+          echo "chat_url=https://sentry-chat-$(terraform output -raw project_id).eu.a.run.app" >> $GITHUB_OUTPUT
+          echo "harness_url=https://sentry-harness-$(terraform output -raw project_id).eu.a.run.app" >> $GITHUB_OUTPUT
+          echo "observer_url=https://sentry-observer-$(terraform output -raw project_id).eu.a.run.app" >> $GITHUB_OUTPUT
           echo "gcs_bucket=$(terraform output -raw gcs_bucket)" >> $GITHUB_OUTPUT
           echo "bq_dataset=$(terraform output -raw bigquery_dataset)" >> $GITHUB_OUTPUT
 
@@ -151,7 +151,7 @@ jobs:
   deploy-vps-backend:
     if: github.event_name == 'workflow_dispatch'
     name: 🖥️ Deploy Backend to VPS
-    needs: deploy-gcp-infrastructure
+    needs: [deploy-gcp-infrastructure, deploy-cloud-run-services]
     runs-on: ubuntu-latest
     outputs:
       vps_status: ${{ steps.status.outputs.status }}
@@ -219,9 +219,9 @@ jobs:
             LLM_BASE_URL=${{ env.LLM_BASE_URL }}
             ENABLE_BIGQUERY_ANALYTICS=true
             CORS_ORIGIN=https://app.${{ env.DOMAIN }}
-            CHAT_SERVICE_URL=${{ needs.deploy-gcp-infrastructure.outputs.chat_url }}
-            HARNESS_SERVICE_URL=${{ needs.deploy-gcp-infrastructure.outputs.harness_url }}
-            OBSERVER_SERVICE_URL=${{ needs.deploy-gcp-infrastructure.outputs.observer_url }}
+            CHAT_SERVICE_URL=${{ needs.deploy-cloud-run-services.outputs.chat_url }}
+            HARNESS_SERVICE_URL=${{ needs.deploy-cloud-run-services.outputs.harness_url }}
+            OBSERVER_SERVICE_URL=${{ needs.deploy-cloud-run-services.outputs.observer_url }}
             CLOUD_RUN_AUTH_MODE=required
             CLOUD_SCHEDULER_INVOKER_SERVICE_ACCOUNT_EMAIL=${{ needs.deploy-gcp-infrastructure.outputs.scheduler_invoker_sa }}
             GOOGLE_APPLICATION_CREDENTIALS=/secrets/gcp-key.json
@@ -320,6 +320,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       cloud_run_status: ${{ steps.status.outputs.status }}
+      chat_url: ${{ steps.health_chat.outputs.url }}
+      harness_url: ${{ steps.health_harness.outputs.url }}
+      observer_url: ${{ steps.health_observer.outputs.url }}
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v4
@@ -439,6 +442,7 @@ jobs:
         id: health_chat
         run: |
           CHAT_URL=$(gcloud run services describe sentry-chat --region=${{ env.GCP_REGION }} --format='value(status.url)')
+          echo "url=$CHAT_URL" >> $GITHUB_OUTPUT
           TOKEN=$(gcloud auth print-identity-token --audiences="$CHAT_URL")
           curl -sf -H "Authorization: Bearer $TOKEN" -H "X-Internal-Token: ${{ secrets.INTERNAL_TOKEN }}" $CHAT_URL/health || exit 1
 
@@ -446,6 +450,7 @@ jobs:
         id: health_harness
         run: |
           HARNESS_URL=$(gcloud run services describe sentry-harness --region=${{ env.GCP_REGION }} --format='value(status.url)')
+          echo "url=$HARNESS_URL" >> $GITHUB_OUTPUT
           TOKEN=$(gcloud auth print-identity-token --audiences="$HARNESS_URL")
           curl -sf -H "Authorization: Bearer $TOKEN" -H "X-Internal-Token: ${{ secrets.INTERNAL_TOKEN }}" $HARNESS_URL/health || exit 1
 
@@ -453,6 +458,7 @@ jobs:
         id: health_observer
         run: |
           OBSERVER_URL=$(gcloud run services describe sentry-observer --region=${{ env.GCP_REGION }} --format='value(status.url)')
+          echo "url=$OBSERVER_URL" >> $GITHUB_OUTPUT
           TOKEN=$(gcloud auth print-identity-token --audiences="$OBSERVER_URL")
           curl -sf -H "Authorization: Bearer $TOKEN" -H "X-Internal-Token: ${{ secrets.INTERNAL_TOKEN }}" $OBSERVER_URL/health || exit 1
 
