@@ -331,6 +331,8 @@ jobs:
     name: 🌐 Deploy Frontend
     needs: deploy-vps-backend
     runs-on: ubuntu-latest
+    permissions:
+      deployments: write
     outputs:
       frontend_status: ${{ steps.status.outputs.status }}
     steps:
