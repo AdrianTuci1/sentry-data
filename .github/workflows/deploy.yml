@@ -350,7 +350,10 @@ jobs:
         id: build
         run: |
           cd frontend
-          echo "VITE_API_URL=https://api.${{ env.DOMAIN }}/api/v1" > .env.production
+          cat > .env.production << ENVEOF
+          VITE_API_URL=https://api.${{ env.DOMAIN }}/api/v1
+          VITE_DEV_MODE=false
+          ENVEOF
           npm ci
           npm run build
 
@@ -372,6 +375,7 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: statsparrot-app
           directory: frontend/dist
+          productionBranch: main
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: ✅ Set Status
