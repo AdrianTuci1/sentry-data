@@ -419,6 +419,22 @@ jobs:
             --no-allow-unauthenticated \
             --quiet
 
+      - name: 🔑 Grant IAM Invoker to Backend
+        id: iam_invoker
+        run: |
+          for svc in sentry-chat sentry-harness sentry-observer; do
+            gcloud run services add-iam-policy-binding $svc \
+              --region=${{ env.GCP_REGION }} \
+              --member="serviceAccount:sentry-backend@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com" \
+              --role="roles/run.invoker" \
+              --quiet || true
+          done
+          gcloud run services add-iam-policy-binding sentry-observer \
+            --region=${{ env.GCP_REGION }} \
+            --member="serviceAccount:sentry-compute@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com" \
+            --role="roles/run.invoker" \
+            --quiet || true
+
       - name: 🏥 Health Check Chat
         id: health_chat
         run: |
