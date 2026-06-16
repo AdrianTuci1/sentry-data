@@ -205,6 +205,7 @@ jobs:
         run: |
           echo "::group::📋 Copying Config Files"
           scp vps/docker-compose.yml ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/sentry-data/
+          scp vps/prometheus.yml ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/sentry-data/
           scp -r vps/nginx ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/sentry-data/
           
           # Create .env file on VPS
@@ -261,8 +262,8 @@ jobs:
             docker tag sentry-observer:${{ github.sha }} sentry-observer:latest
             
             # Restart services
-            docker-compose down
-            docker-compose up -d
+            docker compose down
+            docker compose up -d
             
             # Cleanup
             docker system prune -f
