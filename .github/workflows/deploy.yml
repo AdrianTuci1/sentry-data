@@ -1,8 +1,6 @@
 name: 🚀 Deploy Complete Infrastructure
 
 on:
-  push:
-    branches: [codex/full-worktree-publish]
   workflow_dispatch:
     inputs:
       environment:
@@ -31,12 +29,13 @@ env:
 
 jobs:
   deploy-gcp-infrastructure:
+    if: github.event_name == 'workflow_dispatch'
     name: 📦 Deploy GCP Infrastructure
     runs-on: ubuntu-latest
     env:
       TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
       TF_VAR_region: ${{ vars.GCP_REGION || 'europe-west1' }}
-      TF_VAR_environment: ${{ github.event.inputs.environment || 'prod' }}
+      TF_VAR_environment: ${{ github.event.inputs.environment }}
       TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       TF_VAR_cloudflare_zone_id: ${{ secrets.CLOUDFLARE_ZONE_ID }}
       TF_VAR_domain: ${{ vars.DOMAIN || 'sentrydata.io' }}
@@ -143,6 +142,7 @@ jobs:
           echo "::endgroup::"
 
   deploy-vps-backend:
+    if: github.event_name == 'workflow_dispatch'
     name: 🖥️ Deploy All Services to VPS
     needs: deploy-gcp-infrastructure
     runs-on: ubuntu-latest
@@ -327,6 +327,7 @@ KEYEOF
           rm -f backend-image.tar sync-worker-image.tar chat-image.tar harness-image.tar observer-image.tar
 
   deploy-frontend:
+    if: github.event_name == 'workflow_dispatch'
     name: 🌐 Deploy Frontend
     needs: deploy-vps-backend
     runs-on: ubuntu-latest
@@ -393,7 +394,7 @@ KEYEOF
   final-summary:
     name: 📊 Final Summary
     needs: [deploy-gcp-infrastructure, deploy-vps-backend, deploy-frontend]
-    if: always()
+    if: always() && github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: 📊 Generate Summary
