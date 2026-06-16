@@ -238,8 +238,8 @@ resource "google_cloud_run_v2_service" "chat" {
     service_account = google_service_account.chat.email
 
     scaling {
-      min_instances = 0
-      max_instances = 5
+      min_instance_count = 0
+      max_instance_count = 5
     }
 
     containers {
@@ -258,7 +258,7 @@ resource "google_cloud_run_v2_service" "chat" {
       }
       env {
         name  = "LLM_PROVIDER"
-        value = "gemini"
+        value = var.llm_provider
       }
       env {
         name = "LLM_API_KEY"
@@ -271,7 +271,15 @@ resource "google_cloud_run_v2_service" "chat" {
       }
       env {
         name  = "LLM_MODEL"
-        value = "gemini-2.5-flash"
+        value = var.llm_model_id
+      }
+      env {
+        name  = "LLM_MODEL_ID"
+        value = var.llm_model_id
+      }
+      env {
+        name  = "LLM_BASE_URL"
+        value = var.llm_base_url
       }
       env {
         name = "INTERNAL_TOKEN"
@@ -299,8 +307,8 @@ resource "google_cloud_run_v2_service" "harness" {
     service_account = google_service_account.harness.email
 
     scaling {
-      min_instances = 0
-      max_instances = 3
+      min_instance_count = 0
+      max_instance_count = 3
     }
 
     containers {
@@ -319,7 +327,7 @@ resource "google_cloud_run_v2_service" "harness" {
       }
       env {
         name  = "LLM_PROVIDER"
-        value = "gemini"
+        value = var.llm_provider
       }
       env {
         name = "LLM_API_KEY"
@@ -332,7 +340,15 @@ resource "google_cloud_run_v2_service" "harness" {
       }
       env {
         name  = "LLM_MODEL"
-        value = "gemini-2.5-flash"
+        value = var.llm_model_id
+      }
+      env {
+        name  = "LLM_MODEL_ID"
+        value = var.llm_model_id
+      }
+      env {
+        name  = "LLM_BASE_URL"
+        value = var.llm_base_url
       }
       env {
         name  = "GCS_BUCKET"
@@ -363,8 +379,8 @@ resource "google_cloud_run_v2_service" "observer" {
     service_account = google_service_account.observer.email
 
     scaling {
-      min_instances = 0
-      max_instances = 2
+      min_instance_count = 0
+      max_instance_count = 2
     }
 
     containers {
@@ -456,7 +472,7 @@ resource "cloudflare_record" "api" {
   zone_id = var.cloudflare_zone_id
   name    = "api"
   type    = can(regex("^[0-9.]+$", var.vps_host)) ? "A" : "CNAME"
-  value   = var.vps_host
+  content = var.vps_host
   proxied = true
   ttl     = 1
 }
@@ -465,7 +481,7 @@ resource "cloudflare_record" "app" {
   zone_id = var.cloudflare_zone_id
   name    = "app"
   type    = "CNAME"
-  value   = "sentry-frontend.pages.dev"
+  content = "sentry-frontend.pages.dev"
   proxied = true
   ttl     = 1
 }
@@ -474,7 +490,7 @@ resource "cloudflare_record" "www" {
   zone_id = var.cloudflare_zone_id
   name    = "www"
   type    = "CNAME"
-  value   = "sentry-frontend.pages.dev"
+  content = "sentry-frontend.pages.dev"
   proxied = true
   ttl     = 1
 }
