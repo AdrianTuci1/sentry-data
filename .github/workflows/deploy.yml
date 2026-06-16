@@ -208,36 +208,34 @@ jobs:
           scp vps/prometheus.yml ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/sentry-data/
           scp -r vps/nginx ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/sentry-data/
           
-          # Create .env file on VPS
-          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << EOF
-            cat > /opt/sentry-data/.env << 'ENVFILE'
-            GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}
-            GCP_REGION=europe-west1
-            GCS_BUCKET_NAME=sentry-platform-data-${{ secrets.GCP_PROJECT_ID }}
-            BIGQUERY_DATASET_PREFIX=sentry_dataset
-            BIGQUERY_LOCATION=EU
-            JWT_SECRET=${{ secrets.JWT_SECRET }}
-            INTERNAL_TOKEN=${{ secrets.INTERNAL_TOKEN }}
-            LLM_PROVIDER=${{ env.LLM_PROVIDER }}
-            LLM_API_KEY=${{ secrets.LLM_API_KEY }}
-            LLM_MODEL=${{ env.LLM_MODEL_ID }}
-            LLM_MODEL_ID=${{ env.LLM_MODEL_ID }}
-            LLM_BASE_URL=${{ env.LLM_BASE_URL }}
-            ENABLE_BIGQUERY_ANALYTICS=true
-            CORS_ORIGIN=https://app.${{ env.DOMAIN }}
-            CHAT_SERVICE_URL=http://chat:8080
-            HARNESS_SERVICE_URL=http://harness:8081
-            OBSERVER_SERVICE_URL=http://observer:8082
-            CLOUD_RUN_AUTH_MODE=disabled
-            CLOUD_SCHEDULER_INVOKER_SERVICE_ACCOUNT_EMAIL=${{ needs.deploy-gcp-infrastructure.outputs.scheduler_invoker_sa }}
-            GOOGLE_APPLICATION_CREDENTIALS=/secrets/gcp-key.json
-            ENVFILE
+          # Create .env file on VPS (no indentation - critical for heredoc)
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "cat > /opt/sentry-data/.env" << 'ENVEOF'
+GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}
+GCP_REGION=europe-west1
+GCS_BUCKET_NAME=sentry-platform-data-${{ secrets.GCP_PROJECT_ID }}
+BIGQUERY_DATASET_PREFIX=sentry_dataset
+BIGQUERY_LOCATION=EU
+JWT_SECRET=${{ secrets.JWT_SECRET }}
+INTERNAL_TOKEN=${{ secrets.INTERNAL_TOKEN }}
+LLM_PROVIDER=${{ env.LLM_PROVIDER }}
+LLM_API_KEY=${{ secrets.LLM_API_KEY }}
+LLM_MODEL=${{ env.LLM_MODEL_ID }}
+LLM_MODEL_ID=${{ env.LLM_MODEL_ID }}
+LLM_BASE_URL=${{ env.LLM_BASE_URL }}
+ENABLE_BIGQUERY_ANALYTICS=true
+CORS_ORIGIN=https://app.${{ env.DOMAIN }}
+CHAT_SERVICE_URL=http://chat:8080
+HARNESS_SERVICE_URL=http://harness:8081
+OBSERVER_SERVICE_URL=http://observer:8082
+CLOUD_RUN_AUTH_MODE=disabled
+CLOUD_SCHEDULER_INVOKER_SERVICE_ACCOUNT_EMAIL=${{ needs.deploy-gcp-infrastructure.outputs.scheduler_invoker_sa }}
+GOOGLE_APPLICATION_CREDENTIALS=/secrets/gcp-key.json
+ENVEOF
 
-            mkdir -p /opt/sentry-data/secrets
-            cat > /opt/sentry-data/secrets/gcp-key.json << 'GCPKEY'
-            ${{ secrets.GCP_SA_KEY }}
-            GCPKEY
-          EOF
+          # Create gcp-key.json on VPS
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "mkdir -p /opt/sentry-data/secrets && cat > /opt/sentry-data/secrets/gcp-key.json" << 'KEYEOF'
+${{ secrets.GCP_SA_KEY }}
+KEYEOF
           echo "::endgroup::"
 
       - name: 🚀 Deploy on VPS
