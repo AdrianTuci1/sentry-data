@@ -352,13 +352,23 @@ jobs:
           npm ci
           npm run build
 
+      - name: 🏗️ Ensure Cloudflare Pages Project
+        id: cf_project
+        run: |
+          # Create the Pages project if it doesn't exist (idempotent)
+          curl -s -X POST "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/pages/projects" \
+            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"name":"statsparrot-app","production_branch":"main"}' || true
+          echo "Pages project ready"
+
       - name: 🚀 Deploy to Cloudflare Pages
         id: deploy
         uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: sentry-frontend
+          projectName: statsparrot-app
           directory: frontend/dist
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
