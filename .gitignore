@@ -12,7 +12,7 @@ node_modules
 /runtime/sql/deps
 /runtime/release
 /runtime/pkg/examples/embed/dist
-/rill
+/statsparrot
 /cli/pkg/examples/embed/dist
 /cli/pkg/installscript/embed/install.sh
 /cli/pkg/web/embed/dist
@@ -56,12 +56,12 @@ profile.log
 saved-state.json
 last-query-output.json
 staging-databases
-/rilldata
-/rill-examples/
+/staticlabs
+/statsparrot-examples/
 docs/dist/
 coverage
 # locally deployed test projects can generate this
-.rillcloud
+.statsparrotcloud
 
 # Maven
 target/
@@ -77,7 +77,7 @@ release.properties
 *.iws
 
 dist/*
-rill-binary-sa.json
+statsparrot-binary-sa.json
 gha-creds*
 .release-env
 binaries/

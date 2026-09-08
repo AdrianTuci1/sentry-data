@@ -1,8 +1,8 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill project deployment
+title: statsparrot project deployment
 ---
-## rill project deployment
+## statsparrot project deployment
 
 Manage project deployments
 
@@ -18,11 +18,11 @@ Manage project deployments
 
 ### SEE ALSO
 
-* [rill project](../project.md)	 - Manage projects
-* [rill project deployment create](create.md)	 - Create a deployment for a specific branch
-* [rill project deployment delete](delete.md)	 - Delete a deployment by branch
-* [rill project deployment list](list.md)	 - List all deployments for a project
-* [rill project deployment show](show.md)	 - Show details of a deployment
-* [rill project deployment start](start.md)	 - Start a deployment by branch
-* [rill project deployment stop](stop.md)	 - Stop a deployment by branch
+* [statsparrot project](../project.md)	 - Manage projects
+* [statsparrot project deployment create](create.md)	 - Create a deployment for a specific branch
+* [statsparrot project deployment delete](delete.md)	 - Delete a deployment by branch
+* [statsparrot project deployment list](list.md)	 - List all deployments for a project
+* [statsparrot project deployment show](show.md)	 - Show details of a deployment
+* [statsparrot project deployment start](start.md)	 - Start a deployment by branch
+* [statsparrot project deployment stop](stop.md)	 - Stop a deployment by branch
 

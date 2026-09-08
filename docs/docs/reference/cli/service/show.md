@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill service show
+title: statsparrot service show
 ---
-## rill service show
+## statsparrot service show
 
 Show service
 
 ```
-rill service show <service-name> [flags]
+statsparrot service show <service-name> [flags]
 ```
 
 ### Global flags
@@ -22,5 +22,5 @@ rill service show <service-name> [flags]
 
 ### SEE ALSO
 
-* [rill service](service.md)	 - Manage service accounts
+* [statsparrot service](service.md)	 - Manage service accounts
 

@@ -30,7 +30,7 @@ _[string]_ - Refers to the resource type and must be `model` _(required)_
 
 ### `refresh`
 
-_[object]_ - Specifies the refresh schedule that Rill should follow to re-ingest and update the underlying model data
+_[object]_ - Specifies the refresh schedule that Parrot should follow to re-ingest and update the underlying model data
 
   - **`cron`** - _[string]_ - A cron expression that defines the execution schedule
 
@@ -192,7 +192,7 @@ _[oneOf]_ - Refers to the explicitly defined state of your model, cannot be used
 
         - **`end`** - _[string]_ - End timestamp in ISO 8601 format
 
-        - **`expression`** - _[string]_ - Rill time expression (e.g., 'last 7 days', 'this month')
+        - **`expression`** - _[string]_ - Parrot time expression (e.g., 'last 7 days', 'this month')
 
       - **`comparison_time_range`** - _[object]_ - Optional comparison time range for period-over-period analysis
 
@@ -204,7 +204,7 @@ _[oneOf]_ - Refers to the explicitly defined state of your model, cannot be used
 
         - **`end`** - _[string]_ - End timestamp in ISO 8601 format
 
-        - **`expression`** - _[string]_ - Rill time expression for comparison period
+        - **`expression`** - _[string]_ - Parrot time expression for comparison period
 
       - **`context`** - _[object]_ - Context to constrain the AI analysis
 
@@ -290,7 +290,7 @@ _[oneOf]_ - Refers to how your data is partitioned; cannot be used with state. (
 
         - **`end`** - _[string]_ - End timestamp in ISO 8601 format
 
-        - **`expression`** - _[string]_ - Rill time expression (e.g., 'last 7 days', 'this month')
+        - **`expression`** - _[string]_ - Parrot time expression (e.g., 'last 7 days', 'this month')
 
       - **`comparison_time_range`** - _[object]_ - Optional comparison time range for period-over-period analysis
 
@@ -302,7 +302,7 @@ _[oneOf]_ - Refers to how your data is partitioned; cannot be used with state. (
 
         - **`end`** - _[string]_ - End timestamp in ISO 8601 format
 
-        - **`expression`** - _[string]_ - Rill time expression for comparison period
+        - **`expression`** - _[string]_ - Parrot time expression for comparison period
 
       - **`context`** - _[object]_ - Context to constrain the AI analysis
 
@@ -747,7 +747,7 @@ type: model
 partitions:
     glob:
         connector: gcs
-        path: gs://rilldata-public/github-analytics/Clickhouse/2025/*/commits_*.parquet
+        path: gs://statsparrot-public/github-analytics/Clickhouse/2025/*/commits_*.parquet
 sql: SELECT * FROM read_parquet('{{ .partition.uri }}')
 output:
     connector: duckdb
@@ -762,9 +762,9 @@ refresh:
     cron: "0 8 * * *"
 partitions:
     glob:
-        path: gs://rilldata-public/github-analytics/Clickhouse/2025/*/*
+        path: gs://statsparrot-public/github-analytics/Clickhouse/2025/*/*
         partition: directory
-sql: "SELECT * \n  FROM read_parquet('gs://rilldata-public/{{ .partition.path }}/commits_*.parquet') \n  WHERE '{{ .partition.path }}' IS NOT NULL\n"
+sql: "SELECT * \n  FROM read_parquet('gs://statsparrot-public/{{ .partition.path }}/commits_*.parquet') \n  WHERE '{{ .partition.path }}' IS NOT NULL\n"
 output:
     connector: duckdb
     incremental_strategy: append

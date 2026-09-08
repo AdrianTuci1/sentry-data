@@ -5,7 +5,7 @@ sidebar_label: Security & Access Control
 sidebar_position: 50
 ---
 
-Rill's custom APIs support fine-grained access control through security rules and custom attributes on tokens. You can restrict who can call an API, and filter the data each caller sees — all without writing backend code.
+Parrot's custom APIs support fine-grained access control through security rules and custom attributes on tokens. You can restrict who can call an API, and filter the data each caller sees — all without writing backend code.
 
 ## API access rules
 
@@ -52,7 +52,7 @@ Custom attributes are key-value pairs you attach to [service tokens](/guide/admi
 ### Creating a service token with attributes
 
 ```bash
-rill service create acme-api \
+statsparrot service create acme-api \
   --project my-project \
   --project-role viewer \
   --attributes '{"customer_id": "acme-corp", "region": "us-west", "tier": "premium"}'
@@ -63,7 +63,7 @@ This creates a token with three custom attributes: `customer_id`, `region`, and 
 ### Updating attributes on an existing service
 
 ```bash
-rill service edit acme-api \
+statsparrot service edit acme-api \
   --attributes '{"customer_id": "acme-corp", "region": "eu-central", "tier": "enterprise"}'
 ```
 
@@ -86,7 +86,7 @@ When an API is called with a service token, here's what happens:
                     ↓
 2. API call with bearer token
                     ↓
-3. Rill extracts attributes from the token into JWT claims
+3. Parrot extracts attributes from the token into JWT claims
                     ↓
 4. Template engine makes attributes available as {{ .user.customer_id }}
                     ↓
@@ -125,14 +125,14 @@ security:
 
 ```bash
 # Token for Acme Corp
-rill service create acme-api \
+statsparrot service create acme-api \
   --project my-project \
   --project-role viewer \
   --attributes '{"customer_id": "acme-corp"}'
 # Returns: rill_svc_abc123...
 
 # Token for Globex Inc
-rill service create globex-api \
+statsparrot service create globex-api \
   --project my-project \
   --project-role viewer \
   --attributes '{"customer_id": "globex-inc"}'
@@ -143,7 +143,7 @@ rill service create globex-api \
 
 **Acme sees only their orders:**
 ```bash
-curl "https://api.rilldata.com/v1/organizations/my-org/projects/my-project/runtime/api/customer-orders" \
+curl "https://api.statsparrot.com/v1/organizations/my-org/projects/my-project/runtime/api/customer-orders" \
   -H "Authorization: Bearer rill_svc_abc123..."
 ```
 
@@ -156,7 +156,7 @@ curl "https://api.rilldata.com/v1/organizations/my-org/projects/my-project/runti
 
 **Globex sees only their orders:**
 ```bash
-curl "https://api.rilldata.com/v1/organizations/my-org/projects/my-project/runtime/api/customer-orders" \
+curl "https://api.statsparrot.com/v1/organizations/my-org/projects/my-project/runtime/api/customer-orders" \
   -H "Authorization: Bearer rill_svc_def456..."
 ```
 
@@ -234,7 +234,7 @@ The `row_filter` from the metrics view is automatically applied — each custome
 
 ## Skipping nested security
 
-By default, when an API queries a metrics view, Rill enforces the security policies on both the API itself and the underlying metrics view. In some cases, you may want the API to handle all access control itself and skip checks on nested resources:
+By default, when an API queries a metrics view, Parrot enforces the security policies on both the API itself and the underlying metrics view. In some cases, you may want the API to handle all access control itself and skip checks on nested resources:
 
 ```yaml
 type: api
@@ -253,7 +253,7 @@ Use `skip_nested_security: true` when your API already handles all necessary acc
 For applications that need to issue short-lived tokens to end users (e.g., for embedded dashboards or temporary API access), service tokens can issue ephemeral tokens with custom user attributes:
 
 ```bash
-curl -X POST "https://api.rilldata.com/v1/orgs/<org>/projects/<project>/credentials" \
+curl -X POST "https://api.statsparrot.com/v1/orgs/<org>/projects/<project>/credentials" \
   -H "Authorization: Bearer <service-token>" \
   -H "Content-Type: application/json" \
   -d '{

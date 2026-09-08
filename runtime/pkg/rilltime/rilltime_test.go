@@ -1,10 +1,10 @@
-package rilltime
+package statspartime
 
 import (
 	"testing"
 	"time"
 
-	"github.com/rilldata/rill/runtime/pkg/timeutil"
+	"github.com/staticlabs/statsparrot/runtime/pkg/timeutil"
 	"github.com/stretchr/testify/require"
 )
 
@@ -422,17 +422,17 @@ func Test_TimeNewYorkTimezone(t *testing.T) {
 
 func TestEval_BackwardsCompatibility(t *testing.T) {
 	testCases := []testCase{
-		{"rill-TD", "2025-05-13T00:00:00Z", "2025-05-14T00:00:00Z", timeutil.TimeGrainHour, 1, 1},
-		{"rill-WTD", "2025-05-12T00:00:00Z", "2025-05-14T00:00:00Z", timeutil.TimeGrainDay, 1, 1},
-		{"rill-MTD", "2025-05-01T00:00:00Z", "2025-05-14T00:00:00Z", timeutil.TimeGrainDay, 1, 1},
-		{"rill-QTD", "2025-04-01T00:00:00Z", "2025-05-14T00:00:00Z", timeutil.TimeGrainDay, 1, 1},
-		{"rill-YTD", "2025-01-01T00:00:00Z", "2025-05-14T00:00:00Z", timeutil.TimeGrainMonth, 1, 1},
+		{"statsparrot-TD", "2025-05-13T00:00:00Z", "2025-05-14T00:00:00Z", timeutil.TimeGrainHour, 1, 1},
+		{"statsparrot-WTD", "2025-05-12T00:00:00Z", "2025-05-14T00:00:00Z", timeutil.TimeGrainDay, 1, 1},
+		{"statsparrot-MTD", "2025-05-01T00:00:00Z", "2025-05-14T00:00:00Z", timeutil.TimeGrainDay, 1, 1},
+		{"statsparrot-QTD", "2025-04-01T00:00:00Z", "2025-05-14T00:00:00Z", timeutil.TimeGrainDay, 1, 1},
+		{"statsparrot-YTD", "2025-01-01T00:00:00Z", "2025-05-14T00:00:00Z", timeutil.TimeGrainMonth, 1, 1},
 
-		{"rill-PDC", "2025-05-12T00:00:00Z", "2025-05-13T00:00:00Z", timeutil.TimeGrainHour, 1, 1},
-		{"rill-PWC", "2025-05-05T00:00:00Z", "2025-05-12T00:00:00Z", timeutil.TimeGrainDay, 1, 1},
-		{"rill-PMC", "2025-04-01T00:00:00Z", "2025-05-01T00:00:00Z", timeutil.TimeGrainDay, 1, 1},
-		{"rill-PQC", "2025-01-01T00:00:00Z", "2025-04-01T00:00:00Z", timeutil.TimeGrainMonth, 1, 1},
-		{"rill-PYC", "2024-01-01T00:00:00Z", "2025-01-01T00:00:00Z", timeutil.TimeGrainMonth, 1, 1},
+		{"statsparrot-PDC", "2025-05-12T00:00:00Z", "2025-05-13T00:00:00Z", timeutil.TimeGrainHour, 1, 1},
+		{"statsparrot-PWC", "2025-05-05T00:00:00Z", "2025-05-12T00:00:00Z", timeutil.TimeGrainDay, 1, 1},
+		{"statsparrot-PMC", "2025-04-01T00:00:00Z", "2025-05-01T00:00:00Z", timeutil.TimeGrainDay, 1, 1},
+		{"statsparrot-PQC", "2025-01-01T00:00:00Z", "2025-04-01T00:00:00Z", timeutil.TimeGrainMonth, 1, 1},
+		{"statsparrot-PYC", "2024-01-01T00:00:00Z", "2025-01-01T00:00:00Z", timeutil.TimeGrainMonth, 1, 1},
 
 		// `inf` => `earliest to latest+1s`
 		{"inf", "2020-01-01T00:32:36Z", "2025-05-14T06:32:37Z", timeutil.TimeGrainUnspecified, 1, 1},
@@ -494,7 +494,7 @@ func TestParseISO(t *testing.T) {
 		{"With duration, no offset or round to grain", "P7D", "", timeutil.TimeGrainUnspecified, "2025-05-06T06:32:36Z", "2025-05-13T06:32:36Z", timeutil.TimeGrainUnspecified},
 		{"With duration and offset no round to grain", "P7D", "P2D", timeutil.TimeGrainUnspecified, "2025-05-04T06:32:36Z", "2025-05-11T06:32:36Z", timeutil.TimeGrainUnspecified},
 		{"With duration, offset and round to grain", "P7D", "P2D", timeutil.TimeGrainDay, "2025-05-04T00:00:00Z", "2025-05-11T00:00:00Z", timeutil.TimeGrainUnspecified},
-		{"With DAX duration, offset and round to grain", "rill-PW", "P2D", timeutil.TimeGrainDay, "2025-05-03T00:00:00Z", "2025-05-10T00:00:00Z", timeutil.TimeGrainUnspecified},
+		{"With DAX duration, offset and round to grain", "statsparrot-PW", "P2D", timeutil.TimeGrainDay, "2025-05-03T00:00:00Z", "2025-05-10T00:00:00Z", timeutil.TimeGrainUnspecified},
 	}
 
 	nowTm := parseTestTime(t, now)

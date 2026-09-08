@@ -1,8 +1,8 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill user whitelist
+title: statsparrot user whitelist
 ---
-## rill user whitelist
+## statsparrot user whitelist
 
 Whitelist access by email domain
 
@@ -17,8 +17,8 @@ Whitelist access by email domain
 
 ### SEE ALSO
 
-* [rill user](../user.md)	 - Manage users
-* [rill user whitelist list](list.md)	 - List whitelisted email domains for the org or project
-* [rill user whitelist remove](remove.md)	 - Remove whitelisted email domain for the org or project
-* [rill user whitelist setup](setup.md)	 - Whitelist an email domain for the org or project
+* [statsparrot user](../user.md)	 - Manage users
+* [statsparrot user whitelist list](list.md)	 - List whitelisted email domains for the org or project
+* [statsparrot user whitelist remove](remove.md)	 - Remove whitelisted email domain for the org or project
+* [statsparrot user whitelist setup](setup.md)	 - Whitelist an email domain for the org or project
 

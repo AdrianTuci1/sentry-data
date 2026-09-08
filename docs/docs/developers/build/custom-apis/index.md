@@ -1,21 +1,21 @@
 ---
 title: Custom APIs
-description: Expose your Rill data as HTTP API endpoints
+description: Expose your Parrot data as HTTP API endpoints
 sidebar_label: Custom APIs
 sidebar_position: 10
 ---
 
-Rill lets you create custom API endpoints that return data from your project as JSON over HTTP. Define a YAML file, write a SQL query, and you have an API — no backend code required.
+Parrot lets you create custom API endpoints that return data from your project as JSON over HTTP. Define a YAML file, write a SQL query, and you have an API — no backend code required.
 
 Custom APIs are ideal for:
-- **Powering internal tools** — feed Rill data into dashboards, Slack bots, or scripts
+- **Powering internal tools** — feed Parrot data into dashboards, Slack bots, or scripts
 - **Building customer-facing integrations** — expose filtered data to external applications
 - **Automating workflows** — pull data into CI/CD pipelines, scheduled jobs, or ETL processes
 - **Multi-tenant data access** — serve different data to different customers using [custom attributes](/developers/build/custom-apis/security)
 
 ## API types
 
-Rill supports two types of custom APIs:
+Parrot supports two types of custom APIs:
 
 | Type | Best for | Query target |
 |------|----------|-------------|
@@ -40,7 +40,7 @@ sql: |
 
 ### 2. Test it locally
 
-With Rill Developer running (`rill start`), call your API at:
+With Parrot Developer running (`statsparrot start`), call your API at:
 
 ```bash
 curl "http://localhost:9009/v1/instances/default/api/top-publishers"
@@ -56,22 +56,22 @@ You'll get a JSON response:
 ```
 
 :::note
-Local development does not require authentication. When deployed to Rill Cloud, all API calls require a bearer token.
+Local development does not require authentication. When deployed to Parrot Cloud, all API calls require a bearer token.
 :::
 
-### 3. Deploy and call from Rill Cloud
+### 3. Deploy and call from Parrot Cloud
 
 After deploying your project, call the API with authentication:
 
 ```bash
-curl "https://api.rilldata.com/v1/organizations/<org>/projects/<project>/runtime/api/top-publishers" \
+curl "https://api.statsparrot.com/v1/organizations/<org>/projects/<project>/runtime/api/top-publishers" \
   -H "Authorization: Bearer <token>"
 ```
 
 To test against the deployment for a specific branch (e.g. a dev/preview deployment), insert `/branch/<branch-name>` before `/runtime`:
 
 ```bash
-curl "https://api.rilldata.com/v1/orgs/<org>/projects/<project>/branch/<branch-name>/runtime/api/top-publishers" \
+curl "https://api.statsparrot.com/v1/orgs/<org>/projects/<project>/branch/<branch-name>/runtime/api/top-publishers" \
   -H "Authorization: Bearer <token>"
 ```
 

@@ -2,7 +2,7 @@ import { test as base, type Page } from "@playwright/test";
 import {
   cliLogin,
   cliLogout,
-} from "@rilldata/web-common/tests/fixtures/cli.ts";
+} from "@statsparrot/web-common/tests/fixtures/cli.ts";
 import path from "path";
 import {
   ADMIN_STORAGE_STATE,
@@ -11,9 +11,9 @@ import {
   RILL_ORG_NAME,
   RILL_PROJECT_NAME,
   RILL_EMBED_HTML_FILE,
-} from "@rilldata/web-integration/tests/constants.ts";
+} from "@statsparrot/web-integration/tests/constants.ts";
 import fs from "fs";
-import { generateEmbed } from "@rilldata/web-common/tests/utils/generate-embed.ts";
+import { generateEmbed } from "@statsparrot/web-common/tests/utils/generate-embed.ts";
 
 type MyFixtures = {
   adminPage: Page;
@@ -38,7 +38,7 @@ type MyFixtures = {
 export const rillCloud = base.extend<MyFixtures>({
   embeddedInitialState: [null, { option: true }],
   embeddedResourceName: ["bids_explore", { option: true }],
-  embeddedResourceType: ["rill.runtime.v1.Explore", { option: true }],
+  embeddedResourceType: ["statsparrot.runtime.v1.Explore", { option: true }],
   embeddedHideNavigationBar: [false, { option: true }],
 
   // Note: the `e2e` project uses the admin auth file by default, so it's likely that

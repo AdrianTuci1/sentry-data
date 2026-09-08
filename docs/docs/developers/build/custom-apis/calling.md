@@ -9,16 +9,16 @@ Custom APIs are exposed as HTTP endpoints that return JSON. You can call them fr
 
 ## API endpoints
 
-### Rill Cloud
+### Parrot Cloud
 
 ```
-https://api.rilldata.com/v1/organizations/<org-name>/projects/<project-name>/runtime/api/<api-name>
+https://api.statsparrot.com/v1/organizations/<org-name>/projects/<project-name>/runtime/api/<api-name>
 ```
 
 This targets the project's production deployment. To call the API on the deployment for a specific branch (e.g. a dev/preview deployment), insert `/branch/<branch-name>` before `/runtime`:
 
 ```
-https://api.rilldata.com/v1/orgs/<org-name>/projects/<project-name>/branch/<branch-name>/runtime/api/<api-name>
+https://api.statsparrot.com/v1/orgs/<org-name>/projects/<project-name>/branch/<branch-name>/runtime/api/<api-name>
 ```
 
 ### Local development
@@ -36,14 +36,14 @@ Custom APIs accept both GET and POST requests.
 ### GET with query parameters
 
 ```bash
-curl "https://api.rilldata.com/v1/organizations/<org>/projects/<project>/runtime/api/my-api?domain=google.com&limit=10" \
+curl "https://api.statsparrot.com/v1/organizations/<org>/projects/<project>/runtime/api/my-api?domain=google.com&limit=10" \
   -H "Authorization: Bearer <token>"
 ```
 
 ### POST with JSON body
 
 ```bash
-curl -X POST "https://api.rilldata.com/v1/organizations/<org>/projects/<project>/runtime/api/my-api" \
+curl -X POST "https://api.statsparrot.com/v1/organizations/<org>/projects/<project>/runtime/api/my-api" \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{"domain": "google.com", "limit": 10}'
@@ -77,22 +77,22 @@ curl -X POST http://localhost:9009/v1/instances/default/api/my-api \
 ```
 
 :::note
-User attributes (`{{ .user.* }}`) are not available during local testing since no authentication token is provided. To test with user attributes, deploy to Rill Cloud and use a service token with [custom attributes](/developers/build/custom-apis/security#custom-attributes-on-service-tokens).
+User attributes (`{{ .user.* }}`) are not available during local testing since no authentication token is provided. To test with user attributes, deploy to Parrot Cloud and use a service token with [custom attributes](/developers/build/custom-apis/security#custom-attributes-on-service-tokens).
 :::
 
 ## Authentication
 
-Rill Cloud APIs require a bearer token in the `Authorization` header.
+Parrot Cloud APIs require a bearer token in the `Authorization` header.
 
 ### For development and testing
 
 Create a [user token](/guide/administration/access-tokens/user-tokens) (inherits your personal permissions):
 
 ```bash
-rill token issue --display-name "API Testing"
+statsparrot token issue --display-name "API Testing"
 # Returns: rill_usr_...
 
-curl "https://api.rilldata.com/v1/organizations/<org>/projects/<project>/runtime/api/my-api" \
+curl "https://api.statsparrot.com/v1/organizations/<org>/projects/<project>/runtime/api/my-api" \
   -H "Authorization: Bearer rill_usr_..."
 ```
 
@@ -101,7 +101,7 @@ curl "https://api.rilldata.com/v1/organizations/<org>/projects/<project>/runtime
 Create a [service token](/guide/administration/access-tokens/service-tokens) with optional custom attributes:
 
 ```bash
-rill service create my-api-service \
+statsparrot service create my-api-service \
   --project my-project \
   --project-role viewer \
   --attributes '{"customer_id": "acme-corp"}'
@@ -123,11 +123,11 @@ For full guidance on token types, roles, and management:
 
 ## OpenAPI schema
 
-Rill automatically generates an OpenAPI spec for your project. Download it to generate typed clients:
+Parrot automatically generates an OpenAPI spec for your project. Download it to generate typed clients:
 
 ```bash
-# From Rill Cloud
-curl "https://api.rilldata.com/v1/organizations/<org>/projects/<project>/runtime/api/openapi" \
+# From Parrot Cloud
+curl "https://api.statsparrot.com/v1/organizations/<org>/projects/<project>/runtime/api/openapi" \
   -H "Authorization: Bearer <token>" \
   -o openapi.json
 

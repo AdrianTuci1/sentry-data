@@ -1,8 +1,8 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill public-url
+title: statsparrot public-url
 ---
-## rill public-url
+## statsparrot public-url
 
 Manage public URLs
 
@@ -23,8 +23,8 @@ Manage public URLs
 
 ### SEE ALSO
 
-* [rill](../cli.md)	 - A CLI for Rill
-* [rill public-url create](create.md)	 - Create a public URL
-* [rill public-url delete](delete.md)	 - Delete a public URL
-* [rill public-url list](list.md)	 - List all public URLs
+* [statsparrot](../cli.md)	 - A CLI for Parrot
+* [statsparrot public-url create](create.md)	 - Create a public URL
+* [statsparrot public-url delete](delete.md)	 - Delete a public URL
+* [statsparrot public-url list](list.md)	 - List all public URLs
 

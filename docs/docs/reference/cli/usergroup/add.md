@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill usergroup add
+title: statsparrot usergroup add
 ---
-## rill usergroup add
+## statsparrot usergroup add
 
 Add a group to a project or organization
 
 ```
-rill usergroup add [flags]
+statsparrot usergroup add [flags]
 ```
 
 ### Flags
@@ -33,5 +33,5 @@ rill usergroup add [flags]
 
 ### SEE ALSO
 
-* [rill usergroup](usergroup.md)	 - Manage user groups
+* [statsparrot usergroup](usergroup.md)	 - Manage user groups
 

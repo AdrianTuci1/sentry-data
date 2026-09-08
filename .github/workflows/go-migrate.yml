@@ -1,4 +1,4 @@
-# This workflow is for validating Rill migration files.
+# This workflow is for validating Parrot migration files.
 
 name: Validate Migrations
 on:
@@ -64,9 +64,9 @@ jobs:
 
     - name: Apply Migrations
       env:
-        RILL_ADMIN_DATABASE_DRIVER: postgres
-        RILL_ADMIN_DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
-        RILL_ADMIN_RIVER_DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+        STATSPARROT_ADMIN_DATABASE_DRIVER: postgres
+        STATSPARROT_ADMIN_DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+        STATSPARROT_ADMIN_RIVER_DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
       run: |
         go run ./cli admin migrate
 

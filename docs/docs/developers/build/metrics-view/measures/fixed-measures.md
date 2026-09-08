@@ -64,4 +64,4 @@ In the following example, each publishing company has a monthly minimum guarante
 ```
 
 ## Demo
-[See this project live in our demo!](https://ui.rilldata.com/demo/sample-podcast-project/explore/podcast_explore)
+[See this project live in our demo!](https://ui.statsparrot.com/demo/sample-podcast-project/explore/podcast_explore)

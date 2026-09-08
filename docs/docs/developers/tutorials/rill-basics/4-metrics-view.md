@@ -25,14 +25,14 @@ Now that the data is ready in your model file, we can create a metrics view. The
 
 Let's go ahead and create a simple metrics layer via the UI and build on it. 
 
-![Create Metrics View UI](/img/tutorials/rill-basics/create-metrics-view-ui.png)
+![Create Metrics View UI](/img/tutorials/statsparrot-basics/create-metrics-view-ui.png)
 
 
 As you can see, the default dashboard YAML is as follows:
 
 ```yaml
 # Metrics View YAML
-# Reference documentation: https://docs.rilldata.com/reference/project-files/metrics_views
+# Reference documentation: https://docs.statsparrot.com/reference/project-files/metrics_views
 
 version: 1
 type: metrics_view
@@ -71,7 +71,7 @@ We can go ahead and change the following components as directed in the UI:
 - `measures`: sum(added_lines)
 - `dimensions`: author_name
 
-![Basic Viz Editor](/img/tutorials/rill-basics/basic-viz-editor.png)
+![Basic Viz Editor](/img/tutorials/statsparrot-basics/basic-viz-editor.png)
 
 Once finished, the red border will disappear and your explore dashboard is ready to be created. If you need further information on each component, see the next section, via the YAML.
 
@@ -85,7 +85,7 @@ Let's go over each component and what they are in order to better understand the
 version: 1
 type: metrics_view
 ```
-The type is a Rill-required key pair as it indicates to Rill what type of file this is. Whether a `source`, `metrics_view`, `connector`, etc. We can keep this as is.
+The type is a Parrot-required key pair as it indicates to Parrot what type of file this is. Whether a `source`, `metrics_view`, `connector`, etc. We can keep this as is.
 
 ---
 
@@ -154,7 +154,7 @@ From our dataset, we can add more dimensions to allow more filtering and explora
 		- sum(deleted_lines)
 
 
-You may need to reference the <a href='https://docs.rilldata.com/reference/project-files/explore-dashboards' target="_blank">metrics view YAML </a> reference guide to figure out the above. Your final output should look something like this! 
+You may need to reference the <a href='https://docs.statsparrot.com/reference/project-files/explore-dashboards' target="_blank">metrics view YAML </a> reference guide to figure out the above. Your final output should look something like this! 
 
 
 
@@ -163,7 +163,7 @@ You may need to reference the <a href='https://docs.rilldata.com/reference/proje
   <summary> Working Metrics View YAML</summary>
   ```yaml
 # Metrics View YAML
-# Reference documentation: https://docs.rilldata.com/reference/project-files/metrics_views
+# Reference documentation: https://docs.statsparrot.com/reference/project-files/metrics_views
 
 version: 1
 type: metrics_view
@@ -209,6 +209,6 @@ measures:
 If you decide to build out the metrics view via the UI, it should look something like below!
 
 
-![New Viz Editor](/img/tutorials/rill-basics/new-viz-editor.png)
+![New Viz Editor](/img/tutorials/statsparrot-basics/new-viz-editor.png)
 
 

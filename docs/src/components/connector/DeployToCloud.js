@@ -4,9 +4,9 @@ import Admonition from '@theme/Admonition';
 
 /**
  * DeployToCloud component for connector documentation.
- * Displays the standard "Deploy to Rill Cloud" section with connector-specific details.
+ * Displays the standard "Deploy to Parrot Cloud" section with connector-specific details.
  *
- * Note: The heading should be added in markdown (## Deploy to Rill Cloud)
+ * Note: The heading should be added in markdown (## Deploy to Parrot Cloud)
  * so it appears in the ToC. This component only renders the body content.
  *
  * @param {string} connector - The display name of the connector (e.g., "Athena", "BigQuery")
@@ -17,7 +17,7 @@ function DeployToCloud({ connector, connectorId, credentialDescription }) {
     return (
         <>
             <p>
-                When deploying a project to Rill Cloud, Rill requires you to explicitly provide {credentialDescription}{' '}
+                When deploying a project to Parrot Cloud, Parrot requires you to explicitly provide {credentialDescription}{' '}
                 with access to {connector} used in your project. Please refer to our{' '}
                 <a href={`/reference/project-files/connectors#${connectorId}`}>connector YAML reference docs</a>{' '}
                 for more information.
@@ -27,15 +27,15 @@ function DeployToCloud({ connector, connectorId, credentialDescription }) {
                 credentials during the initial deploy), you can update the credentials by pushing the <code>Deploy</code>{' '}
                 button to update your project or by running the following command in the CLI:
             </p>
-            <pre><code>rill env push</code></pre>
+            <pre><code>statsparrot env push</code></pre>
 
             <Admonition type="tip" title="Did you know?">
                 <p>
                     If you've already configured credentials locally (in your <code>&lt;RILL_PROJECT_DIRECTORY&gt;/.env</code> file),
-                    you can use <code>rill env push</code> to{' '}
-                    <a href="/developers/build/connectors/credentials#rill-env-push">push these credentials</a>{' '}
-                    to your Rill Cloud project. This will allow other users to retrieve and reuse the same credentials
-                    automatically by running <code>rill env pull</code>.
+                    you can use <code>statsparrot env push</code> to{' '}
+                    <a href="/developers/build/connectors/credentials#statsparrot-env-push">push these credentials</a>{' '}
+                    to your Parrot Cloud project. This will allow other users to retrieve and reuse the same credentials
+                    automatically by running <code>statsparrot env pull</code>.
                 </p>
             </Admonition>
         </>

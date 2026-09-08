@@ -1,6 +1,6 @@
-# This workflow triggers deployment with Rill Cloud helm charts
-# Each merge to main branch is build with github sha tag and published to Rill Cloud.
-name: Deploy to Rill Cloud
+# This workflow triggers deployment with Parrot Cloud helm charts
+# Each merge to main branch is build with github sha tag and published to Parrot Cloud.
+name: Deploy to Parrot Cloud
 on:
   create:
     branches:
@@ -16,7 +16,7 @@ on:
 env:
   RELEASE: ${{ startsWith(github.ref, 'refs/tags/v') }}
   DEPLOY_CLOUD: 1
-  IMAGE: gcr.io/rilldata/rill-headless
+  IMAGE: gcr.io/staticlabs/statsparrot-headless
 
 jobs:
   validate-sequential:
@@ -50,7 +50,7 @@ jobs:
     # https://github.com/orgs/community/discussions/54860
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || ( github.event_name == 'create' && startsWith(github.ref_name, 'release') )
     needs: validate-sequential
-    name: Build Rill Headless CLI
+    name: Build Parrot Headless CLI
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -78,9 +78,9 @@ jobs:
         with:
           registry: gcr.io
           username: _json_key
-          password: ${{ secrets.RILL_BINARY_SA }}
+          password: ${{ secrets.STATSPARROT_BINARY_SA }}
 
-      - name: Build & Publish Rill docker image
+      - name: Build & Publish Parrot docker image
         run: |-
           if [ "$RELEASE" == "true" ] || [ "$GITHUB_REF_NAME" == "main" ]; then
             echo "DEPLOY_CLOUD=1" >> $GITHUB_ENV
@@ -89,16 +89,16 @@ jobs:
             echo "DEPLOY_CLOUD=$(git branch -r | grep release-0 | sort | tail -1 | grep -c $GITHUB_REF_NAME)" >> $GITHUB_ENV
           fi
           
-          # Embed DuckDB extensions in the Rill binary
+          # Embed DuckDB extensions in the Parrot binary
           go run scripts/embed_duckdb_ext/main.go
 
-          # Embed Rill example projects
+          # Embed Parrot example projects
           make runtime.examples.embed
 
           if [ ${RELEASE} == "true" ]; then
-            go build -o rill -mod=readonly -ldflags="-s -w -X main.Version=$(scripts/versiontag.sh) -X main.Commit=${GITHUB_SHA} -X main.BuildDate=$(date +%FT%T)" cli/main.go
+            go build -o statsparrot -mod=readonly -ldflags="-s -w -X main.Version=$(scripts/versiontag.sh) -X main.Commit=${GITHUB_SHA} -X main.BuildDate=$(date +%FT%T)" cli/main.go
           else
-            go build -o rill -mod=readonly -ldflags="-s -w -X main.Commit=${GITHUB_SHA} -X main.BuildDate=$(date +%FT%T)" cli/main.go
+            go build -o statsparrot -mod=readonly -ldflags="-s -w -X main.Commit=${GITHUB_SHA} -X main.BuildDate=$(date +%FT%T)" cli/main.go
           fi
           
           docker buildx build --platform linux/${{ matrix.arch }} -t ${IMAGE}:${GITHUB_SHA}-${{ matrix.arch }} . --push --provenance=false --sbom=false  
@@ -113,9 +113,9 @@ jobs:
         with:
           registry: gcr.io
           username: _json_key
-          password: ${{ secrets.RILL_BINARY_SA }}
+          password: ${{ secrets.STATSPARROT_BINARY_SA }}
 
-      - name: Build multi-arch Rill docker image
+      - name: Build multi-arch Parrot docker image
         run: |-          
           docker manifest create ${IMAGE}:${GITHUB_SHA} ${IMAGE}:${GITHUB_SHA}-amd64 ${IMAGE}:${GITHUB_SHA}-arm64
           docker manifest annotate --arch amd64 ${IMAGE}:${GITHUB_SHA} ${IMAGE}:${GITHUB_SHA}-amd64
@@ -126,11 +126,11 @@ jobs:
             docker buildx imagetools create -t ${IMAGE}:${GITHUB_REF_NAME} ${IMAGE}:${GITHUB_SHA}
           fi
 
-      - name: Trigger Rill Cloud deployment
+      - name: Trigger Parrot Cloud deployment
         if: env.DEPLOY_CLOUD == '1'
         run: |-
           set -e
-          curl -X POST https://api.github.com/repos/rilldata/rill-helm-charts/dispatches \
+          curl -X POST https://api.github.com/repos/staticlabs/statsparrot-helm-charts/dispatches \
           -H "Accept: application/vnd.github.everest-preview+json" \
           -H "Authorization: token ${{ secrets.GORELEASER_ACCESS_TOKEN }}" \
           --data '{"event_type": "Deploying Tag: '"${GITHUB_REF_NAME}"'", "client_payload": { "github_sha": "'"${GITHUB_SHA}"'", "tag": "'"${GITHUB_REF_NAME}"'", "release": "${{ env.RELEASE }}"}}'

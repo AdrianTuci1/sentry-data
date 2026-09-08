@@ -1,17 +1,17 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill project skip-partition
+title: statsparrot project skip-partition
 ---
-## rill project skip-partition
+## statsparrot project skip-partition
 
 Skip partitions for a model
 
 ### Synopsis
 
-Mark partitions as skipped so they are excluded from execution and from the model's error state. Skipped partitions remain skipped until they are explicitly triggered (e.g. via 'rill project refresh --partition').
+Mark partitions as skipped so they are excluded from execution and from the model's error state. Skipped partitions remain skipped until they are explicitly triggered (e.g. via 'statsparrot project refresh --partition').
 
 ```
-rill project skip-partition [<project>] <model> [flags]
+statsparrot project skip-partition [<project>] <model> [flags]
 ```
 
 ### Flags
@@ -24,7 +24,7 @@ rill project skip-partition [<project>] <model> [flags]
       --partition strings   Skip specific partitions by key
       --pending             Skip all pending partitions
       --errored             Skip all errored partitions
-      --local               Target locally running Rill
+      --local               Target locally running Parrot
 ```
 
 ### Global flags
@@ -39,5 +39,5 @@ rill project skip-partition [<project>] <model> [flags]
 
 ### SEE ALSO
 
-* [rill project](project.md)	 - Manage projects
+* [statsparrot project](project.md)	 - Manage projects
 

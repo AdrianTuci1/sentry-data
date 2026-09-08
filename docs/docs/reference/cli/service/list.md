@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill service list
+title: statsparrot service list
 ---
-## rill service list
+## statsparrot service list
 
 List service
 
 ```
-rill service list [flags]
+statsparrot service list [flags]
 ```
 
 ### Flags
@@ -28,5 +28,5 @@ rill service list [flags]
 
 ### SEE ALSO
 
-* [rill service](service.md)	 - Manage service accounts
+* [statsparrot service](service.md)	 - Manage service accounts
 

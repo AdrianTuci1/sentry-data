@@ -10,17 +10,17 @@ tags:
 
 # OpenRTB Analytics Demo
 
-Learn how to analyze real-time bidding (RTB) data with Rill using the OpenRTB Analytics demo project. This guide shows you how to track ad impressions, bids, wins, and revenue across different publishers, advertisers, and campaigns.
+Learn how to analyze real-time bidding (RTB) data with Parrot using the OpenRTB Analytics demo project. This guide shows you how to track ad impressions, bids, wins, and revenue across different publishers, advertisers, and campaigns.
 
 ## Step 1: Clone the Project
 
 ```bash
 # Clone the OpenRTB Analytics demo
-git clone https://github.com/rilldata/rill-examples.git
-cd rill-examples/rill-openrtb-prog-ads
+git clone https://github.com/staticlabs/statsparrot-examples.git
+cd statsparrot-examples/statsparrot-openrtb-prog-ads
 
-# Start Rill Developer
-rill start
+# Start Parrot Developer
+statsparrot start
 ```
 
 Visit [http://localhost:9009](http://localhost:9009) to explore your OpenRTB analytics dashboard.
@@ -30,8 +30,8 @@ Visit [http://localhost:9009](http://localhost:9009) to explore your OpenRTB ana
 The project is organized as follows:
 
 ```
-rill-openrtb-prog-ads/
-├── rill.yaml                           # Project configuration
+statsparrot-openrtb-prog-ads/
+├── statsparrot.yaml                           # Project configuration
 ├── sources/                            # Data source definitions
 │   ├── auction_data_raw.yaml           # Ad impression data
 │   └── bids_data_raw.yaml              # Bid request/response data
@@ -58,7 +58,7 @@ The bids source captures bid request and response data:
 # sources/bids_data_raw.yaml
 type: source
 connector: "https"
-uri: "https://storage.googleapis.com/rilldata-public/auction_data.parquet"
+uri: "https://storage.googleapis.com/statsparrot-public/auction_data.parquet"
 ```
 
 **What this does:**
@@ -74,11 +74,11 @@ The auction source tracks aggregated auction metrics and bid outcomes:
 # sources/auction_data_raw.yaml
 type: source
 connector: "https"
-uri: "https://storage.googleapis.com/rilldata-public/auction_data.parquet"
+uri: "https://storage.googleapis.com/statsparrot-public/auction_data.parquet"
 ```
 
 **What this does:**
-- Connects to the `rilldata-public` GCS bucket
+- Connects to the `statsparrot-public` GCS bucket
 - Fetches aggregated auction data with key metrics
 - Tracks bid requests, responses, wins, and bid floors
 - Data includes volume metrics, performance ratios, and revenue data
@@ -91,11 +91,11 @@ In this case, we are not joining the data models and having two unique explore m
 
 ## Step 5: Creating your Metrics View
 
-Metrics in Rill define the measures and dimensions that power your RTB dashboards:
+Metrics in Parrot define the measures and dimensions that power your RTB dashboards:
 
 ```yaml
 # Metrics view YAML
-# Reference documentation: https://docs.rilldata.com/reference/project-files/metrics-views
+# Reference documentation: https://docs.statsparrot.com/reference/project-files/metrics-views
 
 version: 1
 model: "auction_data_model"
@@ -235,4 +235,4 @@ Compare Bids and Auctions.
 ![OpenRTB Analytics 3](/img/tutorials/quickstart/openrtb-analytics-3.png)
 
 
-These are just some of the insights that you can find within your explore dashboard but you'll find more hidden gems in your data as you continue to use Rill. Please let us know if you have any other questions!
+These are just some of the insights that you can find within your explore dashboard but you'll find more hidden gems in your data as you continue to use Parrot. Please let us know if you have any other questions!

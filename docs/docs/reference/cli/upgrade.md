@@ -1,20 +1,20 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill upgrade
+title: statsparrot upgrade
 ---
-## rill upgrade
+## statsparrot upgrade
 
-Upgrade Rill to the latest version
+Upgrade Parrot to the latest version
 
 ```
-rill upgrade [flags]
+statsparrot upgrade [flags]
 ```
 
 ### Flags
 
 ```
       --nightly          Install the latest nightly build
-      --version string   Install a specific version of Rill
+      --version string   Install a specific version of Parrot
 ```
 
 ### Global flags
@@ -28,5 +28,5 @@ rill upgrade [flags]
 
 ### SEE ALSO
 
-* [rill](cli.md)	 - A CLI for Rill
+* [statsparrot](cli.md)	 - A CLI for Parrot
 

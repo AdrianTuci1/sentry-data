@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill whoami
+title: statsparrot whoami
 ---
-## rill whoami
+## statsparrot whoami
 
 Show current user
 
 ```
-rill whoami [flags]
+statsparrot whoami [flags]
 ```
 
 ### Global flags
@@ -21,5 +21,5 @@ rill whoami [flags]
 
 ### SEE ALSO
 
-* [rill](cli.md)	 - A CLI for Rill
+* [statsparrot](cli.md)	 - A CLI for Parrot
 

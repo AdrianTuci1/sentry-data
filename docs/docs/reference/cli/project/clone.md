@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill project clone
+title: statsparrot project clone
 ---
-## rill project clone
+## statsparrot project clone
 
 Clone Project
 
 ```
-rill project clone <project-name> [flags]
+statsparrot project clone <project-name> [flags]
 ```
 
 ### Flags
@@ -28,5 +28,5 @@ rill project clone <project-name> [flags]
 
 ### SEE ALSO
 
-* [rill project](project.md)	 - Manage projects
+* [statsparrot project](project.md)	 - Manage projects
 

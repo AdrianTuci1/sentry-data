@@ -1,15 +1,15 @@
 ---
 title: DuckDB
-description: Power Rill dashboards using DuckDB (default)
+description: Power Parrot dashboards using DuckDB (default)
 sidebar_label: DuckDB
 sidebar_position: 10
 ---
 
 [DuckDB](https://duckdb.org/why_duckdb.html) is an in-memory, columnar SQL database designed for analytical (OLAP) workloads, offering high-speed data processing and analysis. Its columnar storage model and vectorized query execution make it highly efficient for OLAP tasks, enabling fast aggregation, filtering, and joins on large datasets.
 
-## Rill Managed DuckDB
+## Parrot Managed DuckDB
 
-By default, Rill includes DuckDB as an embedded OLAP engine that ingests data from [data sources](/developers/build/connectors) and powers your dashboards. When you start a new project, you'll see a `connectors/duckdb.yaml` file alongside other project files. No additional configuration is needed to use DuckDB with Rill Developer or Rill Cloud.
+By default, Parrot includes DuckDB as an embedded OLAP engine that ingests data from [data sources](/developers/build/connectors) and powers your dashboards. When you start a new project, you'll see a `connectors/duckdb.yaml` file alongside other project files. No additional configuration is needed to use DuckDB with Parrot Developer or Parrot Cloud.
 
 ```yaml
 type: connector
@@ -20,19 +20,19 @@ managed: true
 
 :::tip Performance Considerations
 
-DuckDB is an excellent analytical engine but can face performance challenges as data size grows significantly. As a general guideline, we recommend keeping your data size in DuckDB **under 50GB** along with other [performance recommendations](/developers/tutorials/performance). For larger datasets, Rill still provides excellent performance but may require additional backend optimizations. [Contact us](/contact) if you need assistance with large-scale deployments.
+DuckDB is an excellent analytical engine but can face performance challenges as data size grows significantly. As a general guideline, we recommend keeping your data size in DuckDB **under 50GB** along with other [performance recommendations](/developers/tutorials/performance). For larger datasets, Parrot still provides excellent performance but may require additional backend optimizations. [Contact us](/contact) if you need assistance with large-scale deployments.
 
 :::
 
 ## Live Connect to External DuckDB
 
-Rill also supports connecting to external DuckDB database files as a "live connector". This allows you to leverage existing DuckDB databases within Rill to create metrics views and dashboards.
+Parrot also supports connecting to external DuckDB database files as a "live connector". This allows you to leverage existing DuckDB databases within Parrot to create metrics views and dashboards.
 
 :::warning Local Development Only
 
-This setup is designed for local development and testing only. It will not deploy to Rill Cloud under most circumstances because:
+This setup is designed for local development and testing only. It will not deploy to Parrot Cloud under most circumstances because:
 
-- Rill Cloud can only access files within your project directory
+- Parrot Cloud can only access files within your project directory
 - If your DuckDB file is outside the project folder, it cannot be bundled for deployment
 - Files larger than 100MB will fail to deploy due to upload size limits
 
@@ -53,7 +53,7 @@ path: '/path/to/main.db'
 
 ### Setting the Default OLAP Connection
 
-Creating a connection to MotherDuck will automatically add the `olap_connector` property in your project's [rill.yaml](/reference/project-files/rill-yaml) and change the default OLAP engine to `duckdb`.
+Creating a connection to MotherDuck will automatically add the `olap_connector` property in your project's [statsparrot.yaml](/reference/project-files/statsparrot-yaml) and change the default OLAP engine to `duckdb`.
 
 ```yaml
 olap_connector: duckdb
@@ -62,7 +62,7 @@ olap_connector: duckdb
 
 ## Using DuckDB Extensions
 
-DuckDB supports a wide variety of extensions that can enhance its functionality. To use extensions with Rill's embedded DuckDB, configure them in your connector:
+DuckDB supports a wide variety of extensions that can enhance its functionality. To use extensions with Parrot's embedded DuckDB, configure them in your connector:
 
 ```yaml
 # connectors/duckdb.yaml
@@ -81,7 +81,7 @@ For a complete list of available extensions, see the [DuckDB Extensions document
 
 ## Multiple OLAP Engines
 
-While not recommended, Rill supports using multiple OLAP engines in a single project. For more information, see [Using Multiple OLAP Engines](/developers/build/connectors/olap/multiple-olap).
+While not recommended, Parrot supports using multiple OLAP engines in a single project. For more information, see [Using Multiple OLAP Engines](/developers/build/connectors/olap/multiple-olap).
 
 ## Additional Notes
 

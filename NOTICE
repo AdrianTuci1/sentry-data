@@ -1,0 +1,32 @@
+Statsparrot
+Copyright 2026 Statsparrot Contributors
+
+This product is a source-level port of Rill.
+The upstream work is:
+
+  Rill
+  Copyright 2022 Rill Data Inc.
+  Licensed under the Apache License, Version 2.0 (the "License").
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+The full license text is provided in LICENSE.md. Derivative works must
+retain the copyright and attribution notices above in accordance with
+Section 4(c) of the Apache License, Version 2.0. The contents of this file
+are for informational purposes only and do not modify the License.
+
+Portions of this software are derived from the Rill project
+(https://github.com/rilldata/rill). Statsparrot's frontend
+(web-local, web-common, web-admin) is Rill's Svelte/SvelteKit UI carried over
+unchanged; framework-agnostic logic and the Go runtime, admin, proto, and cli
+packages are carried over unchanged.

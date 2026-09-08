@@ -12,14 +12,14 @@ RUN apt-get update && apt-get install -y ca-certificates git curl gnupg && \
         google-cloud-cli-gke-gcloud-auth-plugin && \
     rm -rf /var/lib/apt/lists/*
 
-COPY rill /usr/local/bin
-RUN chmod 777 /usr/local/bin/rill
+COPY statsparrot /usr/local/bin
+RUN chmod 777 /usr/local/bin/statsparrot
 
-RUN groupadd -g 1001 rill \
-    && useradd -m -u 1001 -s /bin/sh -g rill rill
-USER rill
+RUN groupadd -g 1001 statsparrot \
+    && useradd -m -u 1001 -s /bin/sh -g statsparrot statsparrot
+USER statsparrot
 
-RUN rill runtime install-duckdb-extensions
+RUN statsparrot runtime install-duckdb-extensions
 
-ENTRYPOINT ["rill"]
+ENTRYPOINT ["statsparrot"]
 CMD ["start"]

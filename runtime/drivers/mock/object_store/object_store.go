@@ -5,10 +5,10 @@ import (
 	"errors"
 
 	"github.com/mitchellh/mapstructure"
-	"github.com/rilldata/rill/runtime/drivers"
-	"github.com/rilldata/rill/runtime/pkg/activity"
-	rillblob "github.com/rilldata/rill/runtime/pkg/blob"
-	"github.com/rilldata/rill/runtime/storage"
+	"github.com/staticlabs/statsparrot/runtime/drivers"
+	"github.com/staticlabs/statsparrot/runtime/pkg/activity"
+	rillblob "github.com/staticlabs/statsparrot/runtime/pkg/blob"
+	"github.com/staticlabs/statsparrot/runtime/storage"
 	"go.uber.org/zap"
 	"gocloud.dev/blob"
 

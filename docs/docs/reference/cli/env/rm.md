@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill env rm
+title: statsparrot env rm
 ---
-## rill env rm
+## statsparrot env rm
 
 Remove an env variable
 
 ```
-rill env rm [<project>] <key> [flags]
+statsparrot env rm [<project>] <key> [flags]
 ```
 
 ### Flags
@@ -30,5 +30,5 @@ rill env rm [<project>] <key> [flags]
 
 ### SEE ALSO
 
-* [rill env](env.md)	 - Manage variables for a project
+* [statsparrot env](env.md)	 - Manage variables for a project
 

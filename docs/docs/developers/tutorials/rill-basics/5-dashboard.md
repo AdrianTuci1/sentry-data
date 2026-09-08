@@ -11,20 +11,20 @@ tags:
 ## Explore Dashboard
 We have the choice to start with either an Explore or Canvas dashboard. Let's start with an Explore Dashboard by selecting `Create Explore Dashboard`. This will automatically populate the explore dashboard to select all of the created metrics and dimensions in your metrics view. We can make changes to the view via the YAML or visual dashboard editor.
 
-![Completed 100 Dashboard](/img/tutorials/rill-basics/Completed-100-dashboard.png)
+![Completed 100 Dashboard](/img/tutorials/statsparrot-basics/Completed-100-dashboard.png)
 
 ## Making Changes
 ### Visual Explore Dashboard
 
-![Visual Dashboard Tutorial](/img/tutorials/rill-basics/visual-dashboard-tutorial.png)
+![Visual Dashboard Tutorial](/img/tutorials/statsparrot-basics/visual-dashboard-tutorial.png)
 
-On the right panel, you are able to select measures, dimensions, time ranges, and various other components that control the view of your dashboard. In the main area, you will see a preview of what your dashboard will look like. You can also select the code view to make any needed changes and/or set more advanced settings as found in our [explore dashboard YAML reference.](https://docs.rilldata.com/reference/project-files/explore-dashboards)
+On the right panel, you are able to select measures, dimensions, time ranges, and various other components that control the view of your dashboard. In the main area, you will see a preview of what your dashboard will look like. You can also select the code view to make any needed changes and/or set more advanced settings as found in our [explore dashboard YAML reference.](https://docs.statsparrot.com/reference/project-files/explore-dashboards)
 
 ### YAML
 By default, the page will contain the basic parameters as seen below. You can add more advanced settings as required for your use case.
 ```YAML
 # Explore YAML
-# Reference documentation: https://docs.rilldata.com/reference/project-files/explore-dashboards
+# Reference documentation: https://docs.statsparrot.com/reference/project-files/explore-dashboards
 
 type: explore
 
@@ -41,14 +41,14 @@ measures: '*'
 
 For a quick summary of the different components of an explore dashboard and their respective parts in the dashboard UI:
 
-![Simple Dashboard](/img/tutorials/rill-basics/simple-dashboard.gif)
+![Simple Dashboard](/img/tutorials/statsparrot-basics/simple-dashboard.gif)
 
 --- 
 
 ## Canvas Dashboard
 Next, let's try to make a Canvas dashboard!
 
-![Canvas Dashboard](/img/tutorials/rill-basics/canvas-dashboard.png)
+![Canvas Dashboard](/img/tutorials/statsparrot-basics/canvas-dashboard.png)
 
 Select `Add widget` to build a component using our metrics view. The right-hand panel will display the different parameters that you can set per component. 
 
@@ -58,6 +58,6 @@ Try to create the following:
 
 Once completed, select `Preview`. You should see something like the following image:
 
-![Complete Canvas Dashboard](/img/tutorials/rill-basics/complete-canvas-dashboard.png)
+![Complete Canvas Dashboard](/img/tutorials/statsparrot-basics/complete-canvas-dashboard.png)
 
 

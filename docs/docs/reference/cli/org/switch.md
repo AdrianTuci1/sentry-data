@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill org switch
+title: statsparrot org switch
 ---
-## rill org switch
+## statsparrot org switch
 
 Switch to other organization
 
 ```
-rill org switch [<org-name>] [flags]
+statsparrot org switch [<org-name>] [flags]
 ```
 
 ### Global flags
@@ -21,5 +21,5 @@ rill org switch [<org-name>] [flags]
 
 ### SEE ALSO
 
-* [rill org](org.md)	 - Manage organizations
+* [statsparrot org](org.md)	 - Manage organizations
 

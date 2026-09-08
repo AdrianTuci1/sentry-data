@@ -6,15 +6,15 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/rilldata/rill/runtime"
-	"github.com/rilldata/rill/runtime/testruntime"
+	"github.com/staticlabs/statsparrot/runtime"
+	"github.com/staticlabs/statsparrot/runtime/testruntime"
 	"github.com/stretchr/testify/require"
 )
 
 func TestText_MetricsSQL(t *testing.T) {
 	rt, instanceID := testruntime.NewInstanceWithOptions(t, testruntime.InstanceOptions{
 		Files: map[string]string{
-			"rill.yaml": "",
+			"statsparrot.yaml": "",
 			"model1.sql": `
 SELECT 'US' AS country, DATE '2024-01-01' AS order_date, 100 AS revenue, 5 AS orders
 UNION ALL
@@ -156,7 +156,7 @@ measures:
 func TestText_MetricsSQLRows(t *testing.T) {
 	rt, instanceID := testruntime.NewInstanceWithOptions(t, testruntime.InstanceOptions{
 		Files: map[string]string{
-			"rill.yaml": "",
+			"statsparrot.yaml": "",
 			"bids.sql": `
 SELECT 'Google' AS advertiser_name, 1000 AS overall_spend, DATE '2024-01-01' AS bid_date
 UNION ALL

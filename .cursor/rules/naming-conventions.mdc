@@ -1,5 +1,5 @@
 ---
-description: Naming conventions for files and components in the Rill web frontend codebases
+description: Naming conventions for files and components in the Parrot web frontend codebases
 globs:
   [
     "web-admin/**/*.ts",

@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill public-url create
+title: statsparrot public-url create
 ---
-## rill public-url create
+## statsparrot public-url create
 
 Create a public URL
 
 ```
-rill public-url create [<project-name>] <explore> [flags]
+statsparrot public-url create [<project-name>] <explore> [flags]
 ```
 
 ### Flags
@@ -32,5 +32,5 @@ rill public-url create [<project-name>] <explore> [flags]
 
 ### SEE ALSO
 
-* [rill public-url](public-url.md)	 - Manage public URLs
+* [statsparrot public-url](public-url.md)	 - Manage public URLs
 

@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill project deployment create
+title: statsparrot project deployment create
 ---
-## rill project deployment create
+## statsparrot project deployment create
 
 Create a deployment for a specific branch
 
 ```
-rill project deployment create [<project>] <branch> [flags]
+statsparrot project deployment create [<project>] <branch> [flags]
 ```
 
 ### Flags
@@ -29,5 +29,5 @@ rill project deployment create [<project>] <branch> [flags]
 
 ### SEE ALSO
 
-* [rill project deployment](deployment.md)	 - Manage project deployments
+* [statsparrot project deployment](deployment.md)	 - Manage project deployments
 

@@ -1,8 +1,8 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill query
+title: statsparrot query
 ---
-## rill query
+## statsparrot query
 
 Query data in a project
 
@@ -17,17 +17,17 @@ Note that large results are automatically truncated (use --limit to override).
 
 
 ```
-rill query [<project>] [flags]
+statsparrot query [<project>] [flags]
 ```
 
 ### Examples
 
 ```
-  # SQL query against a Rill Cloud project
-  rill query my-project --sql "SELECT * FROM my-table"
+  # SQL query against a Parrot Cloud project
+  statsparrot query my-project --sql "SELECT * FROM my-table"
 
-  # SQL query against a local Rill project running with 'rill start'
-  rill query --local --sql "SELECT * FROM my-table"
+  # SQL query against a local Parrot project running with 'statsparrot start'
+  statsparrot query --local --sql "SELECT * FROM my-table"
 ```
 
 ### Flags
@@ -37,7 +37,7 @@ rill query [<project>] [flags]
       --branch string               Target deployment by Git branch (default: primary deployment)
       --connector string            Connector to execute against. Defaults to the OLAP connector.
       --limit int                   The maximum number of rows to print (default 100)
-      --local                       Target local runtime instead of Rill Cloud
+      --local                       Target local runtime instead of Parrot Cloud
       --org string                  Organization Name
       --path string                 Project directory (default ".")
       --project string              Project name
@@ -57,5 +57,5 @@ rill query [<project>] [flags]
 
 ### SEE ALSO
 
-* [rill](cli.md)	 - A CLI for Rill
+* [statsparrot](cli.md)	 - A CLI for Parrot
 

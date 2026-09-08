@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill version
+title: statsparrot version
 ---
-## rill version
+## statsparrot version
 
-Show Rill version
+Show Parrot version
 
 ```
-rill version [flags]
+statsparrot version [flags]
 ```
 
 ### Global flags
@@ -21,5 +21,5 @@ rill version [flags]
 
 ### SEE ALSO
 
-* [rill](cli.md)	 - A CLI for Rill
+* [statsparrot](cli.md)	 - A CLI for Parrot
 

@@ -1,7 +1,7 @@
 ---
 id: iframe
 title: Embed Dashboards in an Iframe
-description: Embed Rill dashboards in your own applications using iframes
+description: Embed Parrot dashboards in your own applications using iframes
 sidebar_label: Iframe
 sidebar_position: 10
 ---
@@ -11,23 +11,23 @@ import TabItem from '@theme/TabItem';
 
 ## Introduction
 
-Rill Cloud provides the ability to embed dashboards as components in your own application using iframes, with a few different options:
+Parrot Cloud provides the ability to embed dashboards as components in your own application using iframes, with a few different options:
 - Embedding individual dashboards as standalone iframes
 - Embedding individual dashboards with the ability to navigate to other dashboards (that exist in the _same_ project)
-- Embedding the dashboard list page present in a Rill project (with the ability to select and navigate between dashboards)
+- Embedding the dashboard list page present in a Parrot project (with the ability to select and navigate between dashboards)
 
-When embedding Rill, you need to generate a service token for your backend to request an authenticated iframe URL via the Rill API. Afterward, the iframe URL can be passed to your frontend application for rendering. Here's a high-level diagram of what this flow looks like:
+When embedding Parrot, you need to generate a service token for your backend to request an authenticated iframe URL via the Parrot API. Afterward, the iframe URL can be passed to your frontend application for rendering. Here's a high-level diagram of what this flow looks like:
 
 ```mermaid
 sequenceDiagram
   participant A as ui.ezcommerce.com
   participant B as api.ezcommerce.com
-  participant C as api.rilldata.com
-  participant D as ui.rilldata.com/-/embed
-  participant E as node.region.runtime.rilldata.com
+  participant C as api.statsparrot.com
+  participant D as ui.statsparrot.com/-/embed
+  participant E as node.region.runtime.statsparrot.com
   A ->> B: Get iframe URL
   B ->> B: Resolve the user's email <br />using ezcommerce's own auth
-  B ->>+ C: Get iframe URL for:<br />project="ezcommerce"<br />user="john@example.com"<br/>(uses Rill service token)
+  B ->>+ C: Get iframe URL for:<br />project="ezcommerce"<br />user="john@example.com"<br/>(uses Parrot service token)
   Note right of C: 1. Lookup deployment<br/>2. Generate JWT<br />3. Build iframe URL
   C ->>- B: iframe URL
   B ->> A: iframe URL
@@ -39,13 +39,13 @@ sequenceDiagram
 ```
 
 ## Create a service token
-Use the Rill CLI to create a service token for your current organization using the following command:
+Use the Parrot CLI to create a service token for your current organization using the following command:
 ```bash
 # Create with organization role
-rill service create <service_name> --org-role admin
+statsparrot service create <service_name> --org-role admin
 
 # Or create with project-specific role
-rill service create <service_name> --project <project_name> --project-role admin
+statsparrot service create <service_name> --project <project_name> --project-role admin
 ```
 
 :::info
@@ -61,10 +61,10 @@ Service tokens can have broad permissions and should be handled confidentially. 
 :::
 
 ## Backend: Build an iframe URL
-You should implement an API on your backend that uses the service token to retrieve and return an iframe URL from Rill's API (which is hosted on `api.rilldata.com`).
+You should implement an API on your backend that uses the service token to retrieve and return an iframe URL from Parrot's API (which is hosted on `api.statsparrot.com`).
 
 There are multiple reasons why the iframe URL <u>must</u> be constructed on your backend:
-- To avoid leaking your master Rill service token in the browser
+- To avoid leaking your master Parrot service token in the browser
 - To allow you to use your own authentication and authorization logic to restrict access to the dashboard
 - To optionally use your backend's context about the authenticated user to include user attributes in the iframe URL for enforcement of row-level security policies
 
@@ -74,9 +74,9 @@ Here are examples of how to get an iframe URL using different languages:
   <TabItem value="curl" label="Curl" default>
 
 ```bash
-curl -X POST --location 'https://api.rilldata.com/v1/orgs/<org-name>/projects/<project-name>/iframe' \
+curl -X POST --location 'https://api.statsparrot.com/v1/orgs/<org-name>/projects/<project-name>/iframe' \
 --header 'Content-Type: application/json' \
---header 'Authorization: Bearer <rill-svc-token>' \
+--header 'Authorization: Bearer <statsparrot-svc-token>' \
 --data-raw '{
 "type": "explore",
 "resource": "<explore-name>",
@@ -91,20 +91,20 @@ curl -X POST --location 'https://api.rilldata.com/v1/orgs/<org-name>/projects/<p
 const express = require('express');
 const fetch = require('node-fetch');
 
-const rillServiceToken = "<YOUR RILL SERVICE TOKEN>";
-const rillOrg = "<YOUR RILL ORG NAME>";
-const rillProject = "<YOUR RILL PROJECT NAME>";
+const statsparrotServiceToken = "<YOUR RILL SERVICE TOKEN>";
+const statsparrotOrg = "<YOUR RILL ORG NAME>";
+const statsparrotProject = "<YOUR RILL PROJECT NAME>";
 
 const app = express();
 app.use(express.json());
-app.post('/api/rill/iframe', async (req, res) => {
+app.post('/api/statsparrot/iframe', async (req, res) => {
   const dashboardName = req.body.resource;
   try {
-    const response = await fetch(`https://api.rilldata.com/v1/orgs/${rillOrg}/projects/${rillProject}/iframe`, {
+    const response = await fetch(`https://api.statsparrot.com/v1/orgs/${statsparrotOrg}/projects/${statsparrotProject}/iframe`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${rillServiceToken}`,
+        Authorization: `Bearer ${statsparrotServiceToken}`,
       },
       body: JSON.stringify({
         type: 'explore',
@@ -143,15 +143,15 @@ import requests
 
 app = Flask(__name__)
 
-@app.route('/api/rill/iframe', methods=['POST'])
-def get_rill_iframe():
+@app.route('/api/statsparrot/iframe', methods=['POST'])
+def get_statsparrot_iframe():
     dashboard_name = request.json.get('resource')
     try:
         response = requests.post(
-            'https://api.rilldata.com/v1/orgs/<org-name>/projects/<project-name>/iframe',
+            'https://api.statsparrot.com/v1/orgs/<org-name>/projects/<project-name>/iframe',
             headers={
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer <rill-svc-token>',
+                'Authorization': 'Bearer <statsparrot-svc-token>',
             },
             json={
                 'type': 'explore',
@@ -188,7 +188,7 @@ import (
 	"net/http"
 )
 
-func getRillIframe(w http.ResponseWriter, r *http.Request) {
+func getParrotIframe(w http.ResponseWriter, r *http.Request) {
 	var reqBody map[string]string
 	json.NewDecoder(r.Body).Decode(&reqBody)
 	dashboardName := reqBody["resource"]
@@ -205,7 +205,7 @@ func getRillIframe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := http.Post("https://api.rilldata.com/v1/orgs/<org-name>/projects/<project-name>/iframe", "application/json", bytes.NewBuffer(requestBody))
+	resp, err := http.Post("https://api.statsparrot.com/v1/orgs/<org-name>/projects/<project-name>/iframe", "application/json", bytes.NewBuffer(requestBody))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -234,7 +234,7 @@ func getRillIframe(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("api/rill/iframe", getRillIframe)
+	http.HandleFunc("api/statsparrot/iframe", getParrotIframe)
 	fmt.Println("Server started at port 3000")
 	http.ListenAndServe(":3000", nil)
 }
@@ -258,12 +258,12 @@ import java.util.Map;
 @RestController
 public class DashboardController {
 
-    @PostMapping("/api/rill/iframe")
-    public ResponseEntity<?> getRillIframe(@RequestBody Map<String, Object> payload) {
+    @PostMapping("/api/statsparrot/iframe")
+    public ResponseEntity<?> getParrotIframe(@RequestBody Map<String, Object> payload) {
         String dashboardName = (String) payload.get("resource");
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
-        headers.set("Authorization", "Bearer <rill-svc-token>");
+        headers.set("Authorization", "Bearer <statsparrot-svc-token>");
 
         Map<String, Object> request = new HashMap<>();
         request.put("type", "explore");
@@ -274,7 +274,7 @@ public class DashboardController {
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<Map> response = restTemplate.postForEntity(
-                "https://api.rilldata.com/v1/orgs/<org-name>/projects/<project-name>/iframe",
+                "https://api.statsparrot.com/v1/orgs/<org-name>/projects/<project-name>/iframe",
                 entity,
                 Map.class
         );
@@ -309,7 +309,7 @@ The response of the POST request will then contain an `iframeSrc` value that can
 
 ```json
 {
-  "iframeSrc": "https://ui.rilldata.com/-/embed?access_token=<token>&instance_id=<id>&type=<dashboard type>&resource=<dashboard name>&runtime_host=<runtime host>",
+  "iframeSrc": "https://ui.statsparrot.com/-/embed?access_token=<token>&instance_id=<id>&type=<dashboard type>&resource=<dashboard name>&runtime_host=<runtime host>",
   "runtimeHost": "<runtime_host>",
   "instanceId": "<id>",
   "accessToken": "<token>",
@@ -324,13 +324,13 @@ The `user_email`, `attributes` and `external_user_id` parameters serve two purpo
 - **Per-user state:** `external_user_id` establishes a stable user identity that isolates per-user features such as AI chat history. Without a user identity, these features are not available.
 
 Only one of `user_email` or `attributes` can be provided for a given iframe. The `external_user_id` parameter can optionally be combined with either of them. Here is how each parameter works:
-- `user_email`: Looks up the user in Rill Cloud by email and populates their standard attributes. If no matching user is found, it generates limited attributes with only the fields `email`, `domain` (the part of the email after `@`) and `admin` (set to `false`). The derived `domain` is commonly used in security policies (e.g. `app_site_domain = '{{ .user.domain }}'`). Does not enable per-user state on its own; combine with `external_user_id` to enable per-user state.
+- `user_email`: Looks up the user in Parrot Cloud by email and populates their standard attributes. If no matching user is found, it generates limited attributes with only the fields `email`, `domain` (the part of the email after `@`) and `admin` (set to `false`). The derived `domain` is commonly used in security policies (e.g. `app_site_domain = '{{ .user.domain }}'`). Does not enable per-user state on its own; combine with `external_user_id` to enable per-user state.
 - `attributes`: Passes the provided attributes through directly. Make sure to include all attributes referenced in your security policies (e.g. `email`, `domain`, `admin`, or custom attributes like `tenant_id`). Does not enable per-user state on its own; combine with `external_user_id` to enable per-user state.
 - `external_user_id`: Any stable identifier for the end user. This is usually the user's ID in your own database. Setting it enables per-user state such as AI chat history.
 
 ## Embedding the project vs embedding an individual dashboard
 
-One of the most common differences between how developers may wish to iframe Rill is whether they wish to embed at the project level or individual dashboard level. This behavior can be controlled through the combination of the `resource` and `navigation` properties!
+One of the most common differences between how developers may wish to iframe Parrot is whether they wish to embed at the project level or individual dashboard level. This behavior can be controlled through the combination of the `resource` and `navigation` properties!
 
 If you wish to embed a single dashboard **only**, your payload might look like:
 ```json
@@ -349,7 +349,7 @@ If you wish to still embed a dashboard _but allow navigation between dashboards_
 }
 ```
 
-If you wish to allow navigation _but hide the navigation bar_ — for example to embed a Canvas dashboard whose components can drill through to an Explore dashboard, without showing Rill's own breadcrumbs — then add `hide_navigation_bar`:
+If you wish to allow navigation _but hide the navigation bar_ — for example to embed a Canvas dashboard whose components can drill through to an Explore dashboard, without showing Parrot's own breadcrumbs — then add `hide_navigation_bar`:
 ```json
 {
   "type": "canvas",
@@ -361,7 +361,7 @@ If you wish to allow navigation _but hide the navigation bar_ — for example to
 
 Note that in this mode there is no in-iframe affordance for returning from a dashboard the user drilled into. Your application should listen for the [`navigation` notification](/developers/embed/postmessage) — still emitted when the navigation bar is hidden — and provide its own way back.
 
-Finally, _if you wish to embed the project list view of dashboards instead (what you see when you first open a project in Rill Cloud)_, then you can simply omit the `resource` and appropriately set `navigation` in your payload:
+Finally, _if you wish to embed the project list view of dashboards instead (what you see when you first open a project in Parrot Cloud)_, then you can simply omit the `resource` and appropriately set `navigation` in your payload:
 ```json
 {
   "navigation": true
@@ -370,10 +370,10 @@ Finally, _if you wish to embed the project list view of dashboards instead (what
 
 ## Testing the dashboard
 
-While it is possible to create the iframeSrc URL via the CLI or code to _test_ your embedded dashboard, it might be easier to start off using [Rill Developer's mock users](/developers/build/metrics-view/security#advanced-example-custom-attributes-embed-dashboards), especially if you have multiple attribute views that you want to test before deploying to Rill Cloud. You can pass specific custom_attributes as you would during iframe URL generation to view the pre-filtered explore dashboard.
+While it is possible to create the iframeSrc URL via the CLI or code to _test_ your embedded dashboard, it might be easier to start off using [Parrot Developer's mock users](/developers/build/metrics-view/security#advanced-example-custom-attributes-embed-dashboards), especially if you have multiple attribute views that you want to test before deploying to Parrot Cloud. You can pass specific custom_attributes as you would during iframe URL generation to view the pre-filtered explore dashboard.
 
 ```yaml
-- email: embed@rilldata.com
+- email: embed@statsparrot.com
   name: embed
   custom_variable_1: Value_1
   custom_variable_2: Value_2
@@ -383,7 +383,7 @@ While it is possible to create the iframeSrc URL via the CLI or code to _test_ y
 ## Frontend: Embed the dashboard
 Your frontend should request an iframe URL from your backend API (which you set up in the previous step) and use the `iframeSrc` value of the response to render an HTML `<iframe>` element:
 ```html
-<iframe title="rill-dashboard" src="<iframeSrc>" width="100%" height="100%" />
+<iframe title="statsparrot-dashboard" src="<iframeSrc>" width="100%" height="100%" />
 ```
 
 Once the dashboard is embedded, the parent page can also read and write its UI state (selected resource, filters, time range, view type, and so on) using a `postMessage`-based API exposed by the iframe. See the [postMessage API](/developers/embed/postmessage) reference for details.
@@ -392,18 +392,18 @@ Once the dashboard is embedded, the parent page can also read and write its UI s
 
 ### React Example
 
-Depending on how your app is written and the language being used, you can then use the resulting iframe URL to embed and display Rill dashboards accordingly. Below is a basic example of how to fetch and render a dashboard in **React**:
+Depending on how your app is written and the language being used, you can then use the resulting iframe URL to embed and display Parrot dashboards accordingly. Below is a basic example of how to fetch and render a dashboard in **React**:
 
 ```jsx
 import React, { useEffect, useState } from 'react';
 
-export default function RillDashboard() {
+export default function ParrotDashboard() {
   const [isLoading, setLoading] = useState(true);
   const [iframeSrc, setIframeSrc] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch(`<YOUR BACKEND HOST>/api/rill/iframe`, {
+    fetch(`<YOUR BACKEND HOST>/api/statsparrot/iframe`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -429,7 +429,7 @@ export default function RillDashboard() {
   if (error) return <p>Failed with error: {error}</p>;
 
   return (
-    <iframe title="rill-dashboard"
+    <iframe title="statsparrot-dashboard"
       src={iframeSrc}
       width="100%"
       height="1000"
@@ -440,4 +440,4 @@ export default function RillDashboard() {
 
 ### Next.js Example
 
-You can find a different end-to-end example of embedding a Rill dashboard in a **Next.js** project in [`rilldata/rill-examples/embedding`](https://github.com/rilldata/rill-examples/tree/main/embedding).
+You can find a different end-to-end example of embedding a Parrot dashboard in a **Next.js** project in [`staticlabs/statsparrot-examples/embedding`](https://github.com/staticlabs/statsparrot-examples/tree/main/embedding).

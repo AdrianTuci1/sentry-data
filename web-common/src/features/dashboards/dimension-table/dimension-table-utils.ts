@@ -1,10 +1,10 @@
-import DeltaChange from "@rilldata/web-common/features/dashboards/dimension-table/DeltaChange.svelte";
-import DeltaChangePercentage from "@rilldata/web-common/features/dashboards/dimension-table/DeltaChangePercentage.svelte";
-import { m } from "@rilldata/web-common/lib/i18n/gen/messages";
+import DeltaChange from "@statsparrot/web-common/features/dashboards/dimension-table/DeltaChange.svelte";
+import DeltaChangePercentage from "@statsparrot/web-common/features/dashboards/dimension-table/DeltaChangePercentage.svelte";
+import { m } from "@statsparrot/web-common/lib/i18n/gen/messages";
 import {
   ComparisonDeltaAbsoluteSuffix,
   ComparisonDeltaRelativeSuffix,
-} from "@rilldata/web-common/features/dashboards/filters/measure-filters/measure-filter-entry";
+} from "@statsparrot/web-common/features/dashboards/filters/measure-filters/measure-filter-entry";
 import {
   copyFilterExpression,
   createAndExpression,
@@ -12,7 +12,7 @@ import {
   createLikeExpression,
   createOrExpression,
   matchExpressionByName,
-} from "@rilldata/web-common/features/dashboards/stores/filter-utils";
+} from "@statsparrot/web-common/features/dashboards/stores/filter-utils";
 import { type V1MetricsViewAggregationResponseDataItem } from "../../../runtime-client";
 import PercentOfTotal from "./PercentOfTotal.svelte";
 
@@ -27,13 +27,13 @@ import type {
   V1MetricsViewToplistResponseDataItem,
 } from "../../../runtime-client";
 
-import type { VirtualizedTableColumns } from "@rilldata/web-common/components/virtualized-table/types";
+import type { VirtualizedTableColumns } from "@statsparrot/web-common/components/virtualized-table/types";
 
-import { clamp } from "@rilldata/web-common/lib/clamp";
-import { createMeasureValueFormatter } from "@rilldata/web-common/lib/number-formatting/format-measure-value";
-import { FormatPreset } from "@rilldata/web-common/lib/number-formatting/humanizer-types";
-import { formatMeasurePercentageDifference } from "@rilldata/web-common/lib/number-formatting/percentage-formatter";
-import { numberPartsToString } from "@rilldata/web-common/lib/number-formatting/utils/number-parts-utils";
+import { clamp } from "@statsparrot/web-common/lib/clamp";
+import { createMeasureValueFormatter } from "@statsparrot/web-common/lib/number-formatting/format-measure-value";
+import { FormatPreset } from "@statsparrot/web-common/lib/number-formatting/humanizer-types";
+import { formatMeasurePercentageDifference } from "@statsparrot/web-common/lib/number-formatting/percentage-formatter";
+import { numberPartsToString } from "@statsparrot/web-common/lib/number-formatting/utils/number-parts-utils";
 import type { SvelteComponent } from "svelte";
 import type { ExploreState } from "web-common/src/features/dashboards/stores/explore-state";
 import { SortType } from "../proto-state/derived-types";

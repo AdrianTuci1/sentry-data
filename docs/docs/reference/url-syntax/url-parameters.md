@@ -1,23 +1,23 @@
 ---
 title: Dashboard URL Parameters
-description: Reference for all URL query parameters that control Rill dashboard state.
+description: Reference for all URL query parameters that control Parrot dashboard state.
 sidebar_label: URL Parameters
 sidebar_position: 10
 ---
 
 # Dashboard URL Parameters
 
-Rill dashboards encode their full state in the URL query string. These parameters can be used in browser URLs, shared links, bookmarks, and the [Embed Iframe API](/developers/embed/postmessage) `setState` method.
+Parrot dashboards encode their full state in the URL query string. These parameters can be used in browser URLs, shared links, bookmarks, and the [Embed Iframe API](/developers/embed/postmessage) `setState` method.
 
 ## Global Parameters
 
 | Parameter | Values / Format | Description |
 |---|---|---|
 | `view` | `explore` (default), `pivot`, `tdd` | Active dashboard view |
-| `tr` | ISO 8601 duration (`P7D`, `P30D`) or range (`2024-01-01T00:00:00.000Z,2024-01-31T23:59:59.999Z`) | Time range. Also supports Rill syntax (`-7d/d to now/d`) |
+| `tr` | ISO 8601 duration (`P7D`, `P30D`) or range (`2024-01-01T00:00:00.000Z,2024-01-31T23:59:59.999Z`) | Time range. Also supports Parrot syntax (`-7d/d to now/d`) |
 | `tz` | IANA identifier (`UTC`, `America/New_York`) | Timezone |
 | `grain` | `second`, `minute`, `hour`, `day`, `week`, `month`, `quarter`, `year` | Time aggregation granularity |
-| `compare_tr` | Same format as `tr`. Use `rill-PP` for previous period | Comparison time range |
+| `compare_tr` | Same format as `tr`. Use `statsparrot-PP` for previous period | Comparison time range |
 | `compare_dim` | Dimension name | Dimension for comparison |
 | `highlighted_tr` | ISO 8601 range | Highlighted/scrubbed time range on the time series chart |
 | `f` | URL-encoded filter expression | Filters. Decoded example: `region IN ('North','South')` |
@@ -79,6 +79,6 @@ params.set("grain", "day");
 params.set("f", "region IN ('North','South')");
 params.set("measures", "revenue,orders");
 
-const url = `https://ui.rilldata.com/org/project/explore/dashboard-name?${params}`;
+const url = `https://ui.statsparrot.com/org/project/explore/dashboard-name?${params}`;
 ```
 

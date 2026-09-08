@@ -1,4 +1,4 @@
-package dotrill
+package dotstatsparrot
 
 import (
 	"os"
@@ -108,7 +108,7 @@ func TestAnalytics(t *testing.T) {
 	require.Len(t, id3, 36) // UUID string length
 
 	// Test it recreates install_id if state removed
-	err = os.Remove(filepath.Join(d.homeDir, ".rill", "state.yaml"))
+	err = os.Remove(filepath.Join(d.homeDir, ".statsparrot", "state.yaml"))
 	require.NoError(t, err)
 	id4, enabled, err := d.AnalyticsInfo()
 	require.NoError(t, err)
@@ -120,11 +120,11 @@ func TestAnalytics(t *testing.T) {
 func TestAnalyticsMigration(t *testing.T) {
 	d := New(t.TempDir())
 
-	// setup resets the homeDir and provides helpers for testing ~/.rill/local.json
+	// setup resets the homeDir and provides helpers for testing ~/.statsparrot/local.json
 	setup := func(t *testing.T) (string, func() bool) {
 		d.homeDir = t.TempDir()
-		require.NoError(t, os.MkdirAll(filepath.Join(d.homeDir, ".rill"), os.ModePerm))
-		oldFilename := filepath.Join(d.homeDir, ".rill", "local.json")
+		require.NoError(t, os.MkdirAll(filepath.Join(d.homeDir, ".statsparrot"), os.ModePerm))
+		oldFilename := filepath.Join(d.homeDir, ".statsparrot", "local.json")
 		oldExists := func() bool { _, err := os.Stat(oldFilename); return !os.IsNotExist(err) }
 		return oldFilename, oldExists
 	}

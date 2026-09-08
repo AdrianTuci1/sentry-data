@@ -1,10 +1,10 @@
-## What is Rill
+## What is Parrot
 
-Rill is a business intelligence platform built around the following principles:
+Parrot is a business intelligence platform built around the following principles:
 
 - Code-first: configure projects using versioned and reproducible source code in the form of YAML and SQL files.
 - Full stack: go from raw data sources to user-friendly dashboards powered by clean data with a single tool.
-- Declarative: describe your business logic and Rill automatically runs the infrastructure, migrations and services necessary to make it real.
+- Declarative: describe your business logic and Parrot automatically runs the infrastructure, migrations and services necessary to make it real.
 - OLAP databases: you can easily provision a fast analytical database and load data into it to build dashboards that stay interactive at scale.
 
 ## Architecture
@@ -13,8 +13,8 @@ Users define projects as YAML and SQL files that describe _resources_ — connec
 
 Two deployment modes share the same codebase:
 
-- **Rill Developer** — local application for data engineers. A single Go binary that embeds the CLI, runtime, and `web-local` frontend. Code-first, version-controlled workflow.
-- **Rill Cloud** — hosted platform for teams. Runs the `admin` service, runtime(s), and `web-admin` frontend as separate services. Adds auth, billing, multi-tenancy, and collaboration.
+- **Parrot Developer** — local application for data engineers. A single Go binary that embeds the CLI, runtime, and `web-local` frontend. Code-first, version-controlled workflow.
+- **Parrot Cloud** — hosted platform for teams. Runs the `admin` service, runtime(s), and `web-admin` frontend as separate services. Adds auth, billing, multi-tenancy, and collaboration.
 
 ### Key Directories
 
@@ -22,8 +22,8 @@ Two deployment modes share the same codebase:
 - `admin/` — cloud control plane: auth, billing, provisioning, project management
 - `cli/` — CLI and local application server
 - `web-common/` — shared frontend library consumed by both `web-local` and `web-admin`
-- `web-local/` — local frontend (Rill Developer)
-- `web-admin/` — cloud frontend (Rill Cloud)
+- `web-local/` — local frontend (Parrot Developer)
+- `web-admin/` — cloud frontend (Parrot Cloud)
 - `proto/` — gRPC/protobuf API definitions (source of truth for all APIs)
 
 ## Development
@@ -32,11 +32,11 @@ Two deployment modes share the same codebase:
 
 - **Build CLI**: `make cli` (Go binary + embedded frontend)
 - **Build CLI only**: `make cli-only` (skip frontend, faster)
-- **Local dev**: `rill devtool start local`
-- **Cloud dev**: `rill devtool start cloud`
+- **Local dev**: `statsparrot devtool start local`
+- **Cloud dev**: `statsparrot devtool start cloud`
 - **Test Go**: `go test ./...`
 - **Test frontend (unit, web-common)**: `npm run test -w web-common` (fast, use for tight feedback loops)
-- **Test frontend (unit, web-admin)**: `cd web-admin && npx vitest run src/path/to/spec.ts` (must run from `web-admin/` so vitest picks up the `@rilldata/web-admin` alias)
+- **Test frontend (unit, web-admin)**: `cd web-admin && npx vitest run src/path/to/spec.ts` (must run from `web-admin/` so vitest picks up the `@statsparrot/web-admin` alias)
 - **Test frontend (e2e)**: `npm run test -w web-local` or `npm run test -w web-admin` (Playwright, slow)
 - **Lint/format frontend**: `npm run quality`
 - **Regenerate docs**: `make docs.generate` (run after changes to `proto/`, `cli/` or `runtime/parser`)
@@ -46,7 +46,7 @@ Two deployment modes share the same codebase:
 
 APIs are defined in `.proto` files and mapped to REST via gRPC-Gateway. See `proto/README.md` for conventions.
 
-1. Define endpoint in the relevant `.proto` file under `proto/rill/`
+1. Define endpoint in the relevant `.proto` file under `proto/statsparrot/`
 2. Run `make proto.generate`
 3. Implement handler in `runtime/server/` (or `admin/server/`)
 
@@ -73,7 +73,7 @@ General rules for writing Go code:
 - Use the standard library `errors` (not `github.com/pkg/errors`).
 - Prefer `require.NoError(...)` instead of `panic` in tests.
 
-Rules for contributing backend features in Rill:
+Rules for contributing backend features in Parrot:
 
 - See `CONTRIBUTING.md` for an overview of the various services.
 - Key concepts such as user management and provisioners are implemented in the `admin` package.
@@ -93,5 +93,5 @@ Frontend conventions are being formalized in `.claude/rules/frontend.md` (coming
 ## Tips
 
 - **Monorepo**: Uses npm workspaces (frontend) and Go modules (backend)
-- **Path aliases**: `@rilldata/web-*` imports configured in tsconfig.json
+- **Path aliases**: `@statsparrot/web-*` imports configured in tsconfig.json
 - **Embedded dashboards**: Explore and Canvas dashboards can be embedded in customer apps via iframe. When changing dashboard components, consider whether the change also affects the embed surface.

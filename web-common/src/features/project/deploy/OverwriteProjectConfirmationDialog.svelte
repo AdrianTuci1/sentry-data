@@ -1,6 +1,6 @@
 <script lang="ts">
-  import * as Alert from "@rilldata/web-common/components/alert-dialog/index.js";
-  import { Button } from "@rilldata/web-common/components/button";
+  import * as Alert from "@statsparrot/web-common/components/alert-dialog/index.js";
+  import { Button } from "@statsparrot/web-common/components/button";
 
   export let open: boolean;
   export let rillManagedProject: boolean;

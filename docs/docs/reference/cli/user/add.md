@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill user add
+title: statsparrot user add
 ---
-## rill user add
+## statsparrot user add
 
 Add user to a project, organization or group
 
 ```
-rill user add [flags]
+statsparrot user add [flags]
 ```
 
 ### Flags
@@ -36,5 +36,5 @@ rill user add [flags]
 
 ### SEE ALSO
 
-* [rill user](user.md)	 - Manage users
+* [statsparrot user](user.md)	 - Manage users
 

@@ -4,26 +4,26 @@ sidebar_label: User Groups
 sidebar_position: 24
 ---
 
-Creating user groups in Rill allows administrators to easily grant permissions to multiple projects at different access levels. It is possible to mix and match viewer and administrator permissions in a single group, and users can be part of multiple groups. However, please keep in mind that the higher permission will be applied.
+Creating user groups in Parrot allows administrators to easily grant permissions to multiple projects at different access levels. It is possible to mix and match viewer and administrator permissions in a single group, and users can be part of multiple groups. However, please keep in mind that the higher permission will be applied.
 
 ## Managing User Group Permissions
-There are two ways to set up user groups in Rill.
+There are two ways to set up user groups in Parrot.
 
-1. Administer them via Rill Cloud
+1. Administer them via Parrot Cloud
 2. Administer them via CLI
 
-### How to Manage User Groups in Rill Cloud
+### How to Manage User Groups in Parrot Cloud
 From the organization page, you can manage user groups under the Users tab. Adding user groups from this page will add the user group to the organization. You can then add users to a user group to inherit the group [permissions](/guide/administration/users-and-access/roles-permissions).
 
 ![User Group Management](/img/manage/user-management/usergroup-management.png)
 
 ### How to Manage User Groups via the CLI
 ```
-rill usergroup
+statsparrot usergroup
 Manage user groups
 
 Usage:
-  rill usergroup [command]
+  statsparrot usergroup [command]
 
 Available Commands:
   list        List groups
@@ -42,7 +42,7 @@ Available Commands:
 You can create a new user group by running the following and following the CLI instructions:
 
 ```
-rill usergroup create
+statsparrot usergroup create
 ```
 You will be prompted for the new user group name.
 
@@ -50,10 +50,10 @@ You will be prompted for the new user group name.
 Next, you will need to add the roles and access to the user group.
 
 ```
-rill usergroup add --project <project_name>
+statsparrot usergroup add --project <project_name>
 
       --group string     User group
-      --org string       Organization (default "Rill_Learn")
+      --org string       Organization (default "Parrot_Learn")
       --project string   Project
       --role string      Role of the user group (options: admin, editor, viewer)
 ```
@@ -65,12 +65,12 @@ If you have any questions on permission levels, please review the [Roles and Per
 
 To add a member to the user group, run the following command:
 ```
-rill user add --group <group_name>
+statsparrot user add --group <group_name>
 ```
 
 You will be prompted for the email address for the user.
 
 Once added, you can confirm the user group by running the following command:
 ```
-rill user list --group <group_name>
+statsparrot user list --group <group_name>
 ```

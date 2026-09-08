@@ -1,15 +1,15 @@
 swagger: "2.0"
 info:
-  title: Rill API
+  title: Parrot API
   description: It is used to manage organizations, projects, deployments, users, and roles.
   version: v1
   contact:
-    name: Rill Data
-    url: https://rilldata.com
+    name: Parrot Data
+    url: https://statsparrot.com
   license:
     name: Apache 2.0
-    url: https://github.com/rilldata/rill/blob/main/LICENSE.md
-host: api.rilldata.com
+    url: https://github.com/staticlabs/statsparrot/blob/main/LICENSE.md
+host: api.statsparrot.com
 consumes:
   - application/json
 produces:
@@ -624,7 +624,7 @@ paths:
                 type: boolean
   /v1/orgs/{org}/create-managed-git-repo:
     put:
-      summary: CreateManagedGitRepo creates a new rill managed git repo for the organization.
+      summary: CreateManagedGitRepo creates a new statsparrot managed git repo for the organization.
       operationId: AdminService_CreateManagedGitRepo
       responses:
         "200":
@@ -677,7 +677,7 @@ paths:
                 type: string
               name:
                 type: string
-                title: Eg. "rilldata__project_name"
+                title: Eg. "staticlabs__project_name"
               extension:
                 type: string
                 title: Eg. ".tar.gz"
@@ -1024,7 +1024,7 @@ paths:
                   Either git_remote or archive_asset_id should be set.
               archiveAssetId:
                 type: string
-                description: archive_asset_id is set for projects whose project files are not stored in github but are managed by rill.
+                description: archive_asset_id is set for projects whose project files are not stored in github but are managed by statsparrot.
               prodVersion:
                 type: string
               skipDeploy:
@@ -1383,7 +1383,7 @@ paths:
   /v1/orgs/{org}/projects/{project}/connect-to-github:
     post:
       summary: |-
-        Connects a rill managed project to github.
+        Connects a statsparrot managed project to github.
         Replaces the contents of the remote repo with the contents of the project.
       operationId: AdminService_ConnectProjectToGithub
       responses:
@@ -1586,7 +1586,7 @@ paths:
                 description: If set, will use the provided attributes outright.
               type:
                 type: string
-                description: Type of resource to embed. If not set, defaults to "rill.runtime.v1.Explore".
+                description: Type of resource to embed. If not set, defaults to "statsparrot.runtime.v1.Explore".
               kind:
                 type: string
                 description: 'Deprecated: Alias for `type`.'
@@ -2243,14 +2243,14 @@ paths:
                 $ref: '#/definitions/v1Expression'
                 description: |-
                   Optional filter to apply as a row filter in queries.
-                  This will be translated to a rill.runtime.v1.SecurityRuleRowFilter, which currently applies to metric views queries.
+                  This will be translated to a statsparrot.runtime.v1.SecurityRuleRowFilter, which currently applies to metric views queries.
               fields:
                 type: array
                 items:
                   type: string
                 description: |-
                   Optional list of fields to limit access to. If empty, no field access rule will be added.
-                  This will be translated to a rill.runtime.v1.SecurityRuleFieldAccess, which currently applies to dimension and measure names for explores and metrics views.
+                  This will be translated to a statsparrot.runtime.v1.SecurityRuleFieldAccess, which currently applies to dimension and measure names for explores and metrics views.
               state:
                 type: string
                 description: Optional state to store with the token. Can be fetched with GetCurrentMagicAuthToken.
@@ -3414,7 +3414,7 @@ paths:
           in: query
           required: false
           type: string
-        - name: rillMgdGitRemote
+        - name: statsparrotMgdGitRemote
           in: query
           required: false
           type: string
@@ -3923,7 +3923,7 @@ paths:
     post:
       summary: |-
         RecordEvents sends a batch of telemetry events.
-        The events must conform to the schema described in rill/runtime/pkg/activity/README.md.
+        The events must conform to the schema described in statsparrot/runtime/pkg/activity/README.md.
       operationId: TelemetryService_RecordEvents
       responses:
         "200":
@@ -5765,7 +5765,7 @@ definitions:
         type: string
       managedGitId:
         type: string
-        description: managed_git_id is set if the project is connected to a rill-managed git repo.
+        description: managed_git_id is set if the project is connected to a statsparrot-managed git repo.
       subpath:
         type: string
       prodBranch:
@@ -6619,5 +6619,5 @@ definitions:
       role:
         type: string
 externalDocs:
-  description: Rill API Reference
-  url: https://docs.rilldata.com/api/admin
+  description: Parrot API Reference
+  url: https://docs.statsparrot.com/api/admin

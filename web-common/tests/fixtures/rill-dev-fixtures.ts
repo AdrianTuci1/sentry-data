@@ -1,14 +1,14 @@
 import type { Page } from "@playwright/test";
-import { asyncWaitUntil } from "@rilldata/web-common/lib/waitUtils.ts";
+import { asyncWaitUntil } from "@statsparrot/web-common/lib/waitUtils.ts";
 import axios from "axios";
 import { spawn } from "node:child_process";
 import { cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { test as base, expect } from "playwright/test";
 import treeKill from "tree-kill";
-import { getOpenPort } from "@rilldata/web-common/tests/utils/get-open-port.ts";
-import { makeTempDir } from "@rilldata/web-common/tests/utils/make-temp-dir.ts";
-import { spawnAndMatch } from "@rilldata/web-common/tests/utils/spawn.ts";
+import { getOpenPort } from "@statsparrot/web-common/tests/utils/get-open-port.ts";
+import { makeTempDir } from "@statsparrot/web-common/tests/utils/make-temp-dir.ts";
+import { spawnAndMatch } from "@statsparrot/web-common/tests/utils/spawn.ts";
 
 type MyFixtures = {
   cliHomeDir: string;
@@ -47,11 +47,11 @@ export const rillDev = base.extend<MyFixtures>({
     const TEST_PROJECT_DIRECTORY =
       projectDir ?? makeTempDir(`projects-${TEST_PORT}`);
 
-    // Switch env to "dev" so that this points to the locally started rill cloud.
+    // Switch env to "dev" so that this points to the locally started statsparrot cloud.
     // For tests that involve a local cloud this will point to it.
     // Otherwise, when running in a dev's machine, it will avoid pointing to prod cloud and bombard prod.
     await spawnAndMatch(
-      "../rill",
+      "../statsparrot",
       "devtool switch-env dev".split(" "),
       /Set default env to "dev"/,
       {
@@ -82,7 +82,7 @@ export const rillDev = base.extend<MyFixtures>({
 
     const cmd = `start --no-open --port ${TEST_PORT} --port-grpc ${TEST_GRPC_PORT} ${TEST_PROJECT_DIRECTORY}`;
 
-    const childProcess = spawn("../rill", cmd.split(" "), {
+    const childProcess = spawn("../statsparrot", cmd.split(" "), {
       stdio: "inherit",
       shell: true,
       env: {

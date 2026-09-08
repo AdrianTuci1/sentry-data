@@ -1,0 +1,39 @@
+# Statsparrot self-hosted manifest.
+#
+# Boots a full self-hosted Statsparrot (open-source Parrot) server: the Go runtime
+# plus the embedded web UI, served by the `sp` command. The project directory is
+# persisted in a Docker volume; a new project is scaffolded automatically on
+# first boot via the image entrypoint.
+#
+# Usage:
+#   docker compose -f self-hosted/docker-compose.yaml up --build
+# Then open http://localhost:9009.
+#
+# The image is built from self-hosted/Dockerfile, which performs the Go + node
+# build. This file is a source-level manifest; the build itself is deferred to a
+# Go + node enabled environment.
+
+services:
+  statsparrot:
+    build:
+      context: ..
+      dockerfile: self-hosted/Dockerfile
+    image: statsparrot/statsparrot:self-hosted
+    pull_policy: never
+    restart: unless-stopped
+    ports:
+      - "${STATSPARROT_HTTP_PORT:-9009}:9009"
+    environment:
+      # Internal port the server listens on (fixed to match the published port).
+      STATSPARROT_PORT: "9009"
+      # Project directory (persisted in the volume below).
+      STATSPARROT_PROJECT_DIR: "/var/lib/statsparrot/project"
+      # OLAP engine used when scaffolding a new project on first boot.
+      STATSPARROT_OLAP: "${STATSPARROT_OLAP:-duckdb}"
+      # Origins allowed to talk to the server (CORS). Set to your host URL.
+      STATSPARROT_ALLOWED_ORIGINS: "${STATSPARROT_ALLOWED_ORIGINS:-http://localhost:9009}"
+    volumes:
+      - statsparrot_project:/var/lib/statsparrot/project
+
+volumes:
+  statsparrot_project:

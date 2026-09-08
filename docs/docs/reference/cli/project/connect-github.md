@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill project connect-github
+title: statsparrot project connect-github
 ---
-## rill project connect-github
+## statsparrot project connect-github
 
-Deploy project to Rill Cloud by pulling project files from a git repository
+Deploy project to Parrot Cloud by pulling project files from a git repository
 
 ```
-rill project connect-github [<path>] [flags]
+statsparrot project connect-github [<path>] [flags]
 ```
 
 ### Flags
@@ -22,7 +22,7 @@ rill project connect-github [<path>] [flags]
       --public                  Make dashboards publicly accessible
       --provisioner string      Project provisioner
       --primary-branch string   Git branch to deploy from (default: the default Git branch)
-      --push-env                Push local .env file to Rill Cloud (default true)
+      --push-env                Push local .env file to Parrot Cloud (default true)
 ```
 
 ### Global flags
@@ -36,5 +36,5 @@ rill project connect-github [<path>] [flags]
 
 ### SEE ALSO
 
-* [rill project](project.md)	 - Manage projects
+* [statsparrot project](project.md)	 - Manage projects
 

@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill usergroup list
+title: statsparrot usergroup list
 ---
-## rill usergroup list
+## statsparrot usergroup list
 
 List groups
 
 ```
-rill usergroup list [flags]
+statsparrot usergroup list [flags]
 ```
 
 ### Flags
@@ -30,5 +30,5 @@ rill usergroup list [flags]
 
 ### SEE ALSO
 
-* [rill usergroup](usergroup.md)	 - Manage user groups
+* [statsparrot usergroup](usergroup.md)	 - Manage user groups
 

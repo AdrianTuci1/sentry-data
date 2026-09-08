@@ -1,8 +1,8 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill billing plan
+title: statsparrot billing plan
 ---
-## rill billing plan
+## statsparrot billing plan
 
 Get billing plans
 
@@ -17,6 +17,6 @@ Get billing plans
 
 ### SEE ALSO
 
-* [rill billing](../billing.md)	 - Billing related commands for org
-* [rill billing plan list](list.md)	 - List plans
+* [statsparrot billing](../billing.md)	 - Billing related commands for org
+* [statsparrot billing plan list](list.md)	 - List plans
 

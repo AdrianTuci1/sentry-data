@@ -76,4 +76,4 @@ Similar to the above case statements, you can use the filter expression to filte
     valid_percent_of_total: true
 ```
 ## Demo
-[See this project live in our demo!](https://ui.rilldata.com/demo/rill-kaggle-elec-consumption/explore/household_power_consumption_metrics_explore)
+[See this project live in our demo!](https://ui.statsparrot.com/demo/statsparrot-kaggle-elec-consumption/explore/household_power_consumption_metrics_explore)

@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill env push
+title: statsparrot env push
 ---
-## rill env push
+## statsparrot env push
 
 Push local .env contents to cloud
 
 ```
-rill env push [<project-name>] [flags]
+statsparrot env push [<project-name>] [flags]
 ```
 
 ### Flags
@@ -30,5 +30,5 @@ rill env push [<project-name>] [flags]
 
 ### SEE ALSO
 
-* [rill env](env.md)	 - Manage variables for a project
+* [statsparrot env](env.md)	 - Manage variables for a project
 

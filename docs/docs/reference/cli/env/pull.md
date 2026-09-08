@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill env pull
+title: statsparrot env pull
 ---
-## rill env pull
+## statsparrot env pull
 
 Pull cloud credentials into local .env file
 
 ```
-rill env pull [<project-name>] [flags]
+statsparrot env pull [<project-name>] [flags]
 ```
 
 ### Flags
@@ -30,5 +30,5 @@ rill env pull [<project-name>] [flags]
 
 ### SEE ALSO
 
-* [rill env](env.md)	 - Manage variables for a project
+* [statsparrot env](env.md)	 - Manage variables for a project
 

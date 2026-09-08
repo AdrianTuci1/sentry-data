@@ -1,18 +1,18 @@
 import { expect } from "@playwright/test";
-import { spawnAndMatch } from "@rilldata/web-common/tests/utils/spawn";
+import { spawnAndMatch } from "@statsparrot/web-common/tests/utils/spawn";
 import { spawn } from "child_process";
 import dotenv from "dotenv";
 import { openSync } from "fs";
 import { mkdir } from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
-import { writeFileEnsuringDir } from "@rilldata/web-common/tests/utils/fs";
+import { writeFileEnsuringDir } from "@statsparrot/web-common/tests/utils/fs";
 import { test as setup } from "./base";
 import {
   RILL_DEV_STORAGE_STATE,
   RILL_DEVTOOL_BACKGROUND_PROCESS_PID_FILE,
 } from "../constants";
-import { isServiceReady } from "@rilldata/web-common/tests/utils/is-service-ready";
+import { isServiceReady } from "@statsparrot/web-common/tests/utils/is-service-ready";
 
 setup.describe("global setup", () => {
   setup.describe.configure({
@@ -21,14 +21,14 @@ setup.describe("global setup", () => {
   });
 
   setup("should start services", async () => {
-    // Get the repository root directory, the only place from which `rill devtool` is allowed to be run
+    // Get the repository root directory, the only place from which `statsparrot devtool` is allowed to be run
     const currentDir = path.dirname(fileURLToPath(import.meta.url));
     const repoRoot = path.resolve(currentDir, "../../../");
 
     // Start the cloud dependencies via Docker
     // This will block until the services are ready
     await spawnAndMatch(
-      "rill",
+      "statsparrot",
       ["devtool", "start", "other", "--reset", "--only", "deps"],
       /All services ready/,
       {
@@ -42,7 +42,7 @@ setup.describe("global setup", () => {
     dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
 
     // Check that the required environment variables are set
-    // The above `rill devtool` command pulls the `.env` file with these values.
+    // The above `statsparrot devtool` command pulls the `.env` file with these values.
     // Fail quickly if any of these are missing.
     if (
       !process.env.RILL_DEVTOOL_E2E_ADMIN_ACCOUNT_EMAIL ||
@@ -62,7 +62,7 @@ setup.describe("global setup", () => {
     // A detached process ensures they are not cleaned up when this setup project completes.
     // However, we need to be sure to clean-up the processes manually in the teardown project.
     const child = spawn(
-      "rill",
+      "statsparrot",
       ["devtool", "start", "other", "--only", "admin,runtime"],
       {
         detached: true,
@@ -143,7 +143,7 @@ setup.describe("global setup", () => {
 
     await page.waitForURL(/\/(-\/welcome\/theme)?/);
 
-    // Save the admin's Rill auth cookies to file.
+    // Save the admin's Parrot auth cookies to file.
     // Subsequent tests can seed their browser with this state, instead of needing to go through the log-in flow again.
     await page.context().storageState({ path: RILL_DEV_STORAGE_STATE });
   });

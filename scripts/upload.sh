@@ -16,35 +16,35 @@ echo "time=$(date +%FT%T)" >> metadata.txt
 # Activate GCP Access
 echo ${GCP_TOKEN} > gcp.json
 gcloud auth activate-service-account --key-file gcp.json
-gcloud config set project rilldata
+gcloud config set project staticlabs
 
 # Upload binary
 upload(){
   file=$1
   path=$2
 
-  echo "Uploading ${file} to gs://prod-cdn.rilldata.com/rill/${VERSION}/${path}"
-  gsutil cp ${file} gs://prod-cdn.rilldata.com/rill/${VERSION}/${path}
+  echo "Uploading ${file} to gs://prod-cdn.statsparrot.com/statsparrot/${VERSION}/${path}"
+  gsutil cp ${file} gs://prod-cdn.statsparrot.com/statsparrot/${VERSION}/${path}
 
   if [[ "${VERSION}" != "nightly" ]]; then
-    echo "Uploading ${file} to gs://prod-cdn.rilldata.com/rill/latest/${path}"
-    gsutil cp ${file} gs://prod-cdn.rilldata.com/rill/latest/${path}
+    echo "Uploading ${file} to gs://prod-cdn.statsparrot.com/statsparrot/latest/${path}"
+    gsutil cp ${file} gs://prod-cdn.statsparrot.com/statsparrot/latest/${path}
   fi
 }
 
 if [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
-  cp rilldata/rill-macos-x64 rill
-  shasum -a 256 rill > rill.sha256
-  upload rill macos-x64/rill
-  upload rill.sha256 macos-x64/rill.sha256
+  cp staticlabs/statsparrot-macos-x64 statsparrot
+  shasum -a 256 statsparrot > statsparrot.sha256
+  upload statsparrot macos-x64/statsparrot
+  upload statsparrot.sha256 macos-x64/statsparrot.sha256
   upload metadata.txt metadata.txt
 fi
 
 if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
-  cp rilldata/rill-linux-x64 rill
-  shasum -a 256 rill > rill.sha256
-  upload rill linux-x64/rill
-  upload rill.sha256 linux-x64/rill.sha256
+  cp staticlabs/statsparrot-linux-x64 statsparrot
+  shasum -a 256 statsparrot > statsparrot.sha256
+  upload statsparrot linux-x64/statsparrot
+  upload statsparrot.sha256 linux-x64/statsparrot.sha256
 fi
 
 if [[ ${TRAVIS_OS_NAME} == "windows" ]]; then
@@ -56,8 +56,8 @@ if [[ ${TRAVIS_OS_NAME} == "windows" ]]; then
     /c/Program\ Files\ \(x86\)/Google/Cloud\ SDK/google-cloud-sdk/platform/gsutil_py2/gsutil $1 $2 $3
   }
 
-  CertUtil -hashfile rilldata/rill-win-x64.exe SHA256 > rill.sha256
+  CertUtil -hashfile staticlabs/statsparrot-win-x64.exe SHA256 > statsparrot.sha256
 
-  upload rilldata/rill-win-x64.exe win-x64/rill.exe
-  upload rill.sha256 win-x64/rill.sha256
+  upload staticlabs/statsparrot-win-x64.exe win-x64/statsparrot.exe
+  upload statsparrot.sha256 win-x64/statsparrot.sha256
 fi

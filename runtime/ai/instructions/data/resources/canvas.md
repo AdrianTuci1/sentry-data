@@ -1,8 +1,8 @@
 ---
-description: Detailed instructions and examples for developing canvas dashboard resources in Rill
+description: Detailed instructions and examples for developing canvas dashboard resources in Parrot
 ---
 
-# Instructions for developing a canvas dashboard in Rill
+# Instructions for developing a canvas dashboard in Parrot
 
 ## Introduction
 
@@ -921,7 +921,7 @@ SELECT campaign, conversions FROM conversion_metrics ORDER BY conversions DESC L
 - Apply `format_d3` or `format_preset` from measure metadata to axis and tooltip format strings
 - Pick the best mark type for the data: bar, line, area, point, rect (heatmap), arc (pie/donut), etc.
 - Include tooltips with all relevant fields and human-readable formatting
-- Use a clean, professional color scheme; prefer Rill's categorical palette when possible
+- Use a clean, professional color scheme; prefer Parrot's categorical palette when possible
 - For temporal axes: set `"type": "temporal"` and choose an appropriate `timeUnit`
 - For categorical axes: sort by the primary measure descending unless the user specifies otherwise
 - For layered or multi-view charts, use the `"layer"` or `"concat"` composition operators
@@ -1192,7 +1192,7 @@ Override time settings with detailed control:
 ```yaml
 stacked_bar:
   metrics_view: sales_metrics
-  time_filters: tr=P12M&compare_tr=rill-PY&grain=week
+  time_filters: tr=P12M&compare_tr=statsparrot-PY&grain=week
   # ... other config
 ```
 

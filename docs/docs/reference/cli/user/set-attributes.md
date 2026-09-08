@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill user set-attributes
+title: statsparrot user set-attributes
 ---
-## rill user set-attributes
+## statsparrot user set-attributes
 
 Set custom attributes for a user
 
 ```
-rill user set-attributes [flags]
+statsparrot user set-attributes [flags]
 ```
 
 ### Flags
@@ -31,5 +31,5 @@ rill user set-attributes [flags]
 
 ### SEE ALSO
 
-* [rill user](user.md)	 - Manage users
+* [statsparrot user](user.md)	 - Manage users
 

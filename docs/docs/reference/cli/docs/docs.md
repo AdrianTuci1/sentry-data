@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill docs
+title: statsparrot docs
 ---
-## rill docs
+## statsparrot docs
 
-Open docs.rilldata.com
+Open docs.statsparrot.com
 
 ```
-rill docs [flags]
+statsparrot docs [flags]
 ```
 
 ### Global flags
@@ -21,5 +21,5 @@ rill docs [flags]
 
 ### SEE ALSO
 
-* [rill](../cli.md)	 - A CLI for Rill
+* [statsparrot](../cli.md)	 - A CLI for Parrot
 

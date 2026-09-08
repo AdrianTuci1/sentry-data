@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill service create
+title: statsparrot service create
 ---
-## rill service create
+## statsparrot service create
 
 Create service
 
 ```
-rill service create <service-name> [flags]
+statsparrot service create <service-name> [flags]
 ```
 
 ### Flags
@@ -31,5 +31,5 @@ rill service create <service-name> [flags]
 
 ### SEE ALSO
 
-* [rill service](service.md)	 - Manage service accounts
+* [statsparrot service](service.md)	 - Manage service accounts
 

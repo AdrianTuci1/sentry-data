@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill service token issue
+title: statsparrot service token issue
 ---
-## rill service token issue
+## statsparrot service token issue
 
 Issue service token
 
 ```
-rill service token issue [<service>] [flags]
+statsparrot service token issue [<service>] [flags]
 ```
 
 ### Flags
@@ -28,5 +28,5 @@ rill service token issue [<service>] [flags]
 
 ### SEE ALSO
 
-* [rill service token](token.md)	 - Manage service tokens
+* [statsparrot service token](token.md)	 - Manage service tokens
 

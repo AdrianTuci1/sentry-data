@@ -9,7 +9,7 @@ const alias: Alias[] = [
     replacement: "/src",
   },
   {
-    find: "@rilldata/web-common",
+    find: "@statsparrot/web-common",
     replacement: "/../web-common/src",
   },
 ];
@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => {
     // canvas-entity dynamically imports the admin client only in the cloud context; stub
     // it so web-common unit tests that pull in canvas-entity can resolve the import graph.
     alias.push({
-      find: "@rilldata/web-admin/client",
+      find: "@statsparrot/web-admin/client",
       replacement: "/../web-common/tests/web-admin-client.mock.ts",
     });
   }

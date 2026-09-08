@@ -1,12 +1,12 @@
 <script lang="ts">
   /** provides the formatting for data types */
-  import type { PERC_DIFF } from "@rilldata/web-common/components/data-types/type-utils";
+  import type { PERC_DIFF } from "@statsparrot/web-common/components/data-types/type-utils";
   import {
     INTERVALS,
     NUMERICS,
     TIMESTAMPS,
-  } from "@rilldata/web-common/lib/duckdb-data-types";
-  import type { NumberParts } from "@rilldata/web-common/lib/number-formatting/humanizer-types";
+  } from "@statsparrot/web-common/lib/duckdb-data-types";
+  import type { NumberParts } from "@statsparrot/web-common/lib/number-formatting/humanizer-types";
   import Interval from "./Interval.svelte";
   import MeasureChange from "./MeasureChange.svelte";
   import Number from "./Number.svelte";

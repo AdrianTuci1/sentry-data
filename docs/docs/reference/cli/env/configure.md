@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill env configure
+title: statsparrot env configure
 ---
-## rill env configure
+## statsparrot env configure
 
 Configures connector variables for all sources
 
 ```
-rill env configure [<project-name>] [flags]
+statsparrot env configure [<project-name>] [flags]
 ```
 
 ### Flags
@@ -30,5 +30,5 @@ rill env configure [<project-name>] [flags]
 
 ### SEE ALSO
 
-* [rill env](env.md)	 - Manage variables for a project
+* [statsparrot env](env.md)	 - Manage variables for a project
 

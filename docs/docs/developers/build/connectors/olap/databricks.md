@@ -1,18 +1,18 @@
 ---
 title: Databricks
-description: Power Rill dashboards using Databricks
+description: Power Parrot dashboards using Databricks
 sidebar_label: Databricks
 sidebar_position: 02
 ---
 
-[Databricks](https://docs.databricks.com) is a unified data and AI platform built on top of Apache Spark and the lakehouse architecture, with Unity Catalog for governance and Databricks SQL for analytics. Rill supports connecting to Databricks as a live connector, allowing you to build metrics views and dashboards directly on top of existing Databricks tables — no data movement required.
+[Databricks](https://docs.databricks.com) is a unified data and AI platform built on top of Apache Spark and the lakehouse architecture, with Unity Catalog for governance and Databricks SQL for analytics. Parrot supports connecting to Databricks as a live connector, allowing you to build metrics views and dashboards directly on top of existing Databricks tables — no data movement required.
 
 :::tip Databricks as a Live Connector vs. Data Source Connector
-Rill supports Databricks in two distinct modes:
+Parrot supports Databricks in two distinct modes:
 
-- **OLAP (Live Connector)** — Rill queries Databricks directly at dashboard load time. No data is ingested into Rill. Use this when your data is already modeled and optimized in Databricks and you want Rill as a visual layer on top. Set `olap_connector: databricks` in `rill.yaml`.
+- **OLAP (Live Connector)** — Parrot queries Databricks directly at dashboard load time. No data is ingested into Parrot. Use this when your data is already modeled and optimized in Databricks and you want Parrot as a visual layer on top. Set `olap_connector: databricks` in `statsparrot.yaml`.
 
-- **Data Source Connector** — Rill extracts data from Databricks and ingests it into its embedded engine (DuckDB). Use this when you want Rill to manage the data pipeline, apply transformations via SQL models, or combine Databricks data with other sources. See the [Databricks data source docs](/developers/build/connectors/data-source/databricks).
+- **Data Source Connector** — Parrot extracts data from Databricks and ingests it into its embedded engine (DuckDB). Use this when you want Parrot to manage the data pipeline, apply transformations via SQL models, or combine Databricks data with other sources. See the [Databricks data source docs](/developers/build/connectors/data-source/databricks).
 
 In general, use the live connector if your Databricks tables are already production-ready and large. Use data source ingestion if you need to transform, join, or enrich the data before building dashboards.
 :::
@@ -58,7 +58,7 @@ See the [Databricks SQL Go driver](https://github.com/databricks/databricks-sql-
 
 ## Build a Metrics View on Databricks
 
-Once connected, set Databricks as the OLAP connector in your `rill.yaml`:
+Once connected, set Databricks as the OLAP connector in your `statsparrot.yaml`:
 
 ```yaml
 olap_connector: databricks
@@ -86,7 +86,7 @@ measures:
 In Databricks terminology, `database` maps to the **catalog**, `database_schema` maps to the **schema**, and `model` maps to the **table**. Measure expressions must use [Databricks SQL](https://docs.databricks.com/aws/en/sql/language-manual/) syntax.
 
 :::note
-Rill supports metrics views directly on Databricks as a live connector. Incremental models and partitioned ingestion are not supported in live connector mode.
+Parrot supports metrics views directly on Databricks as a live connector. Incremental models and partitioned ingestion are not supported in live connector mode.
 :::
 
 To reduce SQL warehouse spend on dashboards with repeat traffic, see [Caching query results](/developers/build/metrics-view/underlying-model#caching-query-results) on live connectors.

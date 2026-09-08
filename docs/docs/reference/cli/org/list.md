@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill org list
+title: statsparrot org list
 ---
-## rill org list
+## statsparrot org list
 
 List all organizations
 
 ```
-rill org list [flags]
+statsparrot org list [flags]
 ```
 
 ### Flags
@@ -28,5 +28,5 @@ rill org list [flags]
 
 ### SEE ALSO
 
-* [rill org](org.md)	 - Manage organizations
+* [statsparrot org](org.md)	 - Manage organizations
 

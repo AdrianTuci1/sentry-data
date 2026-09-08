@@ -25,5 +25,5 @@ func main() {
 	encryptionKey := hex.EncodeToString(encryptionKeyBytes)
 
 	// Print
-	fmt.Printf("RILL_ADMIN_SESSION_KEY_PAIRS=%s,%s\n", authKey, encryptionKey)
+	fmt.Printf("STATSPARROT_ADMIN_SESSION_KEY_PAIRS=%s,%s\n", authKey, encryptionKey)
 }

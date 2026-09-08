@@ -1,6 +1,6 @@
 ---
-title: "1. Launch Rill Developer"
-sidebar_label: "1. Launch Rill Developer"
+title: "1. Launch Parrot Developer"
+sidebar_label: "1. Launch Parrot Developer"
 sidebar_position: 3
 hide_table_of_contents: false
 tags:
@@ -9,21 +9,21 @@ tags:
 ---
 
 :::note prerequisites
-You will need to [install Rill](https://docs.rilldata.com/developers/get-started/install).
+You will need to [install Parrot](https://docs.statsparrot.com/developers/get-started/install).
 
 ```bash
-curl https://rill.sh | sh
+curl https://statsparrot.sh | sh
 ```
 
-You need access to either a [locally running ClickHouse Server](https://clickhouse.com/docs/en/install) or [ClickHouse Cloud](https://docs.rilldata.com/developers/build/connectors/olap/clickhouse#connecting-to-clickhouse-cloud). We recommend using ClickHouse Cloud as this will make deploying to Rill Cloud easier. Please review the documentation, [here](https://docs.rilldata.com/developers/build/connectors/olap/clickhouse).
+You need access to either a [locally running ClickHouse Server](https://clickhouse.com/docs/en/install) or [ClickHouse Cloud](https://docs.statsparrot.com/developers/build/connectors/olap/clickhouse#connecting-to-clickhouse-cloud). We recommend using ClickHouse Cloud as this will make deploying to Parrot Cloud easier. Please review the documentation, [here](https://docs.statsparrot.com/developers/build/connectors/olap/clickhouse).
 :::
-## Start Rill Developer
+## Start Parrot Developer
 
 ```yaml
-rill start my-rill-clickhouse
+statsparrot start my-statsparrot-clickhouse
 ```
 
-After running the command, Rill Developer should automatically open in your default browser. If not, you can access it via the following url:
+After running the command, Parrot Developer should automatically open in your default browser. If not, you can access it via the following url:
 
 ```
 localhost:9009
@@ -31,7 +31,7 @@ localhost:9009
 
 You should see the following webpage appear. 
 
-![New Rill Project](/img/tutorials/rill-basics/new-rill-project.png)
+![New Parrot Project](/img/tutorials/statsparrot-basics/new-statsparrot-project.png)
 
 Let's go ahead and select `Start with an empty project`.
 

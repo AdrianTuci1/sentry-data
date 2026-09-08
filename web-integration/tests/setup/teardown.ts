@@ -1,5 +1,5 @@
-import { RILL_DEVTOOL_BACKGROUND_PROCESS_PID_FILE } from "@rilldata/web-integration/tests/constants";
-import { execAsync } from "@rilldata/web-common/tests/utils/spawn";
+import { RILL_DEVTOOL_BACKGROUND_PROCESS_PID_FILE } from "@statsparrot/web-integration/tests/constants";
+import { execAsync } from "@statsparrot/web-common/tests/utils/spawn";
 import fs from "fs";
 import { test as teardown } from "./base";
 

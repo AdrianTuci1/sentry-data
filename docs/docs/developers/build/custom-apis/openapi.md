@@ -5,7 +5,7 @@ sidebar_label: OpenAPI Documentation
 sidebar_position: 60
 ---
 
-Rill automatically generates an OpenAPI specification for your project that combines built-in APIs with your custom API definitions. You can add request and response schemas to your APIs for better documentation and typed client generation.
+Parrot automatically generates an OpenAPI specification for your project that combines built-in APIs with your custom API definitions. You can add request and response schemas to your APIs for better documentation and typed client generation.
 
 ## Adding an OpenAPI spec to your API
 
@@ -75,10 +75,10 @@ Schemas follow the [JSON Schema](https://json-schema.org/) format. You can use `
 curl http://localhost:9009/v1/instances/default/api/openapi -o openapi.json
 ```
 
-### From Rill Cloud
+### From Parrot Cloud
 
 ```bash
-curl "https://api.rilldata.com/v1/organizations/<org>/projects/<project>/runtime/api/openapi" \
+curl "https://api.statsparrot.com/v1/organizations/<org>/projects/<project>/runtime/api/openapi" \
   -H "Authorization: Bearer <token>" \
   -o openapi.json
 ```
@@ -86,12 +86,12 @@ curl "https://api.rilldata.com/v1/organizations/<org>/projects/<project>/runtime
 To download the spec for the deployment of a specific branch (e.g. a dev/preview deployment), insert `/branch/<branch-name>` before `/runtime`:
 
 ```bash
-curl "https://api.rilldata.com/v1/orgs/<org>/projects/<project>/branch/<branch-name>/runtime/api/openapi" \
+curl "https://api.statsparrot.com/v1/orgs/<org>/projects/<project>/branch/<branch-name>/runtime/api/openapi" \
   -H "Authorization: Bearer <token>" \
   -o openapi.json
 ```
 
-The generated spec includes all your custom APIs with their schemas, plus Rill's built-in API endpoints.
+The generated spec includes all your custom APIs with their schemas, plus Parrot's built-in API endpoints.
 
 ## Generating typed clients
 

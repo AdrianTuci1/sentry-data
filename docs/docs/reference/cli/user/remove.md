@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill user remove
+title: statsparrot user remove
 ---
-## rill user remove
+## statsparrot user remove
 
 Remove a user
 
 ```
-rill user remove [flags]
+statsparrot user remove [flags]
 ```
 
 ### Flags
@@ -30,5 +30,5 @@ rill user remove [flags]
 
 ### SEE ALSO
 
-* [rill user](user.md)	 - Manage users
+* [statsparrot user](user.md)	 - Manage users
 

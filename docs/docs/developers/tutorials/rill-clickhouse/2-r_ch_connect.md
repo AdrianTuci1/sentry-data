@@ -13,7 +13,7 @@ import TabItem from '@theme/TabItem';
 
 ## Default OLAP connection and Connect to ClickHouse
 
-Within Rill, you can set the default OLAP connection on the [project level](https://docs.rilldata.com/reference/project-files/rill-yaml) or the [dashboard level](https://docs.rilldata.com/reference/project-files/explore-dashboards).
+Within Parrot, you can set the default OLAP connection on the [project level](https://docs.statsparrot.com/reference/project-files/statsparrot-yaml) or the [dashboard level](https://docs.statsparrot.com/reference/project-files/explore-dashboards).
 For this course, we will set it up on the project level so all of our dashboards will be based on our ClickHouse table.
 
 :::tip
@@ -21,7 +21,7 @@ You have two options for your ClickHouse server:
 1. Use a [local running ClickHouse server](https://clickhouse.com/docs/en/install)
 2. Use [ClickHouse Cloud](https://clickhouse.com/docs/en/cloud/overview)
 
-Depending on what you choose, the contents of your connection will change, and we recommend looking through [our ClickHouse documentation](https://docs.rilldata.com/developers/build/connectors/olap/clickhouse) for further information.
+Depending on what you choose, the contents of your connection will change, and we recommend looking through [our ClickHouse documentation](https://docs.statsparrot.com/developers/build/connectors/olap/clickhouse) for further information.
 
 :::
 
@@ -38,12 +38,12 @@ You can obtain the credentials from your ClickHouse Cloud account by clicking th
 ```
 
 :::
-Once this is created, a `clickhouse.yaml` file will appear in the `connectors` directory and the following will be added to your rill.yaml.
+Once this is created, a `clickhouse.yaml` file will appear in the `connectors` directory and the following will be added to your statsparrot.yaml.
 
 ```yaml
 compiler: rillv1
 
-title: "Rill and ClickHouse Project"
+title: "Parrot and ClickHouse Project"
 olap_connector: clickhouse #automatically added
 ```
 
@@ -61,10 +61,10 @@ dsn: "clickhouse://localhost:9000"
  You can either add the credentials in plain text or dsn via the yaml file or add the credentials via the CLI.
 
 
-Please see our documentation to find the DSN for [your ClickHouse Cloud instance](https://docs.rilldata.com/developers/build/connectors/olap/clickhouse#connecting-to-clickhouse-cloud). 
+Please see our documentation to find the DSN for [your ClickHouse Cloud instance](https://docs.statsparrot.com/developers/build/connectors/olap/clickhouse#connecting-to-clickhouse-cloud). 
 
-### How to pass the credentials to Rill
-There are a few ways to define credentials within Rill.
+### How to pass the credentials to Parrot
+There are a few ways to define credentials within Parrot.
 
 <Tabs>
 <TabItem value="yaml" label="via yaml" default>
@@ -88,10 +88,10 @@ dsn: "clickhouse://localhost:9000"
 
 </TabItem>
 <TabItem value="variable" label="via variables">
-Navigate back to the Terminal and stop the Rill process. You can run the following to add a variable and use this is within Rill.
+Navigate back to the Terminal and stop the Parrot process. You can run the following to add a variable and use this is within Parrot.
 
 ```
-rill start --env host='localhost' --env  port='9000'
+statsparrot start --env host='localhost' --env  port='9000'
 ```
 
 Afterward, create a file called clickhouse.yaml and add the following contents:
@@ -110,7 +110,7 @@ port: "{{ .env.port }}"
 
 
   <TabItem value="env" label="via .env">
-There are a few ways to generate the .env file. Creating a source that requires credentials will automatically generate it. Otherwise, you can create it using `touch .env` in the Rill directory.
+There are a few ways to generate the .env file. Creating a source that requires credentials will automatically generate it. Otherwise, you can create it using `touch .env` in the Parrot directory.
 
 ```
 CLICKHOUSE_HOST="localhost"
@@ -129,7 +129,7 @@ CLICKHOUSE_DSN="..."
 
 :::tip Via the UI
 
-If you connect to ClickHouse via the UI, this will automatically create a template with connectors/clickhouse.yaml as well as a reference of your DSN to the .env folder. This will automatically get pushed along with your project to Rill Cloud. 
+If you connect to ClickHouse via the UI, this will automatically create a template with connectors/clickhouse.yaml as well as a reference of your DSN to the .env folder. This will automatically get pushed along with your project to Parrot Cloud. 
 
 :::
 

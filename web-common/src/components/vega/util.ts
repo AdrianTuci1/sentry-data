@@ -1,4 +1,4 @@
-import { V1TimeGrain } from "@rilldata/web-common/runtime-client";
+import { V1TimeGrain } from "@statsparrot/web-common/runtime-client";
 import type { TimeUnit } from "vega-lite/types_unstable/timeunit.js";
 
 export const timeGrainToVegaTimeUnitMap: Record<V1TimeGrain, TimeUnit> = {

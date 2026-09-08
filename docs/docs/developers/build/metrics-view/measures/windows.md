@@ -40,4 +40,4 @@ Another example is using a rolling sum with no bounding preceding rows, also kno
       frame: RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
 ```
 ## Demo
-[See this project live in our demo!](https://ui.rilldata.com/demo/rill-kaggle-elec-consumption/explore/household_power_consumption_metrics_explore)
+[See this project live in our demo!](https://ui.statsparrot.com/demo/statsparrot-kaggle-elec-consumption/explore/household_power_consumption_metrics_explore)

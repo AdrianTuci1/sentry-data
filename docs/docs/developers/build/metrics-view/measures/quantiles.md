@@ -37,4 +37,4 @@ In this example we see the values of P95 and P99 are calculated using the follow
 ```
 
 ## Demo
-[See this project live in our demo!](https://ui.rilldata.com/demo/rill-kaggle-elec-consumption/explore/household_power_consumption_metrics_explore)
+[See this project live in our demo!](https://ui.statsparrot.com/demo/statsparrot-kaggle-elec-consumption/explore/household_power_consumption_metrics_explore)

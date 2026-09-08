@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill usergroup create
+title: statsparrot usergroup create
 ---
-## rill usergroup create
+## statsparrot usergroup create
 
 Create a group
 
 ```
-rill usergroup create [<name>] [flags]
+statsparrot usergroup create [<name>] [flags]
 ```
 
 ### Flags
@@ -27,5 +27,5 @@ rill usergroup create [<name>] [flags]
 
 ### SEE ALSO
 
-* [rill usergroup](usergroup.md)	 - Manage user groups
+* [statsparrot usergroup](usergroup.md)	 - Manage user groups
 

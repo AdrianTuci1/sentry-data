@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill user whitelist setup
+title: statsparrot user whitelist setup
 ---
-## rill user whitelist setup
+## statsparrot user whitelist setup
 
 Whitelist an email domain for the org or project
 
 ```
-rill user whitelist setup <email-domain> [flags]
+statsparrot user whitelist setup <email-domain> [flags]
 ```
 
 ### Flags
@@ -29,5 +29,5 @@ rill user whitelist setup <email-domain> [flags]
 
 ### SEE ALSO
 
-* [rill user whitelist](whitelist.md)	 - Whitelist access by email domain
+* [statsparrot user whitelist](whitelist.md)	 - Whitelist access by email domain
 

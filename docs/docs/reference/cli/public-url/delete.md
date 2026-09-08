@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill public-url delete
+title: statsparrot public-url delete
 ---
-## rill public-url delete
+## statsparrot public-url delete
 
 Delete a public URL
 
 ```
-rill public-url delete <id> [flags]
+statsparrot public-url delete <id> [flags]
 ```
 
 ### Global flags
@@ -22,5 +22,5 @@ rill public-url delete <id> [flags]
 
 ### SEE ALSO
 
-* [rill public-url](public-url.md)	 - Manage public URLs
+* [statsparrot public-url](public-url.md)	 - Manage public URLs
 

@@ -7,15 +7,15 @@ sidebar_position: 0
 
 # AI Features
 
-Rill includes AI capabilities across both development and data exploration.
+Parrot includes AI capabilities across both development and data exploration.
 
 ## Build Projects with AI
 
-Rill projects are defined as YAML and SQL files, which makes them a natural fit for AI coding agents. Run `rill init` to generate **[agent skills](/developers/agent-skills)** for Claude Code, Cursor, or other tools, then use your AI agent to build connectors, models, metrics views, and dashboards. See the **[Agentic Quickstart](/developers/get-started/ai-quickstart)** to get started.
+Parrot projects are defined as YAML and SQL files, which makes them a natural fit for AI coding agents. Run `statsparrot init` to generate **[agent skills](/developers/agent-skills)** for Claude Code, Cursor, or other tools, then use your AI agent to build connectors, models, metrics views, and dashboards. See the **[Agentic Quickstart](/developers/get-started/ai-quickstart)** to get started.
 
 ## AI Chat
 
-**[AI Chat](/guide/ai/ai-chat)** is built directly into Rill Cloud, allowing you to:
+**[AI Chat](/guide/ai/ai-chat)** is built directly into Parrot Cloud, allowing you to:
 - Ask questions about your data in natural language
 - Get instant insights without writing SQL queries
 - Explore metrics and dimensions conversationally
@@ -23,10 +23,10 @@ Rill projects are defined as YAML and SQL files, which makes them a natural fit 
 
 AI Chat understands your project's metrics views, measures, and dimensions, providing context-aware answers based on your data structure.
 
-## Rill MCP Server
+## Parrot MCP Server
 
-The **[Rill MCP Server](/guide/ai/mcp)** connects your Rill projects to external AI assistants like Claude Desktop using the Model Context Protocol. This enables you to:
-- Query your Rill data from Claude Desktop or other MCP-compatible tools
+The **[Parrot MCP Server](/guide/ai/mcp)** connects your Parrot projects to external AI assistants like Claude Desktop using the Model Context Protocol. This enables you to:
+- Query your Parrot data from Claude Desktop or other MCP-compatible tools
 - Get governed, accurate analytics through AI assistants
 - Maintain security and access controls while using external AI tools
 - Leverage advanced AI capabilities for data analysis

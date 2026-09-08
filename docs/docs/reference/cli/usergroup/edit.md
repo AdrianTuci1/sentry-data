@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill usergroup edit
+title: statsparrot usergroup edit
 ---
-## rill usergroup edit
+## statsparrot usergroup edit
 
 Edit a group
 
 ```
-rill usergroup edit <name> [flags]
+statsparrot usergroup edit <name> [flags]
 ```
 
 ### Flags
@@ -29,5 +29,5 @@ rill usergroup edit <name> [flags]
 
 ### SEE ALSO
 
-* [rill usergroup](usergroup.md)	 - Manage user groups
+* [statsparrot usergroup](usergroup.md)	 - Manage user groups
 

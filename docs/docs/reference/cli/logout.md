@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill logout
+title: statsparrot logout
 ---
-## rill logout
+## statsparrot logout
 
-Logout of the Rill API
+Logout of the Parrot API
 
 ```
-rill logout [flags]
+statsparrot logout [flags]
 ```
 
 ### Global flags
@@ -21,5 +21,5 @@ rill logout [flags]
 
 ### SEE ALSO
 
-* [rill](cli.md)	 - A CLI for Rill
+* [statsparrot](cli.md)	 - A CLI for Parrot
 

@@ -17,20 +17,20 @@ jobs:
       - name: Authenticate GCloud
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: "${{ secrets.RILL_BINARY_SA }}"
+          credentials_json: "${{ secrets.STATSPARROT_BINARY_SA }}"
 
       - name: Set up GCloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Build & Publish Rill docker image
+      - name: Build & Publish Parrot docker image
         run: |-
           cd scripts
 
           gcloud auth configure-docker
 
-          docker build -f druid-micro.dockerfile --build-arg DRUID_VERSION=${{ env.DRUID_VERSION }} -t gcr.io/rilldata/druid-micro:${{ env.DRUID_VERSION }} .
-          docker tag gcr.io/rilldata/druid-micro:${{ env.DRUID_VERSION }} gcr.io/rilldata/druid-micro
-          docker push gcr.io/rilldata/druid-micro:${{ env.DRUID_VERSION }}
-          docker push gcr.io/rilldata/druid-micro
+          docker build -f druid-micro.dockerfile --build-arg DRUID_VERSION=${{ env.DRUID_VERSION }} -t gcr.io/staticlabs/druid-micro:${{ env.DRUID_VERSION }} .
+          docker tag gcr.io/staticlabs/druid-micro:${{ env.DRUID_VERSION }} gcr.io/staticlabs/druid-micro
+          docker push gcr.io/staticlabs/druid-micro:${{ env.DRUID_VERSION }}
+          docker push gcr.io/staticlabs/druid-micro
         env:
           DRUID_VERSION: 25.0.0

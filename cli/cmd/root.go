@@ -7,34 +7,35 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rilldata/rill/cli/cmd/admin"
-	"github.com/rilldata/rill/cli/cmd/auth"
-	"github.com/rilldata/rill/cli/cmd/billing"
-	"github.com/rilldata/rill/cli/cmd/chat"
-	"github.com/rilldata/rill/cli/cmd/deploy"
-	"github.com/rilldata/rill/cli/cmd/devtool"
-	"github.com/rilldata/rill/cli/cmd/docs"
-	"github.com/rilldata/rill/cli/cmd/env"
-	"github.com/rilldata/rill/cli/cmd/initialize"
-	"github.com/rilldata/rill/cli/cmd/org"
-	"github.com/rilldata/rill/cli/cmd/project"
-	"github.com/rilldata/rill/cli/cmd/publicurl"
-	"github.com/rilldata/rill/cli/cmd/query"
-	"github.com/rilldata/rill/cli/cmd/runtime"
-	"github.com/rilldata/rill/cli/cmd/service"
-	"github.com/rilldata/rill/cli/cmd/start"
-	"github.com/rilldata/rill/cli/cmd/sudo"
-	sudouser "github.com/rilldata/rill/cli/cmd/sudo/user"
-	"github.com/rilldata/rill/cli/cmd/token"
-	"github.com/rilldata/rill/cli/cmd/uninstall"
-	"github.com/rilldata/rill/cli/cmd/upgrade"
-	"github.com/rilldata/rill/cli/cmd/user"
-	"github.com/rilldata/rill/cli/cmd/usergroup"
-	"github.com/rilldata/rill/cli/cmd/validate"
-	versioncmd "github.com/rilldata/rill/cli/cmd/version"
-	"github.com/rilldata/rill/cli/cmd/whoami"
-	"github.com/rilldata/rill/cli/pkg/cmdutil"
-	"github.com/rilldata/rill/cli/pkg/version"
+	"github.com/staticlabs/statsparrot/cli/cmd/admin"
+	"github.com/staticlabs/statsparrot/cli/cmd/auth"
+	"github.com/staticlabs/statsparrot/cli/cmd/billing"
+	"github.com/staticlabs/statsparrot/cli/cmd/chat"
+	"github.com/staticlabs/statsparrot/cli/cmd/deploy"
+	"github.com/staticlabs/statsparrot/cli/cmd/devtool"
+	"github.com/staticlabs/statsparrot/cli/cmd/docs"
+	"github.com/staticlabs/statsparrot/cli/cmd/env"
+	"github.com/staticlabs/statsparrot/cli/cmd/initialize"
+	"github.com/staticlabs/statsparrot/cli/cmd/org"
+	"github.com/staticlabs/statsparrot/cli/cmd/project"
+	"github.com/staticlabs/statsparrot/cli/cmd/publicurl"
+	"github.com/staticlabs/statsparrot/cli/cmd/query"
+	"github.com/staticlabs/statsparrot/cli/cmd/runtime"
+	"github.com/staticlabs/statsparrot/cli/cmd/service"
+	"github.com/staticlabs/statsparrot/cli/cmd/sp"
+	"github.com/staticlabs/statsparrot/cli/cmd/start"
+	"github.com/staticlabs/statsparrot/cli/cmd/sudo"
+	sudouser "github.com/staticlabs/statsparrot/cli/cmd/sudo/user"
+	"github.com/staticlabs/statsparrot/cli/cmd/token"
+	"github.com/staticlabs/statsparrot/cli/cmd/uninstall"
+	"github.com/staticlabs/statsparrot/cli/cmd/upgrade"
+	"github.com/staticlabs/statsparrot/cli/cmd/user"
+	"github.com/staticlabs/statsparrot/cli/cmd/usergroup"
+	"github.com/staticlabs/statsparrot/cli/cmd/validate"
+	versioncmd "github.com/staticlabs/statsparrot/cli/cmd/version"
+	"github.com/staticlabs/statsparrot/cli/cmd/whoami"
+	"github.com/staticlabs/statsparrot/cli/pkg/cmdutil"
+	"github.com/staticlabs/statsparrot/cli/pkg/version"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc/status"
 )
@@ -42,10 +43,10 @@ import (
 // Instructions for agents that we add to the root help command in non-interactive environments.
 const agentInstructions = `
 For Agents:
-If you are administrating a Rill Cloud project, the CLI help menus speak for themselves (e.g. "rill project -h" or "rill user -h").
-But if you are developing a Rill project, it is imperative that you initialize and load the Rill agent instructions in the project directory.
-If you are creating a new project, use "rill init <path>" to set up a project with instructions.
-If you are working with an existing project, use "rill init <path> --agent claude" to add agent instructions to the project if it doesn't already have them.
+If you are administrating a Parrot Cloud project, the CLI help menus speak for themselves (e.g. "statsparrot project -h" or "statsparrot user -h").
+But if you are developing a Parrot project, it is imperative that you initialize and load the Parrot agent instructions in the project directory.
+If you are creating a new project, use "statsparrot init <path>" to set up a project with instructions.
+If you are working with an existing project, use "statsparrot init <path> --agent claude" to add agent instructions to the project if it doesn't already have them.
 Make sure you load the instruction files after they are initialized. If necessary, cd into the project directory to discover them.
 `
 
@@ -63,12 +64,15 @@ func Run(ctx context.Context, ver version.Version) {
 		os.Exit(1)
 	}
 
-	// Crude check to detect if we may be running as Rill Cloud, namely if the command is `rill admin ...` or `rill runtime ...`.
-	isCloud := len(os.Args) >= 2 && (os.Args[1] == "admin" || os.Args[1] == "runtime")
+	// Crude check to detect if we may be running as a long-lived service rather
+	// than an interactive CLI. This covers Parrot Cloud (`admin`, `runtime`) and
+	// the self-hosted Statsparrot group (`sp`). A service must never attempt a
+	// network version check on boot, particularly in an offline container.
+	isService := len(os.Args) >= 2 && (os.Args[1] == "admin" || os.Args[1] == "runtime" || os.Args[1] == "sp")
 
-	// Check version (if not running as a cloud service).
+	// Check version (if not running as a service).
 	// NOTE: Not using PersistentPreRunE due to this issue: https://github.com/spf13/cobra/issues/216.
-	if !isCloud {
+	if !isService {
 		err = ch.CheckVersion(ctx)
 		if err != nil {
 			ch.PrintfWarn("Warning: version check failed: %v\n\n", err)
@@ -76,12 +80,12 @@ func Run(ctx context.Context, ver version.Version) {
 	}
 
 	// Print warning if currently acting as an assumed user
-	representingUser, err := ch.DotRill.GetRepresentingUser()
+	representingUser, err := ch.DotStatsparrot.GetRepresentingUser()
 	if err != nil {
 		ch.PrintfWarn("Could not parse representing user email: %v\n\n", err)
 	}
 	if representingUser != "" {
-		expiryTime, err := ch.DotRill.GetRepresentingUserAccessTokenExpiry()
+		expiryTime, err := ch.DotStatsparrot.GetRepresentingUserAccessTokenExpiry()
 		if err != nil {
 			ch.PrintfWarn("Could not parse token expiry %v\n\n", err)
 		} else if time.Now().After(expiryTime) {
@@ -105,7 +109,7 @@ func Run(ctx context.Context, ver version.Version) {
 // RootCmd creates the root command and adds all subcommands.
 func RootCmd(ch *cmdutil.Helper) *cobra.Command {
 	// Build long description with agent instructions if in non-interactive mode
-	long := "Work with Rill projects from the command line."
+	long := "Work with Parrot projects from the command line."
 	if !ch.Interactive {
 		long += "\n\n"
 		long += strings.TrimSpace(agentInstructions)
@@ -113,8 +117,8 @@ func RootCmd(ch *cmdutil.Helper) *cobra.Command {
 
 	// Root command
 	rootCmd := &cobra.Command{
-		Use:   "rill <command> [flags]",
-		Short: "A CLI for Rill",
+		Use:   "statsparrot <command> [flags]",
+		Short: "A CLI for Parrot",
 		Long:  long,
 	}
 	rootCmd.Version = ch.Version.String()
@@ -132,49 +136,64 @@ func RootCmd(ch *cmdutil.Helper) *cobra.Command {
 		}
 	}
 	rootCmd.PersistentFlags().StringVar(&ch.AdminTokenOverride, "api-token", "", "Token for authenticating with the cloud API")
-	rootCmd.Flags().BoolP("version", "v", false, "Show rill version") // Adds option to get version by passing --version or -v
+	rootCmd.Flags().BoolP("version", "v", false, "Show statsparrot version") // Adds option to get version by passing --version or -v
 
 	// Command Groups
 
-	// Project commands
-	cmdutil.AddGroup(rootCmd, "Project", false,
-		start.StartCmd(ch),
-		validate.ValidateCmd(ch),
-		initialize.InitCmd(ch),
-		deploy.DeployCmd(ch),
-		project.ProjectCmd(ch),
-		chat.ChatCmd(ch),
-		query.QueryCmd(ch),
-		publicurl.PublicURLCmd(ch),
-		env.EnvCmd(ch),
-	)
+	if isSelfHosted() {
+		// In the self-hosted server image (see self-hosted/Dockerfile and
+		// self-hosted/entrypoint.sh) the CLI exposes a curated surface: only the
+		// `sp` group is reachable, so cloud-only commands (admin, runtime,
+		// deploy, org, token, publicurl, etc.) are not exposed.
+		cmdutil.AddGroup(rootCmd, "Statsparrot", false,
+			sp.SpCmd(ch),
+		)
+	} else {
+		// Project commands
+		cmdutil.AddGroup(rootCmd, "Project", false,
+			start.StartCmd(ch),
+			validate.ValidateCmd(ch),
+			initialize.InitCmd(ch),
+			deploy.DeployCmd(ch),
+			project.ProjectCmd(ch),
+			chat.ChatCmd(ch),
+			query.QueryCmd(ch),
+			publicurl.PublicURLCmd(ch),
+			env.EnvCmd(ch),
+		)
 
-	// Organization commands
-	cmdutil.AddGroup(rootCmd, "Organization", false,
-		org.OrgCmd(ch),
-		user.UserCmd(ch),
-		usergroup.UsergroupCmd(ch),
-		service.ServiceCmd(ch),
-		billing.BillingCmd(ch),
-	)
+		// Organization commands
+		cmdutil.AddGroup(rootCmd, "Organization", false,
+			org.OrgCmd(ch),
+			user.UserCmd(ch),
+			usergroup.UsergroupCmd(ch),
+			service.ServiceCmd(ch),
+			billing.BillingCmd(ch),
+		)
 
-	// Auth commands
-	cmdutil.AddGroup(rootCmd, "Auth", false,
-		auth.LoginCmd(ch),
-		auth.LogoutCmd(ch),
-		whoami.WhoamiCmd(ch),
-		token.TokenCmd(ch),
-	)
+		// Auth commands
+		cmdutil.AddGroup(rootCmd, "Auth", false,
+			auth.LoginCmd(ch),
+			auth.LogoutCmd(ch),
+			whoami.WhoamiCmd(ch),
+			token.TokenCmd(ch),
+		)
 
-	// Internal commands
-	cmdutil.AddGroup(rootCmd, "Internal", !ch.IsDev(),
-		// These commands are hidden from the help menu
-		sudo.SudoCmd(ch),
-		devtool.DevtoolCmd(ch),
-		verifyInstallCmd(ch),
-		admin.AdminCmd(ch),
-		runtime.RuntimeCmd(ch),
-	)
+		// Statsparrot self-hosted commands
+		cmdutil.AddGroup(rootCmd, "Statsparrot", false,
+			sp.SpCmd(ch),
+		)
+
+		// Internal commands
+		cmdutil.AddGroup(rootCmd, "Internal", !ch.IsDev(),
+			// These commands are hidden from the help menu
+			sudo.SudoCmd(ch),
+			devtool.DevtoolCmd(ch),
+			verifyInstallCmd(ch),
+			admin.AdminCmd(ch),
+			runtime.RuntimeCmd(ch),
+		)
+	}
 
 	// Additional sub-commands
 	rootCmd.AddCommand(
@@ -188,6 +207,14 @@ func RootCmd(ch *cmdutil.Helper) *cobra.Command {
 	return rootCmd
 }
 
+// isSelfHosted reports whether the CLI is running as the self-hosted Statsparrot
+// server (see self-hosted/Dockerfile and self-hosted/entrypoint.sh). When set,
+// only the `sp` command group is reachable so the self-hosted surface stays
+// curated and cloud-only commands are not exposed.
+func isSelfHosted() bool {
+	return os.Getenv("STATSPARROT_SELF_HOSTED") == "1"
+}
+
 // HandleExecuteError handles an error returned by RootCmd, returning the desired exit code.
 // It contains user-friendly handling for common errors.
 // NOTE (2025-03-27): This is a workaround for Cobra not supporting custom logic for printing the error from RunE.
@@ -198,13 +225,13 @@ func HandleExecuteError(ch *cmdutil.Helper, err error) int {
 
 	errMsg := err.Error()
 	if strings.Contains(errMsg, "org not found") {
-		ch.Println("Org not found. Run `rill org list` to see the orgs. Run `rill org switch` to default org.")
+		ch.Println("Org not found. Run `statsparrot org list` to see the orgs. Run `statsparrot org switch` to default org.")
 	} else if strings.Contains(errMsg, "project not found") {
-		ch.Println("Project not found. Run `rill project list` to check the list of projects.")
+		ch.Println("Project not found. Run `statsparrot project list` to check the list of projects.")
 	} else if strings.Contains(errMsg, "auth token not found") {
-		ch.Println("Auth token is invalid/expired. Login again with `rill login`.")
+		ch.Println("Auth token is invalid/expired. Login again with `statsparrot login`.")
 	} else if strings.Contains(errMsg, "not authenticated as a user") {
-		ch.Println("Please log in or sign up for Rill with `rill login`.")
+		ch.Println("Please log in or sign up for Parrot with `statsparrot login`.")
 	} else {
 		if s, ok := status.FromError(err); ok {
 			// rpc error

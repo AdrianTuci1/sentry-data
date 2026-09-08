@@ -10,7 +10,7 @@ alwaysApply: false
 
 ### Web Applications
 
-- **web-local**: Local Rill application (data modeler)
+- **web-local**: Local Parrot application (data modeler)
 - **web-admin**: Admin control plane frontend
 - **web-common**: Shared components and utilities
 

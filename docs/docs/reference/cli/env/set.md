@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill env set
+title: statsparrot env set
 ---
-## rill env set
+## statsparrot env set
 
 Set variable
 
 ```
-rill env set [<project>] <key> <value> [flags]
+statsparrot env set [<project>] <key> <value> [flags]
 ```
 
 ### Flags
@@ -30,5 +30,5 @@ rill env set [<project>] <key> <value> [flags]
 
 ### SEE ALSO
 
-* [rill env](env.md)	 - Manage variables for a project
+* [statsparrot env](env.md)	 - Manage variables for a project
 

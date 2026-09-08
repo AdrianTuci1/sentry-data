@@ -1,20 +1,20 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill project status
+title: statsparrot project status
 ---
-## rill project status
+## statsparrot project status
 
 Project deployment status
 
 ```
-rill project status [<project-name>] [flags]
+statsparrot project status [<project-name>] [flags]
 ```
 
 ### Flags
 
 ```
       --branch string    Target deployment by Git branch (default: primary deployment)
-      --local            Target locally running Rill
+      --local            Target locally running Parrot
       --path string      Project directory (default ".")
       --project string   Project Name
 ```
@@ -31,5 +31,5 @@ rill project status [<project-name>] [flags]
 
 ### SEE ALSO
 
-* [rill project](project.md)	 - Manage projects
+* [statsparrot project](project.md)	 - Manage projects
 

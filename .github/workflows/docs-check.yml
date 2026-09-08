@@ -48,13 +48,13 @@ jobs:
           npm ci -w docs
           npm run build -w docs
 
-      - name: Deploy Docs to Netlify docs.rilldata.com
+      - name: Deploy Docs to Netlify docs.statsparrot.com
         uses: nwtgck/actions-netlify@v3.0
         if: github.event_name != 'pull_request'
         with:
           publish-dir: ./docs/dist
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          deploy-message: "Docs ${{ github.ref_name }} deployed to docs.rilldata.com"
+          deploy-message: "Docs ${{ github.ref_name }} deployed to docs.statsparrot.com"
           production-deploy: true
           enable-pull-request-comment: false
           enable-commit-comment: true
@@ -66,9 +66,9 @@ jobs:
         id: algolia_crawler
         if: github.event_name != 'pull_request'
         with:
-          crawler-name: rilldata
+          crawler-name: staticlabs
           crawler-user-id: ${{ secrets.CRAWLER_USER_ID }}
           crawler-api-key: ${{ secrets.CRAWLER_API_KEY }}
           algolia-app-id: ${{ secrets.ALGOLIA_APP_ID }}
           algolia-api-key: ${{ secrets.ALGOLIA_API_KEY }}
-          site-url: 'https://docs.rilldata.com'
+          site-url: 'https://docs.statsparrot.com'

@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill service delete
+title: statsparrot service delete
 ---
-## rill service delete
+## statsparrot service delete
 
 Delete service
 
 ```
-rill service delete <service-name> [flags]
+statsparrot service delete <service-name> [flags]
 ```
 
 ### Global flags
@@ -22,5 +22,5 @@ rill service delete <service-name> [flags]
 
 ### SEE ALSO
 
-* [rill service](service.md)	 - Manage service accounts
+* [statsparrot service](service.md)	 - Manage service accounts
 

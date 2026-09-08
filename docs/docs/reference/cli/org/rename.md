@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill org rename
+title: statsparrot org rename
 ---
-## rill org rename
+## statsparrot org rename
 
 Rename organization
 
 ```
-rill org rename [flags]
+statsparrot org rename [flags]
 ```
 
 ### Flags
@@ -29,5 +29,5 @@ rill org rename [flags]
 
 ### SEE ALSO
 
-* [rill org](org.md)	 - Manage organizations
+* [statsparrot org](org.md)	 - Manage organizations
 

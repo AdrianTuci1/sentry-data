@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill usergroup delete
+title: statsparrot usergroup delete
 ---
-## rill usergroup delete
+## statsparrot usergroup delete
 
 Delete a group
 
 ```
-rill usergroup delete <name> [flags]
+statsparrot usergroup delete <name> [flags]
 ```
 
 ### Flags
@@ -27,5 +27,5 @@ rill usergroup delete <name> [flags]
 
 ### SEE ALSO
 
-* [rill usergroup](usergroup.md)	 - Manage user groups
+* [statsparrot usergroup](usergroup.md)	 - Manage user groups
 

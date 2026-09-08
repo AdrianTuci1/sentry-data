@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill uninstall
+title: statsparrot uninstall
 ---
-## rill uninstall
+## statsparrot uninstall
 
-Uninstall the Rill binary
+Uninstall the Parrot binary
 
 ```
-rill uninstall [flags]
+statsparrot uninstall [flags]
 ```
 
 ### Global flags
@@ -21,5 +21,5 @@ rill uninstall [flags]
 
 ### SEE ALSO
 
-* [rill](cli.md)	 - A CLI for Rill
+* [statsparrot](cli.md)	 - A CLI for Parrot
 

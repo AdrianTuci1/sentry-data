@@ -1,5 +1,5 @@
 {
-  "name": "Rill Developer",
+  "name": "Parrot Developer",
   "image": "mcr.microsoft.com/devcontainers/go:latest",
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
@@ -17,10 +17,10 @@
   "forwardPorts": [9009, 3001],
   "portsAttributes": {
     "9009": {
-      "label": "Rill Runtime"
+      "label": "Parrot Runtime"
     },
     "3001": {
-      "label": "Rill Frontend Dev",
+      "label": "Parrot Frontend Dev",
       "onAutoForward": "openBrowser"
     }
   }

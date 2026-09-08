@@ -12,7 +12,7 @@ import (
 	_ "github.com/duckdb/duckdb-go/v2"
 )
 
-// DuckDB extensions Rill depends on
+// DuckDB extensions Parrot depends on
 var extensions = []string{"json", "icu", "parquet", "httpfs", "sqlite_scanner", "spatial", "motherduck"}
 
 // DuckDB platforms to download extensions for

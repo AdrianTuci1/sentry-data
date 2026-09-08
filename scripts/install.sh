@@ -61,20 +61,20 @@ sha256Verify() {
 
 # Download the binary and check the integrity using the SHA256 checksum
 downloadBinary() {
-    CDN="cdn.rilldata.com"
+    CDN="cdn.statsparrot.com"
 
-    LATEST_URL="https://${CDN}/rill/latest.txt"
+    LATEST_URL="https://${CDN}/statsparrot/latest.txt"
     if [ "${VERSION}" = "latest" ]; then
         VERSION=$(curl --silent --show-error "${LATEST_URL}")
     fi
-    BINARY_URL="https://${CDN}/rill/${VERSION}/rill_${PLATFORM}.zip"
-    CHECKSUM_URL="https://${CDN}/rill/${VERSION}/checksums.txt"
+    BINARY_URL="https://${CDN}/statsparrot/${VERSION}/statsparrot_${PLATFORM}.zip"
+    CHECKSUM_URL="https://${CDN}/statsparrot/${VERSION}/checksums.txt"
 
     printf "Downloading binary: %s\n" "$BINARY_URL"
     if [ "$NON_INTERACTIVE" = "true" ]; then
-        curl --location --silent --show-error "${BINARY_URL}" --output "rill_${PLATFORM}.zip"
+        curl --location --silent --show-error "${BINARY_URL}" --output "statsparrot_${PLATFORM}.zip"
     else
-        curl --location --progress-bar "${BINARY_URL}" --output "rill_${PLATFORM}.zip"
+        curl --location --progress-bar "${BINARY_URL}" --output "statsparrot_${PLATFORM}.zip"
     fi
 
     printf "\nDownloading checksum: %s\n" "$CHECKSUM_URL"
@@ -87,16 +87,16 @@ downloadBinary() {
     printf "\nVerifying the SHA256 checksum of the downloaded binary:\n"
     sha256Verify checksums.txt
 
-    printf "\nUnpacking rill_%s.zip\n" "$PLATFORM"
-    unzip -q "rill_${PLATFORM}.zip"
+    printf "\nUnpacking statsparrot_%s.zip\n" "$PLATFORM"
+    unzip -q "statsparrot_${PLATFORM}.zip"
 }
 
 # Print install options
 printInstallOptions() {
-    printf "\nWhere would you like to install rill?  (Default [1])\n\n"
-    printf "[1]  /usr/local/bin/rill  [recommended, but requires sudo privileges]\n"
-    printf "[2]  ~/.rill/rill         [directory will be created & path configured]\n"
-    printf "[3]  ./rill               [download to the current directory]\n\n"
+    printf "\nWhere would you like to install statsparrot?  (Default [1])\n\n"
+    printf "[1]  /usr/local/bin/statsparrot  [recommended, but requires sudo privileges]\n"
+    printf "[2]  ~/.statsparrot/statsparrot  [directory will be created & path configured]\n"
+    printf "[3]  ./statsparrot               [download to the current directory]\n\n"
 }
 
 # Ask for preferred install option
@@ -108,7 +108,7 @@ promptInstallChoice() {
             INSTALL_DIR="/usr/local/bin"
             ;;
         2)
-            INSTALL_DIR="$HOME/.rill"
+            INSTALL_DIR="$HOME/.statsparrot"
             ;;
         3)
             INSTALL_DIR=$(pwd)
@@ -122,16 +122,16 @@ promptInstallChoice() {
 
 # Check conflicting installation and exit with a help message
 checkConflictingInstallation() {
-    if [ -x "$(command -v rill)" ]; then
-        INSTALLED_RILL="$(command -v rill)"
-        if [ -x "$(command -v brew)" ] && brew list rilldata/tap/rill >/dev/null 2>&1; then
-            printf "There is a conflicting version of Rill installed using Brew.\n\n"
-            printf "To upgrade using Brew, run 'brew upgrade rilldata/tap/rill'.\n\n"
-            printf "To use this script to install Rill, run 'brew remove rilldata/tap/rill' to remove the conflicting version and try again.\n"
+    if [ -x "$(command -v statsparrot)" ]; then
+        INSTALLED_STATSPARROT="$(command -v statsparrot)"
+        if [ -x "$(command -v brew)" ] && brew list staticlabs/tap/statsparrot >/dev/null 2>&1; then
+            printf "There is a conflicting version of Parrot installed using Brew.\n\n"
+            printf "To upgrade using Brew, run 'brew upgrade staticlabs/tap/statsparrot'.\n\n"
+            printf "To use this script to install Parrot, run 'brew remove staticlabs/tap/statsparrot' to remove the conflicting version and try again.\n"
             exit 1
-        elif [ "$INSTALLED_RILL" != "${INSTALL_DIR}/rill" ]; then
-            printf "There is a conflicting version of Rill installed at '%s'\n\n" "$INSTALLED_RILL"
-            printf "To use this script to install Rill, remove the conflicting version and try again.\n"
+        elif [ "$INSTALLED_STATSPARROT" != "${INSTALL_DIR}/statsparrot" ]; then
+            printf "There is a conflicting version of Parrot installed at '%s'\n\n" "$INSTALLED_STATSPARROT"
+            printf "To use this script to install Parrot, remove the conflicting version and try again.\n"
             exit 1
         fi
     fi
@@ -141,33 +141,33 @@ checkConflictingInstallation() {
 installBinary() {
     if { [ -d "$INSTALL_DIR" ] && [ -w "$INSTALL_DIR" ]; } || { [ ! -d "$INSTALL_DIR" ] && [ -w "$(dirname "$INSTALL_DIR")" ]; }; then
         install -d "$INSTALL_DIR"
-        install rill "$INSTALL_DIR"
+        install statsparrot "$INSTALL_DIR"
     else
-        printf "\nElevated permissions required to install the Rill binary to: %s/rill\n" "$INSTALL_DIR"
+        printf "\nElevated permissions required to install the Parrot binary to: %s/statsparrot\n" "$INSTALL_DIR"
         sudo install -d "$INSTALL_DIR"
-        sudo install rill "$INSTALL_DIR"
+        sudo install statsparrot "$INSTALL_DIR"
     fi
     cd - > /dev/null
 }
 
 # Run the installed binary and print the version
 testInstalledBinary() {
-    RILL_VERSION=$("$INSTALL_DIR"/rill version)
-    "$INSTALL_DIR"/rill verify-install 1>/dev/null || true
-    printf "\nInstallation of %s completed!\n" "$RILL_VERSION"
+    STATSPARROT_VERSION=$("$INSTALL_DIR"/statsparrot version)
+    "$INSTALL_DIR"/statsparrot verify-install 1>/dev/null || true
+    printf "\nInstallation of %s completed!\n" "$STATSPARROT_VERSION"
 }
 
-# Print 'rill start' help intrcutions
+# Print 'statsparrot start' help instructions
 printStartHelp() {
     # Resolve how to reference the binary in help text.
-    if [ "$INSTALL_DIR" = "/usr/local/bin" ] || [ "$INSTALL_DIR" = "$HOME/.rill" ]; then
-        binary="rill"
+    if [ "$INSTALL_DIR" = "/usr/local/bin" ] || [ "$INSTALL_DIR" = "$HOME/.statsparrot" ]; then
+        binary="statsparrot"
     elif [ "$INSTALL_DIR" = "$(pwd)" ]; then
-        binary="./rill"
+        binary="./statsparrot"
     else
-        binary="$INSTALL_DIR/rill"
+        binary="$INSTALL_DIR/statsparrot"
     fi
-    
+
     # Print instructions for non-interactive callers.
     if [ "$NON_INTERACTIVE" = "true" ]; then
         printf "\nTo initialize a new project, run '%s init'. Run '%s -h' for an overview of available commands.\n" "$binary" "$binary"
@@ -179,31 +179,31 @@ printStartHelp() {
     boldoff=$(tput rmso 2>/dev/null) || boldoff=""
 
     # Print instructions for interactive callers.
-    if [ "$INSTALL_DIR" = "$HOME/.rill" ]; then
-        printf "\nTo start a new project in Rill, open a %snew terminal%s and execute the command:\n\n %s%s start my-rill-project%s\n\n" "$boldon" "$boldoff" "$boldon" "$binary" "$boldoff"
+    if [ "$INSTALL_DIR" = "$HOME/.statsparrot" ]; then
+        printf "\nTo start a new project in Parrot, open a %snew terminal%s and execute the command:\n\n %s%s start my-parrot-project%s\n\n" "$boldon" "$boldoff" "$boldon" "$binary" "$boldoff"
     else
-        printf "\nTo start a new project in Rill, execute the command:\n\n %s%s start my-rill-project%s\n\n" "$boldon" "$binary" "$boldoff"
+        printf "\nTo start a new project in Parrot, execute the command:\n\n %s%s start my-parrot-project%s\n\n" "$boldon" "$binary" "$boldoff"
     fi
 }
 
-# Publish Syft install telemetry event, can be disabled by setting the 'RILL_INSTALL_DISABLE_TELEMETRY' environment variable
+# Publish Syft install telemetry event, can be disabled by setting the 'STATSPARROT_INSTALL_DISABLE_TELEMETRY' environment variable
 publishSyftEvent() {
     SYFT_URL=https://event.syftdata.com/log
     SYFT_ID=clp76quhs0006l908bux79l4v
-    if [ -z "$RILL_INSTALL_DISABLE_TELEMETRY" ]; then
+    if [ -z "$STATSPARROT_INSTALL_DISABLE_TELEMETRY" ]; then
         curl --silent --show-error --header "Authorization: ${SYFT_ID}" --header "Content-Type: application/json" --data "{\"event_name\":\"$1\"}" "$SYFT_URL" > /dev/null 2>&1 || true
     fi
 }
 
-# Add the Rill binary to the PATH via configuration of the shells we detect on the system
+# Add the Parrot binary to the PATH via configuration of the shells we detect on the system
 addPathConfigEntries() {
-    PATH_CONFIG_LINE="export PATH=\$HOME/.rill:\$PATH # Added by Rill install"
+    PATH_CONFIG_LINE="export PATH=\$HOME/.statsparrot:\$PATH # Added by Parrot install"
 
-    if [ "$INSTALL_DIR" = "$HOME/.rill" ]; then
+    if [ "$INSTALL_DIR" = "$HOME/.statsparrot" ]; then
         for f in "$HOME/.bashrc" "$HOME/.zshrc"; do
             if [ -f "$f" ]; then
                 if ! grep -Fxq "$PATH_CONFIG_LINE" "$f"; then
-                    printf "\nWould you like to add 'rill' to your PATH by adding an entry in '%s'? (Y/n)\n" "$f"
+                    printf "\nWould you like to add 'statsparrot' to your PATH by adding an entry in '%s'? (Y/n)\n" "$f"
                     read -r ans </dev/tty;
                     case $ans in
                         n)
@@ -223,9 +223,9 @@ removePathConfigEntries() {
     for f in "$HOME/.bashrc" "$HOME/.zshrc"; do
         if [ -f "$f" ]; then
             if [ "$OS" = "darwin" ]; then
-                sed -i "" -e '/# Added by Rill install/d' "$f"
+                sed -i "" -e '/# Added by Parrot install/d' "$f"
             elif [ "$OS" = "linux" ]; then
-                sed -i -e '/# Added by Rill install/d' "$f"
+                sed -i -e '/# Added by Parrot install/d' "$f"
             fi
         fi
     done
@@ -248,12 +248,12 @@ installDirIsWritable() {
 # Resolve the install directory
 resolveInstallDir() {
     # Detect previous installation
-    if [ -x "$(command -v rill)" ] && [ -z "${INSTALL_DIR}" ]; then
-        INSTALLED_RILL="$(command -v rill)"
-        if [ "$INSTALLED_RILL" = "/usr/local/bin/rill" ]; then
+    if [ -x "$(command -v statsparrot)" ] && [ -z "${INSTALL_DIR}" ]; then
+        INSTALLED_STATSPARROT="$(command -v statsparrot)"
+        if [ "$INSTALLED_STATSPARROT" = "/usr/local/bin/statsparrot" ]; then
             INSTALL_DIR="/usr/local/bin"
-        elif [ "$INSTALLED_RILL" = "$HOME/.rill/rill" ]; then
-            INSTALL_DIR="$HOME/.rill"
+        elif [ "$INSTALLED_STATSPARROT" = "$HOME/.statsparrot/statsparrot" ]; then
+            INSTALL_DIR="$HOME/.statsparrot"
         fi
     fi
 
@@ -290,8 +290,8 @@ resolveInstallDir() {
     checkConflictingInstallation # Only check for conflicts in interactive, non-explicit scenarios
 }
 
-# Install Rill on the system
-installRill() {
+# Install Parrot on the system
+installStatsparrot() {
     if [ "$NON_INTERACTIVE" != "true" ]; then
         publishSyftEvent install
     fi
@@ -309,24 +309,24 @@ installRill() {
     printStartHelp
 }
 
-# Uninstall Rill from the system, this function is aware of both the privileged and unprivileged install methods
-uninstallRill() {
+# Uninstall Parrot from the system, this function is aware of both the privileged and unprivileged install methods
+uninstallStatsparrot() {
     if ! [ -x "$(command -v sed)" ]; then
         printf "'sed' could not be found, this script depends on it, please install and try again.\n"
         exit 1
     fi
     initPlatform
 
-    if [ -f "/usr/local/bin/rill" ]
+    if [ -f "/usr/local/bin/statsparrot" ]
     then
-        printf "\nElevated permissions required to uninstall the Rill binary from: '/usr/local/bin/rill'\n"
-        sudo rm /usr/local/bin/rill
+        printf "\nElevated permissions required to uninstall the Parrot binary from: '/usr/local/bin/statsparrot'\n"
+        sudo rm /usr/local/bin/statsparrot
     fi
 
-    rm -f "$HOME/.rill/rill"
+    rm -f "$HOME/.statsparrot/statsparrot"
     removePathConfigEntries
 
-    printf "Uninstall of Rill completed\n"
+    printf "Uninstall of Parrot completed\n"
 }
 
 set -e
@@ -352,15 +352,15 @@ NON_INTERACTIVE=${NON_INTERACTIVE:-false}
 # Parse input flag
 case $1 in
     --uninstall)
-        uninstallRill
+        uninstallStatsparrot
         ;;
     --nightly)
         VERSION=nightly
-        installRill
+        installStatsparrot
         ;;
     --version)
         VERSION=${2:-latest}
-        installRill
+        installStatsparrot
         ;;
     --non-interactive)
         if [ -n "$2" ]; then
@@ -369,10 +369,10 @@ case $1 in
         fi
         VERSION=${3:-latest}
         NON_INTERACTIVE=true
-        installRill
+        installStatsparrot
         ;;
     *)
         VERSION=latest
-        installRill
+        installStatsparrot
         ;;
 esac

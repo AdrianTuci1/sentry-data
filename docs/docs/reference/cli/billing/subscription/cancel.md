@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill billing subscription cancel
+title: statsparrot billing subscription cancel
 ---
-## rill billing subscription cancel
+## statsparrot billing subscription cancel
 
 Cancel subscription for an organization
 
 ```
-rill billing subscription cancel [flags]
+statsparrot billing subscription cancel [flags]
 ```
 
 ### Global flags
@@ -22,5 +22,5 @@ rill billing subscription cancel [flags]
 
 ### SEE ALSO
 
-* [rill billing subscription](subscription.md)	 - Manage organization subscriptions
+* [statsparrot billing subscription](subscription.md)	 - Manage organization subscriptions
 

@@ -14,11 +14,11 @@ def;
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: "Rill",
+  title: "Parrot",
   tagline: "A simple alternative to complex BI stacks",
 
   // netlify settings
-  url: "https://docs.rilldata.com",
+  url: "https://docs.statsparrot.com",
   baseUrl: "/",
   trailingSlash: false,
 
@@ -60,14 +60,14 @@ const config = {
         blog: {
           routeBasePath: 'notes',
           blogTitle: 'Release Notes',
-          blogDescription: 'Release notes for Rill',
+          blogDescription: 'Release notes for Parrot',
           postsPerPage: 1,
           blogSidebarTitle: 'Release Notes',
           blogSidebarCount: 'ALL',
           onUntruncatedBlogPosts: 'ignore',
           feedOptions: {
             type: 'all',
-            copyright: `Copyright © ${new Date().getFullYear()} Rill Data, Inc.`,
+            copyright: `Copyright © ${new Date().getFullYear()} Parrot Data, Inc.`,
           },
         },
         theme: {
@@ -82,7 +82,7 @@ const config = {
         specs: [
           {
             id: 'admin',
-            spec: '../proto/gen/rill/admin/v1/public.openapi.yaml',
+            spec: '../proto/gen/statsparrot/admin/v1/public.openapi.yaml',
             route: '/api/admin/',
           },
         ],
@@ -104,7 +104,7 @@ const config = {
       algolia: {
         appId: "4U01DM4NS4",
         apiKey: "c0399915ae21a35c6d34a473d017c15b",
-        indexName: "rilldata",
+        indexName: "staticlabs",
 
         // Navbar button text (before clicking)
         translations: {
@@ -118,7 +118,7 @@ const config = {
       },
       metadata: [
         {
-          property: 'og:title', content: "Rill | Fast operational dashboards you'll actually use"
+          property: 'og:title', content: "Parrot | Fast operational dashboards you'll actually use"
         },
         {
           property: 'og:image', content: 'https://assets-global.website-files.com/659ddac460dbacbdc813b204/65bad0233db92db596c29c34_social1.jpg'
@@ -127,14 +127,14 @@ const config = {
           name: 'twitter:image', content: 'https://assets-global.website-files.com/659ddac460dbacbdc813b204/65bad0233db92db596c29c34_social1.jpg'
         },
         {
-          name: 'description', content: "Rill is an operational BI tool that helps data teams build fewer, more flexible dashboards, and helps business users make faster decisions with fewer ad hoc requests."
+          name: 'description', content: "Parrot is an operational BI tool that helps data teams build fewer, more flexible dashboards, and helps business users make faster decisions with fewer ad hoc requests."
         }
       ],
       navbar: {
         logo: {
-          alt: "Rill Logo",
-          src: "img/rill-logo-light.svg",
-          srcDark: "img/rill-logo-dark.svg",
+          alt: "Parrot Logo",
+          src: "img/statsparrot-logo-light.svg",
+          srcDark: "img/statsparrot-logo-dark.svg",
           href: "/",
           target: "_self",
         },
@@ -171,8 +171,8 @@ const config = {
                 label: "Time Syntax",
               },
               {
-                to: "/reference/time-syntax/rill-iso-extensions",
-                label: "Rill ISO 8601",
+                to: "/reference/time-syntax/statsparrot-iso-extensions",
+                label: "Parrot ISO 8601",
               },
               {
                 to: "/reference/url-syntax/url-parameters",
@@ -202,12 +202,12 @@ const config = {
           {
             type: "html",
             position: "right",
-            value: '<a href="https://www.rilldata.com/blog" class="navbar-icon-link" aria-label="Blog" target="_blank" rel="noopener noreferrer">Blog</a>',
+            value: '<a href="https://www.statsparrot.com/blog" class="navbar-icon-link" aria-label="Blog" target="_blank" rel="noopener noreferrer">Blog</a>',
           },
           {
             type: "html",
             position: "right",
-            value: '<a href="https://github.com/rilldata/rill" class="navbar-icon-link github-icon-link" aria-label="GitHub" target="_blank" rel="noopener noreferrer"><img src="/icons/Github.svg" alt="" width="20" height="20" class="github-icon" /><span class="github-link-text">GitHub</span></a>',
+            value: '<a href="https://github.com/staticlabs/statsparrot" class="navbar-icon-link github-icon-link" aria-label="GitHub" target="_blank" rel="noopener noreferrer"><img src="/icons/Github.svg" alt="" width="20" height="20" class="github-icon" /><span class="github-link-text">GitHub</span></a>',
           },
           {
             type: "search",
@@ -219,7 +219,7 @@ const config = {
       },
       footer: {
         style: "light",
-        copyright: `© ${new Date().getFullYear()} Rill Data, Inc. • <a href="https://www.rilldata.com/legal/privacy" target="_blank">Privacy Policy</a> • <a href="https://www.rilldata.com/legal/tos" target="_blank"> Terms of Service </a> • <a href="https://github.com/rilldata/rill/blob/main/COMMUNITY-POLICY.md" target="_blank"> Community Policy </a> • <a href="https://github.com/rilldata/rill/blob/main/CONTRIBUTING.md" target="_blank"> Contributing </a>`,
+        copyright: `© ${new Date().getFullYear()} Parrot Data, Inc. • <a href="https://www.statsparrot.com/legal/privacy" target="_blank">Privacy Policy</a> • <a href="https://www.statsparrot.com/legal/tos" target="_blank"> Terms of Service </a> • <a href="https://github.com/staticlabs/statsparrot/blob/main/COMMUNITY-POLICY.md" target="_blank"> Community Policy </a> • <a href="https://github.com/staticlabs/statsparrot/blob/main/CONTRIBUTING.md" target="_blank"> Contributing </a>`,
       },
       prism: {
         theme: lightCodeTheme,
@@ -275,15 +275,15 @@ const config = {
           },
           {
             from: '/home/concepts/architecture',
-            to: '/developers/get-started/why-rill#architecture',
+            to: '/developers/get-started/why-statsparrot#architecture',
           },
           {
             from: '/home/concepts/operational',
-            to: '/developers/get-started/why-rill#operational-vs-traditional-bi',
+            to: '/developers/get-started/why-statsparrot#operational-vs-traditional-bi',
           },
           {
             from: '/home/concepts/bi-as-code',
-            to: '/developers/get-started/why-rill#bi-as-code',
+            to: '/developers/get-started/why-statsparrot#bi-as-code',
           },
           {
             from: '/home/concepts/metrics-layer',
@@ -335,11 +335,11 @@ const config = {
           },
           {
             from: '/concepts/architecture',
-            to: '/developers/get-started/why-rill#architecture',
+            to: '/developers/get-started/why-statsparrot#architecture',
           },
           {
             from: '/concepts/operational',
-            to: '/developers/get-started/why-rill#operational-vs-traditional-bi',
+            to: '/developers/get-started/why-statsparrot#operational-vs-traditional-bi',
           },
           {
             from: '/concepts/metrics-layer',
@@ -347,7 +347,7 @@ const config = {
           },
           {
             from: '/concepts/bi-as-code',
-            to: '/developers/get-started/why-rill#bi-as-code',
+            to: '/developers/get-started/why-statsparrot#bi-as-code',
           },
           {
             from: '/get-started/concepts/cloud-vs-developer',
@@ -355,15 +355,15 @@ const config = {
           },
           {
             from: '/get-started/concepts/architecture',
-            to: '/developers/get-started/why-rill#architecture',
+            to: '/developers/get-started/why-statsparrot#architecture',
           },
           {
             from: '/get-started/concepts/operational',
-            to: '/developers/get-started/why-rill#operational-vs-traditional-bi',
+            to: '/developers/get-started/why-statsparrot#operational-vs-traditional-bi',
           },
           {
             from: '/get-started/concepts/bi-as-code',
-            to: '/developers/get-started/why-rill#bi-as-code',
+            to: '/developers/get-started/why-statsparrot#bi-as-code',
           },
           // ============================================
           // /build/* → /developers/build/*
@@ -1136,8 +1136,8 @@ const config = {
             to: '/developers/get-started/quickstart',
           },
           {
-            from: '/get-started/why-rill',
-            to: '/developers/get-started/why-rill',
+            from: '/get-started/why-statsparrot',
+            to: '/developers/get-started/why-statsparrot',
           },
           // ============================================
           // /guides/* → /developers/tutorials/*
@@ -1163,8 +1163,8 @@ const config = {
             to: '/developers/tutorials/github-analytics',
           },
           {
-            from: '/guides/integrating-with-rill',
-            to: '/developers/tutorials/integrating-with-rill',
+            from: '/guides/integrating-with-statsparrot',
+            to: '/developers/tutorials/integrating-with-statsparrot',
           },
           {
             from: '/guides/openrtb-analytics',
@@ -1179,68 +1179,68 @@ const config = {
             to: '/developers/tutorials/setting-up-mcp',
           },
           {
-            from: '/guides/rill-basics',
-            to: '/developers/tutorials/rill-basics/launch',
+            from: '/guides/statsparrot-basics',
+            to: '/developers/tutorials/statsparrot-basics/launch',
           },
           {
-            from: '/guides/rill-basics/1-launch',
-            to: '/developers/tutorials/rill-basics/launch',
+            from: '/guides/statsparrot-basics/1-launch',
+            to: '/developers/tutorials/statsparrot-basics/launch',
           },
           {
-            from: '/guides/rill-basics/2-import',
-            to: '/developers/tutorials/rill-basics/import',
+            from: '/guides/statsparrot-basics/2-import',
+            to: '/developers/tutorials/statsparrot-basics/import',
           },
           {
-            from: '/guides/rill-basics/3-model',
-            to: '/developers/tutorials/rill-basics/model',
+            from: '/guides/statsparrot-basics/3-model',
+            to: '/developers/tutorials/statsparrot-basics/model',
           },
           {
-            from: '/guides/rill-basics/4-metrics-view',
-            to: '/developers/tutorials/rill-basics/metrics-view',
+            from: '/guides/statsparrot-basics/4-metrics-view',
+            to: '/developers/tutorials/statsparrot-basics/metrics-view',
           },
           {
-            from: '/guides/rill-basics/5-dashboard',
-            to: '/developers/tutorials/rill-basics/dashboard',
+            from: '/guides/statsparrot-basics/5-dashboard',
+            to: '/developers/tutorials/statsparrot-basics/dashboard',
           },
           {
-            from: '/guides/rill-basics/6-deploy',
-            to: '/developers/tutorials/rill-basics/deploy',
+            from: '/guides/statsparrot-basics/6-deploy',
+            to: '/developers/tutorials/statsparrot-basics/deploy',
           },
           {
-            from: '/guides/rill-basics/success',
-            to: '/developers/tutorials/rill-basics/success',
+            from: '/guides/statsparrot-basics/success',
+            to: '/developers/tutorials/statsparrot-basics/success',
           },
           {
-            from: '/guides/rill-clickhouse',
-            to: '/developers/tutorials/rill-clickhouse',
+            from: '/guides/statsparrot-clickhouse',
+            to: '/developers/tutorials/statsparrot-clickhouse',
           },
           {
-            from: '/guides/rill-clickhouse/index',
-            to: '/developers/tutorials/rill-clickhouse',
+            from: '/guides/statsparrot-clickhouse/index',
+            to: '/developers/tutorials/statsparrot-clickhouse',
           },
           {
-            from: '/guides/rill-clickhouse/1-r_ch_launch',
-            to: '/developers/tutorials/rill-clickhouse/r_ch_launch',
+            from: '/guides/statsparrot-clickhouse/1-r_ch_launch',
+            to: '/developers/tutorials/statsparrot-clickhouse/r_ch_launch',
           },
           {
-            from: '/guides/rill-clickhouse/2-r_ch_connect',
-            to: '/developers/tutorials/rill-clickhouse/r_ch_connect',
+            from: '/guides/statsparrot-clickhouse/2-r_ch_connect',
+            to: '/developers/tutorials/statsparrot-clickhouse/r_ch_connect',
           },
           {
-            from: '/guides/rill-clickhouse/3-r_ch_metrics-view',
-            to: '/developers/tutorials/rill-clickhouse/r_ch_metrics-view',
+            from: '/guides/statsparrot-clickhouse/3-r_ch_metrics-view',
+            to: '/developers/tutorials/statsparrot-clickhouse/r_ch_metrics-view',
           },
           {
-            from: '/guides/rill-clickhouse/4-r_ch_dashboard',
-            to: '/developers/tutorials/rill-clickhouse/r_ch_dashboard',
+            from: '/guides/statsparrot-clickhouse/4-r_ch_dashboard',
+            to: '/developers/tutorials/statsparrot-clickhouse/r_ch_dashboard',
           },
           {
-            from: '/guides/rill-clickhouse/5-r_ch_deploy',
-            to: '/developers/tutorials/rill-clickhouse/r_ch_deploy',
+            from: '/guides/statsparrot-clickhouse/5-r_ch_deploy',
+            to: '/developers/tutorials/statsparrot-clickhouse/r_ch_deploy',
           },
           {
-            from: '/guides/rill-clickhouse/r_ch_ingest',
-            to: '/developers/tutorials/rill-clickhouse/r_ch_ingest',
+            from: '/guides/statsparrot-clickhouse/r_ch_ingest',
+            to: '/developers/tutorials/statsparrot-clickhouse/r_ch_ingest',
           },
           // ============================================
           // /integrate/* → /developers/embed/* (renamed)
@@ -1514,8 +1514,8 @@ const config = {
             to: '/reference/project-files/models',
           },
           {
-            from: '/reference/rill-iso-extensions',
-            to: '/reference/time-syntax/rill-iso-extensions',
+            from: '/reference/statsparrot-iso-extensions',
+            to: '/reference/time-syntax/statsparrot-iso-extensions',
           },
           {
             from: '/reference/olap-engines/',

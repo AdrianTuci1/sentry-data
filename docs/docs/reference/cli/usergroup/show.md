@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill usergroup show
+title: statsparrot usergroup show
 ---
-## rill usergroup show
+## statsparrot usergroup show
 
 Show group
 
 ```
-rill usergroup show <name> [flags]
+statsparrot usergroup show <name> [flags]
 ```
 
 ### Flags
@@ -27,5 +27,5 @@ rill usergroup show <name> [flags]
 
 ### SEE ALSO
 
-* [rill usergroup](usergroup.md)	 - Manage user groups
+* [statsparrot usergroup](usergroup.md)	 - Manage user groups
 

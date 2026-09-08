@@ -6,13 +6,13 @@ sidebar_position: 30
 ---
 
 :::warning For Customers with Druid/ClickHouse Engines Only
-Note: The setup instructions below are for customers using Rill's hosted OLAP solution.
+Note: The setup instructions below are for customers using Parrot's hosted OLAP solution.
 :::
 
 ## Setup Instructions
-Follow the instructions below to grant Rill access to your Apache Kafka Cluster and the data on a given topic within the cluster. Providing access to a cloud-provided service, such as Confluent Cloud, is easier because all of the connection and security is already taken care of for you. If you are using a self-managed cluster, ensure security and encryption are configured accordingly.
+Follow the instructions below to grant Parrot access to your Apache Kafka Cluster and the data on a given topic within the cluster. Providing access to a cloud-provided service, such as Confluent Cloud, is easier because all of the connection and security is already taken care of for you. If you are using a self-managed cluster, ensure security and encryption are configured accordingly.
 
-The following scenarios are covered. Apache Kafka is designed to work within almost any enterprise environment, allowing for a variety of unique configurations. Work with your engineering team and Rill Data to ensure your configuration and setup are performant and secure.
+The following scenarios are covered. Apache Kafka is designed to work within almost any enterprise environment, allowing for a variety of unique configurations. Work with your engineering team and Parrot Data to ensure your configuration and setup are performant and secure.
 
 * Confluent Cloud
 * Private Kafka Cluster
@@ -22,27 +22,27 @@ The following scenarios are covered. Apache Kafka is designed to work within alm
 
 ### Confluent Cloud
 
-Confluent Cloud is inherently secure and accessible. Communication with Confluent Cloud can be set up in a few minutes. The main consideration is to determine the level of accessibility for the credentials you will be using from the Rill platform to access the Confluent Cloud Cluster.
+Confluent Cloud is inherently secure and accessible. Communication with Confluent Cloud can be set up in a few minutes. The main consideration is to determine the level of accessibility for the credentials you will be using from the Parrot platform to access the Confluent Cloud Cluster.
 
 The concepts here apply to other Apache Kafka SaaS offerings, even though the means to access them might be different. Please reach out if you have any questions about integrating with your Apache Kafka SaaS provider.
 
 ### Credentials
 
-The first step is to create a security key you can use from Rill Data to access your Kafka cluster. Select a granular access key to reduce exposure. You can use an existing key or an actual account when creating the client API access.
+The first step is to create a security key you can use from Parrot Data to access your Kafka cluster. Select a granular access key to reduce exposure. You can use an existing key or an actual account when creating the client API access.
 
 #### Create Key and Secret
 
-Select "+ Add Key" from the "Cloud API Keys" menu option and create a non-admin account. Create a service account unique to accessing data from Rill Data and be sure to download and secure the client key and secret for use from Rill Data Druid Ingestion.
+Select "+ Add Key" from the "Cloud API Keys" menu option and create a non-admin account. Create a service account unique to accessing data from Parrot Data and be sure to download and secure the client key and secret for use from Parrot Data Druid Ingestion.
 
-It is recommended to create a unique service account so your access control can be uniquely established for access from Rill Data into your Confluent Cloud Kafka Cluster.
+It is recommended to create a unique service account so your access control can be uniquely established for access from Parrot Data into your Confluent Cloud Kafka Cluster.
 
 If you fail to download or lose the key/secret, a new key/secret will need to be generated.
 
 #### Create Cluster API Access
 
-Rill Data manages the Kafka topic offset internally, so the Apache Kafka connection only needs topic read access.
+Parrot Data manages the Kafka topic offset internally, so the Apache Kafka connection only needs topic read access.
 
-The best way to provide Rill access to your cluster is through granular access with the above service account.
+The best way to provide Parrot access to your cluster is through granular access with the above service account.
 
 Ideally, using a topic-name prefix is preferred, as it minimizes the number of ACL rules you need to create and manage for the API access key/secret.
 
@@ -65,7 +65,7 @@ The key aspects for Confluent Cloud ingestion are establishing the bootstrap ser
         "sasl.jaas.config": "org.apache.kafka.common.security.plain.PlainLoginModule   required username='{{ CLIENT_KEY }}'   password='{{ CLIENT_SECRET }}';",
         "sasl.mechanism": "PLAIN"
       },
-      "topic": "rilldata-sourcedata",
+      "topic": "statsparrot-sourcedata",
       "inputFormat": {
         "type": "json"
       },
@@ -74,13 +74,13 @@ The key aspects for Confluent Cloud ingestion are establishing the bootstrap ser
 ```
 ### Private Kafka Cluster
 
-When connecting to a private Apache Kafka Cluster, accessibility and security are the most significant configuration areas. Rill Data connects directly to the Kafka Cluster as a Kafka client and will access your cluster as any other consumer client.
+When connecting to a private Apache Kafka Cluster, accessibility and security are the most significant configuration areas. Parrot Data connects directly to the Kafka Cluster as a Kafka client and will access your cluster as any other consumer client.
 
   * For Apache Kafka to be highly performant, the client API communicates directly to the active Kafka broker for a given partition.
-  * Configure your cluster so the brokers are each individually accessible from the Rill services.
+  * Configure your cluster so the brokers are each individually accessible from the Parrot services.
   * Apache Kafka has the server property **advertised.listeners** to ensure that the client has the correct information to communicate with an individual broker.
 
-When configuring your Kafka Cluster, ensure it can be accessed from Rill by establishing a VPC. An example setup is shown via AWS Private Link below. AWS Private Link allows exposure of the Kafka brokers over a Network Load Balancer using VPC Endpoints. The network packets always remain within the AWS Network.
+When configuring your Kafka Cluster, ensure it can be accessed from Parrot by establishing a VPC. An example setup is shown via AWS Private Link below. AWS Private Link allows exposure of the Kafka brokers over a Network Load Balancer using VPC Endpoints. The network packets always remain within the AWS Network.
 
 #### AWS Private Link
 
@@ -94,24 +94,24 @@ advertised.listeners=PLAINTEXT://:9092,EXTERNAL://${PRIVATE_DNS_NAME}:${INCREMEN
 
 ## Eg:
 # Broker #1
-# advertised.listeners=PLAINTEXT://:9092,EXTERNAL://private-kafka.rilldata.com:19092
+# advertised.listeners=PLAINTEXT://:9092,EXTERNAL://private-kafka.statsparrot.com:19092
 # Broker #2
-# advertised.listeners=PLAINTEXT://:9092,EXTERNAL://private-kafka.rilldata.com:19093
+# advertised.listeners=PLAINTEXT://:9092,EXTERNAL://private-kafka.statsparrot.com:19093
 # Broker #3
-# advertised.listeners=PLAINTEXT://:9092,EXTERNAL://private-kafka.rilldata.com:19094
+# advertised.listeners=PLAINTEXT://:9092,EXTERNAL://private-kafka.statsparrot.com:19094
 ```
 
 #### AWS Private Link using CloudFormation
 
 1. Open AWS CloudFormation to create a new Stack.
-2. Use the Amazon S3 URL: https://s3.amazonaws.com/cf-templates.rilldata.com/rilldata-private-link.yaml
+2. Use the Amazon S3 URL: https://s3.amazonaws.com/cf-templates.statsparrot.com/statsparrot-private-link.yaml
 3. Specify stack details:
-  * **Stack Name**: `rilldata-privatelink`
-  * **AccountId**: Rill Data AWS Account ID.
+  * **Stack Name**: `statsparrot-privatelink`
+  * **AccountId**: Parrot Data AWS Account ID.
   * **NlbArn**: ARN of the Network Load Balancer (Internal) through which we can share the internal Endpoints
 4. Click Next, then Next again, acknowledge the capabilities, and create the stack.
 5. You can check the events and it should create the resources for you.
-6. Share the outputs with Rill Data.
+6. Share the outputs with Parrot Data.
 
 We would be using the following CloudFormation Template.
 
@@ -179,22 +179,22 @@ If neither is used, the cluster is wide open and can be accessed by anyone.
 
 ### AWS Kinesis
 
-We can provide access to the Kinesis stream through an IAM Role which will be assumed by the Rill Data AWS Account to gain access.
+We can provide access to the Kinesis stream through an IAM Role which will be assumed by the Parrot Data AWS Account to gain access.
 
-:::info Rill Data AWS Account
+:::info Parrot Data AWS Account
 arn:aws:iam::248432388601:root
 :::
 
 #### Using CloudFormation Console
 
 1. Open AWS CloudFormation to create a new Stack.
-2. Use the Amazon S3 URL: `https://s3.amazonaws.com/cf-templates.rilldata.com/rilldata-kinesis-access.yaml`
+2. Use the Amazon S3 URL: `https://s3.amazonaws.com/cf-templates.statsparrot.com/statsparrot-kinesis-access.yaml`
 3. Specify Stack Details:
-   * **Stack Name**: `rilldata-kinesis-access`
+   * **Stack Name**: `statsparrot-kinesis-access`
    * **KinesisARN**: Name of the bucket we want to provide access to.
 4. Click Next, then Next again, acknowledge the capabilities, and create the stack.
 5. You can check the events and it should create the resources for you.
-6. Share the outputs with Rill Data.
+6. Share the outputs with Parrot Data.
 
 ##### CloudFormation Template Reference
 
@@ -204,8 +204,8 @@ AWSTemplateFormatVersion: '2010-09-09'
 Metadata:
   License: Apache-2.0
 
-Description: 'AWS CloudFormation Template for providing Rill Data Access to Kinesis. It creates a
-  Role that can be assumed by the Rill Data AWS Account. The Role has an IAM policy associated with it.'
+Description: 'AWS CloudFormation Template for providing Parrot Data Access to Kinesis. It creates a
+  Role that can be assumed by the Parrot Data AWS Account. The Role has an IAM policy associated with it.'
 
 Parameters:
   KinesisARN:
@@ -214,12 +214,12 @@ Parameters:
   NamePrefix:
     Type: String
     Description: Name prefix for the IAM Policy and IAM Role.
-    Default: rilldata
+    Default: statsparrot
 Resources:
   KinesisRole:
     Type: AWS::IAM::Role
     Properties:
-      Description: 'Rill Data Access to the Kinesis. Managed by: CloudFormation'
+      Description: 'Parrot Data Access to the Kinesis. Managed by: CloudFormation'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -249,14 +249,14 @@ Resources:
           - kinesis-access
       Tags:
         - Key: Accessor
-          Value: RillData
+          Value: Parrot
         - Key: ManagedBy
           Value: CloudFormation
 
 Outputs:
   RoleName:
     Value: !GetAtt [KinesisRole, Arn]
-    Description: Kinesis Access Role Arn, to be shared with Rill Data
+    Description: Kinesis Access Role Arn, to be shared with Parrot Data
 ```
 
 ## References

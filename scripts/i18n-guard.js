@@ -240,7 +240,7 @@ const SOURCE_GLOBS = [
   "web-local/src/**/*.ts",
   "web-local/src/**/*.js",
 ];
-const MESSAGES_IMPORT = "@rilldata/web-common/lib/i18n/gen/messages";
+const MESSAGES_IMPORT = "@statsparrot/web-common/lib/i18n/gen/messages";
 
 // Human-facing attributes worth translating. Attributes like `class`, `id`,
 // `href`, `name`, etc. are deliberately excluded.

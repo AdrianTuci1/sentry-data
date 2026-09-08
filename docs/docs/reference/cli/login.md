@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill login
+title: statsparrot login
 ---
-## rill login
+## statsparrot login
 
-Authenticate with the Rill API
+Authenticate with the Parrot API
 
 ```
-rill login [flags]
+statsparrot login [flags]
 ```
 
 ### Global flags
@@ -21,5 +21,5 @@ rill login [flags]
 
 ### SEE ALSO
 
-* [rill](cli.md)	 - A CLI for Rill
+* [statsparrot](cli.md)	 - A CLI for Parrot
 

@@ -6,7 +6,7 @@ sidebar_position: 20
 
 import ImageCodeToggle from '@site/src/components/ImageCodeToggle';
 
-Miscellaneous widgets in Rill Canvas provide additional functionality for text, images, and other non-data elements. These widgets help enhance your dashboards with rich content. For more information, refer to our [Components reference doc](/reference/project-files/component).
+Miscellaneous widgets in Parrot Canvas provide additional functionality for text, images, and other non-data elements. These widgets help enhance your dashboards with rich content. For more information, refer to our [Components reference doc](/reference/project-files/component).
 
 ## Text/Markdown
 
@@ -26,7 +26,7 @@ Text widgets allow you to add formatted text, markdown content, and documentatio
         ***Bold Italic***  
         ~~Strikethrough~~
 
-        [Rill Home](https://rilldata.com)
+        [Parrot Home](https://statsparrot.com)
         Inline code: \`print("Hello")\`
 
         Block code:

@@ -14,11 +14,11 @@ tags:
 
 # Cost Monitoring Analytics Demo
 
-This guide walks you through the Cost Monitoring Analytics demo project, which showcases Rill's capabilities for analyzing cost and usage data. You'll learn how to clone the project, understand its structure, and explore the dashboard.
+This guide walks you through the Cost Monitoring Analytics demo project, which showcases Parrot's capabilities for analyzing cost and usage data. You'll learn how to clone the project, understand its structure, and explore the dashboard.
 
 ## Overview
 
-This dataset is modeled after a similar dashboard we use internally at Rill to both identify opportunities to improve our cloud infrastructure operations and to manage customer implementations. Typical users include engineering, customer success, and finance. In this example, we've combined cloud services, other hosting costs, and revenue metrics.
+This dataset is modeled after a similar dashboard we use internally at Parrot to both identify opportunities to improve our cloud infrastructure operations and to manage customer implementations. Typical users include engineering, customer success, and finance. In this example, we've combined cloud services, other hosting costs, and revenue metrics.
 
 The Cost Monitoring Analytics demo analyzes operational costs and revenue data, providing insights into:
 - **Margin trends** – Daily, weekly, and monthly profitability patterns
@@ -33,8 +33,8 @@ The Cost Monitoring Analytics demo analyzes operational costs and revenue data, 
 
 ```bash
 # Clone the Cost Monitoring Analytics project
-git clone https://github.com/rilldata/rill-examples.git
-cd rill-examples/rill-cost-monitoring
+git clone https://github.com/staticlabs/statsparrot-examples.git
+cd statsparrot-examples/statsparrot-cost-monitoring
 ```
 
 
@@ -43,8 +43,8 @@ cd rill-examples/rill-cost-monitoring
 The project is organized as follows:
 
 ```
-rill-cost-monitoring/
-├── rill.yaml                           # Project configuration
+statsparrot-cost-monitoring/
+├── statsparrot.yaml                           # Project configuration
 ├── sources/                            # Data source definitions
 │   └── metrics_margin_monitoring.yaml  # Margin source dataset
 ├── models/                             # SQL transformations
@@ -62,10 +62,10 @@ rill-cost-monitoring/
 The source connects to our static public dataset containing operational cost and revenue data. You can modify this [source](/developers/build/connectors) to point to your own data export.
 
 ```yaml
-# Visit https://docs.rilldata.com/ to learn more about Rill code artifacts.
+# Visit https://docs.statsparrot.com/ to learn more about Parrot code artifacts.
 type: source
 connector: "https"
-uri: "https://storage.googleapis.com/rilldata-public/metrics_margin_monitoring.parquet"
+uri: "https://storage.googleapis.com/statsparrot-public/metrics_margin_monitoring.parquet"
 ```
 
 **What this data contains:**
@@ -77,24 +77,24 @@ uri: "https://storage.googleapis.com/rilldata-public/metrics_margin_monitoring.p
 
 **What this source does:**
 - Connects to our public GCS bucket (if modified, will need to be verified via [credentials](/developers/build/connectors/credentials))
-- Ingests the data into Rill's OLAP Engine (DuckDB)
+- Ingests the data into Parrot's OLAP Engine (DuckDB)
 - Provides the foundation for margin analysis and business intelligence
 
 
 
 ## Step 4: Data Models
 :::tip Modeling
-In our example, we've already processed the data, but if you need to do some last-mile ETL in Rill, this is possible via a [model](/developers/build/models).
+In our example, we've already processed the data, but if you need to do some last-mile ETL in Parrot, this is possible via a [model](/developers/build/models).
 :::
 
 
 ## Step 5: Creating your Metrics View
 
-Metrics in Rill define the measures and dimensions that power your margin monitoring dashboards:
+Metrics in Parrot define the measures and dimensions that power your margin monitoring dashboards:
 
 ```yaml
 # Metrics view YAML
-# Reference documentation: https://docs.rilldata.com/reference/project-files/metrics-views
+# Reference documentation: https://docs.statsparrot.com/reference/project-files/metrics-views
 # This file was generated using AI.
 
 version: 1

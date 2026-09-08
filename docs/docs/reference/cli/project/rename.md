@@ -1,8 +1,8 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill project rename
+title: statsparrot project rename
 ---
-## rill project rename
+## statsparrot project rename
 
 Rename project
 
@@ -13,7 +13,7 @@ Rename project
 Warning: Renaming a project will invalidate all dashboard URLs.
 
 ```
-rill project rename [flags]
+statsparrot project rename [flags]
 ```
 
 ### Flags
@@ -35,5 +35,5 @@ rill project rename [flags]
 
 ### SEE ALSO
 
-* [rill project](project.md)	 - Manage projects
+* [statsparrot project](project.md)	 - Manage projects
 

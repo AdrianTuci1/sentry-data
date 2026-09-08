@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill user set-role
+title: statsparrot user set-role
 ---
-## rill user set-role
+## statsparrot user set-role
 
 Change a user's role
 
 ```
-rill user set-role [flags]
+statsparrot user set-role [flags]
 ```
 
 ### Flags
@@ -30,5 +30,5 @@ rill user set-role [flags]
 
 ### SEE ALSO
 
-* [rill user](user.md)	 - Manage users
+* [statsparrot user](user.md)	 - Manage users
 

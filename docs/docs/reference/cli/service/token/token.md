@@ -1,8 +1,8 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill service token
+title: statsparrot service token
 ---
-## rill service token
+## statsparrot service token
 
 Manage service tokens
 
@@ -18,8 +18,8 @@ Manage service tokens
 
 ### SEE ALSO
 
-* [rill service](../service.md)	 - Manage service accounts
-* [rill service token issue](issue.md)	 - Issue service token
-* [rill service token list](list.md)	 - List tokens
-* [rill service token revoke](revoke.md)	 - Revoke token
+* [statsparrot service](../service.md)	 - Manage service accounts
+* [statsparrot service token issue](issue.md)	 - Issue service token
+* [statsparrot service token list](list.md)	 - List tokens
+* [statsparrot service token revoke](revoke.md)	 - Revoke token
 

@@ -1,8 +1,8 @@
 import { expect, type Page } from "@playwright/test";
-import { isOrgDeleted } from "@rilldata/web-common/tests/utils/is-org-deleted";
-import { makeTempDir } from "@rilldata/web-common/tests/utils/make-temp-dir";
-import { execAsync } from "@rilldata/web-common/tests/utils/spawn";
-import { RILL_DEV_STORAGE_STATE } from "@rilldata/web-integration/tests/constants.ts";
+import { isOrgDeleted } from "@statsparrot/web-common/tests/utils/is-org-deleted";
+import { makeTempDir } from "@statsparrot/web-common/tests/utils/make-temp-dir";
+import { execAsync } from "@statsparrot/web-common/tests/utils/spawn";
+import { RILL_DEV_STORAGE_STATE } from "@statsparrot/web-integration/tests/constants.ts";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "./setup/base";
@@ -31,7 +31,7 @@ test.describe("Deploy journey", () => {
       allOrgNames.map(async (orgName) =>
         execAsync(
           // We need to set the home to get the correct creds
-          `HOME=${cliHomeDir} rill org delete ${orgName} --interactive=false`,
+          `HOME=${cliHomeDir} statsparrot org delete ${orgName} --interactive=false`,
         ),
       ),
     );
@@ -151,7 +151,7 @@ test.describe("Deploy journey", () => {
       await rillDevPage.getByRole("button", { name: "Deploy" }).click();
 
       await expect(
-        rillDevPage.getByText("Push local changes to Rill Cloud?"),
+        rillDevPage.getByText("Push local changes to Parrot Cloud?"),
       ).toBeVisible();
 
       // Select the 1st org's project

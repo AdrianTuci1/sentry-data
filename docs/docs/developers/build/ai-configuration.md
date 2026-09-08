@@ -1,33 +1,33 @@
 ---
 title: "AI Configuration"
-description: "Configure AI instructions for your Rill project"
+description: "Configure AI instructions for your Parrot project"
 sidebar_label: "AI Configuration"
 sidebar_position: 55
 ---
 
 # AI Configuration
 
-Rill's AI capabilities, including [AI Chat](/guide/ai/ai-chat) and the [MCP Server](/guide/ai/mcp), rely on context to provide accurate and relevant answers. You can provide additional context using the `ai_instructions` field in your project configuration files.
+Parrot's AI capabilities, including [AI Chat](/guide/ai/ai-chat) and the [MCP Server](/guide/ai/mcp), rely on context to provide accurate and relevant answers. You can provide additional context using the `ai_instructions` field in your project configuration files.
 
-LLMs give their best results when they have good context. For a conversation with Rill Data, this means things like clarifying project-specific terms, routing questions to the correct metrics view, or defining business rules. Rather than expecting the user to provide this context every time, you can add `ai_instructions` to your project. This adds the context automatically for every conversation.
+LLMs give their best results when they have good context. For a conversation with Parrot Data, this means things like clarifying project-specific terms, routing questions to the correct metrics view, or defining business rules. Rather than expecting the user to provide this context every time, you can add `ai_instructions` to your project. This adds the context automatically for every conversation.
 
 There are two places to add `ai_instructions`:
 
-1.  **`rill.yaml`**: Project-wide instructions that apply to all queries across your entire project.
+1.  **`statsparrot.yaml`**: Project-wide instructions that apply to all queries across your entire project.
 2.  **`<metrics_view>.yaml`**: Metrics view-specific instructions for individual dashboards.
 
 ## Automatic Context Inclusion
 
-In addition to `ai_instructions`, Rill automatically includes the following in the AI context:
+In addition to `ai_instructions`, Parrot automatically includes the following in the AI context:
 
 - **Measure and dimension descriptions**: Any `description` fields you add to measures and dimensions in your metrics view YAML files are automatically included in the AI context. This helps the AI understand what each metric or dimension represents without requiring you to duplicate that information in `ai_instructions`.
 - **Metrics view metadata**: The metrics view name, display name, and description are included to help route questions to the correct dashboard.
 
 This means you can document your measures and dimensions directly in your metrics view YAML, and that documentation will be available to the AI automatically.
 
-## Project-Level Instructions ([`rill.yaml`](/developers/build/project-configuration))
+## Project-Level Instructions ([`statsparrot.yaml`](/developers/build/project-configuration))
 
-Use the `ai_instructions` field in `rill.yaml` to provide information that is **unique to your project**. This helps the AI agent deliver more relevant and actionable insights tailored to your specific needs.
+Use the `ai_instructions` field in `statsparrot.yaml` to provide information that is **unique to your project**. This helps the AI agent deliver more relevant and actionable insights tailored to your specific needs.
 
 **What to include:**
 - Guidance on which metrics views are most important or should be prioritized for your project
@@ -37,7 +37,7 @@ Use the `ai_instructions` field in `rill.yaml` to provide information that is **
 
 **Example:**
 
-Here's an example of how you might configure `ai_instructions` in your `rill.yaml` to provide project context, metrics routing, and business definitions:
+Here's an example of how you might configure `ai_instructions` in your `statsparrot.yaml` to provide project context, metrics routing, and business definitions:
 
 ```yaml
 ai_instructions: |
@@ -97,18 +97,18 @@ ai_instructions: |
 
 ## Visualization Tips 
 
-When using the [Rill MCP Server](/guide/ai/mcp) with external AI clients like Claude, you can provide specific instructions on how to visualize data. Since the MCP server returns structured data, the AI client is responsible for rendering it.
+When using the [Parrot MCP Server](/guide/ai/mcp) with external AI clients like Claude, you can provide specific instructions on how to visualize data. Since the MCP server returns structured data, the AI client is responsible for rendering it.
 
 :::note Visualization tips affect all AI interactions
-Visualization instructions added to `rill.yaml` will affect both [Rill Chat](/guide/ai/ai-chat) responses and external AI clients via the MCP Server. If you only want visualization tips to apply to external AI clients (like Claude Desktop), consider adding them to your client-specific configuration files instead:
+Visualization instructions added to `statsparrot.yaml` will affect both [Parrot Chat](/guide/ai/ai-chat) responses and external AI clients via the MCP Server. If you only want visualization tips to apply to external AI clients (like Claude Desktop), consider adding them to your client-specific configuration files instead:
 - **Claude Desktop**: Add to `claude_desktop_config.json` or `Claude.md` in your project
 - **Cursor**: Add to `.cursorrules` or `AGENT.md` in your project
 - **Other AI clients**: Check your client's documentation for where to add custom instructions
 
-This way, visualization formatting will only apply when using external clients, while Rill Chat maintains its default formatting.
+This way, visualization formatting will only apply when using external clients, while Parrot Chat maintains its default formatting.
 :::
 
-You can add instructions to your `rill.yaml` to guide the AI in presenting data more effectively (note that this will affect both Rill Chat and MCP clients):
+You can add instructions to your `statsparrot.yaml` to guide the AI in presenting data more effectively (note that this will affect both Parrot Chat and MCP clients):
 
 ```yaml
 ai_instructions: |

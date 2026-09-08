@@ -1,8 +1,8 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill billing subscription
+title: statsparrot billing subscription
 ---
-## rill billing subscription
+## statsparrot billing subscription
 
 Manage organization subscriptions
 
@@ -23,9 +23,9 @@ Manage organization subscriptions
 
 ### SEE ALSO
 
-* [rill billing](../billing.md)	 - Billing related commands for org
-* [rill billing subscription cancel](cancel.md)	 - Cancel subscription for an organization
-* [rill billing subscription edit](edit.md)	 - Edit organization subscription
-* [rill billing subscription list](list.md)	 - List subscriptions for an organization
-* [rill billing subscription renew](renew.md)	 - Renew cancelled organization subscription
+* [statsparrot billing](../billing.md)	 - Billing related commands for org
+* [statsparrot billing subscription cancel](cancel.md)	 - Cancel subscription for an organization
+* [statsparrot billing subscription edit](edit.md)	 - Edit organization subscription
+* [statsparrot billing subscription list](list.md)	 - List subscriptions for an organization
+* [statsparrot billing subscription renew](renew.md)	 - Renew cancelled organization subscription
 

@@ -1,8 +1,8 @@
-import type { ComponentAlignment } from "@rilldata/web-common/features/canvas/components/types";
+import type { ComponentAlignment } from "@statsparrot/web-common/features/canvas/components/types";
 import type {
   ChartLegend,
   ChartSortDirectionOptions,
-} from "@rilldata/web-common/features/components/charts/types";
+} from "@statsparrot/web-common/features/components/charts/types";
 
 type SemanticInputTypes =
   | "metrics"

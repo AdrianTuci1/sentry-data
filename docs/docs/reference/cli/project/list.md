@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill project list
+title: statsparrot project list
 ---
-## rill project list
+## statsparrot project list
 
 List all the projects
 
 ```
-rill project list [flags]
+statsparrot project list [flags]
 ```
 
 ### Flags
@@ -29,5 +29,5 @@ rill project list [flags]
 
 ### SEE ALSO
 
-* [rill project](project.md)	 - Manage projects
+* [statsparrot project](project.md)	 - Manage projects
 

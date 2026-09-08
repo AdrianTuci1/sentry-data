@@ -1,4 +1,4 @@
-import { RILL_EMBED_HTML_FILE } from "@rilldata/web-integration/tests/constants.ts";
+import { RILL_EMBED_HTML_FILE } from "@statsparrot/web-integration/tests/constants.ts";
 import type { AxiosResponse } from "axios";
 import axios from "axios";
 import fs from "fs";
@@ -54,7 +54,7 @@ export async function generateEmbed({
     <title>Iframe Example</title>
 </head>
 <body>
-    <iframe id="rill-frame" src="${iframeSrc}" height="600px" width="100%"></iframe>
+    <iframe id="statsparrot-frame" src="${iframeSrc}" height="600px" width="100%"></iframe>
     <script>
         window.addEventListener('message', (event) => {
             console.log(event.data);

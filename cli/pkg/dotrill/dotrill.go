@@ -1,5 +1,5 @@
-// Package dotrill implements setting and getting key-value pairs in YAML files in ~/.rill.
-package dotrill
+// Package dotstatsparrot implements setting and getting key-value pairs in YAML files in ~/.statsparrot.
+package dotstatsparrot
 
 import (
 	"encoding/json"
@@ -37,23 +37,23 @@ const (
 	UserCheckHashStateKey                           = "user_check_hash"
 )
 
-// DotRill encapsulates access to .rill.
-type DotRill struct {
+// DotStatsparrot encapsulates access to .statsparrot.
+type DotStatsparrot struct {
 	homeDir string
 }
 
 // New creates a new Dotrill instance.
-// If homeDir is empty, it creates `.rill` in the user's home directory.
-func New(homeDir string) DotRill {
+// If homeDir is empty, it creates `.statsparrot` in the user's home directory.
+func New(homeDir string) DotStatsparrot {
 	if homeDir == "" {
 		homeDir, _ = os.UserHomeDir()
 	}
-	return DotRill{homeDir: homeDir}
+	return DotStatsparrot{homeDir: homeDir}
 }
 
-// GetAll loads all values from ~/.rill/{filename}.
+// GetAll loads all values from ~/.statsparrot/{filename}.
 // It assumes filename identifies a YAML file.
-func (d DotRill) GetAll(filename string) (map[string]string, error) {
+func (d DotStatsparrot) GetAll(filename string) (map[string]string, error) {
 	filename, err := d.ResolveFilename(filename, false)
 	if err != nil {
 		return nil, err
@@ -76,9 +76,9 @@ func (d DotRill) GetAll(filename string) (map[string]string, error) {
 	return conf, nil
 }
 
-// Get returns a single entry from ~/.rill/{filename}.
+// Get returns a single entry from ~/.statsparrot/{filename}.
 // It assumes filename identifies a YAML file.
-func (d DotRill) Get(filename, key string) (string, error) {
+func (d DotStatsparrot) Get(filename, key string) (string, error) {
 	conf, err := d.GetAll(filename)
 	if err != nil {
 		return "", err
@@ -87,9 +87,9 @@ func (d DotRill) Get(filename, key string) (string, error) {
 	return conf[key], nil
 }
 
-// Set sets a single value in ~/.rill/{filename}.
+// Set sets a single value in ~/.statsparrot/{filename}.
 // It assumes filename identifies a YAML file.
-func (d DotRill) Set(filename, key, value string) error {
+func (d DotStatsparrot) Set(filename, key, value string) error {
 	if key == "" {
 		return fmt.Errorf("cannot set empty key")
 	}
@@ -114,62 +114,62 @@ func (d DotRill) Set(filename, key, value string) error {
 }
 
 // GetDefaultOrg loads the default org
-func (d DotRill) GetDefaultOrg() (string, error) {
+func (d DotStatsparrot) GetDefaultOrg() (string, error) {
 	return d.Get(ConfigFilename, DefaultOrgConfigKey)
 }
 
 // SetDefaultOrg saves the default org
-func (d DotRill) SetDefaultOrg(orgName string) error {
+func (d DotStatsparrot) SetDefaultOrg(orgName string) error {
 	return d.Set(ConfigFilename, DefaultOrgConfigKey, orgName)
 }
 
 // GetBackupDefaultOrg loads the backedup default org
-func (d DotRill) GetBackupDefaultOrg() (string, error) {
+func (d DotStatsparrot) GetBackupDefaultOrg() (string, error) {
 	return d.Get(ConfigFilename, BackupDefaultOrgConfigKey)
 }
 
 // SetBackupDefaultOrg saves the backedup default org
-func (d DotRill) SetBackupDefaultOrg(orgName string) error {
+func (d DotStatsparrot) SetBackupDefaultOrg(orgName string) error {
 	return d.Set(ConfigFilename, BackupDefaultOrgConfigKey, orgName)
 }
 
 // SetDefaultAdminURL loads the default admin URL (if set)
-func (d DotRill) SetDefaultAdminURL(url string) error {
+func (d DotStatsparrot) SetDefaultAdminURL(url string) error {
 	return d.Set(ConfigFilename, DefaultAdminURLConfigKey, url)
 }
 
 // GetDefaultAdminURL loads the default admin URL (if set)
-func (d DotRill) GetDefaultAdminURL() (string, error) {
+func (d DotStatsparrot) GetDefaultAdminURL() (string, error) {
 	return d.Get(ConfigFilename, DefaultAdminURLConfigKey)
 }
 
 // GetToken loads the current auth token
-func (d DotRill) GetAccessToken() (string, error) {
+func (d DotStatsparrot) GetAccessToken() (string, error) {
 	return d.Get(CredentialsFilename, AccessTokenCredentialsKey)
 }
 
 // SetToken saves an auth token
-func (d DotRill) SetAccessToken(token string) error {
+func (d DotStatsparrot) SetAccessToken(token string) error {
 	return d.Set(CredentialsFilename, AccessTokenCredentialsKey, token)
 }
 
 // GetBackupToken loads the original auth token
-func (d DotRill) GetBackupToken() (string, error) {
+func (d DotStatsparrot) GetBackupToken() (string, error) {
 	return d.Get(CredentialsFilename, BackupTokenCredentialsKey)
 }
 
 // SetBackupToken saves original auth token
-func (d DotRill) SetBackupToken(token string) error {
+func (d DotStatsparrot) SetBackupToken(token string) error {
 	return d.Set(CredentialsFilename, BackupTokenCredentialsKey, token)
 }
 
 // GetRepresentingUser loads the current representing user email
-func (d DotRill) GetRepresentingUser() (string, error) {
+func (d DotStatsparrot) GetRepresentingUser() (string, error) {
 	return d.Get(CredentialsFilename, RepresentingUserCredentialsKey)
 }
 
 // GetRepresentingUserAccessTokenExpiry loads the current auth token expiry
-func (d DotRill) GetRepresentingUserAccessTokenExpiry() (time.Time, error) {
+func (d DotStatsparrot) GetRepresentingUserAccessTokenExpiry() (time.Time, error) {
 	expiryStr, err := d.Get(CredentialsFilename, RepresentingUserAccessTokenExpiryCredentialsKey)
 	if err != nil {
 		return time.Time{}, err
@@ -185,7 +185,7 @@ func (d DotRill) GetRepresentingUserAccessTokenExpiry() (time.Time, error) {
 }
 
 // SetRepresentingUserAccessTokenExpiry saves an auth token expiry
-func (d DotRill) SetRepresentingUserAccessTokenExpiry(expiry time.Time) error {
+func (d DotStatsparrot) SetRepresentingUserAccessTokenExpiry(expiry time.Time) error {
 	var expiryStr string
 	if !expiry.IsZero() {
 		expiryStr = expiry.Format(time.RFC3339Nano)
@@ -194,67 +194,67 @@ func (d DotRill) SetRepresentingUserAccessTokenExpiry(expiry time.Time) error {
 }
 
 // SetRepresentingUser saves representing user email
-func (d DotRill) SetRepresentingUser(email string) error {
+func (d DotStatsparrot) SetRepresentingUser(email string) error {
 	return d.Set(CredentialsFilename, RepresentingUserCredentialsKey, email)
 }
 
-func (d DotRill) SetVersion(version string) error {
+func (d DotStatsparrot) SetVersion(version string) error {
 	return d.Set(StateFilename, LatestVersionStateKey, version)
 }
 
-func (d DotRill) GetVersion() (string, error) {
+func (d DotStatsparrot) GetVersion() (string, error) {
 	return d.Get(StateFilename, LatestVersionStateKey)
 }
 
-func (d DotRill) SetVersionUpdatedAt(updatedAt string) error {
+func (d DotStatsparrot) SetVersionUpdatedAt(updatedAt string) error {
 	return d.Set(StateFilename, LatestVersionCheckedAtStateKey, updatedAt)
 }
 
-func (d DotRill) GetVersionUpdatedAt() (string, error) {
+func (d DotStatsparrot) GetVersionUpdatedAt() (string, error) {
 	return d.Get(StateFilename, LatestVersionCheckedAtStateKey)
 }
 
 // SetEnvToken backup the token for given env
-func (d DotRill) SetEnvToken(env, token string) error {
+func (d DotStatsparrot) SetEnvToken(env, token string) error {
 	key := fmt.Sprintf("tokens.%s", env)
 	return d.Set(CredentialsFilename, key, token)
 }
 
 // GetEnvToken loads the token for given env
-func (d DotRill) GetEnvToken(env string) (string, error) {
+func (d DotStatsparrot) GetEnvToken(env string) (string, error) {
 	key := fmt.Sprintf("tokens.%s", env)
 	return d.Get(CredentialsFilename, key)
 }
 
 // GetCurrentUserID gets the current user ID
-func (d DotRill) GetUserID() (string, error) {
+func (d DotStatsparrot) GetUserID() (string, error) {
 	return d.Get(StateFilename, UserIDStateKey)
 }
 
 // SetCurrentUserID saves the current user ID
-func (d DotRill) SetUserID(userID string) error {
+func (d DotStatsparrot) SetUserID(userID string) error {
 	return d.Set(StateFilename, UserIDStateKey, userID)
 }
 
 // GetUserCheckHash gets the hash used to determine whether to re-fetch the user ID.
-func (d DotRill) GetUserCheckHash() (string, error) {
+func (d DotStatsparrot) GetUserCheckHash() (string, error) {
 	return d.Get(StateFilename, UserCheckHashStateKey)
 }
 
 // SetUserCheckHash sets the hash used to determine whether to re-fetch the user ID.
-func (d DotRill) SetUserCheckHash(hash string) error {
+func (d DotStatsparrot) SetUserCheckHash(hash string) error {
 	return d.Set(StateFilename, UserCheckHashStateKey, hash)
 }
 
 // AnalyticsInfo returns analytics info.
-// It loads a persistent install ID from ~/.rill/state.yaml (setting one if not found).
-// It gets analytics enabled/disabled info from ~/.rill/config.yaml (key "analytics_enabled").
+// It loads a persistent install ID from ~/.statsparrot/state.yaml (setting one if not found).
+// It gets analytics enabled/disabled info from ~/.statsparrot/config.yaml (key "analytics_enabled").
 // It automatically migrates from the pre-v0.23 analytics config. See migrateOldAnalyticsConfig for details.
-func (d DotRill) AnalyticsInfo() (installID string, enabled bool, err error) {
+func (d DotStatsparrot) AnalyticsInfo() (installID string, enabled bool, err error) {
 	// Migrate from earlier analytics tracking, if necessary
 	err = d.migrateOldAnalyticsConfig()
 	if err != nil {
-		fmt.Printf("state migration in ~/.rill did not succeed: %s\n", err.Error())
+		fmt.Printf("state migration in ~/.statsparrot did not succeed: %s\n", err.Error())
 	}
 
 	// Get installID
@@ -296,10 +296,10 @@ type oldAnalyticsConfig struct {
 // migrateOldAnalyticsConfig migrates from the pre-v0.23 to the current analytics setup.
 // It returns nil if there's nothing to migrate.
 //
-// Previously, analytics info was stored in ~/.rill/local.json. It included "installID" and "analyticsEnabled" fields.
+// Previously, analytics info was stored in ~/.statsparrot/local.json. It included "installID" and "analyticsEnabled" fields.
 // We are deprecating it to centralize user-facing config in config.yaml and to prevent confusion around the local.json file.
-// It has been replaced with a config key ("analytics_enabled") and an install ID stored separately in ~/.rill/state.yaml.
-func (d DotRill) migrateOldAnalyticsConfig() error {
+// It has been replaced with a config key ("analytics_enabled") and an install ID stored separately in ~/.statsparrot/state.yaml.
+func (d DotStatsparrot) migrateOldAnalyticsConfig() error {
 	filename, err := d.ResolveFilename("local.json", false)
 	if err != nil {
 		return err
@@ -350,21 +350,21 @@ func (d DotRill) migrateOldAnalyticsConfig() error {
 	return nil
 }
 
-// ResolveFilename resolves a file name to a full path to ~/.rill.
-// If mkdir is true, it will create the .rill directory if it doesn't exist.
-func (d DotRill) ResolveFilename(name string, mkdir bool) (string, error) {
+// ResolveFilename resolves a file name to a full path to ~/.statsparrot.
+// If mkdir is true, it will create the .statsparrot directory if it doesn't exist.
+func (d DotStatsparrot) ResolveFilename(name string, mkdir bool) (string, error) {
 	if d.homeDir == "" {
 		return "", fmt.Errorf("home directory not found")
 	}
 
-	dotrill := filepath.Join(d.homeDir, ".rill")
+	dotstatsparrot := filepath.Join(d.homeDir, ".statsparrot")
 	if mkdir {
-		err := os.MkdirAll(dotrill, os.ModePerm)
+		err := os.MkdirAll(dotstatsparrot, os.ModePerm)
 		if err != nil {
 			return "", err
 		}
 	}
 
-	filename := filepath.Join(dotrill, name)
+	filename := filepath.Join(dotstatsparrot, name)
 	return filename, nil
 }

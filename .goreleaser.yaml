@@ -1,5 +1,5 @@
 version: 2
-project_name: rill
+project_name: statsparrot
 
 release:
   prerelease: auto
@@ -14,27 +14,27 @@ builds:
       - amd64
       - arm64
     prebuilt:
-      path: binaries/{{ .Os }}_{{ .Arch }}/rill
-    binary: rill
+      path: binaries/{{ .Os }}_{{ .Arch }}/statsparrot
+    binary: statsparrot
 
 brews:
-  - homepage: https://github.com/rilldata/rill
-    description: The Rill CLI
-    name: rill
+  - homepage: https://github.com/staticlabs/statsparrot
+    description: The Parrot CLI
+    name: statsparrot
     license: Apache 2.0
-    url_template: https://cdn.rilldata.com/rill/{{ .Tag }}/{{ .ArtifactName }}
+    url_template: https://cdn.statsparrot.com/statsparrot/{{ .Tag }}/{{ .ArtifactName }}
     repository:
-      owner: rilldata
-      name: homebrew-tap
+      owner: staticlabs
+      name: homebrew-statsparrot
       branch: main
       token: "{{ .Env.GITHUB_TOKEN }}"
     test: |
-      system "#{bin}/rill --version"
+      system "#{bin}/statsparrot --version"
     install: |
-      bin.install "rill"
+      bin.install "statsparrot"
     commit_author:
-      name: rilldata
-      email: support@rilldata.com
+      name: staticlabs
+      email: support@statsparrot.com
 
 archives:
   - files:
@@ -46,34 +46,34 @@ archives:
 blobs:
   - disable: "{{ .IsRelease }}"
     provider: gs
-    bucket: prod-cdn.rilldata.com
-    directory: "rill/nightly"
+    bucket: prod-cdn.statsparrot.com
+    directory: "statsparrot/nightly"
     extra_files:
       - glob: ./dist/**/*
       - glob: scripts/install.sh
   - disable: "{{ .IsNightly }}"
     provider: gs
-    bucket: prod-cdn.rilldata.com
-    directory: "rill/latest"
+    bucket: prod-cdn.statsparrot.com
+    directory: "statsparrot/latest"
     extra_files:
       - glob: ./dist/**/*
   - disable: "{{ .IsNightly }}"
     provider: gs
-    bucket: prod-cdn.rilldata.com
-    directory: "rill/v{{ .Version }}"
+    bucket: prod-cdn.statsparrot.com
+    directory: "statsparrot/v{{ .Version }}"
     extra_files:
       - glob: ./dist/**/*
   - disable: "{{ .IsNightly }}"
     provider: gs
-    bucket: prod-cdn.rilldata.com
-    directory: "rill"
+    bucket: prod-cdn.statsparrot.com
+    directory: "statsparrot"
     extra_files_only: true
     extra_files:
       - glob: latest.txt
       - glob: scripts/install.sh
   - disable: "{{ .IsNightly }}"
     provider: gs
-    bucket: prod-cdn.rilldata.com
+    bucket: prod-cdn.statsparrot.com
     extra_files_only: true
     extra_files:
       - glob: scripts/install.sh
@@ -87,12 +87,12 @@ checksum:
 
 dockers:
   - image_templates:
-      - rilldata/rill:latest
-      - rilldata/rill:{{ .Tag }}
+      - staticlabs/statsparrot:latest
+      - staticlabs/statsparrot:{{ .Tag }}
     skip_build: "{{ .IsNightly }}"
     skip_push: "{{ .IsNightly }}"
   - image_templates:
-      - rilldata/rill:nightly
+      - staticlabs/statsparrot:nightly
     skip_build: "{{ .IsRelease }}"
     skip_push: "{{ .IsRelease }}"
 

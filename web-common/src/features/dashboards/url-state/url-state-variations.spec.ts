@@ -1,6 +1,6 @@
-import { getProtoFromDashboardState } from "@rilldata/web-common/features/dashboards/proto-state/toProto";
-import { metricsExplorerStore } from "@rilldata/web-common/features/dashboards/stores/dashboard-stores";
-import type { ExploreState } from "@rilldata/web-common/features/dashboards/stores/explore-state";
+import { getProtoFromDashboardState } from "@statsparrot/web-common/features/dashboards/proto-state/toProto";
+import { metricsExplorerStore } from "@statsparrot/web-common/features/dashboards/stores/dashboard-stores";
+import type { ExploreState } from "@statsparrot/web-common/features/dashboards/stores/explore-state";
 import {
   AD_BIDS_DIMENSION_TABLE_PRESET,
   AD_BIDS_EXPLORE,
@@ -13,8 +13,8 @@ import {
   AD_BIDS_PUBLISHER_DIMENSION,
   AD_BIDS_TIME_DIMENSION_DETAILS_PRESET,
   AD_BIDS_TIME_RANGE_SUMMARY,
-} from "@rilldata/web-common/features/dashboards/stores/test-data/data";
-import { getInitExploreStateForTest } from "@rilldata/web-common/features/dashboards/stores/test-data/helpers";
+} from "@statsparrot/web-common/features/dashboards/stores/test-data/data";
+import { getInitExploreStateForTest } from "@statsparrot/web-common/features/dashboards/stores/test-data/helpers";
 import {
   AD_BIDS_APPLY_DOMAIN_CONTAINS_FILTER,
   AD_BIDS_APPLY_IMP_COUNTRY_BETWEEN_MEASURE_FILTER,
@@ -71,21 +71,21 @@ import {
   AD_BIDS_SET_CHART_TYPE_BAR,
   applyMutationsToDashboard,
   type TestDashboardMutation,
-} from "@rilldata/web-common/features/dashboards/stores/test-data/store-mutations";
-import { getTimeControlState } from "@rilldata/web-common/features/dashboards/time-controls/time-control-store";
-import { getCleanedUrlParamsForGoto } from "@rilldata/web-common/features/dashboards/url-state/convert-partial-explore-state-to-url-params";
-import { getRillDefaultExploreUrlParams } from "@rilldata/web-common/features/dashboards/url-state/get-rill-default-explore-url-params";
-import { getDefaultExplorePreset } from "@rilldata/web-common/features/dashboards/url-state/getDefaultExplorePreset";
+} from "@statsparrot/web-common/features/dashboards/stores/test-data/store-mutations";
+import { getTimeControlState } from "@statsparrot/web-common/features/dashboards/time-controls/time-control-store";
+import { getCleanedUrlParamsForGoto } from "@statsparrot/web-common/features/dashboards/url-state/convert-partial-explore-state-to-url-params";
+import { getParrotDefaultExploreUrlParams } from "@statsparrot/web-common/features/dashboards/url-state/get-statsparrot-default-explore-url-params";
+import { getDefaultExplorePreset } from "@statsparrot/web-common/features/dashboards/url-state/getDefaultExplorePreset";
 import {
   type DashboardTimeControls,
   TimeComparisonOption,
   TimeRangePreset,
-} from "@rilldata/web-common/lib/time/types";
+} from "@statsparrot/web-common/lib/time/types";
 import {
   V1ExploreComparisonMode,
   type V1ExplorePreset,
   type V1ExploreSpec,
-} from "@rilldata/web-common/runtime-client";
+} from "@statsparrot/web-common/runtime-client";
 import { deepClone } from "@vitest/utils/helpers";
 import { get } from "svelte/store";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -138,10 +138,10 @@ const TestCases: {
     ],
     preset: AD_BIDS_PRESET,
     expectedSearch:
-      "tr=P7D&tz=Asia%2FKathmandu&compare_tr=rill-PW&grain=day&measures=impressions&dims=publisher&sort_type=percent&sort_dir=ASC",
+      "tr=P7D&tz=Asia%2FKathmandu&compare_tr=statsparrot-PW&grain=day&measures=impressions&dims=publisher&sort_type=percent&sort_dir=ASC",
     extraExploreState: {
       selectedComparisonTimeRange: {
-        name: "rill-PP",
+        name: "statsparrot-PP",
       } as DashboardTimeControls,
     },
   },
@@ -150,10 +150,10 @@ const TestCases: {
     mutations: [AD_BIDS_SET_P4W_TIME_RANGE_FILTER, AD_BIDS_SET_LA_TIMEZONE],
     preset: AD_BIDS_PRESET,
     expectedSearch:
-      "tr=P4W&tz=America%2FLos_Angeles&compare_tr=rill-PP&grain=week&measures=impressions&dims=publisher&sort_type=percent&sort_dir=ASC",
+      "tr=P4W&tz=America%2FLos_Angeles&compare_tr=statsparrot-PP&grain=week&measures=impressions&dims=publisher&sort_type=percent&sort_dir=ASC",
     extraExploreState: {
       selectedComparisonTimeRange: {
-        name: "rill-PP",
+        name: "statsparrot-PP",
       } as DashboardTimeControls,
     },
   },
@@ -178,7 +178,7 @@ const TestCases: {
       AD_BIDS_SET_P4W_TIME_RANGE_FILTER,
       AD_BIDS_SET_PREVIOUS_WEEK_COMPARE_TIME_RANGE_FILTER,
     ],
-    expectedSearch: "tr=P4W&compare_tr=rill-PW&grain=week",
+    expectedSearch: "tr=P4W&compare_tr=statsparrot-PW&grain=week",
   },
   {
     title: "Time range comparison with preset and state matching preset",
@@ -188,7 +188,7 @@ const TestCases: {
     ],
     preset: AD_BIDS_PRESET,
     expectedSearch:
-      "tr=P7D&tz=Asia%2FKathmandu&compare_tr=rill-PP&grain=day&measures=impressions&dims=publisher&sort_type=percent&sort_dir=ASC",
+      "tr=P7D&tz=Asia%2FKathmandu&compare_tr=statsparrot-PP&grain=day&measures=impressions&dims=publisher&sort_type=percent&sort_dir=ASC",
   },
   {
     title: "Time range comparison with preset and state not matching preset",
@@ -198,7 +198,7 @@ const TestCases: {
     ],
     preset: AD_BIDS_PRESET,
     expectedSearch:
-      "tr=P4W&tz=Asia%2FKathmandu&compare_tr=rill-PW&grain=week&measures=impressions&dims=publisher&sort_type=percent&sort_dir=ASC",
+      "tr=P4W&tz=Asia%2FKathmandu&compare_tr=statsparrot-PW&grain=week&measures=impressions&dims=publisher&sort_type=percent&sort_dir=ASC",
   },
   {
     title: "Time range comparison enable and disable",
@@ -289,7 +289,7 @@ const TestCases: {
     ],
     preset: AD_BIDS_PRESET,
     expectedSearch:
-      "tr=P7D&tz=Asia%2FKathmandu&compare_tr=rill-PP&grain=day&measures=impressions&dims=publisher&sort_type=percent&sort_dir=ASC",
+      "tr=P7D&tz=Asia%2FKathmandu&compare_tr=statsparrot-PP&grain=day&measures=impressions&dims=publisher&sort_type=percent&sort_dir=ASC",
   },
   {
     title:
@@ -301,7 +301,7 @@ const TestCases: {
     ],
     preset: AD_BIDS_PRESET,
     expectedSearch:
-      "tr=P7D&tz=Asia%2FKathmandu&compare_tr=rill-PP&grain=day&measures=impressions%2Cbid_price&dims=publisher%2Cdomain&sort_type=percent&sort_dir=ASC",
+      "tr=P7D&tz=Asia%2FKathmandu&compare_tr=statsparrot-PP&grain=day&measures=impressions%2Cbid_price&dims=publisher%2Cdomain&sort_type=percent&sort_dir=ASC",
   },
   {
     title: "Show and hide measures/dimensions",
@@ -334,7 +334,7 @@ const TestCases: {
     mutations: [AD_BIDS_SORT_BY_PERCENT_VALUE, AD_BIDS_SORT_ASC_BY_IMPRESSIONS],
     preset: AD_BIDS_PRESET,
     expectedSearch:
-      "tr=P7D&tz=Asia%2FKathmandu&compare_tr=rill-PP&grain=day&measures=impressions&dims=publisher&sort_type=percent&sort_dir=ASC",
+      "tr=P7D&tz=Asia%2FKathmandu&compare_tr=statsparrot-PP&grain=day&measures=impressions&dims=publisher&sort_type=percent&sort_dir=ASC",
   },
   {
     title:
@@ -345,7 +345,7 @@ const TestCases: {
     ],
     preset: AD_BIDS_PRESET,
     expectedSearch:
-      "tr=P7D&tz=Asia%2FKathmandu&compare_tr=rill-PP&grain=day&measures=impressions&dims=publisher&sort_by=bid_price&sort_type=delta_abs&leaderboard_measures=bid_price",
+      "tr=P7D&tz=Asia%2FKathmandu&compare_tr=statsparrot-PP&grain=day&measures=impressions&dims=publisher&sort_by=bid_price&sort_type=delta_abs&leaderboard_measures=bid_price",
   },
   {
     title: "Leaderboard configs with multiple measures",
@@ -579,7 +579,7 @@ describe("Human readable URL state variations", () => {
           ),
         );
         const initState = getCleanMetricsExploreForAssertion();
-        const defaultExploreUrlSearch = getRillDefaultExploreUrlParams(
+        const defaultExploreUrlSearch = getParrotDefaultExploreUrlParams(
           AD_BIDS_METRICS_VIEW,
           explore,
           AD_BIDS_TIME_RANGE_SUMMARY.timeRangeSummary,
@@ -698,7 +698,7 @@ describe("Human readable URL state variations", () => {
         AD_BIDS_TIME_RANGE_SUMMARY,
       ),
     );
-    const defaultExploreUrlSearch = getRillDefaultExploreUrlParams(
+    const defaultExploreUrlSearch = getParrotDefaultExploreUrlParams(
       AD_BIDS_METRICS_VIEW,
       AD_BIDS_EXPLORE,
       AD_BIDS_TIME_RANGE_SUMMARY.timeRangeSummary,
@@ -765,7 +765,7 @@ describe("Human readable URL state variations", () => {
           AD_BIDS_TIME_RANGE_SUMMARY,
         ),
       );
-      const defaultExploreUrlSearch = getRillDefaultExploreUrlParams(
+      const defaultExploreUrlSearch = getParrotDefaultExploreUrlParams(
         AD_BIDS_METRICS_3_MEASURES_DIMENSIONS_WITH_TIME,
         explore,
         AD_BIDS_TIME_RANGE_SUMMARY.timeRangeSummary,
@@ -778,7 +778,7 @@ describe("Human readable URL state variations", () => {
       return { explore, defaultExploreUrlSearch, defaultExplorePreset };
     }
 
-    it("should preserve time dimension sort (rill format) after URL roundtrip", async () => {
+    it("should preserve time dimension sort (statsparrot format) after URL roundtrip", async () => {
       const { explore, defaultExploreUrlSearch, defaultExplorePreset } =
         setupAndRoundtrip();
 
@@ -789,7 +789,7 @@ describe("Human readable URL state variations", () => {
 
       const stateBeforeRoundtrip = getCleanMetricsExploreForAssertion();
       expect(stateBeforeRoundtrip.pivot?.sorting).toEqual([
-        { id: "timestamp_rill_TIME_GRAIN_DAY", desc: true },
+        { id: "timestamp_statsparrot_TIME_GRAIN_DAY", desc: true },
       ]);
 
       // Serialize state to URL params

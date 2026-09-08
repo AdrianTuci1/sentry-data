@@ -74,7 +74,7 @@ jobs:
       matrix:
         name: ${{ fromJson(needs.setup.outputs.matrix) }}
     env:
-      RILL_ADMIN_FRONTEND_URL: http://localhost:3000
+      STATSPARROT_ADMIN_FRONTEND_URL: http://localhost:3000
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -97,12 +97,12 @@ jobs:
         if: matrix.name != 'web-admin'
         run: PLAYWRIGHT_TEST=true make cli
 
-      - name: Build rill cli only
+      - name: Build statsparrot cli only
         if: matrix.name == 'web-admin'
         run: PLAYWRIGHT_TEST=true make cli-only
 
       - name: Install duckdb extensions
-        run: ./rill runtime install-duckdb-extensions
+        run: ./statsparrot runtime install-duckdb-extensions
 
       - name: Add CLI binary to PATH
         run: echo "$GITHUB_WORKSPACE" >> $GITHUB_PATH
@@ -131,7 +131,7 @@ jobs:
         uses: google-github-actions/auth@v2
         if: (matrix.name == 'web-admin' || matrix.name == 'web-integration')
         with:
-          credentials_json: "${{ secrets.RILL_BINARY_SA }}"
+          credentials_json: "${{ secrets.STATSPARROT_BINARY_SA }}"
 
       - name: Set up GCloud SDK
         if: (matrix.name == 'web-admin' || matrix.name == 'web-integration')

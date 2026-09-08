@@ -1,8 +1,8 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill usergroup
+title: statsparrot usergroup
 ---
-## rill usergroup
+## statsparrot usergroup
 
 Manage user groups
 
@@ -17,14 +17,14 @@ Manage user groups
 
 ### SEE ALSO
 
-* [rill](../cli.md)	 - A CLI for Rill
-* [rill usergroup add](add.md)	 - Add a group to a project or organization
-* [rill usergroup create](create.md)	 - Create a group
-* [rill usergroup delete](delete.md)	 - Delete a group
-* [rill usergroup edit](edit.md)	 - Edit a group
-* [rill usergroup list](list.md)	 - List groups
-* [rill usergroup remove](remove.md)	 - Remove a group's role on a project or organization
-* [rill usergroup set-resources](set-resources.md)	 - Set a user group's project resources and restriction flag (overwrites existing list)
-* [rill usergroup set-role](set-role.md)	 - Change a group's role on a project or organization
-* [rill usergroup show](show.md)	 - Show group
+* [statsparrot](../cli.md)	 - A CLI for Parrot
+* [statsparrot usergroup add](add.md)	 - Add a group to a project or organization
+* [statsparrot usergroup create](create.md)	 - Create a group
+* [statsparrot usergroup delete](delete.md)	 - Delete a group
+* [statsparrot usergroup edit](edit.md)	 - Edit a group
+* [statsparrot usergroup list](list.md)	 - List groups
+* [statsparrot usergroup remove](remove.md)	 - Remove a group's role on a project or organization
+* [statsparrot usergroup set-resources](set-resources.md)	 - Set a user group's project resources and restriction flag (overwrites existing list)
+* [statsparrot usergroup set-role](set-role.md)	 - Change a group's role on a project or organization
+* [statsparrot usergroup show](show.md)	 - Show group
 

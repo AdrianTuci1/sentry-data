@@ -43,6 +43,6 @@ func main() {
 	}
 
 	// Print
-	fmt.Printf("RILL_ADMIN_SIGNING_KEY_ID=%s\n", jwk.KeyID)
-	fmt.Printf("RILL_ADMIN_SIGNING_JWKS=%s\n", string(jwksJSON))
+	fmt.Printf("STATSPARROT_ADMIN_SIGNING_KEY_ID=%s\n", jwk.KeyID)
+	fmt.Printf("STATSPARROT_ADMIN_SIGNING_JWKS=%s\n", string(jwksJSON))
 }

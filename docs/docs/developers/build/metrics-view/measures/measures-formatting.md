@@ -5,7 +5,7 @@ sidebar_label: "Measure Formatting"
 sidebar_position: 15
 ---
 
-When creating your measures in Rill, you have the option to pick from a preset of formats that we provide to you or use the [d3-format](https://d3js.org/d3-format) parameter to format your data in any way you like. An explicit `format_d3` is applied everywhere the measure is displayed — the big number, tooltips, the dimension leaderboard, TDD, and pivot tables — except chart axis labels, which stay abbreviated to keep them compact.
+When creating your measures in Parrot, you have the option to pick from a preset of formats that we provide to you or use the [d3-format](https://d3js.org/d3-format) parameter to format your data in any way you like. An explicit `format_d3` is applied everywhere the measure is displayed — the big number, tooltips, the dimension leaderboard, TDD, and pivot tables — except chart axis labels, which stay abbreviated to keep them compact.
 
 ![Metrics Editor](/img/build/metrics-view/metrics-editor.png)
 
@@ -72,4 +72,4 @@ While our `format_preset: percentage` will automatically apply `.2%`, you can ma
 
 
 ## Demo
-[See this project live in our demo!](https://ui.rilldata.com/demo/rill-kaggle-elec-consumption/explore/household_power_consumption_metrics_explore)
+[See this project live in our demo!](https://ui.statsparrot.com/demo/statsparrot-kaggle-elec-consumption/explore/household_power_consumption_metrics_explore)

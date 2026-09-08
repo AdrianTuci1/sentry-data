@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill org upload-favicon
+title: statsparrot org upload-favicon
 ---
-## rill org upload-favicon
+## statsparrot org upload-favicon
 
 Upload a custom favicon
 
 ```
-rill org upload-favicon [<org-name> [<path-to-image>]] [flags]
+statsparrot org upload-favicon [<org-name> [<path-to-image>]] [flags]
 ```
 
 ### Flags
@@ -29,5 +29,5 @@ rill org upload-favicon [<org-name> [<path-to-image>]] [flags]
 
 ### SEE ALSO
 
-* [rill org](org.md)	 - Manage organizations
+* [statsparrot org](org.md)	 - Manage organizations
 

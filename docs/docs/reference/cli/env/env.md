@@ -1,8 +1,8 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill env
+title: statsparrot env
 ---
-## rill env
+## statsparrot env
 
 Manage variables for a project
 
@@ -23,10 +23,10 @@ Manage variables for a project
 
 ### SEE ALSO
 
-* [rill](../cli.md)	 - A CLI for Rill
-* [rill env pull](pull.md)	 - Pull cloud credentials into local .env file
-* [rill env push](push.md)	 - Push local .env contents to cloud
-* [rill env rm](rm.md)	 - Remove an env variable
-* [rill env set](set.md)	 - Set variable
-* [rill env show](show.md)	 - Show credentials and other variables
+* [statsparrot](../cli.md)	 - A CLI for Parrot
+* [statsparrot env pull](pull.md)	 - Pull cloud credentials into local .env file
+* [statsparrot env push](push.md)	 - Push local .env contents to cloud
+* [statsparrot env rm](rm.md)	 - Remove an env variable
+* [statsparrot env set](set.md)	 - Set variable
+* [statsparrot env show](show.md)	 - Show credentials and other variables
 

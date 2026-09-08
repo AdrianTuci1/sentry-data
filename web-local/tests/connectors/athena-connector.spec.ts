@@ -8,7 +8,7 @@ test.describe("Athena connector", () => {
     const accessKey = process.env.RILL_RUNTIME_ATHENA_TEST_AWS_ACCESS_KEY_ID;
     const secretKey =
       process.env.RILL_RUNTIME_ATHENA_TEST_AWS_SECRET_ACCESS_KEY;
-    const outputLocation = "s3://integration-test.rilldata.com/athena/";
+    const outputLocation = "s3://integration-test.statsparrot.com/athena/";
 
     if (!accessKey || !secretKey) {
       test.skip(

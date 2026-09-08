@@ -204,7 +204,7 @@ test.describe("GCS connector", () => {
     // First submission attempt
     await openGcsFlowWithHmac();
     const firstPath =
-      "gs://rilldata-public/github-analytics/Clickhouse/2025/06/commits_2025_06.parquet";
+      "gs://staticlabs-public/github-analytics/Clickhouse/2025/06/commits_2025_06.parquet";
     const firstModelName = "gcs_model_one";
     await page.getByRole("textbox", { name: "GCS URI" }).fill(firstPath);
     await page
@@ -237,7 +237,7 @@ test.describe("GCS connector", () => {
     await page
       .getByRole("textbox", { name: "GCS URI" })
       .fill(
-        "gs://rilldata-public/github-analytics/Clickhouse/2025/06/commits_2025_06.parquet",
+        "gs://staticlabs-public/github-analytics/Clickhouse/2025/06/commits_2025_06.parquet",
       );
     await page.getByRole("textbox", { name: "Model name" }).fill(modelName);
     await page.getByRole("button", { name: "Import Data" }).click();

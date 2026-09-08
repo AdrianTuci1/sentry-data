@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill project deployment delete
+title: statsparrot project deployment delete
 ---
-## rill project deployment delete
+## statsparrot project deployment delete
 
 Delete a deployment by branch
 
 ```
-rill project deployment delete [<project>] <branch> [flags]
+statsparrot project deployment delete [<project>] <branch> [flags]
 ```
 
 ### Flags
@@ -29,5 +29,5 @@ rill project deployment delete [<project>] <branch> [flags]
 
 ### SEE ALSO
 
-* [rill project deployment](deployment.md)	 - Manage project deployments
+* [statsparrot project deployment](deployment.md)	 - Manage project deployments
 

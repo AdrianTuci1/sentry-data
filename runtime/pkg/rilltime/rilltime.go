@@ -1,4 +1,4 @@
-package rilltime
+package statspartime
 
 import (
 	"fmt"
@@ -9,8 +9,8 @@ import (
 
 	"github.com/alecthomas/participle/v2"
 	"github.com/alecthomas/participle/v2/lexer"
-	"github.com/rilldata/rill/runtime/pkg/duration"
-	"github.com/rilldata/rill/runtime/pkg/timeutil"
+	"github.com/staticlabs/statsparrot/runtime/pkg/duration"
+	"github.com/staticlabs/statsparrot/runtime/pkg/timeutil"
 )
 
 var (
@@ -20,14 +20,14 @@ var (
 	isoTimePattern         = `(?P<year>\d{4})(-(?P<month>\d{2})(-(?P<day>\d{2})(T(?P<hour>\d{2})(:(?P<minute>\d{2})(:(?P<second>\d{2})(\.((?P<milli>\d{3})|(?P<micro>\d{6})|(?P<nano>\d{9})))?Z)?)?)?)?)?`
 	isoTimeRegex           = regexp.MustCompile(isoTimePattern)
 	// nolint:govet // This is suggested usage by the docs.
-	rillTimeLexer = lexer.MustSimple([]lexer.SimpleRule{
+	statsparrotTimeLexer = lexer.MustSimple([]lexer.SimpleRule{
 		{"Ref", "ref"},
 		{"Earliest", "earliest"},
 		{"Now", "now"},
 		{"Latest", "latest"},
 		{"Watermark", "watermark"},
 		{"ISO8601Duration", iso8601DurationPattern},
-		{"DAXDuration", `rill-\w+`},
+		{"DAXDuration", `statsparrot-\w+`},
 		{"PreviousPeriod", "(?i)p"},
 		{"Offset", `(?i)offset`},
 		// this needs to be after Now and Latest to match to them
@@ -50,14 +50,14 @@ var (
 		{"Punct", `[-[!@#$%^&*()+_={}\|:;"'<>.?/]]`},
 		{"Whitespace", `[ \t]+`},
 	})
-	rillTimeParser = participle.MustBuild[Expression](
-		participle.Lexer(rillTimeLexer),
+	statsparrotTimeParser = participle.MustBuild[Expression](
+		participle.Lexer(statsparrotTimeLexer),
 		participle.Elide("Whitespace"),
 		participle.UseLookahead(2), // Needed to disambiguate `offset -1P` vs `offset -1M`
 	)
 	daxNotations = map[string]string{
-		// Mapping for our old rill-<DAX> syntax
-		// rill- prefixed strings snap to the end of the reference day
+		// Mapping for our old statsparrot-<DAX> syntax
+		// statsparrot- prefixed strings snap to the end of the reference day
 		"TD":  "ref/D to ref/D+1D as of watermark",
 		"WTD": "ref/W to ref/D+1D as of watermark",
 		"MTD": "ref/M to ref/D+1D as of watermark",
@@ -286,7 +286,7 @@ func Parse(from string, parseOpts ParseOptions) (*Expression, error) {
 	if infPattern.MatchString(from) {
 		rt = exprForAllTime(parseOpts)
 	} else {
-		rt, err = rillTimeParser.ParseString("", from)
+		rt, err = statsparrotTimeParser.ParseString("", from)
 		if err != nil {
 			return nil, err
 		}
@@ -351,7 +351,7 @@ func ParseLegacy(duration, offset string, roundToGrain timeutil.TimeGrain, parse
 	}
 
 	if offset != "" {
-		if strings.HasPrefix(offset, "rill-") {
+		if strings.HasPrefix(offset, "statsparrot-") {
 			return nil, fmt.Errorf("offset cannot have DAX notation")
 		}
 
@@ -381,7 +381,7 @@ func ParseCompatibility(timeRange, offset string) error {
 	}
 	if offset != "" {
 		if isNewFormat {
-			return fmt.Errorf("offset cannot be provided along with rill time range")
+			return fmt.Errorf("offset cannot be provided along with statsparrot time range")
 		}
 		if err := duration.ValidateISO8601(offset, false, false); err != nil {
 			return fmt.Errorf("invalid comparison offset %q: %w", offset, err)
@@ -697,10 +697,10 @@ func (l *LegacyISOInterval) expand(parseOpts ParseOptions) (*StartEndInterval, e
 }
 
 func (l *LegacyDAXInterval) expand(parseOpts ParseOptions) (*StartEndInterval, error) {
-	// We are using "rill-" as a prefix to DAX notation so that it doesn't interfere with ISO8601 standard.
+	// We are using "statsparrot-" as a prefix to DAX notation so that it doesn't interfere with ISO8601 standard.
 	// Pulled from https://www.daxpatterns.com/standard-time-related-calculations/
-	rillDur := strings.Replace(l.DAX, "rill-", "", 1)
-	interval, ok := daxNotations[rillDur]
+	statsparrotDur := strings.Replace(l.DAX, "statsparrot-", "", 1)
+	interval, ok := daxNotations[statsparrotDur]
 	if !ok {
 		return nil, fmt.Errorf("invalid DAX duration %q", l.DAX)
 	}

@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill service remove
+title: statsparrot service remove
 ---
-## rill service remove
+## statsparrot service remove
 
 remove service from org or project
 
 ```
-rill service remove <service-name> [flags]
+statsparrot service remove <service-name> [flags]
 ```
 
 ### Flags
@@ -28,5 +28,5 @@ rill service remove <service-name> [flags]
 
 ### SEE ALSO
 
-* [rill service](service.md)	 - Manage service accounts
+* [statsparrot service](service.md)	 - Manage service accounts
 

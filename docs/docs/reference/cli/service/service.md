@@ -1,8 +1,8 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill service
+title: statsparrot service
 ---
-## rill service
+## statsparrot service
 
 Manage service accounts
 
@@ -23,13 +23,13 @@ Manage service accounts
 
 ### SEE ALSO
 
-* [rill](../cli.md)	 - A CLI for Rill
-* [rill service create](create.md)	 - Create service
-* [rill service delete](delete.md)	 - Delete service
-* [rill service edit](edit.md)	 - edit service properties
-* [rill service list](list.md)	 - List service
-* [rill service remove](remove.md)	 - remove service from org or project
-* [rill service set-role](set-role.md)	 - Set role for service
-* [rill service show](show.md)	 - Show service
-* [rill service token](token/token.md)	 - Manage service tokens
+* [statsparrot](../cli.md)	 - A CLI for Parrot
+* [statsparrot service create](create.md)	 - Create service
+* [statsparrot service delete](delete.md)	 - Delete service
+* [statsparrot service edit](edit.md)	 - edit service properties
+* [statsparrot service list](list.md)	 - List service
+* [statsparrot service remove](remove.md)	 - remove service from org or project
+* [statsparrot service set-role](set-role.md)	 - Set role for service
+* [statsparrot service show](show.md)	 - Show service
+* [statsparrot service token](token/token.md)	 - Manage service tokens
 

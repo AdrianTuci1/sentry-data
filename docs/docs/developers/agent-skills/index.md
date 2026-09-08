@@ -1,22 +1,22 @@
 ---
-title: "Rill Agent Skills"
-description: Teach AI coding agents like Claude Code and Cursor how to build Rill projects
+title: "Parrot Agent Skills"
+description: Teach AI coding agents like Claude Code and Cursor how to build Parrot projects
 sidebar_label: "Overview"
 sidebar_position: 0
 ---
 
-Rill ships built-in agent skills that teach AI coding agents how to develop Rill projects. Because Rill projects are defined as YAML and SQL files, they are a natural fit for agentic development: the skills give your agent detailed knowledge of Rill's project structure, resource types, and development workflow, so it can build connectors, models, metrics views, and dashboards on your behalf.
+Parrot ships built-in agent skills that teach AI coding agents how to develop Parrot projects. Because Parrot projects are defined as YAML and SQL files, they are a natural fit for agentic development: the skills give your agent detailed knowledge of Parrot's project structure, resource types, and development workflow, so it can build connectors, models, metrics views, and dashboards on your behalf.
 
 A single command generates everything your agent needs:
 
 ```bash
-rill init --agent all
+statsparrot init --agent all
 ```
 
 The skills work with Claude Code and Cursor out of the box, and ship in a tool-agnostic format for `AGENTS.md`-compatible agents such as OpenAI Codex, Gemini CLI, and GitHub Copilot. Agents that also support the [Agent Skills](https://agentskills.io) convention load the detailed skills automatically; for others, the skill files are plain Markdown that you can point the agent at directly. See the [Installation guide](/developers/agent-skills/install) for setup instructions for each tool.
 
-:::note Agent skills vs. the Rill MCP Server
-Agent skills and the [Rill MCP Server](/guide/ai/mcp) are complementary. The skills teach your agent *how* to build a Rill project — resource types, YAML schemas, and best practices. The MCP server gives it *live access* to your running project — resource status, table schemas, query results, and file operations. `rill init --agent` sets up both: it generates the skill files and an MCP configuration that connects your agent to Rill Developer's local MCP server.
+:::note Agent skills vs. the Parrot MCP Server
+Agent skills and the [Parrot MCP Server](/guide/ai/mcp) are complementary. The skills teach your agent *how* to build a Parrot project — resource types, YAML schemas, and best practices. The MCP server gives it *live access* to your running project — resource status, table schemas, query results, and file operations. `statsparrot init --agent` sets up both: it generates the skill files and an MCP configuration that connects your agent to Parrot Developer's local MCP server.
 :::
 
 ## What you can do
@@ -27,7 +27,7 @@ With agent skills installed, your AI agent can:
 - Create and refactor SQL and YAML models, including incremental and partitioned models
 - Define metrics views with measures, dimensions, and access policies
 - Build explore and canvas dashboards
-- Configure project-wide settings in `rill.yaml` and custom themes
+- Configure project-wide settings in `statsparrot.yaml` and custom themes
 - Inspect resource status, debug parse errors, and fix reconciliation failures
 - Run analytical queries against your metrics views and summarize the results
 
@@ -44,7 +44,7 @@ With agent skills installed, your AI agent can:
 Once installed, the skills activate automatically based on your request. Ask naturally:
 
 ```text
-"Connect to the parquet file at gs://rilldata-public/auction_data.parquet"
+"Connect to the parquet file at gs://statsparrot-public/auction_data.parquet"
 "Create a model that cleans the auction data and buckets bids into price ranges"
 "Create a metrics view with measures for total bids, average bid price, and win rate"
 "Build an explore dashboard for the auction metrics view"
@@ -59,4 +59,4 @@ Once installed, the skills activate automatically based on your request. Ask nat
 - [Installing agent skills](/developers/agent-skills/install)
 - [Agent skills reference](/developers/agent-skills/skills)
 - [AI Configuration](/developers/build/ai-configuration) — add `ai_instructions` to improve AI responses for your project
-- [Rill MCP Server](/guide/ai/mcp) — connect AI assistants to Rill Cloud projects for data analysis
+- [Parrot MCP Server](/guide/ai/mcp) — connect AI assistants to Parrot Cloud projects for data analysis

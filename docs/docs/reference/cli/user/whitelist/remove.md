@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill user whitelist remove
+title: statsparrot user whitelist remove
 ---
-## rill user whitelist remove
+## statsparrot user whitelist remove
 
 Remove whitelisted email domain for the org or project
 
 ```
-rill user whitelist remove <email-domain> [flags]
+statsparrot user whitelist remove <email-domain> [flags]
 ```
 
 ### Flags
@@ -28,5 +28,5 @@ rill user whitelist remove <email-domain> [flags]
 
 ### SEE ALSO
 
-* [rill user whitelist](whitelist.md)	 - Whitelist access by email domain
+* [statsparrot user whitelist](whitelist.md)	 - Whitelist access by email domain
 

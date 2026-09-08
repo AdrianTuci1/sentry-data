@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill project edit
+title: statsparrot project edit
 ---
-## rill project edit
+## statsparrot project edit
 
 Edit the project details
 
 ```
-rill project edit [<project-name>] [flags]
+statsparrot project edit [<project-name>] [flags]
 ```
 
 ### Flags
@@ -39,5 +39,5 @@ rill project edit [<project-name>] [flags]
 
 ### SEE ALSO
 
-* [rill project](project.md)	 - Manage projects
+* [statsparrot project](project.md)	 - Manage projects
 

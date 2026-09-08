@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill usergroup remove
+title: statsparrot usergroup remove
 ---
-## rill usergroup remove
+## statsparrot usergroup remove
 
 Remove a group's role on a project or organization
 
 ```
-rill usergroup remove [flags]
+statsparrot usergroup remove [flags]
 ```
 
 ### Flags
@@ -29,5 +29,5 @@ rill usergroup remove [flags]
 
 ### SEE ALSO
 
-* [rill usergroup](usergroup.md)	 - Manage user groups
+* [statsparrot usergroup](usergroup.md)	 - Manage user groups
 

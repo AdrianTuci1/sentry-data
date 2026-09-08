@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill project deployment stop
+title: statsparrot project deployment stop
 ---
-## rill project deployment stop
+## statsparrot project deployment stop
 
 Stop a deployment by branch
 
 ```
-rill project deployment stop [<project>] <branch> [flags]
+statsparrot project deployment stop [<project>] <branch> [flags]
 ```
 
 ### Flags
@@ -29,5 +29,5 @@ rill project deployment stop [<project>] <branch> [flags]
 
 ### SEE ALSO
 
-* [rill project deployment](deployment.md)	 - Manage project deployments
+* [statsparrot project deployment](deployment.md)	 - Manage project deployments
 

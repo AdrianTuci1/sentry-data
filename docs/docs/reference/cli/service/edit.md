@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill service edit
+title: statsparrot service edit
 ---
-## rill service edit
+## statsparrot service edit
 
 edit service properties
 
 ```
-rill service edit <service-name> [flags]
+statsparrot service edit <service-name> [flags]
 ```
 
 ### Flags
@@ -29,5 +29,5 @@ rill service edit <service-name> [flags]
 
 ### SEE ALSO
 
-* [rill service](service.md)	 - Manage service accounts
+* [statsparrot service](service.md)	 - Manage service accounts
 

@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/rilldata/rill/admin/database"
+	"github.com/staticlabs/statsparrot/admin/database"
 )
 
 // This script generates a new encryption keyring for the database and prints it to stdout. Existing keyring can be provided as an argument like:
@@ -34,5 +34,5 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	fmt.Printf("RILL_ADMIN_DATABASE_ENCRYPTION_KEYRING='%s'\n", conf)
+	fmt.Printf("STATSPARROT_ADMIN_DATABASE_ENCRYPTION_KEYRING='%s'\n", conf)
 }

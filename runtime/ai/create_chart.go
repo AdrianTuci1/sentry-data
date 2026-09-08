@@ -8,10 +8,10 @@ import (
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
-	runtimev1 "github.com/rilldata/rill/proto/gen/rill/runtime/v1"
-	"github.com/rilldata/rill/runtime"
-	"github.com/rilldata/rill/runtime/metricsview"
-	"github.com/rilldata/rill/runtime/pkg/pathutil"
+	runtimev1 "github.com/staticlabs/statsparrot/proto/gen/statsparrot/runtime/v1"
+	"github.com/staticlabs/statsparrot/runtime"
+	"github.com/staticlabs/statsparrot/runtime/metricsview"
+	"github.com/staticlabs/statsparrot/runtime/pkg/pathutil"
 )
 
 const CreateChartName = "create_chart"
@@ -62,8 +62,8 @@ func (t *CreateChart) CheckAccess(ctx context.Context) (bool, error) {
 		return false, nil
 	}
 
-	// Only allow for rill user agents since it doesn't work with external MCP clients
-	if !strings.HasPrefix(s.CatalogSession().UserAgent, "rill") {
+	// Only allow for statsparrot user agents since it doesn't work with external MCP clients
+	if !strings.HasPrefix(s.CatalogSession().UserAgent, "statsparrot") {
 		return false, nil
 	}
 

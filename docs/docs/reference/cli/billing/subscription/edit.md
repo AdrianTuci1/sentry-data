@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill billing subscription edit
+title: statsparrot billing subscription edit
 ---
-## rill billing subscription edit
+## statsparrot billing subscription edit
 
 Edit organization subscription
 
 ```
-rill billing subscription edit [flags]
+statsparrot billing subscription edit [flags]
 ```
 
 ### Flags
@@ -28,5 +28,5 @@ rill billing subscription edit [flags]
 
 ### SEE ALSO
 
-* [rill billing subscription](subscription.md)	 - Manage organization subscriptions
+* [statsparrot billing subscription](subscription.md)	 - Manage organization subscriptions
 

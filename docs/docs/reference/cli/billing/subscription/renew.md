@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill billing subscription renew
+title: statsparrot billing subscription renew
 ---
-## rill billing subscription renew
+## statsparrot billing subscription renew
 
 Renew cancelled organization subscription
 
 ```
-rill billing subscription renew [flags]
+statsparrot billing subscription renew [flags]
 ```
 
 ### Flags
@@ -28,5 +28,5 @@ rill billing subscription renew [flags]
 
 ### SEE ALSO
 
-* [rill billing subscription](subscription.md)	 - Manage organization subscriptions
+* [statsparrot billing subscription](subscription.md)	 - Manage organization subscriptions
 

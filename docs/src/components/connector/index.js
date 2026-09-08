@@ -21,7 +21,7 @@
  *
  * <DevProdSeparation />
  *
- * ## Deploy to Rill Cloud
+ * ## Deploy to Parrot Cloud
  *
  * <DeployToCloud
  *   connector="Athena"

@@ -6,18 +6,18 @@ hide_table_of_contents: false
 tags:
   - Tutorial
   - OLAP:DuckDB
-  - Rill Developer
+  - Parrot Developer
   - Getting Started
 ---
 
 ### What is a model?
-A model in Rill is used to perform intermediate processing as well as any last-mile ETL on the source data. This includes joining lookup tables to your table to enrich and transform the data for analysis. We recommend creating [One Big Table](/developers/build/models/models-101#one-big-table-and-dashboarding) to power your metrics views. 
+A model in Parrot is used to perform intermediate processing as well as any last-mile ETL on the source data. This includes joining lookup tables to your table to enrich and transform the data for analysis. We recommend creating [One Big Table](/developers/build/models/models-101#one-big-table-and-dashboarding) to power your metrics views. 
 
 ### Create a Model from the Source
 
 Go ahead and select the `Create Model` button in the top right-hand corner of the commits dataset.
 
-![Add Model](/img/tutorials/rill-basics/Add-Model.gif)
+![Add Model](/img/tutorials/statsparrot-basics/Add-Model.gif)
 
 You'll be automatically redirected to the model page. On the left panel, you'll see a models folder created with the file `commits__model.sql`. On the right panel, you'll find general information about your model table, the column values, and at the bottom of the page, a preview of the data.
 
@@ -33,13 +33,13 @@ select * from commits order by author_date DESC
 Notice that the preview table is automatically updated as we modify the SQL. This is due to our auto-save feature. In case any errors are encountered, the UI will update accordingly and display the error.
 
 
-![Model Sql](/img/tutorials/rill-basics/Model-SQL.gif)
+![Model Sql](/img/tutorials/statsparrot-basics/Model-SQL.gif)
 
 
 
 :::tip
  
- Our Autosave feature can be enabled or disabled as needed via the rill.yaml file / project settings, or by simply selecting the toggle in the UI.
+ Our Autosave feature can be enabled or disabled as needed via the statsparrot.yaml file / project settings, or by simply selecting the toggle in the UI.
 
 :::
 
@@ -54,7 +54,7 @@ We will grab all the columns from `commits` and only a few from `modified_files`
 
 ```SQL
 -- Model SQL
--- Reference documentation: https://docs.rilldata.com/developers/build/models
+-- Reference documentation: https://docs.statsparrot.com/developers/build/models
 -- @materialize: true
 
 SELECT

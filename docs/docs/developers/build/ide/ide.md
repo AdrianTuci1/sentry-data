@@ -1,33 +1,33 @@
 ---
-title: Build Rill Projects with Your Favorite IDE
-description: Use VS Code, IntelliJ, or any IDE to create and edit Rill projects with real-time feedback
+title: Build Parrot Projects with Your Favorite IDE
+description: Use VS Code, IntelliJ, or any IDE to create and edit Parrot projects with real-time feedback
 sidebar_label: External IDE Integration
 sidebar_position: 00
 ---
 
 
-## Use Any IDE for Rill Development
+## Use Any IDE for Parrot Development
 
-Rill projects are just files and folders that you can edit with any code editor or IDE. Whether you prefer VS Code, IntelliJ, Vim, or any other editor, you can create and modify Rill projects directly from your favorite development environment.
+Parrot projects are just files and folders that you can edit with any code editor or IDE. Whether you prefer VS Code, IntelliJ, Vim, or any other editor, you can create and modify Parrot projects directly from your favorite development environment.
 
 ### How It Works
 
-Rill projects consist of:
+Parrot projects consist of:
 - **SQL files** (`.sql`) for models and metrics views
 - **YAML files** (`.yml`) for project configuration
 - **Data files** in various formats
 
-You can edit these files in any IDE, and Rill will automatically detect changes and provide real-time feedback.
+You can edit these files in any IDE, and Parrot will automatically detect changes and provide real-time feedback.
 
-![](https://cdn.rilldata.com/docs/release-notes/36_hot_reload.gif)
+![](https://cdn.statsparrot.com/docs/release-notes/36_hot_reload.gif)
 
-## Using AI Agents to Build Rill Projects
+## Using AI Agents to Build Parrot Projects
 
-Rill ships built-in [agent skills](/developers/agent-skills) that teach AI coding agents like **Claude Code** and **Cursor** how to build Rill projects. A single `rill init` command scaffolds everything your agent needs — resource schemas, best practices, and development conventions.
+Parrot ships built-in [agent skills](/developers/agent-skills) that teach AI coding agents like **Claude Code** and **Cursor** how to build Parrot projects. A single `statsparrot init` command scaffolds everything your agent needs — resource schemas, best practices, and development conventions.
 
 ```bash
 # Add agent skills for Claude Code, Cursor, and AGENTS.md-compatible tools
-rill init --agent all
+statsparrot init --agent all
 ```
 
 See the [Agent Skills documentation](/developers/agent-skills) for installation instructions for each tool, or the [Agentic Quickstart](/developers/get-started/ai-quickstart) for a full walkthrough.

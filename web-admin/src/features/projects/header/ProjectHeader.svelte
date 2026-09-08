@@ -94,7 +94,7 @@
   $: activeBranch = extractBranchFromPath($page.url.pathname);
 
   $: loggedIn = !!$user.data?.user;
-  $: rillLogoHref = !loggedIn ? "https://www.rilldata.com" : "/";
+  $: rillLogoHref = !loggedIn ? "https://www.statsparrot.com" : "/";
 
   $: orgPathsQuery = useBreadcrumbOrgPaths(
     loggedIn,

@@ -1,6 +1,6 @@
 ---
-title: "3. Create Metrics View Dashboard in Rill"
-sidebar_label: "3. Create Metrics View Dashboard in Rill"
+title: "3. Create Metrics View Dashboard in Parrot"
+sidebar_label: "3. Create Metrics View Dashboard in Parrot"
 sidebar_position: 3
 hide_table_of_contents: false
 tags:
@@ -28,7 +28,7 @@ This is our metrics view, where we can define measures and dimensions to be used
 
 ```yaml
 # Metrics view YAML
-# Reference documentation: https://docs.rilldata.com/reference/project-files/explore-dashboards
+# Reference documentation: https://docs.statsparrot.com/reference/project-files/explore-dashboards
 # This file was generated using AI.
 
 version: 1
@@ -46,7 +46,7 @@ measures:
     ...
 ```
 
-While we go into more details in our [Rill Basics course](/developers/tutorials/rill-basics/dashboard) and [our documentation](https://docs.rilldata.com/developers/build/dashboards), let's go over it quickly.
+While we go into more details in our [Parrot Basics course](/developers/tutorials/statsparrot-basics/dashboard) and [our documentation](https://docs.statsparrot.com/developers/build/dashboards), let's go over it quickly.
 
 ---
 

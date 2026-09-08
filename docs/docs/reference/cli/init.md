@@ -1,36 +1,36 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill init
+title: statsparrot init
 ---
-## rill init
+## statsparrot init
 
-Initialize a new Rill project
+Initialize a new Parrot project
 
 ### Synopsis
 
-Initialize a new Rill project. Use flags to customize the project or run interactively to be prompted for each option.
+Initialize a new Parrot project. Use flags to customize the project or run interactively to be prompted for each option.
 
 Available example projects:
-  - rill-cost-monitoring (duckdb)
-  - rill-github-analytics (duckdb)
-  - rill-openrtb-prog-ads (duckdb)
+  - statsparrot-cost-monitoring (duckdb)
+  - statsparrot-github-analytics (duckdb)
+  - statsparrot-openrtb-prog-ads (duckdb)
 
 
 ```
-rill init [<path>] [flags]
+statsparrot init [<path>] [flags]
 ```
 
 ### Examples
 
 ```
   # Interactive initialization (prompts for all options)
-  rill init
+  statsparrot init
 
   # Create an empty DuckDB project with Claude agent instructions
-  rill init my-project --olap duckdb --agent claude
+  statsparrot init my-project --olap duckdb --agent claude
 
-  # Add Claude agent instructions to an existing Rill project
-  rill init ./existing-project --agent claude
+  # Add Claude agent instructions to an existing Parrot project
+  statsparrot init ./existing-project --agent claude
 ```
 
 ### Flags
@@ -52,5 +52,5 @@ rill init [<path>] [flags]
 
 ### SEE ALSO
 
-* [rill](cli.md)	 - A CLI for Rill
+* [statsparrot](cli.md)	 - A CLI for Parrot
 

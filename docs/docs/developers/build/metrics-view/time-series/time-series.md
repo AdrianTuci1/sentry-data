@@ -13,7 +13,7 @@ Your time series must be a column from your data model of type `TIMESTAMP`, `TIM
 
 ```yaml
 # Metrics View YAML
-# Reference documentation: https://docs.rilldata.com/reference/project-files/metrics_views
+# Reference documentation: https://docs.statsparrot.com/reference/project-files/metrics_views
 
 version: 1
 type: metrics_view

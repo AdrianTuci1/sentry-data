@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Asserts route-tree parity between Rill Developer (web-local) and the
+// Asserts route-tree parity between Parrot Developer (web-local) and the
 // cloud editing surface (web-admin/[organization]/[project]/-/edit/).
 //
 // Both trees render the same shared components from web-common and rely on

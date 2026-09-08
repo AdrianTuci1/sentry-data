@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill org upload-logo
+title: statsparrot org upload-logo
 ---
-## rill org upload-logo
+## statsparrot org upload-logo
 
 Upload a custom logo
 
 ```
-rill org upload-logo [<org-name> [<path-to-image>]] [flags]
+statsparrot org upload-logo [<org-name> [<path-to-image>]] [flags]
 ```
 
 ### Flags
@@ -30,5 +30,5 @@ rill org upload-logo [<org-name> [<path-to-image>]] [flags]
 
 ### SEE ALSO
 
-* [rill org](org.md)	 - Manage organizations
+* [statsparrot org](org.md)	 - Manage organizations
 

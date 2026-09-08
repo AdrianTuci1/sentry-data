@@ -1,14 +1,14 @@
 # CONTRIBUTING
 
-[![PkgGoDev](https://pkg.go.dev/badge/github.com/rilldata/rill)](https://pkg.go.dev/github.com/rilldata/rill)
-[![Go Report Card](https://goreportcard.com/badge/github.com/rilldata/rill)](https://goreportcard.com/report/github.com/rilldata/rill)
-[![codecov](https://codecov.io/gh/rilldata/rill/branch/main/graph/badge.svg?token=RQA182JGA5)](https://codecov.io/gh/rilldata/rill)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/staticlabs/statsparrot)](https://pkg.go.dev/github.com/staticlabs/statsparrot)
+[![Go Report Card](https://goreportcard.com/badge/github.com/staticlabs/statsparrot)](https://goreportcard.com/report/github.com/staticlabs/statsparrot)
+[![codecov](https://codecov.io/gh/staticlabs/statsparrot/branch/main/graph/badge.svg?token=RQA182JGA5)](https://codecov.io/gh/staticlabs/statsparrot)
 
-This file should serve as an entrypoint for learning about and contributing to Rill Developer.
+This file should serve as an entrypoint for learning about and contributing to Parrot Developer.
 
 ## Development environment
 
-If you're a Rill team member, you can run `rill devtool start` from the project root to start a full local development environment. If you select the cloud preset, you can fill it with seed data using `rill devtool seed cloud`. See `cli/cmd/devtool/README.md` for more details.
+If you're a Parrot team member, you can run `statsparrot devtool start` from the project root to start a full local development environment. If you select the cloud preset, you can fill it with seed data using `statsparrot devtool seed cloud`. See `cli/cmd/devtool/README.md` for more details.
 
 ### Development dependencies
 
@@ -25,13 +25,13 @@ This is a full list of development dependencies:
 
 ## Build the application
 
-Running `make` will build a production-ready binary and output it to `./rill` (see `cli/README.md` for details).
+Running `make` will build a production-ready binary and output it to `./statsparrot` (see `cli/README.md` for details).
 
 For detailed instructions on how to run or test the application in development, see the `README.md` file in the individual components' directories (e.g. `web-local/README.md` for the local web app).
 
 ## Release a new major or minor version
 
-To release a new version of Rill, first create a release branch named `release-<minor version>`:
+To release a new version of Parrot, first create a release branch named `release-<minor version>`:
 
 ```bash
 git checkout -b release-0.47
@@ -51,12 +51,12 @@ git push origin v0.47.0
 This will trigger the `cli-release.yml` Github Action, which will:
 
 - Build binaries for macOS (arm64, amd64) and Linux (amd64)
-- Upload the binaries to `https://cdn.rilldata.com/rill/$VERSION/$NAME`
-- Upload the newest version of the install script (in `scripts/install.sh`) to `https://cdn.rilldata.com/install.sh`
+- Upload the binaries to `https://cdn.statsparrot.com/statsparrot/$VERSION/$NAME`
+- Upload the newest version of the install script (in `scripts/install.sh`) to `https://cdn.statsparrot.com/install.sh`
 - Create a Github release containing an auto-generated changelog and the new binaries
-- Publish the new version to our brew tap `rilldata/tap/rill`
+- Publish the new version to our brew tap `statsparrot/tap/statsparrot`
 
-You can follow the progress of the release action from the ["Actions" tab](https://github.com/rilldata/rill/actions). It usually completes in about 10 minutes. See our internal [release run book](https://www.notion.so/rilldata/Release-Run-Book-20a4afb8f2f64d06814a0c89d51bfdcf) for more details.
+You can follow the progress of the release action from the ["Actions" tab](https://github.com/staticlabs/statsparrot/actions). It usually completes in about 10 minutes. See our internal [release run book](https://www.notion.so/statsparrot/Release-Run-Book-20a4afb8f2f64d06814a0c89d51bfdcf) for more details.
 
 ## Release a patch version
 
@@ -89,7 +89,7 @@ Here's a high-level overview of the technologies we use for different parts of t
 
 ## Monorepo
 
-Rill uses a monorepo and you can expect to find all its code in this repository. This allows us to move faster as we can coordinate changes across multiple components in a single PR. It also gives people a single place to learn about the project and follow its development.
+Parrot uses a monorepo and you can expect to find all its code in this repository. This allows us to move faster as we can coordinate changes across multiple components in a single PR. It also gives people a single place to learn about the project and follow its development.
 
 We want the codebase to be easy to understand and contribute to. To achieve that, every directory that contains code of non-trivial complexity should include a `README.md` file that provides details about the module, such as its purpose, how to run and test it, links to relevant tutorials or docs, etc. Only the root `README.md` file should be considered user-facing.
 
@@ -100,21 +100,21 @@ The project uses NPM for Node.js (specifically, NPM [workspaces](https://docs.np
 Here's a guide to the top-level structure of the repository:
 
 - `.github` contains CI/CD workflows.
-- `admin` contains the backend control plane for the managed, multi-user version of Rill.
+- `admin` contains the backend control plane for the managed, multi-user version of Parrot.
 - `cli` contains the CLI and a server for the local frontend (used only in production).
-- `docs` contains the user-facing documentation that we deploy to [docs.rilldata.com](https://docs.rilldata.com).
-- `proto` contains protocol buffer definitions for all Rill components, which notably includes our API interfaces.
+- `docs` contains the user-facing documentation that we deploy to [docs.statsparrot.com](https://docs.statsparrot.com).
+- `proto` contains protocol buffer definitions for all Parrot components, which notably includes our API interfaces.
 - `runtime` contains the engine (data plane) responsible for orchestrating and serving data.
 - `scripts` contains various scripts and other resources used in development.
-- `web-admin` contains the frontend control plane for the managed, multi-user version of Rill.
+- `web-admin` contains the frontend control plane for the managed, multi-user version of Parrot.
 - `web-common` contains common functionality shared across the local and admin frontend applications.
-- `web-local` contains the local Rill application, notably the data modeller.
+- `web-local` contains the local Parrot application, notably the data modeller.
 
 ## Services
 
-Rill is comprised of multiple services that we currently support running in two configurations, local and cloud.
+Parrot is comprised of multiple services that we currently support running in two configurations, local and cloud.
 
-When running `rill start` locally, the same version of the relevant services are started simultaneously in a single process. However, in cloud deployments, the relevant services are deployed individually for better isolation and scalability (for example, runtimes are provisioned dynamically when new projects are deployed).
+When running `statsparrot start` locally, the same version of the relevant services are started simultaneously in a single process. However, in cloud deployments, the relevant services are deployed individually for better isolation and scalability (for example, runtimes are provisioned dynamically when new projects are deployed).
 
 This means that during rollout of a release, a newer version of one service may be communicating with an older version of another service, necessitating backwards compatibility. The backwards compatibility requirements are tied to the release rollout sequence, which is:
 

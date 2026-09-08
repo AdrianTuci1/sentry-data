@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill billing subscription list
+title: statsparrot billing subscription list
 ---
-## rill billing subscription list
+## statsparrot billing subscription list
 
 List subscriptions for an organization
 
 ```
-rill billing subscription list [flags]
+statsparrot billing subscription list [flags]
 ```
 
 ### Global flags
@@ -22,5 +22,5 @@ rill billing subscription list [flags]
 
 ### SEE ALSO
 
-* [rill billing subscription](subscription.md)	 - Manage organization subscriptions
+* [statsparrot billing subscription](subscription.md)	 - Manage organization subscriptions
 

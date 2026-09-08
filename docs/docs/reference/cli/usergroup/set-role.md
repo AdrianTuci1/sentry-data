@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill usergroup set-role
+title: statsparrot usergroup set-role
 ---
-## rill usergroup set-role
+## statsparrot usergroup set-role
 
 Change a group's role on a project or organization
 
 ```
-rill usergroup set-role [flags]
+statsparrot usergroup set-role [flags]
 ```
 
 ### Flags
@@ -30,5 +30,5 @@ rill usergroup set-role [flags]
 
 ### SEE ALSO
 
-* [rill usergroup](usergroup.md)	 - Manage user groups
+* [statsparrot usergroup](usergroup.md)	 - Manage user groups
 

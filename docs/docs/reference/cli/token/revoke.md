@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill token revoke
+title: statsparrot token revoke
 ---
-## rill token revoke
+## statsparrot token revoke
 
 Revoke personal access token(s)
 
 ```
-rill token revoke [token-id] [flags]
+statsparrot token revoke [token-id] [flags]
 ```
 
 ### Flags
@@ -27,5 +27,5 @@ rill token revoke [token-id] [flags]
 
 ### SEE ALSO
 
-* [rill token](token.md)	 - Manage personal access tokens
+* [statsparrot token](token.md)	 - Manage personal access tokens
 

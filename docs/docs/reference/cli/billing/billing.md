@@ -1,8 +1,8 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill billing
+title: statsparrot billing
 ---
-## rill billing
+## statsparrot billing
 
 Billing related commands for org
 
@@ -17,8 +17,8 @@ Billing related commands for org
 
 ### SEE ALSO
 
-* [rill](../cli.md)	 - A CLI for Rill
-* [rill billing list-issues](list-issues.md)	 - List billing issues for an organization
-* [rill billing plan](plan/plan.md)	 - Get billing plans
-* [rill billing subscription](subscription/subscription.md)	 - Manage organization subscriptions
+* [statsparrot](../cli.md)	 - A CLI for Parrot
+* [statsparrot billing list-issues](list-issues.md)	 - List billing issues for an organization
+* [statsparrot billing plan](plan/plan.md)	 - Get billing plans
+* [statsparrot billing subscription](subscription/subscription.md)	 - Manage organization subscriptions
 

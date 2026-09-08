@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill project deployment start
+title: statsparrot project deployment start
 ---
-## rill project deployment start
+## statsparrot project deployment start
 
 Start a deployment by branch
 
 ```
-rill project deployment start [<project>] <branch> [flags]
+statsparrot project deployment start [<project>] <branch> [flags]
 ```
 
 ### Flags
@@ -29,5 +29,5 @@ rill project deployment start [<project>] <branch> [flags]
 
 ### SEE ALSO
 
-* [rill project deployment](deployment.md)	 - Manage project deployments
+* [statsparrot project deployment](deployment.md)	 - Manage project deployments
 

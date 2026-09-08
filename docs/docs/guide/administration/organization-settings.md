@@ -1,18 +1,18 @@
 ---
-title: "Managing Organizations in Rill Cloud"
+title: "Managing Organizations in Parrot Cloud"
 description: Basic management for organizations
 sidebar_label: "Organization Settings"
 sidebar_position: 00
 ---
 
-Before a project can be deployed onto Rill Cloud, an organization must be created. If you are deploying via the UI, this will automatically be done for you. As an administrator, you can also create, edit, and delete organizations from the CLI. From the organization page, you will be able to view your projects, users, and overall settings.
+Before a project can be deployed onto Parrot Cloud, an organization must be created. If you are deploying via the UI, this will automatically be done for you. As an administrator, you can also create, edit, and delete organizations from the CLI. From the organization page, you will be able to view your projects, users, and overall settings.
 
 ## Organization
 
-![Rill Org](/img/manage/project-management/rill-org.png)
+![Parrot Org](/img/manage/project-management/statsparrot-org.png)
 
 
-An organization in Rill is the parent management object and encompasses how your team interfaces with Rill Cloud. Organizations are designed to hold the different components of your Rill project. Organizations consist of projects that each have their own sources, models, metrics views, dashboards, user management, and general settings.
+An organization in Parrot is the parent management object and encompasses how your team interfaces with Parrot Cloud. Organizations are designed to hold the different components of your Parrot project. Organizations consist of projects that each have their own sources, models, metrics views, dashboards, user management, and general settings.
 
 ### Organization Hierarchy
 
@@ -40,11 +40,11 @@ Organization
 From the Users page, you can view and manage users within your organization. Note that users with specific project access will not appear on this page and can be managed via each individual project. For more information, please review our [User Management documentation](/guide/administration/users-and-access/user-management).
 
 
-### Org Settings via Rill Cloud
+### Org Settings via Parrot Cloud
 
 On the organization settings page, depending on your plan type, you can view the general information, billing, and current usage. The Billing tab is only available for those on a `Team Plan`. You can use this page to add or modify your current payment type. For more information, please review our [Billing Information documentation](/developers/other/plans).
 
-![Rill Org Settings](/img/manage/project-management/rill-org-settings.png)
+![Parrot Org Settings](/img/manage/project-management/statsparrot-org-settings.png)
 
 ### Logo and Favicon
 
@@ -53,11 +53,11 @@ Along with general organization settings, you are also able to modify the Logo i
 ## Managing an Organization from the CLI
 Similar to the UI, if you want to make any changes to the organization via the CLI, this is possible using the following: 
 ```
-rill org
+statsparrot org
 Manage organisations
 
 Usage:
-  rill org [command]
+  statsparrot org [command]
 
 Available Commands:
   create      Create organization
@@ -76,6 +76,6 @@ Global Flags:
 
 :::tip
 
-Access to Rill can be granted on the [organization level](/guide/administration/users-and-access/user-management#how-to-add-an-organization-user), [project level](/guide/administration/users-and-access/user-management#how-to-add-a-project-user), and [user group level](/guide/administration/users-and-access/user-management#how-to-add-a-user-to-a-user-group).
+Access to Parrot can be granted on the [organization level](/guide/administration/users-and-access/user-management#how-to-add-an-organization-user), [project level](/guide/administration/users-and-access/user-management#how-to-add-a-project-user), and [user group level](/guide/administration/users-and-access/user-management#how-to-add-a-user-to-a-user-group).
 
 :::

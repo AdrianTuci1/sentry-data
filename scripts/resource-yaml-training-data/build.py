@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Scrapes real-world Rill project resource YAML files from Rill Cloud and formats
+Scrapes real-world Parrot project resource YAML files from Parrot Cloud and formats
 them into text files suitable for LLM training data.
 """
 
@@ -21,7 +21,7 @@ RESOURCE_TYPES = [
 
 
 def main():
-    """Scrape all resource types from Rill Cloud and format them as text files."""
+    """Scrape all resource types from Parrot Cloud and format them as text files."""
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     for resource_type in RESOURCE_TYPES:
@@ -30,12 +30,12 @@ def main():
 
 
 def scrape_resources(resource_type):
-    """Dump resources of a given type from Rill Cloud to a JSON file."""
+    """Dump resources of a given type from Parrot Cloud to a JSON file."""
     output_path = os.path.join(OUTPUT_DIR, f"{resource_type}.json")
     with open(output_path, "w") as f:
         subprocess.run(
             [
-                "rill",
+                "statsparrot",
                 "sudo",
                 "project",
                 "dump-resources",

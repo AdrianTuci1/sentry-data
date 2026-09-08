@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill chat
+title: statsparrot chat
 ---
-## rill chat
+## statsparrot chat
 
-Chat with the Rill AI
+Chat with the Parrot AI
 
 ```
-rill chat [<project-name>] [flags]
+statsparrot chat [<project-name>] [flags]
 ```
 
 ### Flags
@@ -16,7 +16,7 @@ rill chat [<project-name>] [flags]
       --project string   Project name
       --path string      Project directory (default ".")
       --branch string    Target deployment by Git branch (default: primary deployment)
-      --local            Target locally running Rill
+      --local            Target locally running Parrot
 ```
 
 ### Global flags
@@ -30,5 +30,5 @@ rill chat [<project-name>] [flags]
 
 ### SEE ALSO
 
-* [rill](cli.md)	 - A CLI for Rill
+* [statsparrot](cli.md)	 - A CLI for Parrot
 

@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill user set-resources
+title: statsparrot user set-resources
 ---
-## rill user set-resources
+## statsparrot user set-resources
 
 Set a user's project resources and restriction flag (overwrites existing list)
 
 ```
-rill user set-resources [flags]
+statsparrot user set-resources [flags]
 ```
 
 ### Flags
@@ -32,5 +32,5 @@ rill user set-resources [flags]
 
 ### SEE ALSO
 
-* [rill user](user.md)	 - Manage users
+* [statsparrot user](user.md)	 - Manage users
 

@@ -1,8 +1,8 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill token
+title: statsparrot token
 ---
-## rill token
+## statsparrot token
 
 Manage personal access tokens
 
@@ -17,8 +17,8 @@ Manage personal access tokens
 
 ### SEE ALSO
 
-* [rill](../cli.md)	 - A CLI for Rill
-* [rill token issue](issue.md)	 - Issue personal access token
-* [rill token list](list.md)	 - List personal access tokens
-* [rill token revoke](revoke.md)	 - Revoke personal access token(s)
+* [statsparrot](../cli.md)	 - A CLI for Parrot
+* [statsparrot token issue](issue.md)	 - Issue personal access token
+* [statsparrot token list](list.md)	 - List personal access tokens
+* [statsparrot token revoke](revoke.md)	 - Revoke personal access token(s)
 

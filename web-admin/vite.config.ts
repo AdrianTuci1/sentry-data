@@ -10,8 +10,8 @@ dns.setDefaultResultOrder("verbatim");
 export default defineConfig({
   resolve: {
     alias: {
-      "@rilldata/web-admin": "/src",
-      "@rilldata/web-common": "/../web-common/src",
+      "@statsparrot/web-admin": "/src",
+      "@statsparrot/web-common": "/../web-common/src",
     },
   },
   server: {
@@ -23,7 +23,7 @@ export default defineConfig({
     strictPort: true,
   },
   define: {
-    RillPublicEmailDomains: readPublicEmailDomains(),
+    ParrotPublicEmailDomains: readPublicEmailDomains(),
   },
   optimizeDeps: {
     include: [

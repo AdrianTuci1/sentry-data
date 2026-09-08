@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill user list
+title: statsparrot user list
 ---
-## rill user list
+## statsparrot user list
 
 List users
 
 ```
-rill user list [flags]
+statsparrot user list [flags]
 ```
 
 ### Flags
@@ -31,5 +31,5 @@ rill user list [flags]
 
 ### SEE ALSO
 
-* [rill user](user.md)	 - Manage users
+* [statsparrot user](user.md)	 - Manage users
 

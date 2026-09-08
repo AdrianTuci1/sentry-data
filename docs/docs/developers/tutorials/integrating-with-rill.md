@@ -1,6 +1,6 @@
 ---
-title: "Integrating with Rill's Admin API"
-sidebar_label: "Integrating with Rill's Admin API"
+title: "Integrating with Parrot's Admin API"
+sidebar_label: "Integrating with Parrot's Admin API"
 sidebar_position: 30
 hide_table_of_contents: false
 tags:
@@ -9,9 +9,9 @@ tags:
   - Example Project
 ---
 
-# Integrating with Rill's Admin API
+# Integrating with Parrot's Admin API
 
-Rill's Admin API allows you to programmatically manage your Rill organization, including workspaces, users, service accounts, and permissions. This guide will walk you through the steps to integrate with Rill using the Admin API. 
+Parrot's Admin API allows you to programmatically manage your Parrot organization, including workspaces, users, service accounts, and permissions. This guide will walk you through the steps to integrate with Parrot using the Admin API. 
 
 > In this scenario, we will generate an admin service account and use it to make requests to the Admin API to provision a new 'viewer' user with custom attributes. This can be useful for automating temporary viewer user provisioning in your organization.
 
@@ -19,21 +19,21 @@ Rill's Admin API allows you to programmatically manage your Rill organization, i
 
 This guide assumes you have completed the following prerequisites:
 
-1. Installed the Rill developer CLI - see [Install Rill Developer](/developers/get-started/install)
-2. A Rill Cloud organization and workspace - see [Rill Quickstart Guide](https://docs.rilldata.com/quickstart)
-3. Administrative access to your Rill organization
+1. Installed the Parrot developer CLI - see [Install Parrot Developer](/developers/get-started/install)
+2. A Parrot Cloud organization and workspace - see [Parrot Quickstart Guide](https://docs.statsparrot.com/quickstart)
+3. Administrative access to your Parrot organization
 
 :::info
 This guide can be completed with user tokens. These tokens are tied to your personal user and access permissions. They are useful for local scripting and experimentation. We don't recommend for production use.
 :::
 
-- [Rill Admin OpenAPI Specification](/api/admin)
+- [Parrot Admin OpenAPI Specification](/api/admin)
 - [Service Account CLI Reference](/reference/cli/service)
 - [Custom API Integration Guide](/developers/build/custom-apis/calling)
 
-## Example: Managing Users with a Rill Service Account
+## Example: Managing Users with a Parrot Service Account
 
-This example demonstrates how to create a service account, use it to manage users with custom attributes, and then clean up all resources. This is useful for automating user provisioning and management in your Rill organization.
+This example demonstrates how to create a service account, use it to manage users with custom attributes, and then clean up all resources. This is useful for automating user provisioning and management in your Parrot organization.
 
 ### Step 1: Create a Service Account
 
@@ -41,7 +41,7 @@ First, create a service account with organization admin permissions and custom a
 
 ```bash
 # Create a service account with custom attributes
-rill service create user-management-service \
+statsparrot service create user-management-service \
   --org-role admin \
   --attributes '{"department": "engineering", "environment": "production"}'
 
@@ -55,7 +55,7 @@ Now use the service account token to add a user to your organization:
 
 ```bash
 # Add a user to the organization using the service account
-curl -X POST "https://admin.rilldata.com/v1/orgs/example/members" \
+curl -X POST "https://admin.statsparrot.com/v1/orgs/example/members" \
      -H "Authorization: Bearer rill_svc_A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6" \
      -H "Content-Type: application/json" \
      -d '{
@@ -71,7 +71,7 @@ curl -X POST "https://admin.rilldata.com/v1/orgs/example/members" \
 }
 ```
 
-The user will receive an email invitation to join the Rill organization as a viewer.
+The user will receive an email invitation to join the Parrot organization as a viewer.
 
 ### Step 4: Verify User Access and Attributes
 
@@ -79,7 +79,7 @@ Check that the user was added successfully:
 
 ```bash
 # List organization members to verify the user was added
-curl -X GET "https://admin.rilldata.com/v1/orgs/example/members" \
+curl -X GET "https://admin.statsparrot.com/v1/orgs/example/members" \
      -H "Authorization: Bearer rill_svc_A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6"
 ```
 
@@ -89,15 +89,15 @@ Remove the user and service account when done:
 
 ```bash
 # Remove the user from the organization
-curl -X DELETE "https://admin.rilldata.com/v1/orgs/example/members/newuser@example.com" \
+curl -X DELETE "https://admin.statsparrot.com/v1/orgs/example/members/newuser@example.com" \
      -H "Authorization: Bearer rill_svc_A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6"
 
 # Revoke the service account token
-curl -X DELETE "https://admin.rilldata.com/v1/services/tokens/rill_svc_A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6" \
+curl -X DELETE "https://admin.statsparrot.com/v1/services/tokens/rill_svc_A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6" \
      -H "Authorization: Bearer rill_svc_A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6"
 
 # Delete the service account
-rill service remove user-management-service
+statsparrot service remove user-management-service
 ```
 
 ## Service Account API Access

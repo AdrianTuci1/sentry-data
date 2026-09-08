@@ -5,11 +5,11 @@ sidebar_label: Gemini
 sidebar_position: 20
 ---
 
-[Gemini](https://ai.google.dev/) is Google's family of AI models, designed for a wide range of reasoning, coding, and multimodal tasks. Rill supports connecting to Gemini using your own API key and configuration parameters to enable AI-powered conversations and data analysis features.
+[Gemini](https://ai.google.dev/) is Google's family of AI models, designed for a wide range of reasoning, coding, and multimodal tasks. Parrot supports connecting to Gemini using your own API key and configuration parameters to enable AI-powered conversations and data analysis features.
 
 ## API Key
 
-Rill will use your configured Gemini connector if available, or fall back to its built-in LLM service if no custom configuration is provided. Once configured, your API key will be used for AI features in both Rill Developer and Rill Cloud, including the AI Agent builder. You can configure your API key in your project's `.env` file and reference the [credentials in a connector YAML](/reference/project-files/connectors#gemini).
+Parrot will use your configured Gemini connector if available, or fall back to its built-in LLM service if no custom configuration is provided. Once configured, your API key will be used for AI features in both Parrot Developer and Parrot Cloud, including the AI Agent builder. You can configure your API key in your project's `.env` file and reference the [credentials in a connector YAML](/reference/project-files/connectors#gemini).
 
 ### Gemini API Key
 
@@ -29,7 +29,7 @@ To configure Gemini access, you'll need to obtain an API key and configure it in
 
 3. **Set up environment variable:**
 
-   If configuring manually, ensure your project's `.env` file contains the key before starting Rill:
+   If configuring manually, ensure your project's `.env` file contains the key before starting Parrot:
 
    ```env
    gemini_api_key=AI...
@@ -37,7 +37,7 @@ To configure Gemini access, you'll need to obtain an API key and configure it in
 
 4. **Configure Gemini as the default AI connector:**
 
-   Add the following to your `rill.yaml` to use Gemini as the AI provider for your project:
+   Add the following to your `statsparrot.yaml` to use Gemini as the AI provider for your project:
 
    ```yaml
    ai_connector: gemini
@@ -49,8 +49,8 @@ For details on managing credentials across environments, see [Configure Local Cr
 
 For additional configuration options (model, temperature, token limits, etc.), see the [Gemini connector reference](/reference/project-files/connectors#gemini).
 
-## Deploy to Rill Cloud
+## Deploy to Parrot Cloud
 
-Rill requires you to explicitly provide a Gemini API key to use the Gemini connector. See the [connector reference](/reference/project-files/connectors#gemini) for details.
+Parrot requires you to explicitly provide a Gemini API key to use the Gemini connector. See the [connector reference](/reference/project-files/connectors#gemini) for details.
 
-For details on pushing and pulling credentials between environments, see [Configure Local Credentials](/developers/build/connectors/credentials#rill-env-push).
+For details on pushing and pulling credentials between environments, see [Configure Local Credentials](/developers/build/connectors/credentials#statsparrot-env-push).

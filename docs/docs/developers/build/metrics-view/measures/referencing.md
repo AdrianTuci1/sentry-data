@@ -45,4 +45,4 @@ If you are using a [window function](./windows), you'll need to define the measu
 
 
 ## Demo
-[See this project live in our demo!](https://ui.rilldata.com/demo/rill-kaggle-elec-consumption/explore/household_power_consumption_metrics_explore)
+[See this project live in our demo!](https://ui.statsparrot.com/demo/statsparrot-kaggle-elec-consumption/explore/household_power_consumption_metrics_explore)

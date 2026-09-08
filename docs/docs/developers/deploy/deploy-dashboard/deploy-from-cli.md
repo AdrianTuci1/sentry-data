@@ -1,54 +1,54 @@
 ---
-title: Deploy to Rill Cloud from GitLab
-description: How to set up continuous deploys to Rill Cloud from GitLab
+title: Deploy to Parrot Cloud from GitLab
+description: How to set up continuous deploys to Parrot Cloud from GitLab
 sidebar_label: Deploy from GitLab
 sidebar_position: 10
 ---
 
-While Rill Cloud natively integrates with [GitHub](https://github.com), you can also deploy your Rill project from [GitLab](https://about.gitlab.com/) using direct uploads from a [GitLab CI/CD pipeline](https://docs.gitlab.com/ee/ci/quick_start/).
+While Parrot Cloud natively integrates with [GitHub](https://github.com), you can also deploy your Parrot project from [GitLab](https://about.gitlab.com/) using direct uploads from a [GitLab CI/CD pipeline](https://docs.gitlab.com/ee/ci/quick_start/).
 
-Follow these steps to set up continuous deployment from GitLab to Rill Cloud:
+Follow these steps to set up continuous deployment from GitLab to Parrot Cloud:
 
-1. Create a new GitLab repository and push your Rill project to it.
+1. Create a new GitLab repository and push your Parrot project to it.
 
-2. On your local, [authenticate with Rill Cloud](/guide/administration/users-and-access/user-management#logging-into-rill-cloud) and create an organization (replace `my-org-name` with your desired name):
+2. On your local, [authenticate with Parrot Cloud](/guide/administration/users-and-access/user-management#logging-into-statsparrot-cloud) and create an organization (replace `my-org-name` with your desired name):
 ```bash
-rill login
-rill org create my-org-name
+statsparrot login
+statsparrot org create my-org-name
 ```
 
-3. Create the project in Rill Cloud
+3. Create the project in Parrot Cloud
 ```bash
-rill project deploy
+statsparrot project deploy
 ```
 
 :::note Multiple branches
 If your repo contains multiple branches ensure the branch you want to deploy from via
 ```bash
-rill project edit --project my-project-name --prod-branch my-branch-name
+statsparrot project edit --project my-project-name --prod-branch my-branch-name
 ```
 :::
 
-4. Provision a Rill Cloud [service account](/reference/cli/service/create) called `gitlab-ci` and copy its access token:
+4. Provision a Parrot Cloud [service account](/reference/cli/service/create) called `gitlab-ci` and copy its access token:
 ```
-rill service create gitlab-ci
+statsparrot service create gitlab-ci
 ```
 
-5. Set the service token as a CI/CD variable called `RILL_SERVICE_TOKEN` in GitLab (from the repository page, it's under _Settings > CI/CD > Variables_).
+5. Set the service token as a CI/CD variable called `STATSPARROT_SERVICE_TOKEN` in GitLab (from the repository page, it's under _Settings > CI/CD > Variables_).
 
-6. Create a file named `.gitlab-ci.yml` at the root of the repository containing your Rill project. Paste the following contents into it (replace `my-org-name` and `my-project-name` with your desired names):
+6. Create a file named `.gitlab-ci.yml` at the root of the repository containing your Parrot project. Paste the following contents into it (replace `my-org-name` and `my-project-name` with your desired names):
 ```yaml
-deploy-rill-cloud:
+deploy-statsparrot-cloud:
   stage: deploy
   script: 
-    - curl -L -o $HOME/rill.zip https://cdn.rilldata.com/rill/latest/rill_linux_amd64.zip 
-    - unzip -d $HOME $HOME/rill.zip 
+    - curl -L -o $HOME/statsparrot.zip https://cdn.statsparrot.com/statsparrot/latest/rill_linux_amd64.zip 
+    - unzip -d $HOME $HOME/statsparrot.zip 
     - git checkout -B "$CI_COMMIT_REF_NAME" "$CI_COMMIT_SHA"
-    - $HOME/rill project deploy --org my-org-name --project my-project-name --interactive=false --api-token $RILL_SERVICE_TOKEN
+    - $HOME/statsparrot project deploy --org my-org-name --project my-project-name --interactive=false --api-token $STATSPARROT_SERVICE_TOKEN
 ```
 
-Your Rill project should now automatically deploy to `ui.rilldata.com/my-org-name/my-project-name` each time changes are pushed to GitLab!
+Your Parrot project should now automatically deploy to `ui.statsparrot.com/my-org-name/my-project-name` each time changes are pushed to GitLab!
 
 :::note File size limits
-We enforce a file size limit of 100mb so ensure you do not unpack the rill binary in the repo root or add it to your .gitignore
+We enforce a file size limit of 100mb so ensure you do not unpack the statsparrot binary in the repo root or add it to your .gitignore
 :::

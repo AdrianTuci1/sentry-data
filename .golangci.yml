@@ -40,11 +40,11 @@ linters:
               desc: Should be replaced by standard lib errors package
     exhaustruct:
       include:
-        - github.com/rilldata/rill/admin/database\..*Options
-        - github.com/rilldata/rill/admin\..*DeploymentOptions
-        - github.com/rilldata/rill/admin\.provisionRuntimeOptions
-        - github.com/rilldata/rill/admin/provisioner\.Resource
-        - github.com/rilldata/rill/admin/provisioner\.ResourceOptions
+        - github.com/staticlabs/statsparrot/admin/database\..*Options
+        - github.com/staticlabs/statsparrot/admin\..*DeploymentOptions
+        - github.com/staticlabs/statsparrot/admin\.provisionRuntimeOptions
+        - github.com/staticlabs/statsparrot/admin/provisioner\.Resource
+        - github.com/staticlabs/statsparrot/admin/provisioner\.ResourceOptions
     gocritic:
       disabled-checks:
         - hugeParam

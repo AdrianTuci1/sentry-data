@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Breadcrumbs from "@rilldata/web-common/components/navigation/breadcrumbs/Breadcrumbs.svelte";
-  import Header from "@rilldata/web-common/layout/header/Header.svelte";
-  import HeaderLogo from "@rilldata/web-common/layout/header/HeaderLogo.svelte";
+  import Breadcrumbs from "@statsparrot/web-common/components/navigation/breadcrumbs/Breadcrumbs.svelte";
+  import Header from "@statsparrot/web-common/layout/header/Header.svelte";
+  import HeaderLogo from "@statsparrot/web-common/layout/header/HeaderLogo.svelte";
   import { createAdminServiceGetCurrentUser } from "../../client";
   import {
     useBreadcrumbOrgPaths,
@@ -19,7 +19,7 @@
   const user = createAdminServiceGetCurrentUser();
 
   $: loggedIn = !!$user.data?.user;
-  $: rillLogoHref = !loggedIn ? "https://www.rilldata.com" : "/";
+  $: rillLogoHref = !loggedIn ? "https://www.statsparrot.com" : "/";
 
   $: orgPathsQuery = useBreadcrumbOrgPaths(
     loggedIn,

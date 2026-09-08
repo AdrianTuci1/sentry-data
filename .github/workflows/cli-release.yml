@@ -6,7 +6,7 @@
 # this is done because the files are cached at the CDN layer instead and multiple caching layers makes invalidating the cache difficult.
 # The CDN cache is explicitly invalidated as part of the release process, to prevent old versions from being accidentally served after the release is done.
 
-name: Release Rill CLI
+name: Release Parrot CLI
 on:
   push:
     # Trigger a full release on new Git tag
@@ -24,7 +24,7 @@ env:
 
 jobs:
   build:
-    name: Build rill
+    name: Build statsparrot
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -56,12 +56,12 @@ jobs:
       - name: Build and embed static UI
         run: make cli.prepare
         env:
-          RILL_UI_PUBLIC_INTAKE_USER: "data-modeler"
-          RILL_UI_PUBLIC_INTAKE_PASSWORD: ${{ secrets.RILL_INTAKE_PASSWORD }}
-          RILL_UI_PUBLIC_PYLON_APP_ID: "26a0fdd2-3bd3-41e2-82bc-1b35a444729f"
+          STATSPARROT_UI_PUBLIC_INTAKE_USER: "data-modeler"
+          STATSPARROT_UI_PUBLIC_INTAKE_PASSWORD: ${{ secrets.STATSPARROT_INTAKE_PASSWORD }}
+          STATSPARROT_UI_PUBLIC_PYLON_APP_ID: "26a0fdd2-3bd3-41e2-82bc-1b35a444729f"
           NODE_OPTIONS: --max-old-space-size=4096
 
-      - name: Build rill cli
+      - name: Build statsparrot cli
         run: |-
           if [[ ${{ env.PUBLISH_NIGHTLY }} == 'true' ]]; then
             git fetch --prune --unshallow
@@ -70,7 +70,7 @@ jobs:
             VERSION='${{ github.ref_name }}'
           fi
           
-          go build -o rill \
+          go build -o statsparrot \
             -mod=readonly \
             -ldflags="-s -w -X main.Version=${VERSION} -X main.Commit=${{ github.sha }} -X main.BuildDate=$(date +%FT%TZ)" \
             cli/main.go
@@ -78,14 +78,14 @@ jobs:
       - name: Authenticate GCS
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: "${{ secrets.RILL_BINARY_SA }}"
+          credentials_json: "${{ secrets.STATSPARROT_BINARY_SA }}"
 
       - name: Nightly - Upload nightly to CDN bucket
         if: env.PUBLISH_NIGHTLY == 'true'
         uses: google-github-actions/upload-cloud-storage@v2
         with:
-          path: rill
-          destination: prod-cdn.rilldata.com/rill/nightly/binaries/${{ matrix.platform }}/
+          path: statsparrot
+          destination: prod-cdn.statsparrot.com/statsparrot/nightly/binaries/${{ matrix.platform }}/
           process_gcloudignore: false
           headers: |-
             cache-control: no-store
@@ -94,14 +94,14 @@ jobs:
         if: env.PUBLISH_RELEASE == 'true'
         uses: google-github-actions/upload-cloud-storage@v2
         with:
-          path: rill
-          destination: prod-cdn.rilldata.com/rill/${{ github.ref_name }}/binaries/${{ matrix.platform }}/
+          path: statsparrot
+          destination: prod-cdn.statsparrot.com/statsparrot/${{ github.ref_name }}/binaries/${{ matrix.platform }}/
           process_gcloudignore: false
           headers: |-
             cache-control: no-store
 
   release:
-    name: Release rill
+    name: Release statsparrot
     runs-on: ubuntu-22.04
     needs: build
 
@@ -115,7 +115,7 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: "${{ secrets.RILL_BINARY_SA }}"
+          credentials_json: "${{ secrets.STATSPARROT_BINARY_SA }}"
 
       - name: Set up gcloud CLI
         uses: google-github-actions/setup-gcloud@v2
@@ -133,7 +133,7 @@ jobs:
           fi
 
           echo '${{ github.ref_name }}' >> latest.txt
-          gsutil -m cp -r gs://prod-cdn.rilldata.com/rill/$BUCKET_DIR/binaries .
+          gsutil -m cp -r gs://prod-cdn.statsparrot.com/statsparrot/$BUCKET_DIR/binaries .
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -141,7 +141,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_PASS }}
 
-      - name: Release Rill using Goreleaser
+      - name: Release Parrot using Goreleaser
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser-pro
@@ -157,9 +157,9 @@ jobs:
       - name: CDN - Explicitly invalidate the old artifacts from CDN cache
         run: |-
           gcloud compute url-maps invalidate-cdn-cache prod --path "/install.sh" --async
-          gcloud compute url-maps invalidate-cdn-cache prod --path "/rill/latest.txt" --async
+          gcloud compute url-maps invalidate-cdn-cache prod --path "/statsparrot/latest.txt" --async
           if [[ ${{ env.PUBLISH_NIGHTLY }} == 'true' ]]; then
-            gcloud compute url-maps invalidate-cdn-cache prod --path "/rill/nightly/*" --async
+            gcloud compute url-maps invalidate-cdn-cache prod --path "/statsparrot/nightly/*" --async
           fi
 
       - name: Notify Slack

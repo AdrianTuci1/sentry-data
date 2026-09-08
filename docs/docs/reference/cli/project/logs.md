@@ -1,13 +1,13 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill project logs
+title: statsparrot project logs
 ---
-## rill project logs
+## statsparrot project logs
 
 Show project logs
 
 ```
-rill project logs [<project-name>] [flags]
+statsparrot project logs [<project-name>] [flags]
 ```
 
 ### Flags
@@ -33,5 +33,5 @@ rill project logs [<project-name>] [flags]
 
 ### SEE ALSO
 
-* [rill project](project.md)	 - Manage projects
+* [statsparrot project](project.md)	 - Manage projects
 

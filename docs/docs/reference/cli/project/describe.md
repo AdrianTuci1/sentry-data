@@ -1,8 +1,8 @@
 ---
 note: GENERATED. DO NOT EDIT.
-title: rill project describe
+title: statsparrot project describe
 ---
-## rill project describe
+## statsparrot project describe
 
 Retrieve detailed state for a resource
 
@@ -11,7 +11,7 @@ Retrieve detailed state for a resource
 Retrieve detailed state for a specific resource (source, model, dashboard, ...)
 
 ```
-rill project describe [<project-name>] <type> <name> [flags]
+statsparrot project describe [<project-name>] <type> <name> [flags]
 ```
 
 ### Flags
@@ -34,5 +34,5 @@ rill project describe [<project-name>] <type> <name> [flags]
 
 ### SEE ALSO
 
-* [rill project](project.md)	 - Manage projects
+* [statsparrot project](project.md)	 - Manage projects
 
