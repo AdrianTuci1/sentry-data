@@ -1,13 +1,13 @@
 import { expect } from "@playwright/test";
-import { RILL_DEVTOOL_BACKGROUND_PROCESS_PID_FILE } from "@rilldata/web-integration/tests/constants";
-import { isOrgDeleted } from "@rilldata/web-common/tests/utils/is-org-deleted";
-import { execAsync } from "@rilldata/web-common/tests/utils/spawn";
+import { RILL_DEVTOOL_BACKGROUND_PROCESS_PID_FILE } from "@statsparrot/web-integration/tests/constants";
+import { isOrgDeleted } from "@statsparrot/web-common/tests/utils/is-org-deleted";
+import { execAsync } from "@statsparrot/web-common/tests/utils/spawn";
 import fs from "fs";
 import { test as teardown } from "./base";
 
 teardown.describe("global teardown", () => {
   teardown("should clean up the test organization", async ({ cli: _ }) => {
-    await execAsync("rill org delete e2e --interactive=false");
+    await execAsync("statsparrot org delete e2e --interactive=false");
 
     // Wait for the organization to be deleted
     // This includes deleting the org from Orb and Stripe, which we'd like to do to keep those environments clean.

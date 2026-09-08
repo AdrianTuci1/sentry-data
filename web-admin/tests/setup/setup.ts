@@ -1,15 +1,15 @@
 import { expect } from "@playwright/test";
-import { cliLogin } from "@rilldata/web-common/tests/fixtures/cli";
-import { writeFileEnsuringDir } from "@rilldata/web-common/tests/utils/fs";
-import { isServiceReady } from "@rilldata/web-common/tests/utils/is-service-ready.ts";
+import { cliLogin } from "@statsparrot/web-common/tests/fixtures/cli";
+import { writeFileEnsuringDir } from "@statsparrot/web-common/tests/utils/fs";
+import { isServiceReady } from "@statsparrot/web-common/tests/utils/is-service-ready.ts";
 import {
   execAsync,
   spawnAndMatch,
-} from "@rilldata/web-common/tests/utils/spawn";
+} from "@statsparrot/web-common/tests/utils/spawn";
 import {
   RILL_DEVTOOL_BACKGROUND_PROCESS_PID_FILE,
   RILL_EMBED_SERVICE_TOKEN_FILE,
-} from "@rilldata/web-integration/tests/constants";
+} from "@statsparrot/web-integration/tests/constants";
 import { spawn } from "child_process";
 import dotenv from "dotenv";
 import { openSync } from "fs";
@@ -32,14 +32,14 @@ setup.describe("global setup", () => {
   });
 
   setup("should start services", async () => {
-    // Get the repository root directory, the only place from which `rill devtool` is allowed to be run
+    // Get the repository root directory, the only place from which `statsparrot devtool` is allowed to be run
     const currentDir = path.dirname(fileURLToPath(import.meta.url));
     const repoRoot = path.resolve(currentDir, "../../../");
 
     // Start the cloud dependencies via Docker
     // This will block until the services are ready
     await spawnAndMatch(
-      "rill",
+      "statsparrot",
       ["devtool", "start", "other", "--reset", "--only", "deps"],
       /All services ready/,
       {
@@ -53,7 +53,7 @@ setup.describe("global setup", () => {
     dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
 
     // Check that the required environment variables are set
-    // The above `rill devtool` command pulls the `.env` file with these values.
+    // The above `statsparrot devtool` command pulls the `.env` file with these values.
     // Fail quickly if any of these are missing.
     if (
       !process.env.RILL_DEVTOOL_E2E_ADMIN_ACCOUNT_EMAIL ||
@@ -73,7 +73,7 @@ setup.describe("global setup", () => {
     // A detached process ensures they are not cleaned up when this setup project completes.
     // However, we need to be sure to clean-up the processes manually in the teardown project.
     const child = spawn(
-      "rill",
+      "statsparrot",
       ["devtool", "start", "other", "--only", "admin,runtime"],
       {
         detached: true,
@@ -154,7 +154,7 @@ setup.describe("global setup", () => {
 
     await page.waitForURL(/\/(-\/welcome\/theme)?/);
 
-    // Save the admin's Rill auth cookies to file.
+    // Save the admin's Parrot auth cookies to file.
     // Subsequent tests can seed their browser with this state, instead of needing to go through the log-in flow again.
     await page.context().storageState({ path: ADMIN_STORAGE_STATE });
   });
@@ -163,13 +163,13 @@ setup.describe("global setup", () => {
     // Create an organization named "e2e"
     await cliLogin(adminPage);
     const { stdout: orgCreateStdout } = await execAsync(
-      `rill org create ${RILL_ORG_NAME}`,
+      `statsparrot org create ${RILL_ORG_NAME}`,
     );
     expect(orgCreateStdout).toContain("Created org");
 
     // create service and write access token to file
     const { stdout: orgCreateService } = await execAsync(
-      `rill service create ${RILL_SERVICE_NAME} --org-role admin`,
+      `statsparrot service create ${RILL_SERVICE_NAME} --org-role admin`,
     );
     expect(orgCreateService).toContain("Created service");
 
@@ -187,7 +187,7 @@ setup.describe("global setup", () => {
   setup("should deploy the OpenRTB project", async ({ adminPage }) => {
     // Deploy the OpenRTB project
     const { match } = await spawnAndMatch(
-      "rill",
+      "statsparrot",
       [
         "deploy",
         "--path",
@@ -267,13 +267,13 @@ setup.describe("global setup", () => {
   setup("should deploy the AdBids project", async ({ adminPage }) => {
     // increase project quota for the organization
     const { stdout: quotaUpdateStdout } = await execAsync(
-      `rill sudo quota set --org ${RILL_ORG_NAME} --projects 10`,
+      `statsparrot sudo quota set --org ${RILL_ORG_NAME} --projects 10`,
     );
     expect(quotaUpdateStdout).toContain(`Projects: 10`);
 
     // Deploy the AdBids project
     const { match } = await spawnAndMatch(
-      "rill",
+      "statsparrot",
       [
         "deploy",
         "--path",
@@ -308,7 +308,7 @@ setup.describe("global setup", () => {
         },
         { intervals: Array(4).fill(30_000), timeout: 120_000 },
       )
-      .toContain(`Welcome to Untitled Rill Project`);
+      .toContain(`Welcome to Untitled Parrot Project`);
 
     // Navigate to the dashboards page to validate the deployment
     await adminPage.getByRole("link", { name: "Dashboards" }).click();
